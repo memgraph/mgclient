@@ -19,6 +19,12 @@ include(CTest)
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 14)
 
+# Set default build type to 'Release'
+if (NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE "Release")
+endif()
+message(STATUS "CMake build type: ${CMAKE_BUILD_TYPE}")
+
 add_subdirectory(src)
 
 if(BUILD_TESTING)
