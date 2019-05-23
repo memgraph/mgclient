@@ -165,4 +165,5 @@ int mg_path_equal(const mg_path *lhs, const mg_path *rhs);
 int mg_value_equal(const mg_value *lhs, const mg_value *rhs);
 
 extern mg_map mg_empty_map;
+
 #endif
