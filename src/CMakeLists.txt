@@ -1,11 +1,11 @@
 # Copyright (c) 2016-2019 Memgraph Ltd. [https://memgraph.com]
-# 
+#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# 
+#
 #     http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -52,8 +52,13 @@ generate_export_header(mgclient-shared
         BASE_NAME "mgclient"
         EXPORT_FILE_NAME "mgclient-export.h")
 
-install(TARGETS mgclient-static mgclient-shared LIBRARY)
+include(GNUInstallDirs)
+
+install(TARGETS mgclient-static mgclient-shared
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
 install(FILES
         "${CMAKE_CURRENT_BINARY_DIR}/mgclient-export.h"
         "${PROJECT_SOURCE_DIR}/include/mgclient.h"
-        TYPE INCLUDE)
+        TYPE INCLUDE
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})

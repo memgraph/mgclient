@@ -7,7 +7,7 @@ database.
 
 To build and install mgclient from source you will need:
 
-   - CMake version >= 3.1
+   - CMake version >= 3.10
    - OpenSSL version >= 1.0.2
    - C compiler supporting C11
 
@@ -37,7 +37,7 @@ make
 ```
 
 This will build two `mgclient` library flavours: a static library (usually
-named `libmgclient.a`) and a shared library (usually named `libmgclient.so`). 
+named `libmgclient.a`) and a shared library (usually named `libmgclient.so`).
 
 To install the libraries and corresponding header files run `make install`.
 This will install to system default installation directory. If you want to
