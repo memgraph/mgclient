@@ -7,7 +7,7 @@ database.
 
 To build and install mgclient from source you will need:
 
-   - CMake version >= 3.7
+   - CMake version >= 3.4
    - OpenSSL version >= 1.0.2
    - C compiler supporting C11
 
