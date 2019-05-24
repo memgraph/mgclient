@@ -25,6 +25,13 @@ if (NOT CMAKE_BUILD_TYPE)
 endif()
 message(STATUS "CMake build type: ${CMAKE_BUILD_TYPE}")
 
+# Set default instalation directory to '/usr'
+if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+    # '/usr' is a special case, for more details see:
+    # https://cmake.org/cmake/help/latest/module/GNUInstallDirs.html#special-cases
+    set(CMAKE_INSTALL_PREFIX "/usr")
+endif()
+
 add_subdirectory(src)
 
 if(BUILD_TESTING)
