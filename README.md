@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/memgraph/mgclient.svg?branch=master)](https://travis-ci.org/memgraph/mgclient)
+
 # mgclient
 
 mgclient is a C library interface for [Memgraph](https://www.memgraph.com)
