@@ -18,6 +18,8 @@ include(CTest)
 
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 14)
+set(C_STANDARD_REQUIRED ON)
+set(CXX_STANDARD_REQUIRED ON)
 
 # Set default build type to 'Release'
 if (NOT CMAKE_BUILD_TYPE)
