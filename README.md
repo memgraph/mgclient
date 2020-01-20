@@ -8,14 +8,10 @@ database.
 # Building and installing
 
 To build and install mgclient from source you will need:
-
    - CMake version >= 3.4
    - OpenSSL version >= 1.0.2
    - C compiler supporting C11
    - C++ compiler supporting C++14
-
-Additionally, if you want to build tests, you'll need:
-   - [Google Test](https://github.com/google/googletest)
 
 To install minimum compile dependencies on Debian / Ubuntu:
 
@@ -35,18 +31,6 @@ directory and configure the build by running CMake from it:
 ```
 mkdir build
 cd build
-```
-
-If you do not want to build tests, pass `-DBUILD_TESTING=OFF` to CMake like
-this:
-
-```
-cmake -DBUILD_TESTING=OFF ..
-```
-
-If you want to build tests, run default CMake:
-
-```
 cmake ..
 ```
 
