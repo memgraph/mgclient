@@ -8,27 +8,30 @@ database.
 # Building and installing
 
 To build and install mgclient from source you will need:
-
    - CMake version >= 3.4
    - OpenSSL version >= 1.0.2
    - C compiler supporting C11
-
-Additionally, if you want to build tests, you'll need:
    - C++ compiler supporting C++14
 
-Once everything is place, create a build directory inside the source directory
-and configure the build by running CMake from it:
+To install minimum compile dependencies on Debian / Ubuntu:
 
 ```
-$ mkdir build
-$ cd build
-$ cmake ..
+apt-get install -y git cmake make gcc g++ libssl-dev
 ```
 
-If you do not want to build tests, pass `-DBUILD_TESTING=OFF` to CMake like this:
+On RedHat / CentOS / Fedora:
 
 ```
-$ cmake -DBUILD_TESTING=OFF ..
+yum install -y git cmake make gcc gcc-c++ openssl-devel
+```
+
+Once everything is in place, create a build directory inside the source
+directory and configure the build by running CMake from it:
+
+```
+mkdir build
+cd build
+cmake ..
 ```
 
 After running CMake, you should see a Makefile in the build directory. Then you
@@ -41,7 +44,12 @@ make
 This will build two `mgclient` library flavours: a static library (usually
 named `libmgclient.a`) and a shared library (usually named `libmgclient.so`).
 
-To install the libraries and corresponding header files run `make install`.
+To install the libraries and corresponding header files run:
+
+```
+make install
+```
+
 This will install to system default installation directory. If you want to
 change this location, use `-DCMAKE_INSTALL_PREFIX` option when running CMake.
 

@@ -14,6 +14,8 @@
 
 cmake_minimum_required(VERSION 3.4)
 project(mgclient VERSION 0.1)
+# Building tests is disabled by default to simplify the default build config.
+option(BUILD_TESTING "" OFF)
 include(CTest)
 
 set(CMAKE_C_STANDARD 11)
@@ -22,7 +24,7 @@ set(C_STANDARD_REQUIRED ON)
 set(CXX_STANDARD_REQUIRED ON)
 
 # Set default build type to 'Release'
-if (NOT CMAKE_BUILD_TYPE)
+if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "Release")
 endif()
 message(STATUS "CMake build type: ${CMAKE_BUILD_TYPE}")
