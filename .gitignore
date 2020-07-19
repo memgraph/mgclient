@@ -1,6 +1,9 @@
-# build directory
+# Build directory.
 build/
 
-# vim temporary files
+# vim temporary files.
 *.swp
 *.swo
+
+# .vscode project files.
+.vscode/

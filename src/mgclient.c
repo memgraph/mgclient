@@ -19,19 +19,31 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-#include <arpa/inet.h>
 #include <errno.h>
+
+#if ON_POSIX
+#include <arpa/inet.h>
 #include <netdb.h>
 #include <netinet/tcp.h>
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <unistd.h>
+#endif // ON_POSIX
+
+#if ON_WINDOWS
+#include <winsock2.h>
+#include <windows.h>
+#include <Ws2tcpip.h>
+// TODO(gitbuda): Add more https://gist.github.com/PkmX/63dd23f28ba885be53a5.
+#define htobe32(x) __builtin_bswap32(x)
+#define be32toh(x) __builtin_bswap32(x)
+#endif // ON_WINDOWS
 
 #include "mgcommon.h"
 #include "mgconstants.h"
 #include "mgmessage.h"
 #include "mgsession.h"
+#include "mgsocket.h"
 
 typedef struct mg_session_params {
   const char *address;
@@ -374,12 +386,19 @@ static int init_tcp_connection(const mg_session_params *params, int *sockfd,
     return MG_ERROR_NETWORK_FAILURE;
   }
 
+  #ifdef ON_WINDOWS
+  SOCKET tsockfd = INVALID_SOCKET;
+  int status = 0;
+  #endif
+  #ifdef ON_POSIX
   int tsockfd = -1;
   int status = 0;
+  #endif
 
   for (struct addrinfo *curr_addr = addr_list; curr_addr;
        curr_addr = curr_addr->ai_next) {
-    tsockfd = socket(curr_addr->ai_family, curr_addr->ai_socktype,
+    // TODO(gitbuda): Cross-platform error handling.
+    tsockfd = mg_socket_init(curr_addr->ai_family, curr_addr->ai_socktype,
                      curr_addr->ai_protocol);
     if (tsockfd == -1) {
       status = MG_ERROR_NETWORK_FAILURE;
@@ -387,13 +406,14 @@ static int init_tcp_connection(const mg_session_params *params, int *sockfd,
                            strerror(errno));
       continue;
     }
+    // TODO(gitbuda): Cross-platform error handling.
     if (MG_RETRY_ON_EINTR(
-            connect(tsockfd, curr_addr->ai_addr, curr_addr->ai_addrlen)) != 0) {
+            mg_socket_connect(tsockfd, curr_addr->ai_addr, curr_addr->ai_addrlen)) != 0) {
       status = MG_ERROR_NETWORK_FAILURE;
       mg_session_set_error(session, "couldn't connect to host: %s",
                            strerror(errno));
-
-      if (MG_RETRY_ON_EINTR(close(tsockfd)) != 0) {
+      // TODO(gitbuda): Cross-platform error handling.
+      if (MG_RETRY_ON_EINTR(mg_socket_close(tsockfd)) != 0) {
         abort();
       }
       tsockfd = -1;
@@ -410,20 +430,22 @@ static int init_tcp_connection(const mg_session_params *params, int *sockfd,
     return status;
   }
 
+  // TODO(gitbuda): Set the right socket options.
   struct {
     int level;
     int optname;
     int optval;
   } socket_options[] = {// disable Nagle algorithm for performance reasons
-                        {SOL_TCP, TCP_NODELAY, 1},
+                       // {SOL_TCP, TCP_NODELAY, 1},
                         // turn keep-alive on
-                        {SOL_SOCKET, SO_KEEPALIVE, 1},
+                       // {SOL_SOCKET, SO_KEEPALIVE, 1},
                         // wait 20s before sending keep-alive packets
-                        {SOL_TCP, TCP_KEEPIDLE, 20},
+                       // {SOL_TCP, TCP_KEEPIDLE, 20},
                         // 4 keep-alive packets must fail to close
-                        {SOL_TCP, TCP_KEEPCNT, 4},
+                       // {SOL_TCP, TCP_KEEPCNT, 4},
                         // send keep-alive packets every 15s
-                        {SOL_TCP, TCP_KEEPINTVL, 15}};
+                       // {SOL_TCP, TCP_KEEPINTVL, 15}
+                       };
   const size_t OPTCNT = sizeof(socket_options) / sizeof(socket_options[0]);
 
   for (size_t i = 0; i < OPTCNT; ++i) {
@@ -434,7 +456,8 @@ static int init_tcp_connection(const mg_session_params *params, int *sockfd,
                    (void *)&optval, optlen) != 0) {
       mg_session_set_error(session, "couldn't set socket option: %s",
                            strerror(errno));
-      if (MG_RETRY_ON_EINTR(close(tsockfd)) != 0) {
+      // TODO(gitbuda): Cross-platform error handling.
+      if (MG_RETRY_ON_EINTR(mg_socket_close(tsockfd)) != 0) {
         abort();
       }
       return MG_ERROR_NETWORK_FAILURE;
@@ -564,7 +587,8 @@ int mg_connect_ca(const mg_session_params *params, mg_session **session,
   return 0;
 
 cleanup:
-  if (sockfd >= 0 && MG_RETRY_ON_EINTR(close(sockfd)) != 0) {
+  // TODO(gitbuda): Cross-platform error handling.
+  if (sockfd >= 0 && MG_RETRY_ON_EINTR(mg_socket_close(sockfd)) != 0) {
     abort();
   }
   *session = tsession;
@@ -772,6 +796,7 @@ const mg_list *mg_result_row(const mg_result *result) {
   }
   return result->message->record_v->fields;
 }
+
 const mg_map *mg_result_summary(const mg_result *result) {
   if (result->message->type != MG_MESSAGE_TYPE_SUCCESS) {
     return NULL;

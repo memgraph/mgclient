@@ -5,7 +5,7 @@
 mgclient is a C library interface for [Memgraph](https://www.memgraph.com)
 database.
 
-# Building and installing
+# Building and installing on Linux
 
 To build and install mgclient from source you will need:
    - CMake version >= 3.4
@@ -54,6 +54,21 @@ This will install to system default installation directory. If you want to
 change this location, use `-DCMAKE_INSTALL_PREFIX` option when running CMake.
 
 If you want to run tests, just type `ctest` in your build directory.
+
+# Building and installing on Windows
+
+To build `mgclient` on Windows MINGW environment could be used.
+   - Install MSYS2 from https://www.msys2.org/.
+   - Install MinGW toolchain with the following command:
+     ```
+     pacman -S --needed base-devel mingw-w64-i686-toolchain mingw-w64-x86_64-toolchain git mercurial mingw-w64-i686-cmake mingw-w64-x86_64-cmake
+     ```
+
+Once the environment is ready, please run:
+
+```
+./build_clean.sh
+```
 
 # Using the library
 

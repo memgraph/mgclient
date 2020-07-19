@@ -21,6 +21,11 @@ set(mgclient_src_files
         mgsession-encoder.c
         mgtransport.c
         mgvalue.c)
+if(${WIN32})
+    list(APPEND mgclient_src_files mgsocket-windows.c)
+else()
+    list(APPEND mgclient_src_files mgsocket-posix.c)
+endif()
 
 find_package(OpenSSL REQUIRED)
 
@@ -36,6 +41,9 @@ target_include_directories(mgclient-static
         "${CMAKE_CURRENT_BINARY_DIR}"
         "${OPENSSL_INCLUDE_DIR}")
 target_link_libraries(mgclient-static PRIVATE ${OPENSSL_LIBRARIES})
+if(${WIN32})
+    target_link_libraries(mgclient-static PUBLIC ws2_32)
+endif()
 
 add_library(mgclient-shared SHARED ${mgclient_src_files})
 set_target_properties(mgclient-shared PROPERTIES
@@ -47,6 +55,9 @@ target_include_directories(mgclient-shared
         "${CMAKE_CURRENT_BINARY_DIR}"
         "${OPENSSL_INCLUDE_DIR}")
 target_link_libraries(mgclient-shared PRIVATE ${OPENSSL_LIBRARIES})
+if(${WIN32})
+    target_link_libraries(mgclient-shared PUBLIC ws2_32)
+endif()
 
 generate_export_header(mgclient-shared
         BASE_NAME "mgclient"

@@ -21,10 +21,18 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-#include <endian.h>
 #include <errno.h>
 #include <unistd.h>
+
+#ifdef ON_POSIX
+#include <endian.h>
+#endif // ON_POSIX
+
+#ifdef ON_WINDOWS
+// TODO(gitbuda): Add more https://gist.github.com/PkmX/63dd23f28ba885be53a5.
+#define htobe16(x) __builtin_bswap16(x)
+#define be16toh(x) __builtin_bswap16(x)
+#endif // ON_WINDOWS
 
 #include "mgcommon.h"
 #include "mgconstants.h"
