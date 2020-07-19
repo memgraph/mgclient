@@ -386,14 +386,15 @@ static int init_tcp_connection(const mg_session_params *params, int *sockfd,
     return MG_ERROR_NETWORK_FAILURE;
   }
 
-  #ifdef ON_WINDOWS
-  SOCKET tsockfd = INVALID_SOCKET;
-  int status = 0;
-  #endif
-  #ifdef ON_POSIX
+#ifdef ON_POSIX
   int tsockfd = -1;
   int status = 0;
-  #endif
+#endif // ON_POSIX
+
+#ifdef ON_WINDOWS
+  SOCKET tsockfd = INVALID_SOCKET;
+  int status = 0;
+#endif // ON_WINDOWS
 
   for (struct addrinfo *curr_addr = addr_list; curr_addr;
        curr_addr = curr_addr->ai_next) {
