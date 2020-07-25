@@ -34,7 +34,7 @@ jobs:
         with:
           msystem: ${{ matrix.msystem }}
           update: true
-          install: git base-devel mingw-w64-${{ matrix.arch }}-toolchain mingw-w64-${{ matrix.arch }}-cmake
+          install: git base-devel mingw-w64-${{ matrix.arch }}-toolchain mingw-w64-${{ matrix.arch }}-cmake openssl-devel
       - uses: actions/checkout@v2
       - name: Build, test and install mgclient
         run: |
