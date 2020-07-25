@@ -6,7 +6,7 @@ jobs:
   build_and_test:
     strategy:
      matrix:
-        platform: [ubuntu-18.04]
+        platform: [ubuntu-18.04, windows-latest]
     runs-on: ${{ matrix.platform }}
     steps:
     - uses: actions/checkout@v1
