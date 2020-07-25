@@ -400,7 +400,7 @@ static int init_tcp_connection(const mg_session_params *params, int *sockfd,
        curr_addr = curr_addr->ai_next) {
     // TODO(gitbuda): Cross-platform error handling.
     tsockfd = mg_socket_init(curr_addr->ai_family, curr_addr->ai_socktype,
-                     curr_addr->ai_protocol);
+                             curr_addr->ai_protocol);
     if (tsockfd == -1) {
       status = MG_ERROR_NETWORK_FAILURE;
       mg_session_set_error(session, "couldn't open socket: %s",
@@ -408,8 +408,8 @@ static int init_tcp_connection(const mg_session_params *params, int *sockfd,
       continue;
     }
     // TODO(gitbuda): Cross-platform error handling.
-    if (MG_RETRY_ON_EINTR(
-            mg_socket_connect(tsockfd, curr_addr->ai_addr, curr_addr->ai_addrlen)) != 0) {
+    if (mg_socket_connect(tsockfd, curr_addr->ai_addr,
+                          curr_addr->ai_addrlen) != 0) {
       status = MG_ERROR_NETWORK_FAILURE;
       mg_session_set_error(session, "couldn't connect to host: %s",
                            strerror(errno));
@@ -431,38 +431,9 @@ static int init_tcp_connection(const mg_session_params *params, int *sockfd,
     return status;
   }
 
-  // TODO(gitbuda): Set the right socket options.
-  struct {
-    int level;
-    int optname;
-    int optval;
-  } socket_options[] = {// disable Nagle algorithm for performance reasons
-                       // {SOL_TCP, TCP_NODELAY, 1},
-                        // turn keep-alive on
-                       // {SOL_SOCKET, SO_KEEPALIVE, 1},
-                        // wait 20s before sending keep-alive packets
-                       // {SOL_TCP, TCP_KEEPIDLE, 20},
-                        // 4 keep-alive packets must fail to close
-                       // {SOL_TCP, TCP_KEEPCNT, 4},
-                        // send keep-alive packets every 15s
-                       // {SOL_TCP, TCP_KEEPINTVL, 15}
-                       };
-  const size_t OPTCNT = sizeof(socket_options) / sizeof(socket_options[0]);
-
-  for (size_t i = 0; i < OPTCNT; ++i) {
-    int optval = socket_options[i].optval;
-    socklen_t optlen = sizeof(optval);
-
-    if (setsockopt(tsockfd, socket_options[i].level, socket_options[i].optname,
-                   (void *)&optval, optlen) != 0) {
-      mg_session_set_error(session, "couldn't set socket option: %s",
-                           strerror(errno));
-      // TODO(gitbuda): Cross-platform error handling.
-      if (MG_RETRY_ON_EINTR(mg_socket_close(tsockfd)) != 0) {
-        abort();
-      }
-      return MG_ERROR_NETWORK_FAILURE;
-    }
+  int set_options_status = mg_socket_options(tsockfd, session);
+  if (set_options_status == MG_ERROR_NETWORK_FAILURE) {
+    return MG_ERROR_NETWORK_FAILURE;
   }
 
   *sockfd = tsockfd;

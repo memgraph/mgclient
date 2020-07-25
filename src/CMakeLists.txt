@@ -71,4 +71,5 @@ install(TARGETS mgclient-static mgclient-shared
 install(FILES
         "${CMAKE_CURRENT_BINARY_DIR}/mgclient-export.h"
         "${PROJECT_SOURCE_DIR}/include/mgclient.h"
+        "${PROJECT_SOURCE_DIR}/include/mgclient-error.h"
         DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})

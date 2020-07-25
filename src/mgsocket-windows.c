@@ -14,22 +14,32 @@
 
 #include "mgsocket.h"
 
+#include "mgclient-error.h"
+
 int mg_socket_init(int af, int type, int protocol) {
   return socket(af, type, protocol);
 }
 
-int mg_socket_connect(int sock, const struct sockaddr* addr, socklen_t addrlen) {
-    return connect(sock, addr, addrlen);
+int mg_socket_connect(int sock, const struct sockaddr* addr,
+                      socklen_t addrlen) {
+  return connect(sock, addr, addrlen);
+}
+
+int mg_socket_options(int sock, mg_session* session) {
+  return MG_ERROR_UNIMPLEMENTED;
 }
 
 int mg_socket_send(int sock, const void* buf, int len) {
-    return send(sock, buf, len, 0);
+  return send(sock, buf, len, 0);
 }
 
 int mg_socket_receive(int sock, void* buf, int len) {
-    return recv(sock, buf, len, 0);
+  return recv(sock, buf, len, 0);
 }
 
-int mg_socket_close(int sock) {
-    return  closesocket(sock);
+int mg_socket_close(int sock) { return closesocket(sock); }
+
+char* mg_socket_error() {
+  // TODO(gitbuda): Implement mg_socket_error for Windows.
+  return "";
 }
