@@ -3,10 +3,10 @@ name: CI
 on: [push]
 
 jobs:
-  build_and_test:
+  build_and_test_posix:
     strategy:
      matrix:
-        platform: [ubuntu-18.04, windows-latest]
+        platform: [ubuntu-18.04]
     runs-on: ${{ matrix.platform }}
     steps:
     - uses: actions/checkout@v1
@@ -18,3 +18,29 @@ jobs:
         make
         ctest
         sudo make install
+
+  build_and_test_windows:
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        include: [
+          { msystem: MINGW64, arch: x86_64 }
+        ]
+    defaults:
+      run:
+        shell: msys2 {0}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - uses: msys2/setup-msys2@v2
+        with:
+          msystem: ${{ matrix.msystem }}
+          update: true
+          install: git base-devel mingw-w64-${{ matrix.arch }}-toolchain mingw-w64-${{ matrix.arch }}-cmake
+      - name: Build, test and install mgclient
+        run: |
+          mkdir -p build
+          cd build
+          cmake ..
+          cmake --build .
