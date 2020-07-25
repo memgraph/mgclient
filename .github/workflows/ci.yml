@@ -30,14 +30,12 @@ jobs:
       run:
         shell: msys2 {0}
     steps:
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
       - uses: msys2/setup-msys2@v2
         with:
           msystem: ${{ matrix.msystem }}
           update: true
           install: git base-devel mingw-w64-${{ matrix.arch }}-toolchain mingw-w64-${{ matrix.arch }}-cmake
+      - uses: actions/checkout@v2
       - name: Build, test and install mgclient
         run: |
           mkdir -p build
