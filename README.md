@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/memgraph/mgclient.svg?branch=master)](https://travis-ci.org/memgraph/mgclient)
+[![Actions Status](https://github.com/memgraph/mgclient/workflows/CI/badge.svg)](https://github.com/memgraph/mgclient/actions)
 
 # mgclient
 

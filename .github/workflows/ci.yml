@@ -1,0 +1,20 @@
+name: CI
+
+on: [push]
+
+jobs:
+  build_and_test:
+    strategy:
+     matrix:
+        platform: [ubuntu-18.04]
+    runs-on: ${{ matrix.platform }}
+    steps:
+    - uses: actions/checkout@v1
+    - name: Build, test and install mgclient
+      run: |
+        mkdir build
+        cd build
+        cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=ON ..
+        make
+        ctest
+        sudo make install
