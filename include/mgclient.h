@@ -130,6 +130,11 @@ extern "C" {
 
 #include <stdint.h>
 
+/// Initializes the client.
+///
+/// \return Zero if initialization was successful.
+MGCLIENT_EXPORT int mg_init();
+
 /// An enum listing all the types as specified by Bolt protocol.
 enum mg_value_type {
   MG_VALUE_TYPE_NULL,

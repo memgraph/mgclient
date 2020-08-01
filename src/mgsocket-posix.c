@@ -20,7 +20,11 @@
 #include "mgclient-error.h"
 #include "mgcommon.h"
 
-int mg_socket_init(int af, int type, int protocol) {
+int mg_socket_init() {
+    return 0;
+}
+
+int mg_socket_create(int af, int type, int protocol) {
   return socket(af, type, protocol);
 }
 

@@ -45,6 +45,10 @@
 #include "mgsession.h"
 #include "mgsocket.h"
 
+int mg_init() {
+  return mg_socket_init();
+}
+
 typedef struct mg_session_params {
   const char *address;
   const char *host;
@@ -399,8 +403,8 @@ static int init_tcp_connection(const mg_session_params *params, int *sockfd,
   for (struct addrinfo *curr_addr = addr_list; curr_addr;
        curr_addr = curr_addr->ai_next) {
     // TODO(gitbuda): Cross-platform error handling.
-    tsockfd = mg_socket_init(curr_addr->ai_family, curr_addr->ai_socktype,
-                             curr_addr->ai_protocol);
+    tsockfd = mg_socket_create(curr_addr->ai_family, curr_addr->ai_socktype,
+                               curr_addr->ai_protocol);
     if (tsockfd == -1) {
       status = MG_ERROR_NETWORK_FAILURE;
       mg_session_set_error(session, "couldn't open socket: %s",

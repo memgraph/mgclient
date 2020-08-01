@@ -16,7 +16,13 @@
 
 #include "mgclient-error.h"
 
-int mg_socket_init(int af, int type, int protocol) {
+int mg_socket_init() {
+  // TODO(gitbuda): Handle errors, return MG_ERRORs.
+  WSADATA data;
+  return WSAStartup(MAKEWORD(2, 2), &data);
+}
+
+int mg_socket_create(int af, int type, int protocol) {
   return socket(af, type, protocol);
 }
 

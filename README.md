@@ -70,7 +70,7 @@ Once the environment is ready, please run:
 mkdir build
 cd build
 cmake .. -G "MinGW Makefiles"
-cmake --build .
+cmake --build . --target install
 ```
 
 # Using the library
@@ -90,6 +90,12 @@ executing a single query:
 #include <mgclient.h>
 
 int main(int argc, char *argv[]) {
+  int status = mg_init();
+  if (status != 0) {
+    fprintf(stderr, "failed to initialize the client: %d\n", status);
+    exit(1);
+  }
+
   if (argc != 4) {
     fprintf(stderr, "Usage: %s [host] [port] [query]\n", argv[0]);
     exit(1);
@@ -105,7 +111,7 @@ int main(int argc, char *argv[]) {
   mg_session_params_set_sslmode(params, MG_SSLMODE_REQUIRE);
 
   mg_session *session = NULL;
-  int status = mg_connect(params, &session);
+  status = mg_connect(params, &session);
   mg_session_params_destroy(params);
   if (status < 0) {
     printf("failed to connect to Memgraph: %s\n", mg_session_error(session));

@@ -25,7 +25,9 @@
 
 #include "mgsession.h"
 
-int mg_socket_init(int af, int type, int protocol);
+int mg_socket_init();
+
+int mg_socket_create(int af, int type, int protocol);
 
 int mg_socket_connect(int sock, const struct sockaddr* addr, socklen_t addrlen);
 
