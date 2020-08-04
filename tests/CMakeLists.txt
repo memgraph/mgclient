@@ -80,7 +80,7 @@ target_link_libraries(allocator mgclient-static gtest gtest-main)
 add_test(allocator allocator)
 
 if(BUILD_TESTING_INTEGRATION)
-    add_executable(memgraph memgraph.cpp)
+    add_executable(memgraph integration/memgraph.cpp)
     target_include_directories(memgraph PRIVATE ${GTEST_INCLUDE_DIRS} "${CMAKE_SOURCE_DIR}/src")
     target_link_libraries(memgraph mgclient-static gtest gtest-main)
     add_test(memgraph memgraph)

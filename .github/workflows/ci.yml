@@ -8,6 +8,10 @@ jobs:
      matrix:
         platform: [ubuntu-18.04]
     runs-on: ${{ matrix.platform }}
+    env:
+      MEMGRAPH_HOST: "127.0.0.1"
+      MEMGRAPH_PORT: 7687
+      MEMGRAPH_SSLMODE: true
     steps:
     - uses: actions/checkout@v1
     - name: Cache Memgraph Docker image
@@ -15,7 +19,7 @@ jobs:
       uses: actions/cache@v1
       with:
         path: ~/memgraph
-        key: cache-memgraph-v1.0.0-docker-image
+        key: cache-memgraph-v1.1.0-docker-image
 
     - name: Download Memgraph Docker image
       if: steps.cache-memgraph-docker.outputs.cache-hit != 'true'
