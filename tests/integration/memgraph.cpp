@@ -43,19 +43,19 @@ std::string GetStringValue(const mg_value *value) {
   return GetStringValue(s);
 }
 
-class MemgraphConenction : public ::testing::Test {
+class MemgraphConnection : public ::testing::Test {
  protected:
   virtual void SetUp() override {
     params = mg_session_params_make();
     std::string memgraph_host =
         GetEnvOrDefault<std::string>("MEMGRAPH_HOST", "127.0.0.1");
     int memgraph_port = GetEnvOrDefault<int>("MEMGRAPH_PORT", 7687);
-    bool memgraph_SSL = GetEnvOrDefault<bool>("MEMGRAPH_SSLMODE", true);
+    bool memgraph_ssl = GetEnvOrDefault<bool>("MEMGRAPH_SSLMODE", true);
 
     mg_session_params_set_host(params, memgraph_host.c_str());
     mg_session_params_set_port(params, memgraph_port);
     mg_session_params_set_sslmode(
-        params, memgraph_SSL ? MG_SSLMODE_REQUIRE : MG_SSLMODE_DISABLE);
+        params, memgraph_ssl ? MG_SSLMODE_REQUIRE : MG_SSLMODE_DISABLE);
   }
 
   virtual void TearDown() override {
@@ -72,13 +72,13 @@ class MemgraphConenction : public ::testing::Test {
   mg_session *session;
 };
 
-TEST_F(MemgraphConenction, CanConnectToMemgraph) {
+TEST_F(MemgraphConnection, CanConnectToMemgraph) {
   int status = mg_connect(params, &session);
 
   ASSERT_EQ(status, 0);
 }
 
-TEST_F(MemgraphConenction, InsertAndRetriveFromMemegraph) {
+TEST_F(MemgraphConnection, InsertAndRetriveFromMemegraph) {
   mg_result *result;
   int status = 0, rows = 0;
   const char *create_query =
