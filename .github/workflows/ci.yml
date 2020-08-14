@@ -3,64 +3,33 @@ name: CI
 on: [push]
 
 jobs:
-  clang_check:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-    - name: Install clang-format
-      run: |
-        sudo apt remove -y clang-6.0 libclang-common-6.0-dev libclang1-6.0 libllvm6.0
-        sudo apt install -y clang-format-6.0
-
-    - name: Run Clang format
-      run: |
-        ALL_CPP_AND_HPP_FILES=$(find . -type f -regex ".*\.[cpp,hpp]+" -print | paste -sd " ")
-        result_file="clang_check.txt"
-        for file in ${ALL_CPP_AND_HPP_FILES}; do
-          clang-format-6.0 -i -style=Google -verbose ${file}
-        done
-        git diff > ${result_file}
-        if [[ -s "${result_file}" ]]; then
-          echo "Clang check failed!"
-          cat "${result_file}"
-          exit 1
-        else
-          echo "Clang check ok!"
-          exit 0
-        fi
-
   build_and_test:
     strategy:
      matrix:
         platform: [ubuntu-18.04]
     runs-on: ${{ matrix.platform }}
     env:
-      MEMGRAPH_PORT: 7687
-      MEMGRAPH_HOST: "127.0.0.1"
-      MEMGRAPH_SSLMODE: 1
+      MG_VERSION: "1.1.0"
     steps:
-    - uses: actions/checkout@v1
+    - name: Set-up repository
+      uses: actions/checkout@v1
+
     - name: Cache Memgraph Docker image
       id: cache-memgraph-docker
       uses: actions/cache@v1
       with:
         path: ~/memgraph
-        key: cache-memgraph-v1.1.0-docker-image
+        key: cache-memgraph-v${MG_VERSION}-docker-image
 
     - name: Download Memgraph Docker image
       if: steps.cache-memgraph-docker.outputs.cache-hit != 'true'
-      env:
-        MG_VERSION: "1.1.0"
       run: |
         mkdir ~/memgraph
         curl -L https://memgraph.com/download/memgraph/v${MG_VERSION}/docker/memgraph-${MG_VERSION}-community-docker.tar.gz > ~/memgraph/memgraph-docker.tar.gz
 
-    - name: Load Memgraph Docker image
+    - name: Load and run Memgraph Docker image
       run: |
         docker load -i ~/memgraph/memgraph-docker.tar.gz
-
-    - name: Run Memgraph instance via Docker
-      run: |
         docker run -d -p 7687:7687 memgraph
 
     - name: Build, test and install mgclient
