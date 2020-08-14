@@ -78,8 +78,11 @@ class MemgraphConnection : public ::testing::Test {
 
   virtual void TearDown() override {
     mg_result *result;
-    mg_session_run(session, "MATCH (n) DETACH DELETE n", NULL, NULL);
-    mg_session_pull(session, &result);
+    const char *delete_all_query = "MATCH (n) DETACH DELETE n";
+
+    ASSERT_EQ(mg_session_run(session, delete_all_query, NULL, NULL), 0);
+    ASSERT_EQ(mg_session_pull(session, &result), 0);
+    ASSERT_EQ(mg_session_pull(session, &result), MG_ERROR_BAD_CALL);
     mg_session_params_destroy(params);
     if (session) {
       mg_session_destroy(session);
@@ -97,9 +100,7 @@ TEST_F(MemgraphConnection, InsertAndRetriveFromMemegraph) {
       "CREATE (n: TestLabel{id: 1, name: 'test1', is_deleted: true}) "
       "CREATE (n)-[:TestRel {attr: 'attr1'}]->(: TestLabel{id: 12, name: "
       "'test2', is_deleted: false})";
-  const char *get_query =
-      "MATCH (n)-[r]->(m) "
-      "RETURN n, r, m";
+  const char *get_query = "MATCH (n)-[r]->(m) RETURN n, r, m";
 
   ASSERT_EQ(mg_connect(params, &session), 0);
   ASSERT_EQ(mg_session_run(session, create_query, NULL, NULL), 0);
@@ -123,8 +124,10 @@ TEST_F(MemgraphConnection, InsertAndRetriveFromMemegraph) {
         GetRelationshipValue(mg_list_at(mg_row, 1));
 
     // Assert Labels
+    ASSERT_EQ(mg_node_label_count(node_n), 1);
     EXPECT_EQ(GetStringValue(mg_node_label_at(node_n, 0)), "TestLabel");
     EXPECT_EQ(GetStringValue(mg_relationship_type(relationship_r)), "TestRel");
+    ASSERT_EQ(mg_node_label_count(node_m), 1);
     EXPECT_EQ(GetStringValue(mg_node_label_at(node_m, 0)), "TestLabel");
 
     // Assert properties of Node n
