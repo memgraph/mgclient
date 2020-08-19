@@ -8,13 +8,35 @@ jobs:
      matrix:
         platform: [ubuntu-18.04]
     runs-on: ${{ matrix.platform }}
+    env:
+      MG_VERSION: "1.1.0"
     steps:
-    - uses: actions/checkout@v1
+    - name: Set-up repository
+      uses: actions/checkout@v1
+
+    - name: Cache Memgraph Docker image
+      id: cache-memgraph-docker
+      uses: actions/cache@v1
+      with:
+        path: ~/memgraph
+        key: cache-memgraph-v${MG_VERSION}-docker-image
+
+    - name: Download Memgraph Docker image
+      if: steps.cache-memgraph-docker.outputs.cache-hit != 'true'
+      run: |
+        mkdir ~/memgraph
+        curl -L https://memgraph.com/download/memgraph/v${MG_VERSION}/docker/memgraph-${MG_VERSION}-community-docker.tar.gz > ~/memgraph/memgraph-docker.tar.gz
+
+    - name: Load and run Memgraph Docker image
+      run: |
+        docker load -i ~/memgraph/memgraph-docker.tar.gz
+        docker run -d -p 7687:7687 memgraph
+
     - name: Build, test and install mgclient
       run: |
         mkdir build
         cd build
-        cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=ON ..
+        cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=ON -DBUILD_TESTING_INTEGRATION=ON ..
         make
-        ctest
+        ctest --output-on-failure
         sudo make install
