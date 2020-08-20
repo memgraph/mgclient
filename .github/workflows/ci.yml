@@ -3,6 +3,36 @@ name: CI
 on: [push]
 
 jobs:
+  clang_check:
+    runs-on: ubuntu-latest
+    env:
+      result_file: "clang_check.txt"
+      style: "Google"
+    steps:
+    - name: Set-up repository
+      uses: actions/checkout@v2
+
+    - name: Install clang-format
+      run: |
+        sudo apt remove -y clang-6.0 libclang-common-6.0-dev libclang1-6.0 libllvm6.0
+        sudo apt install -y clang-format-6.0
+
+    - name: Run clang formatter
+      run: |
+        ALL_CPP_AND_HPP_FILES=$(find . -type f -regex ".*\.[cpp,hpp]+" -print | paste -sd " ")
+        for file in ${ALL_CPP_AND_HPP_FILES}; do
+          clang-format-6.0 -i -style=${style} -verbose ${file}
+        done
+        git diff > ${result_file}
+        if [[ -s "${result_file}" ]]; then
+          echo "Clang check failed!"
+          cat "${result_file}"
+          exit 1
+        else
+          echo "Clang check ok!"
+          exit 0
+        fi
+
   build_and_test:
     strategy:
      matrix:
