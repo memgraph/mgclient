@@ -17,10 +17,10 @@ jobs:
         sudo apt remove -y clang-6.0 libclang-common-6.0-dev libclang1-6.0 libllvm6.0
         sudo apt install -y clang-format-6.0
 
-    - name: Run clang formatter
+    - name: Check code style via clang-format
       run: |
-        ALL_CPP_AND_HPP_FILES=$(find . -type f -regex ".*\.[cpp,hpp]+" -print | paste -sd " ")
-        for file in ${ALL_CPP_AND_HPP_FILES}; do
+        ALL_FILES_TO_CHECK=$(find . -type f -regex ".*\.\(cpp\|hpp\|c\|h\)" -print | paste -sd " ")
+        for file in ${ALL_FILES_TO_CHECK}; do
           clang-format-6.0 -i -style=${style} -verbose ${file}
         done
         git diff > ${result_file}
