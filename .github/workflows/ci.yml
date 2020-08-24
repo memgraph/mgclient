@@ -5,31 +5,28 @@ on: [push]
 jobs:
   clang_check:
     runs-on: ubuntu-latest
-    env:
-      result_file: "clang_check.txt"
-      style: "Google"
     steps:
     - name: Set-up repository
       uses: actions/checkout@v2
 
     - name: Install clang-format
       run: |
-        sudo apt remove -y clang-6.0 libclang-common-6.0-dev libclang1-6.0 libllvm6.0
-        sudo apt install -y clang-format-6.0
+        sudo apt install -y clang-format-8
 
-    - name: Check code style via clang-format
+    - name: Run clang formatter
       run: |
         ALL_FILES_TO_CHECK=$(find . -type f -regex ".*\.\(cpp\|hpp\|c\|h\)" -print | paste -sd " ")
         for file in ${ALL_FILES_TO_CHECK}; do
-          clang-format-6.0 -i -style=${style} -verbose ${file}
+          clang-format-8 -i -verbose ${file}
         done
-        git diff > ${result_file}
-        if [[ -s "${result_file}" ]]; then
-          echo "Clang check failed!"
-          cat "${result_file}"
+        changes="$(git diff)"
+        if [[ ! -z ${changes} ]]; then
+          echo "Clang-format check failed!"
+          echo "You should fix the following formatting errors:"
+          echo "${changes}"
           exit 1
         else
-          echo "Clang check ok!"
+          echo "Clang-format check ok!"
           exit 0
         fi
 
