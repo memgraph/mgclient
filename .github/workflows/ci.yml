@@ -20,7 +20,7 @@ jobs:
           clang-format-8 -i -verbose ${file}
         done
         changes="$(git diff)"
-        if [[ ! -z ${changes} ]]; then
+        if [[ ! -z "${changes}" ]]; then
           echo "Clang-format check failed!"
           echo "You should fix the following formatting errors:"
           echo "${changes}"
