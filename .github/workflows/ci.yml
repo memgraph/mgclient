@@ -3,6 +3,33 @@ name: CI
 on: [push]
 
 jobs:
+  clang_check:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Set-up repository
+      uses: actions/checkout@v2
+
+    - name: Install clang-format
+      run: |
+        sudo apt install -y clang-format-8
+
+    - name: Run clang formatter
+      run: |
+        ALL_FILES_TO_CHECK=$(find . -type f -regex ".*\.\(cpp\|hpp\|c\|h\)" -print | paste -sd " ")
+        for file in ${ALL_FILES_TO_CHECK}; do
+          clang-format-8 -i -verbose ${file}
+        done
+        changes="$(git diff)"
+        if [[ ! -z "${changes}" ]]; then
+          echo "Clang-format check failed!"
+          echo "You should fix the following formatting errors:"
+          echo "${changes}"
+          exit 1
+        else
+          echo "Clang-format check ok!"
+          exit 0
+        fi
+
   build_and_test:
     strategy:
      matrix:
