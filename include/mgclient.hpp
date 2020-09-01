@@ -11,7 +11,7 @@ namespace mg {
 /// An interface for a Memgraph client that can execute queries and fetch
 /// results.
 class Client {
- public:
+public:
   struct Params {
     std::string host;
     uint16_t port;
@@ -27,30 +27,36 @@ class Client {
   Client &operator=(Client &&) = delete;
   ~Client();
 
-  /// Executes the given Cypher `statement`.
-  /// Returns true when the statement is successfully executed, false otherwise.
+  /// \brief Executes the given Cypher `statement`.
+  /// \return true when the statement is successfully executed, false otherwise.
+  /// \note
   /// After executing the statement, the method is blocked until all incoming
   /// data (execution results) are handled, i.e. until `FetchOne` method returns
   /// `std::nullopt`.
   bool Execute(const std::string &statement);
 
-  /// Executes the given Cypher `statement`, supplied with additional `params`.
-  /// Returns true when the statement is successfully executed, false otherwise.
-  /// After executing the statement, the method is blocked until all incoming
-  /// data (execution results) are handled, i.e. until `FetchOne` method returns
-  /// `std::nullopt`.
+  /// \brief Executes the given Cypher `statement`, supplied with additional
+  /// `params`.
+  /// \return true when the statement is successfully executed, false
+  /// otherwise.
+  /// \note
+  /// After executing the statement, the method is blocked
+  /// until all incoming data (execution results) are handled, i.e. until
+  /// `FetchOne` method returns `std::nullopt`.
   bool Execute(const std::string &statement, const ConstMap &params);
 
-  /// Fetches the next result from the input stream.
+  /// \brief Fetches the next result from the input stream.
+  /// \return next result from the input stream.
   /// If there is nothing to fetch, `std::nullopt` is returned.
   std::optional<std::vector<Value>> FetchOne();
 
-  /// Static method that creates a Memgraph client instance.
+  /// \brief Static method that creates a Memgraph client instance.
+  /// \return pointer to the created client instance.
   /// If the connection couldn't be established given the `params`, it returns
   /// a `nullptr`.
   static std::unique_ptr<Client> Connect(const Params &params);
 
- private:
+private:
   explicit Client(mg_session *session);
 
   mg_session *session_;
@@ -69,8 +75,8 @@ std::unique_ptr<Client> Client::Connect(const Client::Params &params) {
     mg_session_params_set_password(mg_params, params.password.c_str());
   }
   mg_session_params_set_client_name(mg_params, params.client_name.c_str());
-  mg_session_params_set_sslmode(
-      mg_params, params.use_ssl ? MG_SSLMODE_REQUIRE : MG_SSLMODE_DISABLE);
+  mg_session_params_set_sslmode(mg_params, params.use_ssl ? MG_SSLMODE_REQUIRE
+                                                          : MG_SSLMODE_DISABLE);
 
   mg_session *session = nullptr;
   int status = mg_connect(mg_params, &session);
@@ -123,4 +129,4 @@ std::optional<std::vector<Value>> Client::FetchOne() {
   return values;
 }
 
-}  // namespace mg
+} // namespace mg
