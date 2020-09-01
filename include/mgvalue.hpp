@@ -251,7 +251,7 @@ public:
   /// \note
   /// Each key-value pair has to be checked, resulting with
   /// O(n) time complexity.
-  ConstValue operator[](const std::string_view &key) const;
+  ConstValue operator[](const std::string_view key) const;
 
   Iterator begin() const { return Iterator(this, 0); }
   Iterator end() const { return Iterator(this, size()); }
@@ -261,41 +261,41 @@ public:
   /// \note
   /// Each key-value pair has to be checked, resulting with O(n) time
   /// complexity.
-  Iterator find(const std::string_view &key) const;
+  Iterator find(const std::string_view key) const;
 
   /// \brief Inserts the given `key`-`value` pair into the map.
   /// Checks if the given `key` already exists by iterating over all entries.
   /// Copies both the `key` and the `value`.
-  bool Insert(const std::string_view &key, const Value &value);
+  bool Insert(const std::string_view key, const Value &value);
 
   /// \brief Inserts the given `key`-`value` pair into the map.
   /// Checks if the given `key` already exists by iterating over all entries.
   /// Copies both the `key` and the `value`.
-  bool Insert(const std::string_view &key, const ConstValue &value);
+  bool Insert(const std::string_view key, const ConstValue &value);
 
   /// \brief Inserts the given `key`-`value` pair into the map.
   /// Checks if the given `key` already exists by iterating over all entries.
   /// Copies the `key` and takes the ownership of `value` by moving it.
   /// Behaviour of accessing the `value` after performing this operation is
   /// considered undefined.
-  bool Insert(const std::string_view &key, Value &&value);
+  bool Insert(const std::string_view key, Value &&value);
 
   /// \brief Inserts the given `key`-`value` pair into the map.
   /// It doesn't check if the given `key` already exists in the map.
   /// Copies both the `key` and the `value`.
-  bool InsertUnsafe(const std::string_view &key, const Value &value);
+  bool InsertUnsafe(const std::string_view key, const Value &value);
 
   /// \brief Inserts the given `key`-`value` pair into the map.
   /// It doesn't check if the  given `key` already exists in the map.
   /// Copies both the `key` and the `value`.
-  bool InsertUnsafe(const std::string_view &key, const ConstValue &value);
+  bool InsertUnsafe(const std::string_view key, const ConstValue &value);
 
   /// \brief Inserts the given `key`-`value` pair into the map.
   /// It doesn't check if the given `key` already exists in the map.
   /// Copies the `key` and takes the ownership of `value` by moving it.
   /// Behaviour of accessing the `value` after performing this operation
   /// is considered undefined.
-  bool InsertUnsafe(const std::string_view &key, Value &&value);
+  bool InsertUnsafe(const std::string_view key, Value &&value);
 
   const ConstMap AsConstMap() const;
 
@@ -328,7 +328,7 @@ public:
   /// \note
   /// Each key-value pair has to be checked, resulting with O(n)
   /// time complexity.
-  ConstValue operator[](const std::string_view &key) const;
+  ConstValue operator[](const std::string_view key) const;
 
   Iterator begin() const { return Iterator(this, 0); }
   Iterator end() const { return Iterator(this, size()); }
@@ -338,7 +338,7 @@ public:
   /// \note
   /// Each key-value pair has to be checked, resulting with O(n) time
   /// complexity.
-  Iterator find(const std::string_view &key) const;
+  Iterator find(const std::string_view key) const;
 
   bool operator==(const ConstMap &other) const;
   bool operator==(const Map &other) const;
@@ -721,7 +721,7 @@ public:
   explicit Value(double value) : Value(mg_value_make_float(value)) {}
 
   // Constructors for string:
-  explicit Value(const std::string_view &value);
+  explicit Value(const std::string_view value);
   explicit Value(const char *value);
 
   /// \brief Constructs a list value and takes the ownership of the `list`.
@@ -1125,11 +1125,11 @@ Map::Map(std::initializer_list<std::pair<std::string, Value>> list)
   }
 }
 
-ConstValue Map::operator[](const std::string_view &key) const {
+ConstValue Map::operator[](const std::string_view key) const {
   return ConstValue(mg_map_at2(ptr_, key.size(), key.data()));
 }
 
-Map::Iterator Map::find(const std::string_view &key) const {
+Map::Iterator Map::find(const std::string_view key) const {
   for (size_t i = 0; i < size(); ++i) {
     if (key == detail::ConvertString(mg_map_key_at(ptr_, i))) {
       return Iterator(this, i);
@@ -1138,34 +1138,34 @@ Map::Iterator Map::find(const std::string_view &key) const {
   return end();
 }
 
-bool Map::Insert(const std::string_view &key, const Value &value) {
+bool Map::Insert(const std::string_view key, const Value &value) {
   return mg_map_insert2(ptr_, mg_string_make2(key.size(), key.data()),
                         mg_value_copy(value.ptr())) == 0;
 }
 
-bool Map::Insert(const std::string_view &key, const ConstValue &value) {
+bool Map::Insert(const std::string_view key, const ConstValue &value) {
   return mg_map_insert2(ptr_, mg_string_make2(key.size(), key.data()),
                         mg_value_copy(value.ptr())) == 0;
 }
 
-bool Map::Insert(const std::string_view &key, Value &&value) {
+bool Map::Insert(const std::string_view key, Value &&value) {
   bool result = mg_map_insert2(ptr_, mg_string_make2(key.size(), key.data()),
                                value.ptr_) == 0;
   value.ptr_ = nullptr;
   return result;
 }
 
-bool Map::InsertUnsafe(const std::string_view &key, const Value &value) {
+bool Map::InsertUnsafe(const std::string_view key, const Value &value) {
   return mg_map_insert_unsafe2(ptr_, mg_string_make2(key.size(), key.data()),
                                mg_value_copy(value.ptr())) == 0;
 }
 
-bool Map::InsertUnsafe(const std::string_view &key, const ConstValue &value) {
+bool Map::InsertUnsafe(const std::string_view key, const ConstValue &value) {
   return mg_map_insert_unsafe2(ptr_, mg_string_make2(key.size(), key.data()),
                                mg_value_copy(value.ptr())) == 0;
 }
 
-bool Map::InsertUnsafe(const std::string_view &key, Value &&value) {
+bool Map::InsertUnsafe(const std::string_view key, Value &&value) {
   bool result =
       mg_map_insert_unsafe2(ptr_, mg_string_make2(key.size(), key.data()),
                             value.ptr_) == 0;
@@ -1189,11 +1189,11 @@ std::pair<std::string_view, ConstValue> ConstMap::Iterator::operator*() const {
       ConstValue(mg_map_value_at(iterable_->ptr(), index_)));
 }
 
-ConstValue ConstMap::operator[](const std::string_view &key) const {
+ConstValue ConstMap::operator[](const std::string_view key) const {
   return ConstValue(mg_map_at2(const_ptr_, key.size(), key.data()));
 }
 
-ConstMap::Iterator ConstMap::find(const std::string_view &key) const {
+ConstMap::Iterator ConstMap::find(const std::string_view key) const {
   for (size_t i = 0; i < size(); ++i) {
     if (key == detail::ConvertString(mg_map_key_at(const_ptr_, i))) {
       return Iterator(this, i);
@@ -1436,7 +1436,7 @@ Value::~Value() {
 
 Value::Value(const ConstValue &value) : ptr_(mg_value_copy(value.ptr())) {}
 
-Value::Value(const std::string_view &value)
+Value::Value(const std::string_view value)
     : Value(
           mg_value_make_string2(mg_string_make2(value.size(), value.data()))) {}
 
