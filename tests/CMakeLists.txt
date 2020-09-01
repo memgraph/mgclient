@@ -14,9 +14,54 @@
 
 include(ExternalProject)
 
-# Setup GTest
 find_package(Threads REQUIRED)
 
+# Setup gflags
+set(GFLAGS_ROOT ${PROJECT_BINARY_DIR}/gflags)
+ExternalProject_Add(gflags-proj
+  PREFIX            ${GFLAGS_ROOT}
+  INSTALL_DIR       ${GFLAGS_ROOT}
+  GIT_REPOSITORY    https://github.com/gflags/gflags.git
+  GIT_TAG           v2.2.2
+  CMAKE_ARGS        "-DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>"
+                    "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}"
+                    "-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}")
+
+set(GFLAGS_INCLUDE_DIR ${GFLAGS_ROOT}/include)
+set(GFLAGS_LIBRARY_PATH ${GFLAGS_ROOT}/lib/${CMAKE_FIND_LIBRARY_PREFIXES}gflags.a)
+set(GFLAGS_DEBUG_LIBRARY_PATH ${GFLAGS_ROOT}/lib/${CMAKE_FIND_LIBRARY_PREFIXES}gflags_debug.a)
+add_library(gflags STATIC IMPORTED)
+set_target_properties(gflags PROPERTIES
+  IMPORTED_LOCATION ${GFLAGS_LIBRARY_PATH}
+  IMPORTED_LOCATION_DEBUG ${GFLAGS_DEBUG_LIBRARY_PATH}
+  INTERFACE_LINK_LIBRARIES ${CMAKE_THREAD_LIBS_INIT})
+add_dependencies(gflags gflags-proj)
+
+
+# Setup glog
+set(GLOG_ROOT ${PROJECT_BINARY_DIR}/glog)
+ExternalProject_Add(glog-proj
+  PREFIX            ${GLOG_ROOT}
+  INSTALL_DIR       ${GLOG_ROOT}
+  GIT_REPOSITORY    https://github.com/google/glog.git
+  GIT_TAG           v0.4.0
+  CMAKE_ARGS        "-DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>"
+                    "-DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}"
+                    "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}"
+                    "-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}"
+  DEPENDS           gflags-proj)
+
+set(GLOG_INCLUDE_DIR ${GLOG_ROOT}/include)
+set(GLOG_LIBRARY_PATH ${GLOG_ROOT}/lib/${CMAKE_FIND_LIBRARY_PREFIXES}glog.a)
+set(GLOG_DEBUG_LIBRARY_PATH ${GLOG_ROOT}/lib/${CMAKE_FIND_LIBRARY_PREFIXES}glogd.a)
+add_library(glog STATIC IMPORTED)
+set_target_properties(glog PROPERTIES
+  IMPORTED_LOCATION ${GLOG_LIBRARY_PATH}
+  IMPORTED_LOCATION_DEBUG ${GLOG_DEBUG_LIBRARY_PATH}
+  INTERFACE_LINK_LIBRARIES ${CMAKE_THREAD_LIBS_INIT})
+add_dependencies(glog glog-proj)
+
+# Setup GTest
 ExternalProject_Add(gtest-proj
         PREFIX            gtest
         GIT_REPOSITORY    https://github.com/google/googletest.git
@@ -76,3 +121,7 @@ add_gtest(allocator allocator.cpp)
 if(BUILD_TESTING_INTEGRATION)
   add_gtest(basic integration/basic.cpp)
 endif()
+
+add_gtest(cpp_mgclient_value cpp/mgclient_value.cpp)
+target_link_libraries(cpp_mgclient_value glog gflags)
+target_include_directories(cpp_mgclient_value PRIVATE ${GLOG_INCLUDE_DIR} ${GFLAGS_INCLUDE_DIR})
