@@ -119,7 +119,11 @@ target_link_libraries(transport stdc++fs)
 add_gtest(allocator allocator.cpp)
 
 if(BUILD_TESTING_INTEGRATION)
-  add_gtest(basic integration/basic.cpp)
+  add_gtest(basic_integration_c integration_c/basic.cpp)
+
+  add_gtest(basic_integration_cpp integration_cpp/basic.cpp)
+  target_link_libraries(basic_integration_cpp glog gflags)
+  target_include_directories(basic_integration_cpp PRIVATE ${GLOG_INCLUDE_DIR} ${GFLAGS_INCLUDE_DIR})
 endif()
 
 add_gtest(cpp_mgclient_value cpp/mgclient_value.cpp)
