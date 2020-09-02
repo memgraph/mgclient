@@ -31,10 +31,10 @@ T GetEnvOrDefault(const std::string &value_name, const T &default_value) {
 class MemgraphConnection : public ::testing::Test {
 protected:
   virtual void SetUp() override {
-    client = mg::Client::Connect(mg::Client::Params{
-        .host = GetEnvOrDefault<std::string>("MEMGRAPH_HOST", "127.0.0.1"),
-        .port = GetEnvOrDefault<uint16_t>("MEMGRAPH_PORT", 7687),
-        .use_ssl = GetEnvOrDefault<bool>("MEMGRAPH_SSLMODE", true)});
+    client = mg::Client::Connect(
+        {GetEnvOrDefault<std::string>("MEMGRAPH_HOST", "127.0.0.1"),
+         GetEnvOrDefault<uint16_t>("MEMGRAPH_PORT", 7687), "", "",
+         GetEnvOrDefault<bool>("MEMGRAPH_SSLMODE", true), ""});
   }
 
   virtual void TearDown() override {
