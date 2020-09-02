@@ -57,7 +57,11 @@ include(GNUInstallDirs)
 install(TARGETS mgclient-static mgclient-shared
         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
+install(DIRECTORY
+        "${CMAKE_SOURCE_DIR}/include/"
+        DESTINATION
+        ${CMAKE_INSTALL_INCLUDEDIR})
 install(FILES
         "${CMAKE_CURRENT_BINARY_DIR}/mgclient-export.h"
-        "${PROJECT_SOURCE_DIR}/include/mgclient.h"
-        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+        DESTINATION
+        ${CMAKE_INSTALL_INCLUDEDIR})
