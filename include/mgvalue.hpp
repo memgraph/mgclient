@@ -106,6 +106,7 @@ inline bool operator!=(const Id &id1, const Id &id2) { return !(id1 == id2); }
 ////////////////////////////////////////////////////////////////////////////////
 /// List:
 
+/// \brief Wrapper class for \ref mg_list.
 class List final {
 private:
   friend class Value;
@@ -206,6 +207,7 @@ private:
 ////////////////////////////////////////////////////////////////////////////////
 // Map:
 
+/// \brief Wrapper class for \ref mg_map.
 class Map final {
 private:
   friend class Value;
@@ -354,6 +356,7 @@ private:
 ////////////////////////////////////////////////////////////////////////////////
 // Node:
 
+/// \brief Wrapper class for \ref mg_node
 class Node final {
 private:
   friend class Value;
@@ -380,6 +383,7 @@ public:
 
   explicit Node(mg_node *ptr) : ptr_(ptr) {}
 
+  /// \brief Create a Node from a copy of the given \ref mg_node.
   explicit Node(const mg_node *const_ptr) : Node(mg_node_copy(const_ptr)) {}
 
   Node(const Node &other);
@@ -435,6 +439,7 @@ private:
 ////////////////////////////////////////////////////////////////////////////////
 // Relationship:
 
+/// \brief Wrapper class for \ref mg_relationship.
 class Relationship final {
 private:
   friend class Value;
@@ -442,7 +447,7 @@ private:
 public:
   explicit Relationship(mg_relationship *ptr) : ptr_(ptr) {}
 
-  /// \brief Create a Relationship by copying the given \ref mg_relationship.
+  /// \brief Create a Relationship from a copy the given \ref mg_relationship.
   explicit Relationship(const mg_relationship *const_ptr)
       : Relationship(mg_relationship_copy(const_ptr)) {}
 
@@ -518,6 +523,7 @@ private:
 ////////////////////////////////////////////////////////////////////////////////
 // UnboundRelationship:
 
+/// \brief Wrapper class for \ref mg_unbound_relationship.
 class UnboundRelationship final {
 private:
   friend class Value;
@@ -525,7 +531,7 @@ private:
 public:
   explicit UnboundRelationship(mg_unbound_relationship *ptr) : ptr_(ptr) {}
 
-  /// \brief Create an UnboundRelationship by copying the given
+  /// \brief Create an UnboundRelationship from a copy of the given
   /// \ref mg_unbound_relationship.
   explicit UnboundRelationship(const mg_unbound_relationship *const_ptr)
       : UnboundRelationship(mg_unbound_relationship_copy(const_ptr)) {}
@@ -594,6 +600,7 @@ private:
 ////////////////////////////////////////////////////////////////////////////////
 // Path:
 
+/// \brief Wrapper class for \ref mg_path.
 class Path final {
 private:
   friend class Value;
@@ -601,7 +608,7 @@ private:
 public:
   explicit Path(mg_path *ptr) : ptr_(ptr) {}
 
-  /// \brief Create a Path by copying the given \ref mg_path.
+  /// \brief Create a Path from a copy of the given \ref mg_path.
   explicit Path(const mg_path *const_ptr) : Path(mg_path_copy(const_ptr)) {}
 
   Path(const Path &other);
@@ -675,6 +682,7 @@ private:
 ////////////////////////////////////////////////////////////////////////////////
 // Value:
 
+/// Wrapper class for \ref mg_value
 class Value final {
 private:
   friend class List;
@@ -700,7 +708,7 @@ public:
   /// `value` is destroyed when a `Value` object is destroyed.
   explicit Value(mg_value *ptr) : ptr_(ptr) {}
 
-  /// \brief Creates a Value by copying the given \ref mg_value.
+  /// \brief Creates a Value from a copy of the given \ref mg_value.
   explicit Value(const mg_value *const_ptr) : Value(mg_value_copy(const_ptr)) {}
 
   Value(const Value &other);
