@@ -15,16 +15,16 @@
 namespace mg {
 
 namespace detail {
-/**
- * uint to int conversion in C++ is a bit tricky. Take a look here
- * https://stackoverflow.com/questions/14623266/why-cant-i-reinterpret-cast-uint-to-int
- * for more details.
- *
- * @tparam TDest Returned datatype.
- * @tparam TSrc Input datatype.
- *
- * @return "copy casted" value.
- */
+/// \brief Type castign using memcpy.
+/// uint to int conversion in C++ is a bit tricky. Take a look here
+/// https://stackoverflow.com/questions/14623266/why-cant-i-reinterpret-cast-uint-to-int
+/// for more details.
+///
+/// \tparam TDest Returned datatype.
+/// \tparam TSrc Input datatype.
+///
+/// \return "copy casted" value.
+///
 template <typename TDest, typename TSrc> TDest MemcpyCast(TSrc src) {
   TDest dest;
   static_assert(sizeof(dest) == sizeof(src),
