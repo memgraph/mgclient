@@ -43,8 +43,8 @@ TEST(ValueTest, BasicTypes) {
   ASSERT_EQ(value_string1, value_string2);
   ASSERT_NE(value_string1, value_bool1);
   ASSERT_NE(value_bool1, value_bool2);
-  //ASSERT_EQ(value_string1.AsConstValue(), value_string2.AsConstValue());
-  //ASSERT_EQ(value_string1.AsConstValue(), value_string2);
+  ASSERT_EQ(value_string1.AsConstValue(), value_string2.AsConstValue());
+  ASSERT_EQ(value_string1.AsConstValue(), value_string2);
   ASSERT_EQ(value_string1, value_string2.AsConstValue());
   ASSERT_NE(value_int1.AsConstValue(), value_int2.AsConstValue());
   ASSERT_NE(value_int1.AsConstValue(), value_int2);
