@@ -35,19 +35,21 @@ protected:
         {GetEnvOrDefault<std::string>("MEMGRAPH_HOST", "127.0.0.1"),
          GetEnvOrDefault<uint16_t>("MEMGRAPH_PORT", 7687), "", "",
          GetEnvOrDefault<bool>("MEMGRAPH_SSLMODE", true), ""});
+
+    // Clean the database for the tests
+    ASSERT_TRUE(client->Execute(delete_all_query));
+    ASSERT_FALSE(client->FetchOne());
   }
 
   virtual void TearDown() override {
-    // Clean the result stream to unblock execute
-    std::optional<std::vector<mg::Value>> result;
-    while ((result = client->FetchOne()))
-      ;
+    // Check if all results are consumed in the tests
+    ASSERT_FALSE(client->FetchOne());
 
-    const auto delete_all_query = "MATCH (n) DETACH DELETE n";
     ASSERT_TRUE(client->Execute(delete_all_query));
   }
 
   std::unique_ptr<mg::Client> client;
+  const char *delete_all_query = "MATCH (n) DETACH DELETE n";
 };
 
 TEST_F(MemgraphConnection, InsertAndRetrieveFromMemgraph) {

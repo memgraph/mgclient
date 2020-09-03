@@ -77,4 +77,4 @@ if(BUILD_TESTING_INTEGRATION)
   add_gtest(integration_basic_cpp integration/basic_cpp.cpp)
 endif()
 
-add_gtest(cpp_mgclient_value cpp/mgclient_value.cpp)
+add_gtest(cpp_mgclient_value unit/mgclient_value.cpp)
