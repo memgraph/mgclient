@@ -4,5 +4,3 @@ build/
 # vim temporary files
 *.swp
 *.swo
-
-compile_commands.json
