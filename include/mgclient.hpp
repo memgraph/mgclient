@@ -65,7 +65,6 @@ private:
 std::unique_ptr<Client> Client::Connect(const Client::Params &params) {
   mg_session_params *mg_params = mg_session_params_make();
   if (!mg_params) {
-    LOG(ERROR) << "Failed to allocate session params.";
     return nullptr;
   }
   mg_session_params_set_host(mg_params, params.host.c_str());
@@ -96,7 +95,6 @@ Client::~Client() { mg_session_destroy(session_); }
 bool Client::Execute(const std::string &statement) {
   int status = mg_session_run(session_, statement.c_str(), nullptr, nullptr);
   if (status < 0) {
-    LOG(ERROR) << "Execution failed: " << mg_session_error(session_);
     return false;
   }
   return true;
@@ -106,7 +104,6 @@ bool Client::Execute(const std::string &statement, const ConstMap &params) {
   int status =
       mg_session_run(session_, statement.c_str(), params.ptr(), nullptr);
   if (status < 0) {
-    LOG(ERROR) << "Execution failed: " << mg_session_error(session_);
     return false;
   }
   return true;

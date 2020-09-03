@@ -8,23 +8,14 @@
 #include <utility>
 #include <vector>
 
-#include <glog/logging.h>
-
 #include "mgclient.h"
 
 namespace mg {
 
 namespace detail {
-/// \brief Type castign using memcpy.
-/// uint to int conversion in C++ is a bit tricky. Take a look here
-/// https://stackoverflow.com/questions/14623266/why-cant-i-reinterpret-cast-uint-to-int
-/// for more details.
-///
-/// \tparam TDest Returned datatype.
-/// \tparam TSrc Input datatype.
-///
-/// \return "copy casted" value.
-///
+// uint to int conversion in C++ is a bit tricky. Take a look here
+// https://stackoverflow.com/questions/14623266/why-cant-i-reinterpret-cast-uint-to-int
+// for more details.
 template <typename TDest, typename TSrc> TDest MemcpyCast(TSrc src) {
   TDest dest;
   static_assert(sizeof(dest) == sizeof(src),
@@ -91,17 +82,15 @@ public:
   int64_t AsInt() const { return id_; }
   uint64_t AsUint() const { return detail::MemcpyCast<uint64_t>(id_); }
 
+  bool operator==(const Id &other) const { return id_ == other.id_; }
+
+  bool operator!=(const Id &other) const { return !(*this == other); }
+
 private:
   explicit Id(int64_t id) : id_(id) {}
 
   int64_t id_;
 };
-
-inline bool operator==(const Id &id1, const Id &id2) {
-  return id1.AsInt() == id2.AsInt();
-}
-
-inline bool operator!=(const Id &id1, const Id &id2) { return !(id1 == id2); }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// List:
@@ -167,9 +156,13 @@ public:
 
   const ConstList AsConstList() const;
 
+  /// \exception std::runtime_error list contains value with unknown type
   bool operator==(const List &other) const;
+  /// \exception std::runtime_error list contains value with unknown type
   bool operator==(const ConstList &other) const;
+  /// \exception std::runtime_error list contains value with unknown type
   bool operator!=(const List &other) const { return !(*this == other); }
+  /// \exception std::runtime_error list contains value with unknown type
   bool operator!=(const ConstList &other) const { return !(*this == other); }
 
   const mg_list *ptr() const { return ptr_; }
@@ -193,9 +186,13 @@ public:
   Iterator begin() const { return Iterator(this, 0); }
   Iterator end() const { return Iterator(this, size()); }
 
+  /// \exception std::runtime_error list contains value with unknown type
   bool operator==(const ConstList &other) const;
+  /// \exception std::runtime_error list contains value with unknown type
   bool operator==(const List &other) const;
+  /// \exception std::runtime_error list contains value with unknown type
   bool operator!=(const ConstList &other) const { return !(*this == other); }
+  /// \exception std::runtime_error list contains value with unknown type
   bool operator!=(const List &other) const { return !(*this == other); }
 
   const mg_list *ptr() const { return const_ptr_; }
@@ -301,9 +298,13 @@ public:
 
   const ConstMap AsConstMap() const;
 
+  /// \exception std::runtime_error map contains value with unknown type
   bool operator==(const Map &other) const;
+  /// \exception std::runtime_error map contains value with unknown type
   bool operator==(const ConstMap &other) const;
+  /// \exception std::runtime_error map contains value with unknown type
   bool operator!=(const Map &other) const { return !(*this == other); }
+  /// \exception std::runtime_error map contains value with unknown type
   bool operator!=(const ConstMap &other) const { return !(*this == other); }
 
   const mg_map *ptr() const { return ptr_; }
@@ -342,9 +343,13 @@ public:
   /// complexity.
   Iterator find(const std::string_view key) const;
 
+  /// \exception std::runtime_error map contains value with unknown type
   bool operator==(const ConstMap &other) const;
+  /// \exception std::runtime_error map contains value with unknown type
   bool operator==(const Map &other) const;
+  /// \exception std::runtime_error map contains value with unknown type
   bool operator!=(const ConstMap &other) const { return !(*this == other); }
+  /// \exception std::runtime_error map contains value with unknown type
   bool operator!=(const Map &other) const { return !(*this == other); }
 
   const mg_map *ptr() const { return const_ptr_; }
@@ -402,9 +407,17 @@ public:
 
   ConstNode AsConstNode() const;
 
+  /// \exception std::runtime_error node property contains value with
+  /// unknown type
   bool operator==(const Node &other) const;
+  /// \exception std::runtime_error node property contains value with
+  /// unknown type
   bool operator==(const ConstNode &other) const;
+  /// \exception std::runtime_error node property contains value with
+  /// unknown type
   bool operator!=(const Node &other) const { return !(*this == other); }
+  /// \exception std::runtime_error node property contains value with
+  /// unknown type
   bool operator!=(const ConstNode &other) const { return !(*this == other); }
 
   const mg_node *ptr() const { return ptr_; }
@@ -425,9 +438,17 @@ public:
     return ConstMap(mg_node_properties(const_ptr_));
   }
 
+  /// \exception std::runtime_error node property contains value with
+  /// unknown type
   bool operator==(const ConstNode &other) const;
+  /// \exception std::runtime_error node property contains value with
+  /// unknown type
   bool operator==(const Node &other) const;
+  /// \exception std::runtime_error node property contains value with
+  /// unknown type
   bool operator!=(const ConstNode &other) const { return !(*this == other); }
+  /// \exception std::runtime_error node property contains value with
+  /// unknown type
   bool operator!=(const Node &other) const { return !(*this == other); }
 
   const mg_node *ptr() const { return const_ptr_; }
@@ -475,9 +496,17 @@ public:
 
   ConstRelationship AsConstRelationship() const;
 
+  /// \exception std::runtime_error relationship property contains value with
+  /// unknown type
   bool operator==(const Relationship &other) const;
+  /// \exception std::runtime_error relationship property contains value with
+  /// unknown type
   bool operator==(const ConstRelationship &other) const;
+  /// \exception std::runtime_error relationship property contains value with
+  /// unknown type
   bool operator!=(const Relationship &other) const { return !(*this == other); }
+  /// \exception std::runtime_error relationship property contains value with
+  /// unknown type
   bool operator!=(const ConstRelationship &other) const {
     return !(*this == other);
   }
@@ -507,11 +536,19 @@ public:
     return ConstMap(mg_relationship_properties(const_ptr_));
   }
 
+  /// \exception std::runtime_error relationship property contains value with
+  /// unknown type
   bool operator==(const ConstRelationship &other) const;
+  /// \exception std::runtime_error relationship property contains value with
+  /// unknown type
   bool operator==(const Relationship &other) const;
+  /// \exception std::runtime_error relationship property contains value with
+  /// unknown type
   bool operator!=(const ConstRelationship &other) const {
     return !(*this == other);
   }
+  /// \exception std::runtime_error relationship property contains value with
+  /// unknown type
   bool operator!=(const Relationship &other) const { return !(*this == other); }
 
   const mg_relationship *ptr() const { return const_ptr_; }
@@ -554,11 +591,19 @@ public:
 
   ConstUnboundRelationship AsConstUnboundRelationship() const;
 
+  /// \exception std::runtime_error relationship property contains value with
+  /// unknown type
   bool operator==(const UnboundRelationship &other) const;
+  /// \exception std::runtime_error relationship property contains value with
+  /// unknown type
   bool operator==(const ConstUnboundRelationship &other) const;
+  /// \exception std::runtime_error relationship property contains value with
+  /// unknown type
   bool operator!=(const UnboundRelationship &other) const {
     return !(*this == other);
   }
+  /// \exception std::runtime_error relationship property contains value with
+  /// unknown type
   bool operator!=(const ConstUnboundRelationship &other) const {
     return !(*this == other);
   }
@@ -582,11 +627,19 @@ public:
     return ConstMap(mg_unbound_relationship_properties(const_ptr_));
   }
 
+  /// \exception std::runtime_error relationship property contains value with
+  /// unknown type
   bool operator==(const ConstUnboundRelationship &other) const;
+  /// \exception std::runtime_error relationship property contains value with
+  /// unknown type
   bool operator==(const UnboundRelationship &other) const;
+  /// \exception std::runtime_error relationship property contains value with
+  /// unknown type
   bool operator!=(const ConstUnboundRelationship &other) const {
     return !(*this == other);
   }
+  /// \exception std::runtime_error relationship property contains value with
+  /// unknown type
   bool operator!=(const UnboundRelationship &other) const {
     return !(*this == other);
   }
@@ -637,9 +690,13 @@ public:
 
   ConstPath AsConstPath() const;
 
+  /// \exception std::runtime_error path contains elements with unknown value
   bool operator==(const Path &other) const;
+  /// \exception std::runtime_error path contains elements with unknown value
   bool operator==(const ConstPath &other) const;
+  /// \exception std::runtime_error path contains elements with unknown value
   bool operator!=(const Path &other) const { return !(*this == other); }
+  /// \exception std::runtime_error path contains elements with unknown value
   bool operator!=(const ConstPath &other) const { return !(*this == other); }
 
   const mg_path *ptr() const { return ptr_; }
@@ -668,9 +725,13 @@ public:
   /// \return True if the edge is reversed, false otherwise.
   bool IsReversedRelationshipAt(size_t index) const;
 
+  /// \exception std::runtime_error path contains elements with unknown value
   bool operator==(const ConstPath &other) const;
+  /// \exception std::runtime_error path contains elements with unknown value
   bool operator==(const Path &other) const;
+  /// \exception std::runtime_error path contains elements with unknown value
   bool operator!=(const ConstPath &other) const { return !(*this == other); }
+  /// \exception std::runtime_error path contains elements with unknown value
   bool operator!=(const Path &other) const { return !(*this == other); }
 
   const mg_path *ptr() const { return const_ptr_; }
@@ -764,24 +825,39 @@ public:
   /// operation is considered undefined.
   explicit Value(Path &&path);
 
+  /// \pre value type is Type::Bool
   bool ValueBool() const;
+  /// \pre value type is Type::Int
   int64_t ValueInt() const;
+  /// \pre value type is Type::Double
   double ValueDouble() const;
+  /// \pre value type is Type::String
   std::string_view ValueString() const;
+  /// \pre value type is Type::List
   const ConstList ValueList() const;
+  /// \pre value type is Type::Map
   const ConstMap ValueMap() const;
+  /// \pre value type is Type::Node
   const ConstNode ValueNode() const;
+  /// \pre value type is Type::Relationship
   const ConstRelationship ValueRelationship() const;
+  /// \pre value type is Type::UnboundRelationship
   const ConstUnboundRelationship ValueUnboundRelationship() const;
+  /// \pre value type is Type::Path
   const ConstPath ValuePath() const;
 
+  /// \exception std::runtime_error the value type is unknown
   Type type() const;
 
   ConstValue AsConstValue() const;
 
+  /// \exception std::runtime_error the value type is unknown
   bool operator==(const Value &other) const;
+  /// \exception std::runtime_error the value type is unknown
   bool operator==(const ConstValue &other) const;
+  /// \exception std::runtime_error the value type is unknown
   bool operator!=(const Value &other) const { return !(*this == other); }
+  /// \exception std::runtime_error the value type is unknown
   bool operator!=(const ConstValue &other) const { return !(*this == other); }
 
   const mg_value *ptr() const { return ptr_; }
@@ -794,22 +870,37 @@ class ConstValue final {
 public:
   explicit ConstValue(const mg_value *const_ptr) : const_ptr_(const_ptr) {}
 
+  /// \pre value type is Type::Bool
   bool ValueBool() const;
+  /// \pre value type is Type::Int
   int64_t ValueInt() const;
+  /// \pre value type is Type::Double
   double ValueDouble() const;
+  /// \pre value type is Type::String
   std::string_view ValueString() const;
+  /// \pre value type is Type::List
   const ConstList ValueList() const;
+  /// \pre value type is Type::Map
   const ConstMap ValueMap() const;
+  /// \pre value type is Type::Node
   const ConstNode ValueNode() const;
+  /// \pre value type is Type::Relationship
   const ConstRelationship ValueRelationship() const;
+  /// \pre value type is Type::UnboundRelationship
   const ConstUnboundRelationship ValueUnboundRelationship() const;
+  /// \pre value type is Type::Path
   const ConstPath ValuePath() const;
 
+  /// \exception std::runtime_error the value type is unknown
   Value::Type type() const;
 
+  /// \exception std::runtime_error the value type is unknown
   bool operator==(const ConstValue &other) const;
+  /// \exception std::runtime_error the value type is unknown
   bool operator==(const Value &other) const;
+  /// \exception std::runtime_error the value type is unknown
   bool operator!=(const ConstValue &other) const { return !(*this == other); }
+  /// \exception std::runtime_error the value type is unknown
   bool operator!=(const Value &other) const { return !(*this == other); }
 
   const mg_value *ptr() const { return const_ptr_; }
@@ -850,8 +941,7 @@ Value::Type ConvertType(mg_value_type type) {
   case MG_VALUE_TYPE_PATH:
     return Value::Type::Path;
   case MG_VALUE_TYPE_UNKNOWN:
-    CHECK(false) << "Unknown value type!";
-    return Value::Type::Null;
+    throw std::runtime_error("Unknown value type!");
   }
 }
 
@@ -1020,8 +1110,7 @@ bool AreValuesEqual(const mg_value *value1, const mg_value *value2) {
   case MG_VALUE_TYPE_PATH:
     return detail::ArePathsEqual(mg_value_path(value1), mg_value_path(value2));
   case MG_VALUE_TYPE_UNKNOWN:
-    CHECK(false) << "Unknown value type!";
-    return false;
+    throw std::runtime_error("Comparing values of unknown types!");
   }
 }
 } // namespace detail
@@ -1375,20 +1464,25 @@ Path::Path(const ConstPath &path) : ptr_(mg_path_copy(path.ptr())) {}
 
 ConstNode Path::GetNodeAt(size_t index) const {
   auto vertex_ptr = mg_path_node_at(ptr_, index);
-  CHECK(vertex_ptr != nullptr) << "Unable to access the vertex of a path!";
+  if (vertex_ptr == nullptr) {
+    std::abort();
+  }
   return ConstNode(vertex_ptr);
 }
 
 ConstUnboundRelationship Path::GetRelationshipAt(size_t index) const {
   auto edge_ptr = mg_path_relationship_at(ptr_, index);
-  CHECK(edge_ptr != nullptr) << "Unable to access the edge of a path!";
+  if (edge_ptr == nullptr) {
+    std::abort();
+  }
   return ConstUnboundRelationship(edge_ptr);
 }
 
 bool Path::IsReversedRelationshipAt(size_t index) const {
   auto is_reversed = mg_path_relationship_reversed_at(ptr_, index);
-  CHECK(is_reversed != -1)
-      << "Unable to access the edge orientation of a path!";
+  if (is_reversed == -1) {
+    std::abort();
+  }
   return is_reversed == 1;
 }
 
@@ -1404,20 +1498,25 @@ bool Path::operator==(const ConstPath &other) const {
 
 ConstNode ConstPath::GetNodeAt(size_t index) const {
   auto vertex_ptr = mg_path_node_at(const_ptr_, index);
-  CHECK(vertex_ptr != nullptr) << "Unable to access the vertex of a path!";
+  if (vertex_ptr == nullptr) {
+    std::abort();
+  }
   return ConstNode(vertex_ptr);
 }
 
 ConstUnboundRelationship ConstPath::GetRelationshipAt(size_t index) const {
   auto edge_ptr = mg_path_relationship_at(const_ptr_, index);
-  CHECK(edge_ptr != nullptr) << "Unable to access the edge of a path!";
+  if (edge_ptr == nullptr) {
+    std::abort();
+  }
   return ConstUnboundRelationship(edge_ptr);
 }
 
 bool ConstPath::IsReversedRelationshipAt(size_t index) const {
   auto is_reversed = mg_path_relationship_reversed_at(const_ptr_, index);
-  CHECK(is_reversed != -1)
-      << "Unable to access the edge orientation of a path!";
+  if (is_reversed == -1) {
+    std::abort();
+  }
   return is_reversed == 1;
 }
 
@@ -1477,52 +1576,72 @@ Value::Value(Path &&path) : Value(mg_value_make_path(path.ptr_)) {
 }
 
 bool Value::ValueBool() const {
-  CHECK(type() == Type::Bool);
+  if (type() != Type::Bool) {
+    std::abort();
+  }
   return static_cast<bool>(mg_value_bool(ptr_));
 }
 
 int64_t Value::ValueInt() const {
-  CHECK(type() == Type::Int);
+  if (type() != Type::Int) {
+    std::abort();
+  }
   return mg_value_integer(ptr_);
 }
 
 double Value::ValueDouble() const {
-  CHECK(type() == Type::Double);
+  if (type() != Type::Double) {
+    std::abort();
+  }
   return mg_value_float(ptr_);
 }
 
 std::string_view Value::ValueString() const {
-  CHECK(type() == Type::String);
+  if (type() != Type::String) {
+    std::abort();
+  }
   return detail::ConvertString(mg_value_string(ptr_));
 }
 
 const ConstList Value::ValueList() const {
-  CHECK(type() == Type::List);
+  if (type() != Type::List) {
+    std::abort();
+  }
   return ConstList(mg_value_list(ptr_));
 }
 
 const ConstMap Value::ValueMap() const {
-  CHECK(type() == Type::Map);
+  if (type() != Type::Map) {
+    std::abort();
+  }
   return ConstMap(mg_value_map(ptr_));
 }
 
 const ConstNode Value::ValueNode() const {
-  CHECK(type() == Type::Node);
+  if (type() != Type::Node) {
+    std::abort();
+  }
   return ConstNode(mg_value_node(ptr_));
 }
 
 const ConstRelationship Value::ValueRelationship() const {
-  CHECK(type() == Type::Relationship);
+  if (type() != Type::Relationship) {
+    std::abort();
+  }
   return ConstRelationship(mg_value_relationship(ptr_));
 }
 
 const ConstUnboundRelationship Value::ValueUnboundRelationship() const {
-  CHECK(type() == Type::UnboundRelationship);
+  if (type() != Type::UnboundRelationship) {
+    std::abort();
+  }
   return ConstUnboundRelationship(mg_value_unbound_relationship(ptr_));
 }
 
 const ConstPath Value::ValuePath() const {
-  CHECK(type() == Type::Path);
+  if (type() != Type::Path) {
+    std::abort();
+  }
   return ConstPath(mg_value_path(ptr_));
 }
 
@@ -1541,52 +1660,72 @@ bool Value::operator==(const ConstValue &other) const {
 }
 
 bool ConstValue::ValueBool() const {
-  CHECK(type() == Value::Type::Bool);
+  if (type() != Value::Type::Bool) {
+    std::abort();
+  }
   return static_cast<bool>(mg_value_bool(const_ptr_));
 }
 
 int64_t ConstValue::ValueInt() const {
-  CHECK(type() == Value::Type::Int);
+  if (type() != Value::Type::Int) {
+    std::abort();
+  }
   return mg_value_integer(const_ptr_);
 }
 
 double ConstValue::ValueDouble() const {
-  CHECK(type() == Value::Type::Double);
+  if (type() != Value::Type::Double) {
+    std::abort();
+  }
   return mg_value_float(const_ptr_);
 }
 
 std::string_view ConstValue::ValueString() const {
-  CHECK(type() == Value::Type::String);
+  if (type() != Value::Type::String) {
+    std::abort();
+  }
   return detail::ConvertString(mg_value_string(const_ptr_));
 }
 
 const ConstList ConstValue::ValueList() const {
-  CHECK(type() == Value::Type::List);
+  if (type() != Value::Type::List) {
+    std::abort();
+  }
   return ConstList(mg_value_list(const_ptr_));
 }
 
 const ConstMap ConstValue::ValueMap() const {
-  CHECK(type() == Value::Type::List);
+  if (type() != Value::Type::List) {
+    std::abort();
+  }
   return ConstMap(mg_value_map(const_ptr_));
 }
 
 const ConstNode ConstValue::ValueNode() const {
-  CHECK(type() == Value::Type::Node);
+  if (type() != Value::Type::Node) {
+    std::abort();
+  }
   return ConstNode(mg_value_node(const_ptr_));
 }
 
 const ConstRelationship ConstValue::ValueRelationship() const {
-  CHECK(type() == Value::Type::Relationship);
+  if (type() != Value::Type::Relationship) {
+    std::abort();
+  }
   return ConstRelationship(mg_value_relationship(const_ptr_));
 }
 
 const ConstUnboundRelationship ConstValue::ValueUnboundRelationship() const {
-  CHECK(type() == Value::Type::UnboundRelationship);
+  if (type() != Value::Type::UnboundRelationship) {
+    std::abort();
+  }
   return ConstUnboundRelationship(mg_value_unbound_relationship(const_ptr_));
 }
 
 const ConstPath ConstValue::ValuePath() const {
-  CHECK(type() == Value::Type::Path);
+  if (type() != Value::Type::Path) {
+    std::abort();
+  }
   return ConstPath(mg_value_path(const_ptr_));
 }
 Value::Type ConstValue::type() const {
