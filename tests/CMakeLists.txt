@@ -32,49 +32,47 @@ set(GTEST_INCLUDE_DIRS ${GTEST_ROOT}/include
         CACHE INTERNAL "Path to gtest include directory")
 
 set(GTEST_LIBRARY_PATH ${GTEST_ROOT}/lib/${CMAKE_FIND_LIBRARY_PREFIXES}gtest.a)
+set(GTEST_DEBUG_LIBRARY_PATH ${GTEST_ROOT}/lib/${CMAKE_FIND_LIBRARY_PREFIXES}gtestd.a)
 set(GTEST_LIBRARY gtest)
 add_library(${GTEST_LIBRARY} STATIC IMPORTED)
 set_target_properties(${GTEST_LIBRARY} PROPERTIES
         IMPORTED_LOCATION ${GTEST_LIBRARY_PATH}
+        IMPORTED_LOCATION_DEBUG ${GTEST_DEBUG_LIBRARY_PATH}
         INTERFACE_LINK_LIBRARIES ${CMAKE_THREAD_LIBS_INIT})
 add_dependencies(${GTEST_LIBRARY} gtest-proj)
 
 set(GTEST_MAIN_LIBRARY_PATH ${GTEST_ROOT}/lib/${CMAKE_FIND_LIBRARY_PREFIXES}gtest_main.a)
+set(GTEST_MAIN_DEBUG_LIBRARY_PATH ${GTEST_ROOT}/lib/${CMAKE_FIND_LIBRARY_PREFIXES}gtest_maind.a)
 set(GTEST_MAIN_LIBRARY gtest-main)
 add_library(${GTEST_MAIN_LIBRARY} STATIC IMPORTED)
 set_target_properties(${GTEST_MAIN_LIBRARY} PROPERTIES
         IMPORTED_LOCATION ${GTEST_MAIN_LIBRARY_PATH}
+        IMPORTED_LOCATION_DEBUG ${GTEST_MAIN_DEBUG_LIBRARY_PATH}
         INTERFACE_LINK_LIBRARIES ${CMAKE_THREAD_LIBS_INIT})
 add_dependencies(${GTEST_MAIN_LIBRARY} gtest-proj)
 
-add_executable(value value.cpp)
-target_include_directories(value PRIVATE ${GTEST_INCLUDE_DIRS} "${CMAKE_SOURCE_DIR}/src")
-target_link_libraries(value mgclient-static gtest gtest-main)
-add_test(value value)
+macro(add_gtest target_name target_path)
+  add_executable(${target_name} ${target_path})
+  target_include_directories(${target_name} PRIVATE ${GTEST_INCLUDE_DIRS} "${CMAKE_SOURCE_DIR}/src")
+  target_link_libraries(${target_name} mgclient-static gtest gtest-main)
+  add_test(${target_name} ${target_name})
+endmacro()
 
-add_executable(encoder encoder.cpp)
-target_include_directories(encoder PRIVATE ${GTEST_INCLUDE_DIRS} "${CMAKE_SOURCE_DIR}/src")
-target_link_libraries(encoder mgclient-static gtest gtest-main)
-add_test(encoder encoder)
+add_gtest(value value.cpp)
 
-add_executable(decoder decoder.cpp)
-target_include_directories(decoder PRIVATE ${GTEST_INCLUDE_DIRS} "${CMAKE_SOURCE_DIR}/src")
-target_link_libraries(decoder mgclient-static gtest gtest-main)
-add_test(decoder decoder)
+add_gtest(encoder encoder.cpp)
 
-add_executable(client client.cpp)
-target_include_directories(client PRIVATE ${GTEST_INCLUDE_DIRS} "${CMAKE_SOURCE_DIR}/src")
-target_link_libraries(client mgclient-static gtest gtest-main)
+add_gtest(decoder decoder.cpp)
+
+add_gtest(client client.cpp)
 # We're mocking the mg_secure_transport_init function in the test.
 target_link_libraries(client -Wl,--wrap=mg_secure_transport_init)
-add_test(client client)
 
-add_executable(transport transport.cpp)
-target_include_directories(transport PRIVATE ${GTEST_INCLUDE_DIRS} "${CMAKE_SOURCE_DIR}/src")
-target_link_libraries(transport mgclient-static gtest gtest-main stdc++fs)
-add_test(transport transport)
+add_gtest(transport transport.cpp)
+target_link_libraries(transport stdc++fs)
 
-add_executable(allocator allocator.cpp)
-target_include_directories(allocator PRIVATE ${GTEST_INCLUDE_DIRS} "${CMAKE_SOURCE_DIR}/src")
-target_link_libraries(allocator mgclient-static gtest gtest-main)
-add_test(allocator allocator)
+add_gtest(allocator allocator.cpp)
+
+if(BUILD_TESTING_INTEGRATION)
+  add_gtest(basic integration/basic.cpp)
+endif()

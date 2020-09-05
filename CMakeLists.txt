@@ -26,6 +26,9 @@ project(mgclient VERSION 0.1)
 
 # Building tests is disabled by default to simplify the default build config.
 option(BUILD_TESTING "" OFF)
+# Integration tests are disabled by default, since the memgraph instance is
+# neccessary to execute them.
+option(BUILD_TESTING_INTEGRATION "" OFF)
 include(CTest)
 
 set(CMAKE_C_STANDARD 11)

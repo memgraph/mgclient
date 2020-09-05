@@ -84,7 +84,7 @@ extern "C" {
 ///
 ///  1. Return values
 ///
-///     Functions that return a non-const pointer to a object give
+///     Functions that return a non-const pointer to an object give
 ///     ownership of the returned object to the caller. Examples are:
 ///       - creation functions (e.g. \ref mg_list_make_empty).
 ///       - copy functions (e.g. \ref mg_value_copy).
