@@ -75,6 +75,10 @@ int mg_socket_receive(int sock, void* buf, int len) {
   return (int)recv(sock, buf, len, 0);
 }
 
+int mg_socket_pair(int d, int type, int protocol, int *sv) {
+  return socketpair(d, type, protocol, sv);
+}
+
 int mg_socket_close(int sock) { return MG_RETRY_ON_EINTR(close(sock)); }
 
 char* mg_socket_error() { return strerror(errno); }

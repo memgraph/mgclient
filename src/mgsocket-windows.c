@@ -43,6 +43,33 @@ int mg_socket_receive(int sock, void* buf, int len) {
   return recv(sock, buf, len, 0);
 }
 
+// Taken from https://nlnetlabs.nl/svn/unbound/tags/release-1.0.1/compat/socketpair.c
+// TODO(gitbuda): Understand how to correctly implement socketpair on Windows.
+int mg_socket_pair(int d, int type, int protocol, int *sv) {
+  static int count;
+  char buf[64];
+  HANDLE fd;
+  DWORD dwMode;
+  (void)d; (void)type; (void)protocol;
+  sprintf(buf, "\\\\.\\pipe\\levent-%d", count++);
+  /// Create a duplex pipe which will behave like a socket pair.
+  fd = CreateNamedPipe(buf, PIPE_ACCESS_DUPLEX, PIPE_TYPE_BYTE | PIPE_NOWAIT,
+		                   PIPE_UNLIMITED_INSTANCES, 4096, 4096, 0, NULL);
+  if (fd == INVALID_HANDLE_VALUE)
+    return (-1);
+  sv[0] = (int)fd;
+
+  fd = CreateFile(buf, GENERIC_READ|GENERIC_WRITE, 0, NULL, OPEN_EXISTING,
+                  FILE_ATTRIBUTE_NORMAL, NULL);
+  if (fd == INVALID_HANDLE_VALUE)
+    return (-1);
+  dwMode = PIPE_NOWAIT;
+  SetNamedPipeHandleState(fd, &dwMode, NULL, NULL);
+  sv[1] = (int)fd;
+
+  return (0);
+}
+
 int mg_socket_close(int sock) { return closesocket(sock); }
 
 char* mg_socket_error() {

@@ -15,18 +15,29 @@
 #include <random>
 #include <thread>
 
-#include <arpa/inet.h>
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
+
+#if ON_POSIX
+#include <arpa/inet.h>
 #include <netinet/ip.h>
 #include <sys/socket.h>
 #include <sys/types.h>
+#endif // ON_POSIX
+
+#if ON_WINDOWS
+// TODO(gitbuda): Add more https://gist.github.com/PkmX/63dd23f28ba885be53a5.
+#define htobe16(x) __builtin_bswap16(x)
+#define htobe32(x) __builtin_bswap32(x)
+#define htobe64(x) __builtin_bswap64(x)
+#endif // ON_WINDOWS
 
 #include "mgclient.h"
 
 extern "C" {
 #include "mgcommon.h"
 #include "mgsession.h"
+#include "mgsocket.h"
 }
 
 #include "test-common.hpp"
@@ -114,8 +125,9 @@ int __wrap_mg_secure_transport_init(int sockfd, const char *cert,
 int SendData(int sockfd, const char *buf, size_t len) {
   size_t total_sent = 0;
   while (total_sent < len) {
+    // TODO(gitbuda): MSG_NOSIGNAL was sent to the send here. IMPORTANT!
     ssize_t sent_now = MG_RETRY_ON_EINTR(
-        send(sockfd, buf + total_sent, len - total_sent, MSG_NOSIGNAL));
+        mg_socket_send(sockfd, buf + total_sent, len - total_sent));
     if (sent_now == -1) {
       return -1;
     }
@@ -128,7 +140,7 @@ int RecvData(int sockfd, char *buf, size_t len) {
   size_t total_received = 0;
   while (total_received < len) {
     ssize_t received_now = MG_RETRY_ON_EINTR(
-        recv(sockfd, buf + total_received, len - total_received, 0));
+        mg_socket_receive(sockfd, buf + total_received, len - total_received));
     if (received_now == 0) {
       // Server closed the connection.
       return -1;
@@ -522,7 +534,7 @@ class RunTest : public ::testing::Test {
  protected:
   virtual void SetUp() override {
     int tmp[2];
-    socketpair(AF_UNIX, SOCK_STREAM, 0, tmp);
+    ASSERT_EQ(mg_socket_pair(AF_UNIX, SOCK_STREAM, 0, tmp), 0);
     sc = tmp[0];
     ss = tmp[1];
 

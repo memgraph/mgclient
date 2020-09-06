@@ -37,6 +37,8 @@ int mg_socket_send(int sock, const void* buf, int len);
 
 int mg_socket_receive(int sock, void* buf, int len);
 
+int mg_socket_pair(int d, int type, int protocol, int *sv);
+
 int mg_socket_close(int sock);
 
 char* mg_socket_error();

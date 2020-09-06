@@ -16,14 +16,25 @@
 #include <thread>
 
 #include <gtest/gtest.h>
+
+#ifdef ON_POSIX
 #include <sys/socket.h>
 #include <sys/types.h>
+#endif // ON_POSIX
+
+#ifdef ON_WINDOWS
+// TODO(gitbuda): Add more https://gist.github.com/PkmX/63dd23f28ba885be53a5.
+#define htobe16(x) __builtin_bswap16(x)
+#define htobe32(x) __builtin_bswap32(x)
+#define htobe64(x) __builtin_bswap64(x)
+#endif // ON_WINDOWS
 
 #include "mgclient.h"
 
 extern "C" {
 #include "mgcommon.h"
 #include "mgsession.h"
+#include "mgsocket.h"
 }
 
 #include "bolt-testdata.hpp"
@@ -41,7 +52,7 @@ class TestClient {
     thread_ = std::thread([this, sockfd, data] {
       size_t sent = 0;
       while (sent < data.size()) {
-        ssize_t now = send(sockfd, data.data(), data.size() - sent, 0);
+        ssize_t now = mg_socket_send(sockfd, data.data(), data.size() - sent);
         if (now < 0) {
           error = true;
           break;
@@ -84,7 +95,7 @@ class DecoderTest : public ::testing::Test {
  protected:
   virtual void SetUp() override {
     int tmp[2];
-    socketpair(AF_UNIX, SOCK_STREAM, 0, tmp);
+    ASSERT_EQ(mg_socket_pair(AF_UNIX, SOCK_STREAM, 0, tmp), 0);
     sc = tmp[0];
     ss = tmp[1];
   }

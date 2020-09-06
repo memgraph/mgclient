@@ -17,9 +17,13 @@ cmake_minimum_required(VERSION 3.4)
 if(${WIN32})
     message(STATUS "ON WINDOWS BUILD")
     add_definitions(-DON_WINDOWS=1)
+    # CMAKE_FIND_LIBRARY_PREFIXES on Windows is "lib;".
+    # "lib;" breaks gtest lib referencing.
+    set(MGCLIENT_FIND_LIBRARY_PREFIXES "lib")
 else()
     message(STATUS "ON POSIX BUILD")
     add_definitions(-DON_POSIX=1)
+    set(MGCLIENT_FIND_LIBRARY_PREFIXES "${CMAKE_FIND_LIBRARY_PREFIXES}")
 endif()
 
 project(mgclient VERSION 0.1)
@@ -32,7 +36,8 @@ option(BUILD_TESTING_INTEGRATION "" OFF)
 include(CTest)
 
 set(CMAKE_C_STANDARD 11)
-set(CMAKE_CXX_STANDARD 14)
+# C++17 is fine here because it is required only for the testing purposes.
+set(CMAKE_CXX_STANDARD 17)
 set(C_STANDARD_REQUIRED ON)
 set(CXX_STANDARD_REQUIRED ON)
 

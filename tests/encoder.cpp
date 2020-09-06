@@ -16,14 +16,23 @@
 #include <thread>
 
 #include <gtest/gtest.h>
+
+#ifdef ON_POSIX
 #include <sys/socket.h>
 #include <sys/types.h>
+#endif // ON_POSIX
+
+#ifdef ON_WINDOWS
+// TODO(gitbuda): Add more https://gist.github.com/PkmX/63dd23f28ba885be53a5.
+#define be16toh(x) _byteswap_ushort(x)
+#endif // ON_WINDOWS
 
 #include "mgclient.h"
 
 extern "C" {
 #include "mgconstants.h"
 #include "mgsession.h"
+#include "mgsocket.h"
 }
 
 #include "bolt-testdata.hpp"
@@ -43,7 +52,7 @@ class TestServer {
     thread_ = std::thread([this, sockfd] {
       char buffer[8192];
       while (true) {
-        ssize_t now = recv(sockfd, buffer, 8192, 0);
+        ssize_t now = mg_socket_receive(sockfd, buffer, 8192);
         if (now < 0) {
           error = true;
           break;
@@ -81,7 +90,7 @@ class EncoderTest : public ::testing::Test {
     session.out_end = session.out_begin;
     {
       int tmp[2];
-      socketpair(AF_UNIX, SOCK_STREAM, 0, tmp);
+      ASSERT_EQ(mg_socket_pair(AF_UNIX, SOCK_STREAM, 0, tmp), 0);
       sc = tmp[0];
       ss = tmp[1];
     }
