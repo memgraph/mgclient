@@ -14,7 +14,7 @@
 
 // TODO(mtomic): Maybe add test for raw transport.
 
-#include <filesystem>
+#include <experimental/filesystem>
 #include <fstream>
 #include <functional>
 #include <random>
@@ -28,21 +28,24 @@
 #include <netinet/ip.h>
 #include <sys/socket.h>
 #include <sys/types.h>
-#endif // ON_POSIX
+#endif  // ON_POSIX
 
 #if ON_WINDOWS
-// NOTE: https://stackoverflow.com/questions/49504648/x509-name-macro-in-c-wont-compile
+// NOTE:
+// https://stackoverflow.com/questions/49504648/x509-name-macro-in-c-wont-compile
 #define WIN32_LEAN_AND_MEAN
 #include <openssl/x509.h>
-#endif // ON_WINDOWS
+#endif  // ON_WINDOWS
 
 extern "C" {
 #include "mgclient.h"
-#include "mgtransport.h"
 #include "mgsocket.h"
+#include "mgtransport.h"
 }
 
 #include "test-common.hpp"
+
+namespace fs = std::experimental::filesystem;
 
 std::pair<X509 *, EVP_PKEY *> MakeCertAndKey(const char *name) {
   RSA *rsa = RSA_new();
@@ -114,12 +117,12 @@ class SecureTransportTest : public ::testing::Test {
     X509_sign(client_cert, ca_key, EVP_sha1());
 
     // Write client key and certificates to temporary file.
-    client_cert_path = std::filesystem::temp_directory_path() / "client.crt";
+    client_cert_path = fs::temp_directory_path() / "client.crt";
     BIO *cert_file = BIO_new_file(client_cert_path.string().c_str(), "w");
     PEM_write_bio_X509(cert_file, client_cert);
     BIO_free(cert_file);
 
-    client_key_path = std::filesystem::temp_directory_path() / "client.key";
+    client_key_path = fs::temp_directory_path() / "client.key";
     BIO *key_file = BIO_new_file(client_key_path.string().c_str(), "w");
     PEM_write_bio_PrivateKey(key_file, client_key, NULL, NULL, 0, NULL, NULL);
     BIO_free(key_file);
@@ -149,8 +152,8 @@ class SecureTransportTest : public ::testing::Test {
   X509 *ca_cert;
   EVP_PKEY *server_key;
 
-  std::filesystem::path client_cert_path;
-  std::filesystem::path client_key_path;
+  fs::path client_cert_path;
+  fs::path client_key_path;
 
   int sc;
   int ss;
@@ -238,10 +241,10 @@ TEST_F(SecureTransportTest, WithCertificate) {
   });
 
   mg_transport *transport;
-  ASSERT_EQ(mg_secure_transport_init(
-                sc, client_cert_path.string().c_str(),
-                client_key_path.string().c_str(),
-                (mg_secure_transport **)&transport, (mg_allocator *)&allocator),
+  ASSERT_EQ(mg_secure_transport_init(sc, client_cert_path.string().c_str(),
+                                     client_key_path.string().c_str(),
+                                     (mg_secure_transport **)&transport,
+                                     (mg_allocator *)&allocator),
             0);
   ASSERT_EQ(mg_transport_send((mg_transport *)transport, "hello", 5), 0);
 

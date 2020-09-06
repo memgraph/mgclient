@@ -14,6 +14,8 @@
 
 cmake_minimum_required(VERSION 3.4)
 
+project(mgclient VERSION 0.1)
+
 if(${WIN32})
     message(STATUS "ON WINDOWS BUILD")
     add_definitions(-DON_WINDOWS=1)
@@ -25,8 +27,6 @@ else()
     add_definitions(-DON_POSIX=1)
     set(MGCLIENT_FIND_LIBRARY_PREFIXES "${CMAKE_FIND_LIBRARY_PREFIXES}")
 endif()
-
-project(mgclient VERSION 0.1)
 
 # Building tests is disabled by default to simplify the default build config.
 option(BUILD_TESTING "" OFF)

@@ -23,14 +23,14 @@
 #include <netinet/ip.h>
 #include <sys/socket.h>
 #include <sys/types.h>
-#endif // ON_POSIX
+#endif  // ON_POSIX
 
 #if ON_WINDOWS
 // TODO(gitbuda): Add more https://gist.github.com/PkmX/63dd23f28ba885be53a5.
 #define htobe16(x) __builtin_bswap16(x)
 #define htobe32(x) __builtin_bswap32(x)
 #define htobe64(x) __builtin_bswap64(x)
-#endif // ON_WINDOWS
+#endif  // ON_WINDOWS
 
 #include "mgclient.h"
 

@@ -20,20 +20,18 @@
 #include "mgclient-error.h"
 #include "mgcommon.h"
 
-int mg_socket_init() {
-    return 0;
-}
+int mg_socket_init() { return 0; }
 
 int mg_socket_create(int af, int type, int protocol) {
   return socket(af, type, protocol);
 }
 
-int mg_socket_connect(int sock, const struct sockaddr* addr,
+int mg_socket_connect(int sock, const struct sockaddr *addr,
                       socklen_t addrlen) {
   return MG_RETRY_ON_EINTR(connect(sock, addr, addrlen));
 }
 
-int mg_socket_options(int sock, mg_session* session) {
+int mg_socket_options(int sock, mg_session *session) {
   struct {
     int level;
     int optname;
@@ -55,7 +53,7 @@ int mg_socket_options(int sock, mg_session* session) {
     socklen_t optlen = sizeof(optval);
 
     if (setsockopt(sock, socket_options[i].level, socket_options[i].optname,
-                   (void*)&optval, optlen) != 0) {
+                   (void *)&optval, optlen) != 0) {
       mg_session_set_error(session, "couldn't set socket option: %s",
                            mg_socket_error());
       if (mg_socket_close(sock) != 0) {
@@ -67,11 +65,11 @@ int mg_socket_options(int sock, mg_session* session) {
   return 0;
 }
 
-int mg_socket_send(int sock, const void* buf, int len) {
+int mg_socket_send(int sock, const void *buf, int len) {
   return (int)send(sock, buf, len, MSG_NOSIGNAL);
 }
 
-int mg_socket_receive(int sock, void* buf, int len) {
+int mg_socket_receive(int sock, void *buf, int len) {
   return (int)recv(sock, buf, len, 0);
 }
 
@@ -81,4 +79,4 @@ int mg_socket_pair(int d, int type, int protocol, int *sv) {
 
 int mg_socket_close(int sock) { return MG_RETRY_ON_EINTR(close(sock)); }
 
-char* mg_socket_error() { return strerror(errno); }
+char *mg_socket_error() { return strerror(errno); }

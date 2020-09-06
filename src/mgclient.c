@@ -15,11 +15,11 @@
 #include "mgclient.h"
 
 #include <assert.h>
+#include <errno.h>
 #include <inttypes.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <errno.h>
 
 #if ON_POSIX
 #include <arpa/inet.h>
@@ -28,16 +28,16 @@
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <unistd.h>
-#endif // ON_POSIX
+#endif  // ON_POSIX
 
 #if ON_WINDOWS
-#include <winsock2.h>
-#include <windows.h>
 #include <Ws2tcpip.h>
+#include <windows.h>
+#include <winsock2.h>
 // TODO(gitbuda): Add more https://gist.github.com/PkmX/63dd23f28ba885be53a5.
 #define htobe32(x) __builtin_bswap32(x)
 #define be32toh(x) __builtin_bswap32(x)
-#endif // ON_WINDOWS
+#endif  // ON_WINDOWS
 
 #include "mgcommon.h"
 #include "mgconstants.h"
@@ -45,9 +45,7 @@
 #include "mgsession.h"
 #include "mgsocket.h"
 
-int mg_init() {
-  return mg_socket_init();
-}
+int mg_init() { return mg_socket_init(); }
 
 typedef struct mg_session_params {
   const char *address;
@@ -393,12 +391,12 @@ static int init_tcp_connection(const mg_session_params *params, int *sockfd,
 #ifdef ON_POSIX
   int tsockfd = -1;
   int status = 0;
-#endif // ON_POSIX
+#endif  // ON_POSIX
 
 #ifdef ON_WINDOWS
   SOCKET tsockfd = INVALID_SOCKET;
   int status = 0;
-#endif // ON_WINDOWS
+#endif  // ON_WINDOWS
 
   for (struct addrinfo *curr_addr = addr_list; curr_addr;
        curr_addr = curr_addr->ai_next) {
@@ -412,8 +410,8 @@ static int init_tcp_connection(const mg_session_params *params, int *sockfd,
       continue;
     }
     // TODO(gitbuda): Cross-platform error handling.
-    if (mg_socket_connect(tsockfd, curr_addr->ai_addr,
-                          curr_addr->ai_addrlen) != 0) {
+    if (mg_socket_connect(tsockfd, curr_addr->ai_addr, curr_addr->ai_addrlen) !=
+        0) {
       status = MG_ERROR_NETWORK_FAILURE;
       mg_session_set_error(session, "couldn't connect to host: %s",
                            strerror(errno));

@@ -129,7 +129,7 @@ std::string ENCODED_SIZE[] = {"not applicable",
                               "\x00\x01\x00\x00"s,
                               "\x00\x01\xFB\xD0"s};
 
-int NUM_INPUTS = sizeof(SIZE) / sizeof(size_t);
+int NUM_INPUTS = sizeof(SIZES) / sizeof(size_t);
 
 enum class ContainerType { STRING, LIST, MAP };
 

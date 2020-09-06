@@ -15,9 +15,9 @@
 #include "mgtransport.h"
 
 #include <assert.h>
+#include <errno.h>
 #include <stdlib.h>
 #include <string.h>
-#include <errno.h>
 
 #ifdef ON_POSIX
 #include <poll.h>
@@ -25,15 +25,15 @@
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <unistd.h>
-#endif // ON_POSIX
+#endif  // ON_POSIX
 
 #ifdef ON_WINDOWS
-#endif // ON_WINDOWS
+#endif  // ON_WINDOWS
 
-#include "mgsocket.h"
 #include "mgallocator.h"
 #include "mgclient.h"
 #include "mgcommon.h"
+#include "mgsocket.h"
 
 int mg_init_ssl = 1;
 
