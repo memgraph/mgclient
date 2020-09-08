@@ -23,7 +23,7 @@ template <typename TDest, typename TSrc> TDest MemcpyCast(TSrc src) {
   static_assert(std::is_arithmetic<TSrc>::value,
                 "MemcpyCast expects source is an arithmetic type");
   static_assert(std::is_arithmetic<TDest>::value,
-                "MemcypCast expects destination is an arithmetic type");
+                "MemcpyCast expects destination is an arithmetic type");
   std::memcpy(&dest, &src, sizeof(src));
   return dest;
 }
@@ -83,7 +83,6 @@ public:
   uint64_t AsUint() const { return detail::MemcpyCast<uint64_t>(id_); }
 
   bool operator==(const Id &other) const { return id_ == other.id_; }
-
   bool operator!=(const Id &other) const { return !(*this == other); }
 
 private:

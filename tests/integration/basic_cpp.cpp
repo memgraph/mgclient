@@ -46,6 +46,7 @@ protected:
     ASSERT_FALSE(client->FetchOne());
 
     ASSERT_TRUE(client->Execute(delete_all_query));
+    ASSERT_FALSE(client->FetchOne());
   }
 
   std::unique_ptr<mg::Client> client;
