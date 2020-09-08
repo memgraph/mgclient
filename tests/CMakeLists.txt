@@ -14,9 +14,8 @@
 
 include(ExternalProject)
 
-# Setup GTest
 find_package(Threads REQUIRED)
-
+# Setup GTest
 ExternalProject_Add(gtest-proj
         PREFIX            gtest
         GIT_REPOSITORY    https://github.com/google/googletest.git
@@ -74,5 +73,8 @@ target_link_libraries(transport stdc++fs)
 add_gtest(allocator allocator.cpp)
 
 if(BUILD_TESTING_INTEGRATION)
-  add_gtest(basic integration/basic.cpp)
+  add_gtest(integration_basic_c integration/basic_c.cpp)
+  add_gtest(integration_basic_cpp integration/basic_cpp.cpp)
 endif()
+
+add_gtest(unit_mgclient_value unit/mgclient_value.cpp)
