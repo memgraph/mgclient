@@ -20,8 +20,7 @@
 template <typename T>
 T GetEnvOrDefault(const std::string &value_name, const T &default_value) {
   const char *char_value = std::getenv(value_name.c_str());
-  if (!char_value)
-    return default_value;
+  if (!char_value) return default_value;
   T value;
   std::stringstream env_value_stream(char_value);
   env_value_stream >> value;
@@ -29,7 +28,7 @@ T GetEnvOrDefault(const std::string &value_name, const T &default_value) {
 }
 
 class MemgraphConnection : public ::testing::Test {
-protected:
+ protected:
   virtual void SetUp() override {
     client = mg::Client::Connect(
         {GetEnvOrDefault<std::string>("MEMGRAPH_HOST", "127.0.0.1"),

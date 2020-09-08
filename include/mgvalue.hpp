@@ -16,7 +16,8 @@ namespace detail {
 // uint to int conversion in C++ is a bit tricky. Take a look here
 // https://stackoverflow.com/questions/14623266/why-cant-i-reinterpret-cast-uint-to-int
 // for more details.
-template <typename TDest, typename TSrc> TDest MemcpyCast(TSrc src) {
+template <typename TDest, typename TSrc>
+TDest MemcpyCast(TSrc src) {
   TDest dest;
   static_assert(sizeof(dest) == sizeof(src),
                 "MemcpyCast expects source and destination to be of same size");
@@ -27,7 +28,7 @@ template <typename TDest, typename TSrc> TDest MemcpyCast(TSrc src) {
   std::memcpy(&dest, &src, sizeof(src));
   return dest;
 }
-} // namespace detail
+}  // namespace detail
 
 // Forward declarations:
 class ConstList;
@@ -41,10 +42,10 @@ class Value;
 
 #define CREATE_ITERATOR(container, element)                                    \
   class Iterator {                                                             \
-  private:                                                                     \
+   private:                                                                    \
     friend class container;                                                    \
                                                                                \
-  public:                                                                      \
+   public:                                                                     \
     bool operator==(const Iterator &other) const {                             \
       return iterable_ == other.iterable_ && index_ == other.index_;           \
     }                                                                          \
@@ -58,7 +59,7 @@ class Value;
                                                                                \
     element operator*() const;                                                 \
                                                                                \
-  private:                                                                     \
+   private:                                                                    \
     Iterator(const container *iterable, size_t index)                          \
         : iterable_(iterable), index_(index) {}                                \
                                                                                \
@@ -68,7 +69,7 @@ class Value;
 
 /// Wrapper for int64_t ID to prevent dangerous implicit conversions.
 class Id {
-public:
+ public:
   Id() = default;
 
   /// Construct Id from uint64_t
@@ -85,7 +86,7 @@ public:
   bool operator==(const Id &other) const { return id_ == other.id_; }
   bool operator!=(const Id &other) const { return !(*this == other); }
 
-private:
+ private:
   explicit Id(int64_t id) : id_(id) {}
 
   int64_t id_;
@@ -96,10 +97,10 @@ private:
 
 /// \brief Wrapper class for \ref mg_list.
 class List final {
-private:
+ private:
   friend class Value;
 
-public:
+ public:
   CREATE_ITERATOR(List, ConstValue);
 
   explicit List(mg_list *ptr) : ptr_(ptr) {}
@@ -166,12 +167,12 @@ public:
 
   const mg_list *ptr() const { return ptr_; }
 
-private:
+ private:
   mg_list *ptr_;
 };
 
 class ConstList final {
-public:
+ public:
   CREATE_ITERATOR(ConstList, ConstValue);
 
   explicit ConstList(const mg_list *const_ptr) : const_ptr_(const_ptr) {}
@@ -196,7 +197,7 @@ public:
 
   const mg_list *ptr() const { return const_ptr_; }
 
-private:
+ private:
   const mg_list *const_ptr_;
 };
 
@@ -205,11 +206,11 @@ private:
 
 /// \brief Wrapper class for \ref mg_map.
 class Map final {
-private:
+ private:
   friend class Value;
   using KeyValuePair = std::pair<std::string_view, ConstValue>;
 
-public:
+ public:
   CREATE_ITERATOR(Map, KeyValuePair);
 
   explicit Map(mg_map *ptr) : ptr_(ptr) {}
@@ -308,15 +309,15 @@ public:
 
   const mg_map *ptr() const { return ptr_; }
 
-private:
+ private:
   mg_map *ptr_;
 };
 
 class ConstMap final {
-private:
+ private:
   using KeyValuePair = std::pair<std::string_view, ConstValue>;
 
-public:
+ public:
   CREATE_ITERATOR(ConstMap, KeyValuePair);
 
   explicit ConstMap(const mg_map *const_ptr) : const_ptr_(const_ptr) {}
@@ -353,7 +354,7 @@ public:
 
   const mg_map *ptr() const { return const_ptr_; }
 
-private:
+ private:
   const mg_map *const_ptr_;
 };
 
@@ -362,13 +363,13 @@ private:
 
 /// \brief Wrapper class for \ref mg_node
 class Node final {
-private:
+ private:
   friend class Value;
 
-public:
+ public:
   /// \brief View of the node's labels
   class Labels final {
-  public:
+   public:
     CREATE_ITERATOR(Labels, std::string_view);
 
     explicit Labels(const mg_node *node) : node_(node) {}
@@ -381,7 +382,7 @@ public:
     Iterator begin() { return Iterator(this, 0); }
     Iterator end() { return Iterator(this, size()); }
 
-  private:
+   private:
     const mg_node *node_;
   };
 
@@ -421,12 +422,12 @@ public:
 
   const mg_node *ptr() const { return ptr_; }
 
-private:
+ private:
   mg_node *ptr_;
 };
 
 class ConstNode final {
-public:
+ public:
   explicit ConstNode(const mg_node *const_ptr) : const_ptr_(const_ptr) {}
 
   Id id() const { return Id::FromInt(mg_node_id(const_ptr_)); }
@@ -452,7 +453,7 @@ public:
 
   const mg_node *ptr() const { return const_ptr_; }
 
-private:
+ private:
   const mg_node *const_ptr_;
 };
 
@@ -461,10 +462,10 @@ private:
 
 /// \brief Wrapper class for \ref mg_relationship.
 class Relationship final {
-private:
+ private:
   friend class Value;
 
-public:
+ public:
   explicit Relationship(mg_relationship *ptr) : ptr_(ptr) {}
 
   /// \brief Create a Relationship from a copy the given \ref mg_relationship.
@@ -512,12 +513,12 @@ public:
 
   const mg_relationship *ptr() const { return ptr_; }
 
-private:
+ private:
   mg_relationship *ptr_;
 };
 
 class ConstRelationship final {
-public:
+ public:
   explicit ConstRelationship(const mg_relationship *const_ptr)
       : const_ptr_(const_ptr) {}
 
@@ -552,7 +553,7 @@ public:
 
   const mg_relationship *ptr() const { return const_ptr_; }
 
-private:
+ private:
   const mg_relationship *const_ptr_;
 };
 
@@ -561,10 +562,10 @@ private:
 
 /// \brief Wrapper class for \ref mg_unbound_relationship.
 class UnboundRelationship final {
-private:
+ private:
   friend class Value;
 
-public:
+ public:
   explicit UnboundRelationship(mg_unbound_relationship *ptr) : ptr_(ptr) {}
 
   /// \brief Create an UnboundRelationship from a copy of the given
@@ -609,12 +610,12 @@ public:
 
   const mg_unbound_relationship *ptr() const { return ptr_; }
 
-private:
+ private:
   mg_unbound_relationship *ptr_;
 };
 
 class ConstUnboundRelationship final {
-public:
+ public:
   explicit ConstUnboundRelationship(const mg_unbound_relationship *const_ptr)
       : const_ptr_(const_ptr) {}
 
@@ -645,7 +646,7 @@ public:
 
   const mg_unbound_relationship *ptr() const { return const_ptr_; }
 
-private:
+ private:
   const mg_unbound_relationship *const_ptr_;
 };
 
@@ -654,10 +655,10 @@ private:
 
 /// \brief Wrapper class for \ref mg_path.
 class Path final {
-private:
+ private:
   friend class Value;
 
-public:
+ public:
   explicit Path(mg_path *ptr) : ptr_(ptr) {}
 
   /// \brief Create a Path from a copy of the given \ref mg_path.
@@ -700,12 +701,12 @@ public:
 
   const mg_path *ptr() const { return ptr_; }
 
-private:
+ private:
   mg_path *ptr_;
 };
 
 class ConstPath final {
-public:
+ public:
   explicit ConstPath(const mg_path *const_ptr) : const_ptr_(const_ptr) {}
 
   /// Length of the path in number of edges.
@@ -735,7 +736,7 @@ public:
 
   const mg_path *ptr() const { return const_ptr_; }
 
-private:
+ private:
   const mg_path *const_ptr_;
 };
 
@@ -744,11 +745,11 @@ private:
 
 /// Wrapper class for \ref mg_value
 class Value final {
-private:
+ private:
   friend class List;
   friend class Map;
 
-public:
+ public:
   /// \brief Types that can be stored in a `Value`.
   enum class Type : uint8_t {
     Null,
@@ -861,12 +862,12 @@ public:
 
   const mg_value *ptr() const { return ptr_; }
 
-private:
+ private:
   mg_value *ptr_;
 };
 
 class ConstValue final {
-public:
+ public:
   explicit ConstValue(const mg_value *const_ptr) : const_ptr_(const_ptr) {}
 
   /// \pre value type is Type::Bool
@@ -904,7 +905,7 @@ public:
 
   const mg_value *ptr() const { return const_ptr_; }
 
-private:
+ private:
   const mg_value *const_ptr_;
 };
 
@@ -917,30 +918,30 @@ std::string_view ConvertString(const mg_string *str) {
 
 Value::Type ConvertType(mg_value_type type) {
   switch (type) {
-  case MG_VALUE_TYPE_NULL:
-    return Value::Type::Null;
-  case MG_VALUE_TYPE_BOOL:
-    return Value::Type::Bool;
-  case MG_VALUE_TYPE_INTEGER:
-    return Value::Type::Int;
-  case MG_VALUE_TYPE_FLOAT:
-    return Value::Type::Double;
-  case MG_VALUE_TYPE_STRING:
-    return Value::Type::String;
-  case MG_VALUE_TYPE_LIST:
-    return Value::Type::List;
-  case MG_VALUE_TYPE_MAP:
-    return Value::Type::Map;
-  case MG_VALUE_TYPE_NODE:
-    return Value::Type::Node;
-  case MG_VALUE_TYPE_RELATIONSHIP:
-    return Value::Type::Relationship;
-  case MG_VALUE_TYPE_UNBOUND_RELATIONSHIP:
-    return Value::Type::UnboundRelationship;
-  case MG_VALUE_TYPE_PATH:
-    return Value::Type::Path;
-  case MG_VALUE_TYPE_UNKNOWN:
-    throw std::runtime_error("Unknown value type!");
+    case MG_VALUE_TYPE_NULL:
+      return Value::Type::Null;
+    case MG_VALUE_TYPE_BOOL:
+      return Value::Type::Bool;
+    case MG_VALUE_TYPE_INTEGER:
+      return Value::Type::Int;
+    case MG_VALUE_TYPE_FLOAT:
+      return Value::Type::Double;
+    case MG_VALUE_TYPE_STRING:
+      return Value::Type::String;
+    case MG_VALUE_TYPE_LIST:
+      return Value::Type::List;
+    case MG_VALUE_TYPE_MAP:
+      return Value::Type::Map;
+    case MG_VALUE_TYPE_NODE:
+      return Value::Type::Node;
+    case MG_VALUE_TYPE_RELATIONSHIP:
+      return Value::Type::Relationship;
+    case MG_VALUE_TYPE_UNBOUND_RELATIONSHIP:
+      return Value::Type::UnboundRelationship;
+    case MG_VALUE_TYPE_PATH:
+      return Value::Type::Path;
+    case MG_VALUE_TYPE_UNKNOWN:
+      throw std::runtime_error("Unknown value type!");
   }
 }
 
@@ -1082,37 +1083,40 @@ bool AreValuesEqual(const mg_value *value1, const mg_value *value2) {
     return false;
   }
   switch (mg_value_get_type(value1)) {
-  case MG_VALUE_TYPE_NULL:
-    return true;
-  case MG_VALUE_TYPE_BOOL:
-    return mg_value_bool(value1) == mg_value_bool(value2);
-  case MG_VALUE_TYPE_INTEGER:
-    return mg_value_integer(value1) == mg_value_integer(value2);
-  case MG_VALUE_TYPE_FLOAT:
-    return mg_value_float(value1) == mg_value_float(value2);
-  case MG_VALUE_TYPE_STRING:
-    return detail::ConvertString(mg_value_string(value1)) ==
-           detail::ConvertString(mg_value_string(value2));
-  case MG_VALUE_TYPE_LIST:
-    return detail::AreListsEqual(mg_value_list(value1), mg_value_list(value2));
-  case MG_VALUE_TYPE_MAP:
-    return detail::AreMapsEqual(mg_value_map(value1), mg_value_map(value2));
-  case MG_VALUE_TYPE_NODE:
-    return detail::AreNodesEqual(mg_value_node(value1), mg_value_node(value2));
-  case MG_VALUE_TYPE_RELATIONSHIP:
-    return detail::AreRelationshipsEqual(mg_value_relationship(value1),
-                                         mg_value_relationship(value2));
-  case MG_VALUE_TYPE_UNBOUND_RELATIONSHIP:
-    return detail::AreUnboundRelationshipsEqual(
-        mg_value_unbound_relationship(value1),
-        mg_value_unbound_relationship(value2));
-  case MG_VALUE_TYPE_PATH:
-    return detail::ArePathsEqual(mg_value_path(value1), mg_value_path(value2));
-  case MG_VALUE_TYPE_UNKNOWN:
-    throw std::runtime_error("Comparing values of unknown types!");
+    case MG_VALUE_TYPE_NULL:
+      return true;
+    case MG_VALUE_TYPE_BOOL:
+      return mg_value_bool(value1) == mg_value_bool(value2);
+    case MG_VALUE_TYPE_INTEGER:
+      return mg_value_integer(value1) == mg_value_integer(value2);
+    case MG_VALUE_TYPE_FLOAT:
+      return mg_value_float(value1) == mg_value_float(value2);
+    case MG_VALUE_TYPE_STRING:
+      return detail::ConvertString(mg_value_string(value1)) ==
+             detail::ConvertString(mg_value_string(value2));
+    case MG_VALUE_TYPE_LIST:
+      return detail::AreListsEqual(mg_value_list(value1),
+                                   mg_value_list(value2));
+    case MG_VALUE_TYPE_MAP:
+      return detail::AreMapsEqual(mg_value_map(value1), mg_value_map(value2));
+    case MG_VALUE_TYPE_NODE:
+      return detail::AreNodesEqual(mg_value_node(value1),
+                                   mg_value_node(value2));
+    case MG_VALUE_TYPE_RELATIONSHIP:
+      return detail::AreRelationshipsEqual(mg_value_relationship(value1),
+                                           mg_value_relationship(value2));
+    case MG_VALUE_TYPE_UNBOUND_RELATIONSHIP:
+      return detail::AreUnboundRelationshipsEqual(
+          mg_value_unbound_relationship(value1),
+          mg_value_unbound_relationship(value2));
+    case MG_VALUE_TYPE_PATH:
+      return detail::ArePathsEqual(mg_value_path(value1),
+                                   mg_value_path(value2));
+    case MG_VALUE_TYPE_UNKNOWN:
+      throw std::runtime_error("Comparing values of unknown types!");
   }
 }
-} // namespace detail
+}  // namespace detail
 
 ////////////////////////////////////////////////////////////////////////////////
 // List:
@@ -1418,8 +1422,8 @@ std::string_view UnboundRelationship::type() const {
   return detail::ConvertString(mg_unbound_relationship_type(ptr_));
 }
 
-ConstUnboundRelationship
-UnboundRelationship::AsConstUnboundRelationship() const {
+ConstUnboundRelationship UnboundRelationship::AsConstUnboundRelationship()
+    const {
   return ConstUnboundRelationship(ptr_);
 }
 
@@ -1427,8 +1431,8 @@ bool UnboundRelationship::operator==(const UnboundRelationship &other) const {
   return detail::AreUnboundRelationshipsEqual(ptr_, other.ptr_);
 }
 
-bool UnboundRelationship::
-operator==(const ConstUnboundRelationship &other) const {
+bool UnboundRelationship::operator==(
+    const ConstUnboundRelationship &other) const {
   return detail::AreUnboundRelationshipsEqual(ptr_, other.ptr());
 }
 
@@ -1436,13 +1440,13 @@ std::string_view ConstUnboundRelationship::type() const {
   return detail::ConvertString(mg_unbound_relationship_type(const_ptr_));
 }
 
-bool ConstUnboundRelationship::
-operator==(const ConstUnboundRelationship &other) const {
+bool ConstUnboundRelationship::operator==(
+    const ConstUnboundRelationship &other) const {
   return detail::AreUnboundRelationshipsEqual(const_ptr_, other.const_ptr_);
 }
 
-bool ConstUnboundRelationship::
-operator==(const UnboundRelationship &other) const {
+bool ConstUnboundRelationship::operator==(
+    const UnboundRelationship &other) const {
   return detail::AreUnboundRelationshipsEqual(const_ptr_, other.ptr());
 }
 
@@ -1739,4 +1743,4 @@ bool ConstValue::operator==(const Value &other) const {
   return detail::AreValuesEqual(const_ptr_, other.ptr());
 }
 
-} // namespace mg
+}  // namespace mg
