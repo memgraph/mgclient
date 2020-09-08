@@ -11,7 +11,7 @@ namespace mg {
 /// An interface for a Memgraph client that can execute queries and fetch
 /// results.
 class Client {
-public:
+ public:
   struct Params {
     std::string host;
     uint16_t port;
@@ -56,7 +56,7 @@ public:
   /// a `nullptr`.
   static std::unique_ptr<Client> Connect(const Params &params);
 
-private:
+ private:
   explicit Client(mg_session *session);
 
   mg_session *session_;
@@ -74,8 +74,8 @@ std::unique_ptr<Client> Client::Connect(const Client::Params &params) {
     mg_session_params_set_password(mg_params, params.password.c_str());
   }
   mg_session_params_set_client_name(mg_params, params.client_name.c_str());
-  mg_session_params_set_sslmode(mg_params, params.use_ssl ? MG_SSLMODE_REQUIRE
-                                                          : MG_SSLMODE_DISABLE);
+  mg_session_params_set_sslmode(
+      mg_params, params.use_ssl ? MG_SSLMODE_REQUIRE : MG_SSLMODE_DISABLE);
 
   mg_session *session = nullptr;
   int status = mg_connect(mg_params, &session);
@@ -126,4 +126,4 @@ std::optional<std::vector<Value>> Client::FetchOne() {
   return values;
 }
 
-} // namespace mg
+}  // namespace mg

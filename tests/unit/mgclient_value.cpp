@@ -1,11 +1,10 @@
-#include <unistd.h>
 #include <malloc.h>
+#include <unistd.h>
 
 #include <gtest/gtest.h>
 
 #include "mgclient.h"
 #include "mgvalue.hpp"
-
 
 using namespace std;
 
