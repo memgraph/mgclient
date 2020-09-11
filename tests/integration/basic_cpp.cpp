@@ -35,6 +35,8 @@ class MemgraphConnection : public ::testing::Test {
          GetEnvOrDefault<uint16_t>("MEMGRAPH_PORT", 7687), "", "",
          GetEnvOrDefault<bool>("MEMGRAPH_SSLMODE", true), ""});
 
+    ASSERT_TRUE(client);
+
     // Clean the database for the tests
     ASSERT_TRUE(client->Execute(delete_all_query));
     ASSERT_FALSE(client->FetchOne());

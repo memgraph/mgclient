@@ -18,7 +18,7 @@ class Client {
     std::string username;
     std::string password;
     bool use_ssl;
-    std::string client_name;
+    std::string user_agent;
   };
 
   Client(const Client &) = delete;
@@ -73,7 +73,7 @@ std::unique_ptr<Client> Client::Connect(const Client::Params &params) {
     mg_session_params_set_username(mg_params, params.username.c_str());
     mg_session_params_set_password(mg_params, params.password.c_str());
   }
-  mg_session_params_set_client_name(mg_params, params.client_name.c_str());
+  mg_session_params_set_user_agent(mg_params, params.user_agent.c_str());
   mg_session_params_set_sslmode(
       mg_params, params.use_ssl ? MG_SSLMODE_REQUIRE : MG_SSLMODE_DISABLE);
 
@@ -93,16 +93,28 @@ Client::Client(mg_session *session) : session_(session) {}
 Client::~Client() { mg_session_destroy(session_); }
 
 bool Client::Execute(const std::string &statement) {
-  int status = mg_session_run(session_, statement.c_str(), nullptr, nullptr);
+  int status = mg_session_run(session_, statement.c_str(), nullptr, nullptr,
+                              nullptr, nullptr);
   if (status < 0) {
     return false;
   }
+
+  int stauts = mg_session_pull(session_, nullptr);
+  if (status < 0) {
+    return false;
+  }
+
   return true;
 }
 
 bool Client::Execute(const std::string &statement, const ConstMap &params) {
-  int status =
-      mg_session_run(session_, statement.c_str(), params.ptr(), nullptr);
+  int status = mg_session_run(session_, statement.c_str(), params.ptr(),
+                              nullptr, nullptr, nullptr);
+  if (status < 0) {
+    return false;
+  }
+
+  int stauts = mg_session_pull(session_, nullptr);
   if (status < 0) {
     return false;
   }
@@ -111,7 +123,7 @@ bool Client::Execute(const std::string &statement, const ConstMap &params) {
 
 std::optional<std::vector<Value>> Client::FetchOne() {
   mg_result *result;
-  int status = mg_session_pull(session_, &result);
+  int status = mg_session_fetch(session_, &result);
   if (status != 1) {
     return std::nullopt;
   }
