@@ -979,8 +979,8 @@ MGCLIENT_EXPORT void mg_session_params_set_username(mg_session_params *,
                                                     const char *username);
 MGCLIENT_EXPORT void mg_session_params_set_password(mg_session_params *,
                                                     const char *password);
-MGCLIENT_EXPORT void mg_session_params_set_client_name(mg_session_params *,
-                                                       const char *client_name);
+MGCLIENT_EXPORT void mg_session_params_set_user_agent(mg_session_params *,
+                                                      const char *user_agent);
 MGCLIENT_EXPORT void mg_session_params_set_sslmode(mg_session_params *,
                                                    enum mg_sslmode sslmode);
 MGCLIENT_EXPORT void mg_session_params_set_sslcert(mg_session_params *,
