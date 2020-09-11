@@ -83,6 +83,9 @@ mg_session *mg_session_init(mg_allocator *allocator) {
   session->result.message = NULL;
   session->result.columns = NULL;
 
+  session->explicit_transaction = 0;
+  session->query_number = 0;
+
   return session;
 
 cleanup:

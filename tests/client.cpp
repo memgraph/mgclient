@@ -257,8 +257,8 @@ TEST_F(ConnectTest, HandshakeFail) {
     char handshake[20];
     ASSERT_EQ(RecvData(sockfd, handshake, 20), 0);
     ASSERT_EQ(std::string(handshake, 4), "\x60\x60\xB0\x17"s);
-    ASSERT_EQ(std::string(handshake + 4, 4), "\x00\x00\x00\x01"s);
-    ASSERT_EQ(std::string(handshake + 8, 4), "\x00\x00\x00\x00"s);
+    ASSERT_EQ(std::string(handshake + 4, 4), "\x00\x00\x01\x04"s);
+    ASSERT_EQ(std::string(handshake + 8, 4), "\x00\x00\x00\x01"s);
     ASSERT_EQ(std::string(handshake + 12, 4), "\x00\x00\x00\x00"s);
     ASSERT_EQ(std::string(handshake + 16, 4), "\x00\x00\x00\x00"s);
 
@@ -287,8 +287,8 @@ TEST_F(ConnectTest, InitFail) {
       char handshake[20];
       ASSERT_EQ(RecvData(sockfd, handshake, 20), 0);
       ASSERT_EQ(std::string(handshake, 4), "\x60\x60\xB0\x17"s);
-      ASSERT_EQ(std::string(handshake + 4, 4), "\x00\x00\x00\x01"s);
-      ASSERT_EQ(std::string(handshake + 8, 4), "\x00\x00\x00\x00"s);
+      ASSERT_EQ(std::string(handshake + 4, 4), "\x00\x00\x01\x04"s);
+      ASSERT_EQ(std::string(handshake + 8, 4), "\x00\x00\x00\x01"s);
       ASSERT_EQ(std::string(handshake + 12, 4), "\x00\x00\x00\x00"s);
       ASSERT_EQ(std::string(handshake + 16, 4), "\x00\x00\x00\x00"s);
 
@@ -298,6 +298,7 @@ TEST_F(ConnectTest, InitFail) {
 
     mg_session *session = mg_session_init(&mg_system_allocator);
     ASSERT_TRUE(session);
+    session->version = 1;
     mg_raw_transport_init(sockfd, (mg_raw_transport **)&session->transport,
                           &mg_system_allocator);
 
@@ -359,8 +360,8 @@ TEST_F(ConnectTest, Success) {
       char handshake[20];
       ASSERT_EQ(RecvData(sockfd, handshake, 20), 0);
       ASSERT_EQ(std::string(handshake, 4), "\x60\x60\xB0\x17"s);
-      ASSERT_EQ(std::string(handshake + 4, 4), "\x00\x00\x00\x01"s);
-      ASSERT_EQ(std::string(handshake + 8, 4), "\x00\x00\x00\x00"s);
+      ASSERT_EQ(std::string(handshake + 4, 4), "\x00\x00\x01\x04"s);
+      ASSERT_EQ(std::string(handshake + 8, 4), "\x00\x00\x00\x01"s);
       ASSERT_EQ(std::string(handshake + 12, 4), "\x00\x00\x00\x00"s);
       ASSERT_EQ(std::string(handshake + 16, 4), "\x00\x00\x00\x00"s);
 
@@ -370,6 +371,7 @@ TEST_F(ConnectTest, Success) {
 
     mg_session *session = mg_session_init(&mg_system_allocator);
     ASSERT_TRUE(session);
+    session->version = 1;
     mg_raw_transport_init(sockfd, (mg_raw_transport **)&session->transport,
                           &mg_system_allocator);
 
@@ -436,8 +438,8 @@ TEST_F(ConnectTest, SuccessWithSSL) {
       char handshake[20];
       ASSERT_EQ(RecvData(sockfd, handshake, 20), 0);
       ASSERT_EQ(std::string(handshake, 4), "\x60\x60\xB0\x17"s);
-      ASSERT_EQ(std::string(handshake + 4, 4), "\x00\x00\x00\x01"s);
-      ASSERT_EQ(std::string(handshake + 8, 4), "\x00\x00\x00\x00"s);
+      ASSERT_EQ(std::string(handshake + 4, 4), "\x00\x00\x01\x04"s);
+      ASSERT_EQ(std::string(handshake + 8, 4), "\x00\x00\x00\x01"s);
       ASSERT_EQ(std::string(handshake + 12, 4), "\x00\x00\x00\x00"s);
       ASSERT_EQ(std::string(handshake + 16, 4), "\x00\x00\x00\x00"s);
 
@@ -447,6 +449,7 @@ TEST_F(ConnectTest, SuccessWithSSL) {
 
     mg_session *session = mg_session_init(&mg_system_allocator);
     ASSERT_TRUE(session);
+    session->version = 1;
     mg_raw_transport_init(sockfd, (mg_raw_transport **)&session->transport,
                           &mg_system_allocator);
 
@@ -529,6 +532,7 @@ class RunTest : public ::testing::Test {
     session = mg_session_init((mg_allocator *)&allocator);
     mg_raw_transport_init(sc, (mg_raw_transport **)&session->transport,
                           (mg_allocator *)&allocator);
+    session->version = 1;
     session->status = MG_SESSION_READY;
   }
 
@@ -614,7 +618,7 @@ TEST_F(RunTest, ProtocolViolation) {
 
     mg_session_destroy(session);
   });
-  ASSERT_EQ(mg_session_run(session, "MATCH (n) RETURN n", NULL, NULL),
+  ASSERT_EQ(mg_session_run(session, "MATCH (n) RETURN n", NULL, NULL, NULL, NULL),
             MG_ERROR_PROTOCOL_VIOLATION);
   ASSERT_EQ(mg_session_status(session), MG_SESSION_BAD);
   mg_session_destroy(session);
@@ -667,7 +671,7 @@ TEST_F(RunTest, InvalidStatement) {
 
     mg_session_destroy(session);
   });
-  ASSERT_EQ(mg_session_run(session, "MATCH (n) RETURN m", NULL, NULL),
+  ASSERT_EQ(mg_session_run(session, "MATCH (n) RETURN m", NULL, NULL, NULL, NULL),
             MG_ERROR_CLIENT_ERROR);
   ASSERT_THAT(std::string(mg_session_error(session)),
               HasSubstr("Unbound variable: m"));
@@ -680,6 +684,7 @@ TEST_F(RunTest, InvalidStatement) {
 TEST_F(RunTest, OkNoResults) {
   RunServer([](int sockfd) {
     mg_session *session = mg_session_init(&mg_system_allocator);
+    session->version = 1;
     mg_raw_transport_init(sockfd, (mg_raw_transport **)&session->transport,
                           &mg_system_allocator);
 
@@ -714,7 +719,7 @@ TEST_F(RunTest, OkNoResults) {
       mg_message *message;
       ASSERT_EQ(mg_session_receive_message(session), 0);
       ASSERT_EQ(mg_session_read_bolt_message(session, &message), 0);
-      ASSERT_EQ(message->type, MG_MESSAGE_TYPE_PULL_ALL);
+      ASSERT_EQ(message->type, MG_MESSAGE_TYPE_PULL);
       mg_message_destroy_ca(message, session->decoder_allocator);
     }
 
@@ -730,16 +735,17 @@ TEST_F(RunTest, OkNoResults) {
     mg_session_destroy(session);
   });
 
-  ASSERT_EQ(mg_session_run(session, "MATCH (n) RETURN n", NULL, NULL), 0);
+  ASSERT_EQ(mg_session_run(session, "MATCH (n) RETURN n", NULL, NULL, NULL, NULL), 0);
   ASSERT_EQ(mg_session_status(session), MG_SESSION_EXECUTING);
 
   mg_result *result;
-  ASSERT_EQ(mg_session_pull(session, &result), 0);
+  ASSERT_EQ(mg_session_pull(session, NULL), 0);
+  ASSERT_EQ(mg_session_fetch(session, &result), 0);
   ASSERT_TRUE(CheckColumns(result, std::vector<std::string>{"n"}));
   ASSERT_TRUE(CheckSummary(result, 0.01));
   ASSERT_EQ(mg_session_status(session), MG_SESSION_READY);
 
-  ASSERT_EQ(mg_session_pull(session, &result), MG_ERROR_BAD_CALL);
+  ASSERT_EQ(mg_session_fetch(session, &result), MG_ERROR_BAD_CALL);
   ASSERT_EQ(mg_session_status(session), MG_SESSION_READY);
 
   mg_session_destroy(session);
@@ -786,7 +792,7 @@ TEST_F(RunTest, MultipleQueries) {
         mg_message *message;
         ASSERT_EQ(mg_session_receive_message(session), 0);
         ASSERT_EQ(mg_session_read_bolt_message(session, &message), 0);
-        ASSERT_EQ(message->type, MG_MESSAGE_TYPE_PULL_ALL);
+        ASSERT_EQ(message->type, MG_MESSAGE_TYPE_PULL);
         mg_message_destroy_ca(message, session->decoder_allocator);
       }
 
@@ -814,7 +820,7 @@ TEST_F(RunTest, MultipleQueries) {
   for (int i = 0; i < 10; ++i) {
     ASSERT_EQ(mg_session_run(session,
                              ("RETURN " + std::to_string(i) + " AS n").c_str(),
-                             NULL, NULL),
+                             NULL, NULL, NULL, NULL),
               0);
 
     ASSERT_EQ(mg_session_status(session), MG_SESSION_EXECUTING);
@@ -822,8 +828,10 @@ TEST_F(RunTest, MultipleQueries) {
     mg_result *result;
 
     // Check result.
-    ASSERT_EQ(mg_session_pull(session, &result), 1);
-    ASSERT_EQ(mg_session_status(session), MG_SESSION_EXECUTING);
+    ASSERT_EQ(mg_session_pull(session, NULL), 0);
+    ASSERT_EQ(mg_session_status(session), MG_SESSION_FETCHING);
+    ASSERT_EQ(mg_session_fetch(session, &result), 1);
+    ASSERT_EQ(mg_session_status(session), MG_SESSION_FETCHING);
 
     ASSERT_TRUE(CheckColumns(result, std::vector<std::string>{"n"}));
 
@@ -832,12 +840,12 @@ TEST_F(RunTest, MultipleQueries) {
     EXPECT_EQ(mg_value_get_type(mg_list_at(row, 0)), MG_VALUE_TYPE_INTEGER);
     EXPECT_EQ(mg_value_integer(mg_list_at(row, 0)), i);
 
-    ASSERT_EQ(mg_session_pull(session, &result), 0);
+    ASSERT_EQ(mg_session_fetch(session, &result), 0);
     ASSERT_TRUE(CheckColumns(result, std::vector<std::string>{"n"}));
     ASSERT_TRUE(CheckSummary(result, 0.01));
     ASSERT_EQ(mg_session_status(session), MG_SESSION_READY);
 
-    ASSERT_EQ(mg_session_pull(session, &result), MG_ERROR_BAD_CALL);
+    ASSERT_EQ(mg_session_fetch(session, &result), MG_ERROR_BAD_CALL);
     ASSERT_EQ(mg_session_status(session), MG_SESSION_READY);
   }
 
@@ -884,7 +892,7 @@ TEST_F(RunTest, OkWithResults) {
       mg_message *message;
       ASSERT_EQ(mg_session_receive_message(session), 0);
       ASSERT_EQ(mg_session_read_bolt_message(session, &message), 0);
-      ASSERT_EQ(message->type, MG_MESSAGE_TYPE_PULL_ALL);
+      ASSERT_EQ(message->type, MG_MESSAGE_TYPE_PULL);
       mg_message_destroy_ca(message, session->decoder_allocator);
     }
 
@@ -913,16 +921,19 @@ TEST_F(RunTest, OkWithResults) {
 
   ASSERT_EQ(
       mg_session_run(session, "UNWIND [1, 2, 3] AS n RETURN n, n + 5 AS m",
-                     NULL, NULL),
+                     NULL, NULL, NULL, NULL),
       0);
   ASSERT_EQ(mg_session_status(session), MG_SESSION_EXECUTING);
 
   mg_result *result;
 
+  ASSERT_EQ(mg_session_pull(session, NULL), 0);
+  ASSERT_EQ(mg_session_status(session), MG_SESSION_FETCHING);
+
   // Check results.
   for (int i = 1; i <= 3; ++i) {
-    ASSERT_EQ(mg_session_pull(session, &result), 1);
-    ASSERT_EQ(mg_session_status(session), MG_SESSION_EXECUTING);
+    ASSERT_EQ(mg_session_fetch(session, &result), 1);
+    ASSERT_EQ(mg_session_status(session), MG_SESSION_FETCHING);
 
     ASSERT_TRUE(CheckColumns(result, std::vector<std::string>{"n", "m"}));
 
@@ -935,12 +946,12 @@ TEST_F(RunTest, OkWithResults) {
     EXPECT_EQ(mg_value_integer(mg_list_at(row, 1)), i + 5);
   }
 
-  ASSERT_EQ(mg_session_pull(session, &result), 0);
+  ASSERT_EQ(mg_session_fetch(session, &result), 0);
   ASSERT_TRUE(CheckColumns(result, std::vector<std::string>{"n", "m"}));
   ASSERT_TRUE(CheckSummary(result, 0.01));
   ASSERT_EQ(mg_session_status(session), MG_SESSION_READY);
 
-  ASSERT_EQ(mg_session_pull(session, &result), MG_ERROR_BAD_CALL);
+  ASSERT_EQ(mg_session_fetch(session, &result), MG_ERROR_BAD_CALL);
   ASSERT_EQ(mg_session_status(session), MG_SESSION_READY);
 
   mg_session_destroy(session);
@@ -985,7 +996,7 @@ TEST_F(RunTest, QueryRuntimeError) {
       mg_message *message;
       ASSERT_EQ(mg_session_receive_message(session), 0);
       ASSERT_EQ(mg_session_read_bolt_message(session, &message), 0);
-      ASSERT_EQ(message->type, MG_MESSAGE_TYPE_PULL_ALL);
+      ASSERT_EQ(message->type, MG_MESSAGE_TYPE_PULL);
       mg_message_destroy_ca(message, session->decoder_allocator);
     }
 
@@ -1020,15 +1031,16 @@ TEST_F(RunTest, QueryRuntimeError) {
   });
 
   ASSERT_EQ(
-      mg_session_run(session, "MATCH (n) RETURN size(n.prop)", NULL, NULL), 0);
+      mg_session_run(session, "MATCH (n) RETURN size(n.prop)", NULL, NULL, NULL, NULL), 0);
   ASSERT_EQ(mg_session_status(session), MG_SESSION_EXECUTING);
 
   mg_result *result;
 
-  ASSERT_EQ(mg_session_pull(session, &result), MG_ERROR_CLIENT_ERROR);
+  ASSERT_EQ(mg_session_pull(session, NULL), 0);
+  ASSERT_EQ(mg_session_fetch(session, &result), MG_ERROR_CLIENT_ERROR);
   ASSERT_EQ(mg_session_status(session), MG_SESSION_READY);
 
-  ASSERT_EQ(mg_session_pull(session, &result), MG_ERROR_BAD_CALL);
+  ASSERT_EQ(mg_session_fetch(session, &result), MG_ERROR_BAD_CALL);
   ASSERT_EQ(mg_session_status(session), MG_SESSION_READY);
 
   mg_session_destroy(session);
@@ -1072,7 +1084,7 @@ TEST_F(RunTest, QueryDatabaseError) {
       mg_message *message;
       ASSERT_EQ(mg_session_receive_message(session), 0);
       ASSERT_EQ(mg_session_read_bolt_message(session, &message), 0);
-      ASSERT_EQ(message->type, MG_MESSAGE_TYPE_PULL_ALL);
+      ASSERT_EQ(message->type, MG_MESSAGE_TYPE_PULL);
       mg_message_destroy_ca(message, session->decoder_allocator);
     }
 
@@ -1087,15 +1099,16 @@ TEST_F(RunTest, QueryDatabaseError) {
   });
 
   ASSERT_EQ(
-      mg_session_run(session, "MATCH (n) RETURN size(n.prop)", NULL, NULL), 0);
+      mg_session_run(session, "MATCH (n) RETURN size(n.prop)", NULL, NULL, NULL, NULL), 0);
   ASSERT_EQ(mg_session_status(session), MG_SESSION_EXECUTING);
 
   mg_result *result;
 
-  ASSERT_NE(mg_session_pull(session, &result), 0);
+  ASSERT_EQ(mg_session_pull(session, NULL), 0);
+  ASSERT_NE(mg_session_fetch(session, &result), 0);
   ASSERT_EQ(mg_session_status(session), MG_SESSION_BAD);
 
-  ASSERT_EQ(mg_session_pull(session, &result), MG_ERROR_BAD_CALL);
+  ASSERT_EQ(mg_session_fetch(session, &result), MG_ERROR_BAD_CALL);
 
   mg_session_destroy(session);
   StopServer();
@@ -1145,7 +1158,7 @@ TEST_F(RunTest, RunWithParams) {
       mg_message *message;
       ASSERT_EQ(mg_session_receive_message(session), 0);
       ASSERT_EQ(mg_session_read_bolt_message(session, &message), 0);
-      ASSERT_EQ(message->type, MG_MESSAGE_TYPE_PULL_ALL);
+      ASSERT_EQ(message->type, MG_MESSAGE_TYPE_PULL);
       mg_message_destroy_ca(message, session->decoder_allocator);
     }
 
@@ -1171,13 +1184,14 @@ TEST_F(RunTest, RunWithParams) {
 
   mg_map *params = mg_map_make_empty(1);
   mg_map_insert_unsafe(params, "param", mg_value_make_integer(42));
-  ASSERT_EQ(mg_session_run(session, "WITH $param AS x RETURN x", params, NULL),
+  ASSERT_EQ(mg_session_run(session, "WITH $param AS x RETURN x", params, NULL, NULL, NULL),
             0);
   mg_map_destroy(params);
 
   mg_result *result;
   {
-    ASSERT_EQ(mg_session_pull(session, &result), 1);
+    ASSERT_EQ(mg_session_pull(session, NULL), 0);
+    ASSERT_EQ(mg_session_fetch(session, &result), 1);
     ASSERT_TRUE(CheckColumns(result, std::vector<std::string>{"x"}));
     const mg_list *row = mg_result_row(result);
     ASSERT_EQ(mg_list_size(row), 1);
@@ -1185,7 +1199,7 @@ TEST_F(RunTest, RunWithParams) {
     ASSERT_EQ(mg_value_integer(mg_list_at(row, 0)), 42);
   }
 
-  ASSERT_EQ(mg_session_pull(session, &result), 0);
+  ASSERT_EQ(mg_session_fetch(session, &result), 0);
   ASSERT_TRUE(CheckColumns(result, std::vector<std::string>{"x"}));
   ASSERT_TRUE(CheckSummary(result, 0.01));
   ASSERT_EQ(mg_session_status(session), MG_SESSION_READY);

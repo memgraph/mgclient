@@ -81,9 +81,10 @@ class MemgraphConnection : public ::testing::Test {
     mg_result *result;
     const char *delete_all_query = "MATCH (n) DETACH DELETE n";
 
-    ASSERT_EQ(mg_session_run(session, delete_all_query, NULL, NULL), 0);
-    ASSERT_EQ(mg_session_pull(session, &result), 0);
-    ASSERT_EQ(mg_session_pull(session, &result), MG_ERROR_BAD_CALL);
+    ASSERT_EQ(mg_session_run(session, delete_all_query, NULL, NULL, NULL, NULL), 0);
+    ASSERT_EQ(mg_session_pull(session, NULL), 0);
+    ASSERT_EQ(mg_session_fetch(session, &result), 0);
+    ASSERT_EQ(mg_session_fetch(session, &result), MG_ERROR_BAD_CALL);
     mg_session_params_destroy(params);
     if (session) {
       mg_session_destroy(session);

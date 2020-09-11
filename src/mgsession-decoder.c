@@ -1396,11 +1396,9 @@ int mg_session_read_bolt_message(mg_session *session, mg_message **message) {
         goto wrong_marker;
       }
       tmessage->type = MG_MESSAGE_TYPE_PULL;
-      if (session->version == 4) {
-        status = mg_session_read_pull_message(session, &tmessage->pull_v);
-        if (status != 0) {
-          goto cleanup;
-        }
+      status = mg_session_read_pull_message(session, &tmessage->pull_v);
+      if (status != 0) {
+        goto cleanup;
       }
       break;
     default:

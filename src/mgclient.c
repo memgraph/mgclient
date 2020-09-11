@@ -218,6 +218,7 @@ static int mg_bolt_handshake(mg_session *session) {
     mg_session_set_error(session, "failed to receive handshake response");
     return MG_ERROR_RECV_FAILED;
   }
+
   if (server_version == VERSION_1) {
     session->version = 1;
   } else if (server_version == VERSION_4_1) {
@@ -329,25 +330,6 @@ int mg_bolt_init_v1(mg_session *session, const mg_session_params *params) {
       mg_session_send_init_message(session, params->user_agent, auth_token);
   mg_map_destroy(auth_token);
 
-  if (status != 0) {
-    return status;
-  }
-
-  MG_RETURN_IF_FAILED(mg_session_receive_message(session));
-
-  mg_message *response;
-  MG_RETURN_IF_FAILED(mg_session_read_bolt_message(session, &response));
-
-  if (response->type == MG_MESSAGE_TYPE_SUCCESS) {
-    status = 0;
-  } else if (response->type == MG_MESSAGE_TYPE_FAILURE) {
-    status = handle_failure_message(session, response->failure_v);
-  } else {
-    status = MG_ERROR_PROTOCOL_VIOLATION;
-    mg_session_set_error(session, "unexpected message type");
-  }
-
-  mg_message_destroy_ca(response, session->decoder_allocator);
   return status;
 }
 
@@ -841,6 +823,7 @@ int mg_session_pull(mg_session *session, const mg_map *pull_information) {
   if (session->version == 4 && !pull_information) {
     pull_information = &mg_empty_map;
   }
+
   status = mg_session_send_pull_message(session, pull_information);
   if (status != 0) {
     goto fatal_failure;
