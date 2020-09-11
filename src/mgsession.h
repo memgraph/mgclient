@@ -33,7 +33,13 @@ typedef struct mg_result {
 
 typedef struct mg_session {
   int status;
+
+  int explicit_transaction;
+  int query_number;
+
   mg_transport *transport;
+
+  int version;
 
   char *out_buffer;
   size_t out_begin;
@@ -117,6 +123,26 @@ int mg_session_read_unbound_relationship(mg_session *session,
 
 int mg_session_read_path(mg_session *session, mg_path **path);
 
+int mg_session_read_date(mg_session *session, mg_date **date);
+
+int mg_session_read_time(mg_session *session, mg_time **time);
+
+int mg_session_read_local_time(mg_session *session, mg_local_time **local_time);
+
+int mg_session_read_date_time(mg_session *session, mg_date_time **date_time);
+
+int mg_session_read_date_time_zone_id(mg_session *session,
+                                      mg_date_time_zone_id **date_time_zone_id);
+
+int mg_session_read_local_date_time(mg_session *session,
+                                    mg_local_date_time **local_date_time);
+
+int mg_session_read_duration(mg_session *session, mg_duration **duration);
+
+int mg_session_read_point_2d(mg_session *session, mg_point_2d **point_2d);
+
+int mg_session_read_point_3d(mg_session *session, mg_point_3d **point_3d);
+
 int mg_session_read_value(mg_session *session, mg_value **value);
 
 int mg_session_read_bolt_message(mg_session *session, mg_message **message);
@@ -126,10 +152,15 @@ int mg_session_read_bolt_message(mg_session *session, mg_message **message);
 int mg_session_send_init_message(mg_session *session, const char *client_name,
                                  const mg_map *auth_token);
 
-int mg_session_send_run_message(mg_session *session, const char *statement,
-                                const mg_map *parameters);
+int mg_session_send_hello_message(mg_session *session, const mg_map *extra,
+                                  const mg_map *routing);
 
-int mg_session_send_pull_all_message(mg_session *session);
+int mg_session_send_run_message(mg_session *session, const char *statement,
+                                const mg_map *parameters, const mg_map *extra);
+
+int mg_session_send_pull_message(mg_session *session, const mg_map *extra);
+
+int mg_session_send_reset_message(mg_session *session);
 
 int mg_session_send_ack_failure_message(mg_session *session);
 
@@ -140,5 +171,11 @@ int mg_session_send_success_message(mg_session *session,
                                     const mg_map *metadata);
 
 int mg_session_send_record_message(mg_session *session, const mg_list *fields);
+
+int mg_session_send_begin_message(mg_session *session, const mg_map *extra);
+
+int mg_session_send_commit_messsage(mg_session *session);
+
+int mg_session_send_rollback_messsage(mg_session *session);
 
 #endif

@@ -1,3 +1,4 @@
+
 // Copyright (c) 2016-2020 Memgraph Ltd. [https://memgraph.com]
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -68,6 +69,56 @@ typedef struct mg_path {
   int64_t *sequence;
 } mg_path;
 
+typedef struct mg_date {
+  int64_t days;
+} mg_date;
+
+typedef struct mg_time {
+  int64_t nanoseconds;
+  int64_t tz_offset_seconds;
+} mg_time;
+
+typedef struct mg_local_time {
+  int64_t nanoseconds;
+} mg_local_time;
+
+typedef struct mg_date_time {
+  int64_t seconds;
+  int64_t nanoseconds;
+  int64_t tz_offset_minutes;
+} mg_date_time;
+
+typedef struct mg_date_time_zone_id {
+  int64_t seconds;
+  int64_t nanoseconds;
+  int64_t tz_id;
+} mg_date_time_zone_id;
+
+typedef struct mg_local_date_time {
+  int64_t seconds;
+  int64_t nanoseconds;
+} mg_local_date_time;
+
+typedef struct mg_duration {
+  int64_t months;
+  int64_t days;
+  int64_t seconds;
+  int64_t nanoseconds;
+} mg_duration;
+
+typedef struct mg_point_2d {
+  int64_t srid;
+  double x;
+  double y;
+} mg_point_2d;
+
+typedef struct mg_point_3d {
+  int64_t srid;
+  double x;
+  double y;
+  double z;
+} mg_point_3d;
+
 struct mg_value {
   enum mg_value_type type;
   union {
@@ -81,6 +132,15 @@ struct mg_value {
     mg_relationship *relationship_v;
     mg_unbound_relationship *unbound_relationship_v;
     mg_path *path_v;
+    mg_date *date_v;
+    mg_time *time_v;
+    mg_local_time *local_time_v;
+    mg_date_time *date_time_v;
+    mg_date_time_zone_id *date_time_zone_id_v;
+    mg_local_date_time *local_date_time_v;
+    mg_duration *duration_v;
+    mg_point_2d *point_2d_v;
+    mg_point_3d *point_3d_v;
   };
 };
 

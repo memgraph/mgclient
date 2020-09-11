@@ -1,3 +1,4 @@
+
 // Copyright (c) 2016-2020 Memgraph Ltd. [https://memgraph.com]
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,6 +18,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "mgallocator.h"
 #include "mgclient.h"
 #include "mgconstants.h"
 
@@ -204,6 +206,97 @@ mg_value *mg_value_make_path(mg_path *path) {
   return value;
 }
 
+mg_value *mg_value_make_date(mg_date *date) {
+  mg_value *value = mg_allocator_malloc(&mg_system_allocator, sizeof(mg_value));
+  if (!value) {
+    return NULL;
+  }
+  value->type = MG_VALUE_TYPE_DATE;
+  value->date_v = date;
+  return value;
+}
+
+mg_value *mg_value_make_time(mg_time *time) {
+  mg_value *value = mg_allocator_malloc(&mg_system_allocator, sizeof(mg_value));
+  if (!value) {
+    return NULL;
+  }
+  value->type = MG_VALUE_TYPE_TIME;
+  value->time_v = time;
+  return value;
+}
+
+mg_value *mg_value_make_local_time(mg_local_time *local_time) {
+  mg_value *value = mg_allocator_malloc(&mg_system_allocator, sizeof(mg_value));
+  if (!value) {
+    return NULL;
+  }
+  value->type = MG_VALUE_TYPE_LOCAL_TIME;
+  value->local_time_v = local_time;
+  return value;
+}
+
+mg_value *mg_value_make_date_time(mg_date_time *date_time) {
+  mg_value *value = mg_allocator_malloc(&mg_system_allocator, sizeof(mg_value));
+  if (!value) {
+    return NULL;
+  }
+  value->type = MG_VALUE_TYPE_DATE_TIME;
+  value->date_time_v = date_time;
+  return value;
+}
+
+mg_value *mg_value_make_date_time_zone_id(
+    mg_date_time_zone_id *date_time_zone_id) {
+  mg_value *value = mg_allocator_malloc(&mg_system_allocator, sizeof(mg_value));
+  if (!value) {
+    return NULL;
+  }
+  value->type = MG_VALUE_TYPE_DATE_TIME_ZONE_ID;
+  value->date_time_zone_id_v = date_time_zone_id;
+  return value;
+}
+
+mg_value *mg_value_make_local_date_time(mg_local_date_time *local_date_time) {
+  mg_value *value = mg_allocator_malloc(&mg_system_allocator, sizeof(mg_value));
+  if (!value) {
+    return NULL;
+  }
+  value->type = MG_VALUE_TYPE_LOCAL_DATE_TIME;
+  value->local_date_time_v = local_date_time;
+  return value;
+}
+
+mg_value *mg_value_make_duration(mg_duration *duration) {
+  mg_value *value = mg_allocator_malloc(&mg_system_allocator, sizeof(mg_value));
+  if (!value) {
+    return NULL;
+  }
+  value->type = MG_VALUE_TYPE_DURATION;
+  value->duration_v = duration;
+  return value;
+}
+
+mg_value *mg_value_make_point_2d(mg_point_2d *point_2d) {
+  mg_value *value = mg_allocator_malloc(&mg_system_allocator, sizeof(mg_value));
+  if (!value) {
+    return NULL;
+  }
+  value->type = MG_VALUE_TYPE_POINT_2D;
+  value->point_2d_v = point_2d;
+  return value;
+}
+
+mg_value *mg_value_make_point_3d(mg_point_3d *point_3d) {
+  mg_value *value = mg_allocator_malloc(&mg_system_allocator, sizeof(mg_value));
+  if (!value) {
+    return NULL;
+  }
+  value->type = MG_VALUE_TYPE_POINT_3D;
+  value->point_3d_v = point_3d;
+  return value;
+}
+
 enum mg_value_type mg_value_get_type(const mg_value *val) { return val->type; }
 
 int mg_value_bool(const mg_value *val) { return val->bool_v; }
@@ -230,6 +323,38 @@ const mg_unbound_relationship *mg_value_unbound_relationship(
 }
 
 const mg_path *mg_value_path(const mg_value *val) { return val->path_v; }
+
+const mg_date *mg_value_date(const mg_value *val) { return val->date_v; }
+
+const mg_time *mg_value_time(const mg_value *val) { return val->time_v; }
+
+const mg_local_time *mg_value_local_time(const mg_value *val) {
+  return val->local_time_v;
+}
+
+const mg_date_time *mg_value_date_time(const mg_value *val) {
+  return val->date_time_v;
+}
+
+const mg_date_time_zone_id *mg_value_date_time_zone_id(const mg_value *val) {
+  return val->date_time_zone_id_v;
+}
+
+const mg_local_date_time *mg_value_local_date_time(const mg_value *val) {
+  return val->local_date_time_v;
+}
+
+const mg_duration *mg_value_duration(const mg_value *val) {
+  return val->duration_v;
+}
+
+const mg_point_2d *mg_value_point_2d(const mg_value *val) {
+  return val->point_2d_v;
+}
+
+const mg_point_3d *mg_value_point_3d(const mg_value *val) {
+  return val->point_3d_v;
+}
 
 mg_value *mg_value_copy_ca(const mg_value *val, mg_allocator *allocator) {
   if (!val) {
@@ -296,6 +421,33 @@ mg_value *mg_value_copy_ca(const mg_value *val, mg_allocator *allocator) {
         goto cleanup;
       }
       break;
+    case MG_VALUE_TYPE_DATE:
+      new_val->date_v = val->date_v;
+      break;
+    case MG_VALUE_TYPE_TIME:
+      new_val->time_v = val->time_v;
+      break;
+    case MG_VALUE_TYPE_LOCAL_TIME:
+      new_val->local_time_v = val->local_time_v;
+      break;
+    case MG_VALUE_TYPE_DATE_TIME:
+      new_val->date_time_v = val->date_time_v;
+      break;
+    case MG_VALUE_TYPE_DATE_TIME_ZONE_ID:
+      new_val->date_time_zone_id_v = val->date_time_zone_id_v;
+      break;
+    case MG_VALUE_TYPE_LOCAL_DATE_TIME:
+      new_val->local_date_time_v = val->local_date_time_v;
+      break;
+    case MG_VALUE_TYPE_DURATION:
+      new_val->duration_v = val->duration_v;
+      break;
+    case MG_VALUE_TYPE_POINT_2D:
+      new_val->point_2d_v = val->point_2d_v;
+      break;
+    case MG_VALUE_TYPE_POINT_3D:
+      new_val->point_3d_v = val->point_3d_v;
+      break;
     case MG_VALUE_TYPE_UNKNOWN:
       break;
   }
@@ -319,6 +471,15 @@ void mg_value_destroy_ca(mg_value *val, mg_allocator *allocator) {
     case MG_VALUE_TYPE_BOOL:
     case MG_VALUE_TYPE_INTEGER:
     case MG_VALUE_TYPE_FLOAT:
+    case MG_VALUE_TYPE_DATE:
+    case MG_VALUE_TYPE_TIME:
+    case MG_VALUE_TYPE_LOCAL_TIME:
+    case MG_VALUE_TYPE_DATE_TIME:
+    case MG_VALUE_TYPE_DATE_TIME_ZONE_ID:
+    case MG_VALUE_TYPE_LOCAL_DATE_TIME:
+    case MG_VALUE_TYPE_DURATION:
+    case MG_VALUE_TYPE_POINT_2D:
+    case MG_VALUE_TYPE_POINT_3D:
       break;
     case MG_VALUE_TYPE_STRING:
       mg_string_destroy_ca(val->string_v, allocator);
@@ -947,6 +1108,83 @@ void mg_path_destroy(mg_path *path) {
   mg_path_destroy_ca(path, &mg_system_allocator);
 }
 
+// SPATIAL AND TEMPORAL STRUCTURES
+int64_t mg_date_days(const mg_date *date) { return date->days; }
+
+int64_t mg_time_nanoseconds(const mg_time *time) { return time->nanoseconds; }
+
+int64_t mg_time_tz_offset_seconds(const mg_time *time) {
+  return time->tz_offset_seconds;
+}
+
+int64_t mg_local_time_nanoseconds(const mg_local_time *local_time) {
+  return local_time->nanoseconds;
+}
+
+int64_t mg_date_time_seconds(const mg_date_time *date_time) {
+  return date_time->seconds;
+}
+
+int64_t mg_date_time_nanoseconds(const mg_date_time *date_time) {
+  return date_time->nanoseconds;
+}
+
+int64_t mg_date_time_tz_offset_minutes(const mg_date_time *date_time) {
+  return date_time->tz_offset_minutes;
+}
+
+int64_t mg_date_time_zone_id_seconds(
+    const mg_date_time_zone_id *date_time_zone_id) {
+  return date_time_zone_id->seconds;
+}
+
+int64_t mg_date_time_zone_id_nanoseconds(
+    const mg_date_time_zone_id *date_time_zone_id) {
+  return date_time_zone_id->nanoseconds;
+}
+
+int64_t mg_date_time_zone_id_tz_id(
+    const mg_date_time_zone_id *date_time_zone_id) {
+  return date_time_zone_id->tz_id;
+}
+
+int64_t mg_local_date_time_seconds(const mg_local_date_time *local_date_time) {
+  return local_date_time->seconds;
+}
+
+int64_t mg_local_date_time_nanoseconds(
+    const mg_local_date_time *local_date_time) {
+  return local_date_time->nanoseconds;
+}
+
+int64_t mg_duration_months(const mg_duration *duration) {
+  return duration->months;
+}
+
+int64_t mg_duration_days(const mg_duration *duration) { return duration->days; }
+
+int64_t mg_duration_seconds(const mg_duration *duration) {
+  return duration->seconds;
+}
+
+int64_t mg_duration_nanoseconds(const mg_duration *duration) {
+  return duration->nanoseconds;
+}
+
+int64_t mg_point_2d_srid(const mg_point_2d *point_2d) { return point_2d->srid; }
+
+double mg_point_2d_x(const mg_point_2d *point_2d) { return point_2d->x; }
+
+double mg_point_2d_y(const mg_point_2d *point_2d) { return point_2d->y; }
+
+int64_t mg_point_3d_srid(const mg_point_3d *point_3d) { return point_3d->srid; }
+
+double mg_point_3d_x(const mg_point_3d *point_3d) { return point_3d->x; }
+
+double mg_point_3d_y(const mg_point_3d *point_3d) { return point_3d->y; }
+
+double mg_point_3d_z(const mg_point_3d *point_3d) { return point_3d->z; }
+
 mg_node *mg_node_make(int64_t id, uint32_t label_count, mg_string **labels,
                       mg_map *properties) {
   mg_node *node = mg_node_alloc(label_count, &mg_system_allocator);
@@ -1129,6 +1367,24 @@ int mg_value_equal(const mg_value *lhs, const mg_value *rhs) {
                                            rhs->unbound_relationship_v);
     case MG_VALUE_TYPE_PATH:
       return mg_path_equal(lhs->path_v, rhs->path_v);
+    case MG_VALUE_TYPE_DATE:
+      return lhs->date_v == rhs->date_v;
+    case MG_VALUE_TYPE_TIME:
+      return lhs->time_v == rhs->time_v;
+    case MG_VALUE_TYPE_LOCAL_TIME:
+      return lhs->local_time_v == rhs->local_time_v;
+    case MG_VALUE_TYPE_DATE_TIME:
+      return lhs->date_time_v == rhs->date_time_v;
+    case MG_VALUE_TYPE_DATE_TIME_ZONE_ID:
+      return lhs->date_time_zone_id_v == rhs->date_time_zone_id_v;
+    case MG_VALUE_TYPE_LOCAL_DATE_TIME:
+      return lhs->local_date_time_v == rhs->local_date_time_v;
+    case MG_VALUE_TYPE_DURATION:
+      return lhs->duration_v == rhs->duration_v;
+    case MG_VALUE_TYPE_POINT_2D:
+      return lhs->point_2d_v == rhs->point_2d_v;
+    case MG_VALUE_TYPE_POINT_3D:
+      return lhs->point_3d_v == rhs->point_3d_v;
     case MG_VALUE_TYPE_UNKNOWN:
       return 0;
   }

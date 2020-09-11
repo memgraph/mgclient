@@ -142,6 +142,15 @@ enum mg_value_type {
   MG_VALUE_TYPE_RELATIONSHIP,
   MG_VALUE_TYPE_UNBOUND_RELATIONSHIP,
   MG_VALUE_TYPE_PATH,
+  MG_VALUE_TYPE_DATE,
+  MG_VALUE_TYPE_TIME,
+  MG_VALUE_TYPE_LOCAL_TIME,
+  MG_VALUE_TYPE_DATE_TIME,
+  MG_VALUE_TYPE_DATE_TIME_ZONE_ID,
+  MG_VALUE_TYPE_LOCAL_DATE_TIME,
+  MG_VALUE_TYPE_DURATION,
+  MG_VALUE_TYPE_POINT_2D,
+  MG_VALUE_TYPE_POINT_3D,
   MG_VALUE_TYPE_UNKNOWN
 };
 
@@ -210,6 +219,24 @@ typedef struct mg_unbound_relationship mg_unbound_relationship;
 /// direction opposite of the direction of the underlying relationship in the
 /// data graph.
 typedef struct mg_path mg_path;
+
+typedef struct mg_date mg_date;
+
+typedef struct mg_time mg_time;
+
+typedef struct mg_local_time mg_local_time;
+
+typedef struct mg_date_time mg_date_time;
+
+typedef struct mg_date_time_zone_id mg_date_time_zone_id;
+
+typedef struct mg_local_date_time mg_local_date_time;
+
+typedef struct mg_duration mg_duration;
+
+typedef struct mg_point_2d mg_point_2d;
+
+typedef struct mg_point_3d mg_point_3d;
 
 /// Constructs a nil \ref mg_value.
 ///
@@ -281,6 +308,26 @@ MGCLIENT_EXPORT mg_value *mg_value_make_unbound_relationship(
 /// \return Pointer to the newly constructed value or NULL if error occurred.
 MGCLIENT_EXPORT mg_value *mg_value_make_path(mg_path *path);
 
+MGCLIENT_EXPORT mg_value *mg_value_make_date(mg_date *date);
+
+MGCLIENT_EXPORT mg_value *mg_value_make_time(mg_time *time);
+
+MGCLIENT_EXPORT mg_value *mg_value_make_local_time(mg_local_time *local_time);
+
+MGCLIENT_EXPORT mg_value *mg_value_make_date_time(mg_date_time *date_time);
+
+MGCLIENT_EXPORT mg_value *mg_value_make_date_time_zone_id(
+    mg_date_time_zone_id *date_time_zone_id);
+
+MGCLIENT_EXPORT mg_value *mg_value_make_local_date_time(
+    mg_local_date_time *local_date_time);
+
+MGCLIENT_EXPORT mg_value *mg_value_make_duration(mg_duration *duration);
+
+MGCLIENT_EXPORT mg_value *mg_value_make_point_2d(mg_point_2d *point_2d);
+
+MGCLIENT_EXPORT mg_value *mg_value_make_point_3d(mg_point_3d *point_3d);
+
 /// Returns the type of the given \ref mg_value.
 MGCLIENT_EXPORT enum mg_value_type mg_value_get_type(const mg_value *val);
 
@@ -345,6 +392,26 @@ MGCLIENT_EXPORT const mg_unbound_relationship *mg_value_unbound_relationship(
 /// Type check should be made first. Accessing the wrong value results in
 /// undefined behavior.
 MGCLIENT_EXPORT const mg_path *mg_value_path(const mg_value *val);
+
+MGCLIENT_EXPORT const mg_date *mg_value_date(const mg_value *val);
+
+MGCLIENT_EXPORT const mg_time *mg_value_time(const mg_value *val);
+
+MGCLIENT_EXPORT const mg_local_time *mg_value_local_time(const mg_value *val);
+
+MGCLIENT_EXPORT const mg_date_time *mg_value_date_time(const mg_value *val);
+
+MGCLIENT_EXPORT const mg_date_time_zone_id *mg_value_date_time_zone_id(
+    const mg_value *val);
+
+MGCLIENT_EXPORT const mg_local_date_time *mg_value_local_date_time(
+    const mg_value *val);
+
+MGCLIENT_EXPORT const mg_duration *mg_value_duration(const mg_value *val);
+
+MGCLIENT_EXPORT const mg_point_2d *mg_value_point_2d(const mg_value *val);
+
+MGCLIENT_EXPORT const mg_point_3d *mg_value_point_3d(const mg_value *val);
 
 /// Creates a copy of the given value.
 ///
@@ -685,6 +752,56 @@ MGCLIENT_EXPORT mg_path *mg_path_copy(const mg_path *path);
 /// Destroys the given path.
 MGCLIENT_EXPORT void mg_path_destroy(mg_path *path);
 
+int64_t mg_date_days(const mg_date *date);
+
+int64_t mg_time_nanoseconds(const mg_time *time);
+
+int64_t mg_time_tz_offset_seconds(const mg_time *time);
+
+int64_t mg_local_time_nanoseconds(const mg_local_time *local_time);
+
+int64_t mg_date_time_seconds(const mg_date_time *date_time);
+
+int64_t mg_date_time_nanoseconds(const mg_date_time *date_time);
+
+int64_t mg_date_time_tz_offset_minutes(const mg_date_time *date_time);
+
+int64_t mg_date_time_zone_id_seconds(
+    const mg_date_time_zone_id *date_time_zone_id);
+
+int64_t mg_date_time_zone_id_nanoseconds(
+    const mg_date_time_zone_id *date_time_zone_id);
+
+int64_t mg_date_time_zone_id_tz_id(
+    const mg_date_time_zone_id *date_time_zone_id);
+
+int64_t mg_local_date_time_seconds(const mg_local_date_time *local_date_time);
+
+int64_t mg_local_date_time_nanoseconds(
+    const mg_local_date_time *local_date_time);
+
+int64_t mg_duration_months(const mg_duration *duration);
+
+int64_t mg_duration_days(const mg_duration *duration);
+
+int64_t mg_duration_seconds(const mg_duration *duration);
+
+int64_t mg_duration_nanoseconds(const mg_duration *duration);
+
+int64_t mg_point_2d_srid(const mg_point_2d *point_2d);
+
+double mg_point_2d_x(const mg_point_2d *point_2d);
+
+double mg_point_2d_y(const mg_point_2d *point_2d);
+
+int64_t mg_point_3d_srid(const mg_point_3d *point_3d);
+
+double mg_point_3d_x(const mg_point_3d *point_3d);
+
+double mg_point_3d_y(const mg_point_3d *point_3d);
+
+double mg_point_3d_z(const mg_point_3d *point_3d);
+
 /// Marks a \ref mg_session ready to execute a new query using \ref
 /// mg_session_run.
 #define MG_SESSION_READY 0
@@ -696,6 +813,10 @@ MGCLIENT_EXPORT void mg_path_destroy(mg_path *path);
 /// Marks a bad \ref mg_session which cannot be used to execute queries and can
 /// only be destroyed.
 #define MG_SESSION_BAD 2
+
+/// Marks a \ref mg_session which is currently fetching result of a query.
+/// Results can be pulled using \ref mg_session_fetch.
+#define MG_SESSION_FETCHING 3
 
 /// Failed to send data to server.
 #define MG_ERROR_SEND_FAILED (-1)
@@ -946,7 +1067,15 @@ typedef struct mg_result mg_result;
 ///         Otherwise, a non-zero error code is returned.
 MGCLIENT_EXPORT int mg_session_run(mg_session *session, const char *query,
                                    const mg_map *params,
-                                   const mg_list **columns);
+                                   const mg_map *extra_run_information,
+                                   const mg_list **columns, int64_t *qid);
+
+MGCLIENT_EXPORT int mg_session_begin_transaction(
+    mg_session *session, const mg_map *extra_run_information);
+
+MGCLIENT_EXPORT int mg_session_end_transaction(mg_session *session,
+                                               int commit_transaction,
+                                               mg_result **result);
 
 /// Tries to pull the next query result from \ref mg_session.
 ///
@@ -959,7 +1088,10 @@ MGCLIENT_EXPORT int mg_session_run(mg_session *session, const char *query,
 ///         now more result rows and that the query execution summary was stored
 ///         in \p result. Its contents may be accessed using \ref
 ///         mg_result_summary. On failure, a non-zero exit code is returned.
-MGCLIENT_EXPORT int mg_session_pull(mg_session *session, mg_result **result);
+MGCLIENT_EXPORT int mg_session_fetch(mg_session *session, mg_result **result);
+
+MGCLIENT_EXPORT int mg_session_pull(mg_session *session,
+                                    const mg_map *pull_information);
 
 /// Returns names of columns output by the current query execution.
 MGCLIENT_EXPORT const mg_list *mg_result_columns(const mg_result *result);

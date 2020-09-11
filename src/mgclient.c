@@ -32,6 +32,7 @@
 #include "mgconstants.h"
 #include "mgmessage.h"
 #include "mgsession.h"
+#include "mgvalue.h"
 
 typedef struct mg_session_params {
   const char *address;
@@ -39,7 +40,7 @@ typedef struct mg_session_params {
   uint16_t port;
   const char *username;
   const char *password;
-  const char *client_name;
+  const char *user_agent;
   enum mg_sslmode sslmode;
   const char *sslcert;
   const char *sslkey;
@@ -59,7 +60,7 @@ mg_session_params *mg_session_params_make() {
   params->port = 0;
   params->username = NULL;
   params->password = NULL;
-  params->client_name = MG_CLIENT_NAME_DEFAULT;
+  params->user_agent = MG_USER_AGENT_DEFAULT;
   params->sslmode = MG_SSLMODE_DISABLE;
   params->sslcert = NULL;
   params->sslkey = NULL;
@@ -98,9 +99,9 @@ void mg_session_params_set_password(mg_session_params *params,
   params->password = password;
 }
 
-void mg_session_params_set_client_name(mg_session_params *params,
-                                       const char *client_name) {
-  params->client_name = client_name;
+void mg_session_params_set_user_agent(mg_session_params *params,
+                                      const char *user_agent) {
+  params->user_agent = user_agent;
 }
 
 void mg_session_params_set_sslmode(mg_session_params *params,
@@ -150,8 +151,8 @@ const char *mg_session_params_get_password(const mg_session_params *params) {
   return params->password;
 }
 
-const char *mg_session_params_get_client_name(const mg_session_params *params) {
-  return params->client_name;
+const char *mg_session_params_get_user_agent(const mg_session_params *params) {
+  return params->user_agent;
 }
 
 enum mg_sslmode mg_session_params_get_sslmode(const mg_session_params *params) {
@@ -202,10 +203,11 @@ int validate_session_params(const mg_session_params *params,
 static int mg_bolt_handshake(mg_session *session) {
   const uint32_t VERSION_NONE = htobe32(0);
   const uint32_t VERSION_1 = htobe32(1);
+  const uint32_t VERSION_4_1 = htobe32(0x0104);
   if (mg_transport_send(session->transport, MG_HANDSHAKE_MAGIC,
                         strlen(MG_HANDSHAKE_MAGIC)) != 0 ||
+      mg_transport_send(session->transport, (char *)&VERSION_4_1, 4) != 0 ||
       mg_transport_send(session->transport, (char *)&VERSION_1, 4) != 0 ||
-      mg_transport_send(session->transport, (char *)&VERSION_NONE, 4) != 0 ||
       mg_transport_send(session->transport, (char *)&VERSION_NONE, 4) != 0 ||
       mg_transport_send(session->transport, (char *)&VERSION_NONE, 4) != 0) {
     mg_session_set_error(session, "failed to send handshake data");
@@ -216,7 +218,11 @@ static int mg_bolt_handshake(mg_session *session) {
     mg_session_set_error(session, "failed to receive handshake response");
     return MG_ERROR_RECV_FAILED;
   }
-  if (server_version != VERSION_1) {
+  if (server_version == VERSION_1) {
+    session->version = 1;
+  } else if (server_version == VERSION_4_1) {
+    session->version = 4;
+  } else {
     mg_session_set_error(session, "unsupported protocol version: %" PRIu32,
                          be32toh(server_version));
     return MG_ERROR_PROTOCOL_VIOLATION;
@@ -313,16 +319,103 @@ done:
   return type;
 }
 
-static int mg_bolt_init(mg_session *session, const mg_session_params *params) {
+int mg_bolt_init_v1(mg_session *session, const mg_session_params *params) {
   mg_map *auth_token = build_auth_token(params->username, params->password);
   if (!auth_token) {
     return MG_ERROR_OOM;
   }
 
   int status =
-      mg_session_send_init_message(session, params->client_name, auth_token);
+      mg_session_send_init_message(session, params->user_agent, auth_token);
   mg_map_destroy(auth_token);
 
+  if (status != 0) {
+    return status;
+  }
+
+  MG_RETURN_IF_FAILED(mg_session_receive_message(session));
+
+  mg_message *response;
+  MG_RETURN_IF_FAILED(mg_session_read_bolt_message(session, &response));
+
+  if (response->type == MG_MESSAGE_TYPE_SUCCESS) {
+    status = 0;
+  } else if (response->type == MG_MESSAGE_TYPE_FAILURE) {
+    status = handle_failure_message(session, response->failure_v);
+  } else {
+    status = MG_ERROR_PROTOCOL_VIOLATION;
+    mg_session_set_error(session, "unexpected message type");
+  }
+
+  mg_message_destroy_ca(response, session->decoder_allocator);
+  return status;
+}
+
+static mg_map *build_hello_extra(const char *user_agent, const char *username,
+                                 const char *password) {
+  mg_map *extra = mg_map_make_empty(4);
+  if (!extra) {
+    return NULL;
+  }
+
+  if (user_agent) {
+    mg_value *user_agent_value = mg_value_make_string(user_agent);
+    if (!user_agent_value ||
+        mg_map_insert_unsafe(extra, "user_agent", user_agent_value) != 0) {
+      goto cleanup;
+    }
+  }
+
+  assert((username && password) || (!username && !password));
+  if (username) {
+    mg_value *scheme = mg_value_make_string("basic");
+    if (!scheme || mg_map_insert_unsafe(extra, "scheme", scheme) != 0) {
+      goto cleanup;
+    }
+
+    mg_value *principal = mg_value_make_string(username);
+    if (!principal || mg_map_insert_unsafe(extra, "principal", principal)) {
+      goto cleanup;
+    }
+
+    mg_value *credentials = mg_value_make_string(password);
+    if (!credentials ||
+        mg_map_insert_unsafe(extra, "credentials", credentials)) {
+      goto cleanup;
+    }
+  } else {
+    mg_value *scheme = mg_value_make_string("none");
+    if (!scheme || mg_map_insert_unsafe(extra, "scheme", scheme) != 0) {
+      goto cleanup;
+    }
+  }
+
+  return extra;
+
+cleanup:
+  mg_map_destroy(extra);
+  return NULL;
+}
+
+int mg_bolt_init_v4(mg_session *session, const mg_session_params *params) {
+  mg_map *extra =
+      build_hello_extra(params->user_agent, params->username, params->password);
+  if (!extra) {
+    return MG_ERROR_OOM;
+  }
+
+  mg_map *routing = &mg_empty_map;
+
+  int status = mg_session_send_hello_message(session, extra, routing);
+  mg_map_destroy(extra);
+  mg_map_destroy(routing);
+
+  return status;
+}
+
+static int mg_bolt_init(mg_session *session, const mg_session_params *params) {
+  int status = session->version == 1 ? mg_bolt_init_v1(session, params)
+                                     : mg_bolt_init_v4(session, params);
   if (status != 0) {
     return status;
   }
@@ -576,8 +669,36 @@ int mg_connect(const mg_session_params *params, mg_session **session) {
   return mg_connect_ca(params, session, &mg_system_allocator);
 }
 
+int handle_failure_v1(mg_session *session) {
+  int status = 0;
+  status = mg_session_send_ack_failure_message(session);
+  if (status != 0) {
+    return status;
+  }
+
+  status = mg_session_receive_message(session);
+  if (status != 0) {
+    return status;
+  }
+
+  mg_message *response;
+  status = mg_session_read_bolt_message(session, &response);
+  if (status != 0) {
+    return status;
+  }
+
+  if (response->type != MG_MESSAGE_TYPE_SUCCESS) {
+    status = MG_ERROR_PROTOCOL_VIOLATION;
+    mg_session_set_error(session, "unexpected message type");
+  }
+
+  mg_message_destroy_ca(response, session->decoder_allocator);
+  return status;
+}
+
 int mg_session_run(mg_session *session, const char *query, const mg_map *params,
-                   const mg_list **columns) {
+                   const mg_map *extra_run_information, const mg_list **columns,
+                   int64_t *qid) {
   if (session->status == MG_SESSION_BAD) {
     mg_session_set_error(session, "bad session");
     return MG_ERROR_BAD_CALL;
@@ -586,7 +707,14 @@ int mg_session_run(mg_session *session, const char *query, const mg_map *params,
     mg_session_set_error(session, "already executing a query");
     return MG_ERROR_BAD_CALL;
   }
-  assert(session->status == MG_SESSION_READY);
+  if (session->status == MG_SESSION_FETCHING) {
+    mg_session_set_error(session, "fetching results of a query");
+    return MG_ERROR_BAD_CALL;
+  }
+
+  assert(session->status == MG_SESSION_READY ||
+         (session->version == 4 && session->explicit_transaction &&
+          session->status == MG_SESSION_EXECUTING));
 
   mg_message_destroy_ca(session->result.message, session->decoder_allocator);
   session->result.message = NULL;
@@ -597,8 +725,17 @@ int mg_session_run(mg_session *session, const char *query, const mg_map *params,
     params = &mg_empty_map;
   }
 
+  // extra field allowed only allowed for Auto-commit Transaction
+  // TODO(aandelic): Check if sending extra run information while in Explicit
+  // Transaction should result with an error
+  if (session->version == 4 &&
+      (!extra_run_information || session->explicit_transaction)) {
+    extra_run_information = &mg_empty_map;
+  }
+
   int status = 0;
-  status = mg_session_send_run_message(session, query, params);
+  status = mg_session_send_run_message(session, query, params,
+                                       extra_run_information);
   if (status != 0) {
     goto fatal_failure;
   }
@@ -631,40 +768,39 @@ int mg_session_run(mg_session *session, const char *query, const mg_map *params,
       mg_session_set_error(session, "out of memory");
       return MG_ERROR_OOM;
     }
-    status = mg_session_send_pull_all_message(session);
-    if (status != 0) {
-      goto fatal_failure;
+
+    if (session->version == 4 && session->explicit_transaction) {
+      if (qid) {
+        const mg_value *qid_tmp =
+            mg_map_at(response->success_v->metadata, "qid");
+
+        if (!qid_tmp || mg_value_get_type(qid_tmp) != MG_VALUE_TYPE_INTEGER) {
+          status = MG_ERROR_PROTOCOL_VIOLATION;
+          mg_message_destroy_ca(response, session->decoder_allocator);
+          mg_session_set_error(session, "invalid response metadata");
+          goto fatal_failure;
+        }
+
+        *qid = mg_value_integer(qid_tmp);
+      }
+
+      ++session->query_number;
     }
+
     if (columns) {
       *columns = session->result.columns;
     }
+
     session->status = MG_SESSION_EXECUTING;
     return 0;
   }
 
   if (response->type == MG_MESSAGE_TYPE_FAILURE) {
     int failure_status = handle_failure_message(session, response->failure_v);
-    mg_message_destroy_ca(response, session->decoder_allocator);
 
-    status = mg_session_send_ack_failure_message(session);
+    status = session->version == 1 ? handle_failure_v1(session)
+                                   : mg_session_send_reset_message(session);
     if (status != 0) {
-      goto fatal_failure;
-    }
-
-    status = mg_session_receive_message(session);
-    if (status != 0) {
-      goto fatal_failure;
-    }
-
-    status = mg_session_read_bolt_message(session, &response);
-    if (status != 0) {
-      goto fatal_failure;
-    }
-
-    if (response->type != MG_MESSAGE_TYPE_SUCCESS) {
-      mg_message_destroy_ca(response, session->decoder_allocator);
-      status = MG_ERROR_PROTOCOL_VIOLATION;
-      mg_session_set_error(session, "unexpected message type");
       goto fatal_failure;
     }
 
@@ -682,7 +818,7 @@ fatal_failure:
   return status;
 }
 
-int mg_session_pull(mg_session *session, mg_result **result) {
+int mg_session_pull(mg_session *session, const mg_map *pull_information) {
   if (session->status == MG_SESSION_BAD) {
     mg_session_set_error(session, "bad session");
     return MG_ERROR_BAD_CALL;
@@ -691,7 +827,48 @@ int mg_session_pull(mg_session *session, mg_result **result) {
     mg_session_set_error(session, "not executing a query");
     return MG_ERROR_BAD_CALL;
   }
+  if (session->status == MG_SESSION_FETCHING) {
+    mg_session_set_error(session, "fetching results from a query");
+    return MG_ERROR_BAD_CALL;
+  }
+
   assert(session->status == MG_SESSION_EXECUTING);
+
+  mg_message_destroy_ca(session->result.message, session->decoder_allocator);
+  session->result.message = NULL;
+
+  int status = 0;
+  if (session->version == 4 && !pull_information) {
+    pull_information = &mg_empty_map;
+  }
+  status = mg_session_send_pull_message(session, pull_information);
+  if (status != 0) {
+    goto fatal_failure;
+  }
+
+  session->status = MG_SESSION_FETCHING;
+  return 0;
+
+fatal_failure:
+  mg_session_invalidate(session);
+  assert(status != 0);
+  return status;
+}
+
+int mg_session_fetch(mg_session *session, mg_result **result) {
+  if (session->status == MG_SESSION_BAD) {
+    mg_session_set_error(session, "bad session");
+    return MG_ERROR_BAD_CALL;
+  }
+  if (session->status == MG_SESSION_READY) {
+    mg_session_set_error(session, "not executing a query");
+    return MG_ERROR_BAD_CALL;
+  }
+  if (session->status == MG_SESSION_EXECUTING) {
+    mg_session_set_error(session, "results not pulled");
+    return MG_ERROR_BAD_CALL;
+  }
+  assert(session->status == MG_SESSION_FETCHING);
 
   mg_message_destroy_ca(session->result.message, session->decoder_allocator);
   session->result.message = NULL;
@@ -716,9 +893,30 @@ int mg_session_pull(mg_session *session, mg_result **result) {
   }
 
   if (message->type == MG_MESSAGE_TYPE_SUCCESS) {
+    if (session->version == 4) {
+      const mg_value *has_more =
+          mg_map_at(message->success_v->metadata, "has_more");
+
+      if (has_more && has_more->type != MG_VALUE_TYPE_BOOL) {
+        status = MG_ERROR_PROTOCOL_VIOLATION;
+        mg_message_destroy_ca(message, session->decoder_allocator);
+        mg_session_set_error(session, "invalid response metadata");
+        goto fatal_failure;
+      }
+
+      if (!has_more || !mg_value_bool(has_more)) {
+        session->query_number -= session->explicit_transaction;
+        session->status = session->explicit_transaction && session->query_number
+                              ? MG_SESSION_EXECUTING
+                              : MG_SESSION_READY;
+      } else {
+        session->status = MG_SESSION_EXECUTING;
+      }
+    } else {
+      session->status = MG_SESSION_READY;
+    }
     session->result.message = message;
     *result = &session->result;
-    session->status = MG_SESSION_READY;
     return 0;
   }
 
@@ -726,25 +924,9 @@ int mg_session_pull(mg_session *session, mg_result **result) {
     int failure_status = handle_failure_message(session, message->failure_v);
     mg_message_destroy_ca(message, session->decoder_allocator);
 
-    status = mg_session_send_ack_failure_message(session);
+    status = session->version == 1 ? handle_failure_v1(session)
+                                   : mg_session_send_reset_message(session);
     if (status != 0) {
-      goto fatal_failure;
-    }
-
-    status = mg_session_receive_message(session);
-    if (status != 0) {
-      goto fatal_failure;
-    }
-
-    status = mg_session_read_bolt_message(session, &message);
-    if (status != 0) {
-      goto fatal_failure;
-    }
-
-    if (message->type != MG_MESSAGE_TYPE_SUCCESS) {
-      mg_message_destroy_ca(message, session->decoder_allocator);
-      status = MG_ERROR_PROTOCOL_VIOLATION;
-      mg_session_set_error(session, "unexpected message type");
       goto fatal_failure;
     }
 
@@ -759,6 +941,165 @@ int mg_session_pull(mg_session *session, mg_result **result) {
 
 fatal_failure:
   mg_session_invalidate(session);
+  return status;
+}
+
+int mg_session_begin_transaction(mg_session *session,
+                                 const mg_map *extra_run_information) {
+  if (session->version == 1) {
+    mg_session_set_error(session,
+                         "Transaction are not supported in this version");
+  }
+  if (session->status == MG_SESSION_BAD) {
+    mg_session_set_error(session, "bad session");
+    return MG_ERROR_BAD_CALL;
+  }
+  if (session->status == MG_SESSION_EXECUTING) {
+    mg_session_set_error(
+        session, "Cannot start a transaction while a query is executing");
+    return MG_ERROR_BAD_CALL;
+  }
+  if (session->status == MG_SESSION_FETCHING) {
+    mg_session_set_error(session, "fetching result of a query");
+    return MG_ERROR_BAD_CALL;
+  }
+  if (session->explicit_transaction) {
+    mg_session_set_error(session, "Transaction already started");
+    return MG_ERROR_BAD_CALL;
+  }
+  assert(session->status == MG_SESSION_READY && !session->explicit_transaction);
+
+  mg_message_destroy_ca(session->result.message, session->decoder_allocator);
+  session->result.message = NULL;
+  // TODO(aandelic): Check if the columns should be destroyed
+
+  if (!extra_run_information) {
+    extra_run_information = &mg_empty_map;
+  }
+
+  int status = 0;
+  status = mg_session_send_begin_message(session, extra_run_information);
+  if (status != 0) {
+    goto fatal_failure;
+  }
+
+  status = mg_session_receive_message(session);
+  if (status != 0) {
+    goto fatal_failure;
+  }
+
+  mg_message *response;
+  status = mg_session_read_bolt_message(session, &response);
+  if (status != 0) {
+    goto fatal_failure;
+  }
+
+  if (response->type == MG_MESSAGE_TYPE_SUCCESS) {
+    mg_message_destroy_ca(response, session->decoder_allocator);
+    session->explicit_transaction = 1;
+    session->query_number = 0;
+    return 0;
+  }
+
+  if (response->type == MG_MESSAGE_TYPE_FAILURE) {
+    int failure_status = handle_failure_message(session, response->failure_v);
+
+    status = session->version == 1 ? handle_failure_v1(session)
+                                   : mg_session_send_reset_message(session);
+    if (status != 0) {
+      goto fatal_failure;
+    }
+
+    mg_message_destroy_ca(response, session->decoder_allocator);
+    return failure_status;
+  }
+
+  status = MG_ERROR_PROTOCOL_VIOLATION;
+  mg_message_destroy_ca(response, session->decoder_allocator);
+  mg_session_set_error(session, "unexpected message type");
+
+fatal_failure:
+  mg_session_invalidate(session);
+  assert(status != 0);
+  return status;
+}
+
+int mg_session_end_transaction(mg_session *session, int commit_transaction,
+                               mg_result **result) {
+  if (session->version == 1) {
+    mg_session_set_error(session,
+                         "Transaction are not supported in this version");
+  }
+  if (session->status == MG_SESSION_BAD) {
+    mg_session_set_error(session, "bad session");
+    return MG_ERROR_BAD_CALL;
+  }
+
+  if (!session->explicit_transaction) {
+    mg_session_set_error(session, "No active transaction");
+    return MG_ERROR_BAD_CALL;
+  }
+
+  if (session->status == MG_SESSION_EXECUTING ||
+      session->status == MG_SESSION_FETCHING) {
+    mg_session_set_error(session,
+                         "Cannot end a transaction while a query is executing");
+    return MG_ERROR_BAD_CALL;
+  }
+
+  assert(session->status == MG_SESSION_READY && session->explicit_transaction);
+
+  mg_message_destroy_ca(session->result.message, session->decoder_allocator);
+  session->result.message = NULL;
+  // TODO(aandelic): Check if the columns should be destroyed
+
+  int status = 0;
+  status = commit_transaction ? mg_session_send_commit_messsage(session)
+                              : mg_session_send_rollback_messsage(session);
+  if (status != 0) {
+    goto fatal_failure;
+  }
+
+  status = mg_session_receive_message(session);
+  if (status != 0) {
+    goto fatal_failure;
+  }
+
+  mg_message *response;
+
+  status = mg_session_read_bolt_message(session, &response);
+  if (status != 0) {
+    goto fatal_failure;
+  }
+
+  if (response->type == MG_MESSAGE_TYPE_SUCCESS) {
+    session->result.message = response;
+    *result = &session->result;
+    session->status = MG_SESSION_READY;
+    session->explicit_transaction = 0;
+    return 0;
+  }
+
+  if (response->type == MG_MESSAGE_TYPE_FAILURE) {
+    int failure_status = handle_failure_message(session, response->failure_v);
+
+    status = session->version == 1 ? handle_failure_v1(session)
+                                   : mg_session_send_reset_message(session);
+    if (status != 0) {
+      goto fatal_failure;
+    }
+
+    mg_message_destroy_ca(response, session->decoder_allocator);
+    return failure_status;
+  }
+
+  status = MG_ERROR_PROTOCOL_VIOLATION;
+  mg_message_destroy_ca(response, session->decoder_allocator);
+  mg_session_set_error(session, "unexpected message type");
+
+fatal_failure:
+  mg_session_invalidate(session);
+  assert(status != 0);
   return status;
 }
 

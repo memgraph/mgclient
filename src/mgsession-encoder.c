@@ -164,6 +164,35 @@ int mg_session_write_value(mg_session *session, const mg_value *value) {
     case MG_VALUE_TYPE_PATH:
       mg_session_set_error(session, "tried to send value of type 'path'");
       return MG_ERROR_INVALID_VALUE;
+    case MG_VALUE_TYPE_DATE:
+      mg_session_set_error(session, "tried to send value of type 'date'");
+      return MG_ERROR_INVALID_VALUE;
+    case MG_VALUE_TYPE_TIME:
+      mg_session_set_error(session, "tried to send value of type 'time'");
+      return MG_ERROR_INVALID_VALUE;
+    case MG_VALUE_TYPE_LOCAL_TIME:
+      mg_session_set_error(session, "tried to send value of type 'local_time'");
+      return MG_ERROR_INVALID_VALUE;
+    case MG_VALUE_TYPE_DATE_TIME:
+      mg_session_set_error(session, "tried to send value of type 'date_time'");
+      return MG_ERROR_INVALID_VALUE;
+    case MG_VALUE_TYPE_DATE_TIME_ZONE_ID:
+      mg_session_set_error(session,
+                           "tried to send value of type 'date_time_zone_id'");
+      return MG_ERROR_INVALID_VALUE;
+    case MG_VALUE_TYPE_LOCAL_DATE_TIME:
+      mg_session_set_error(session,
+                           "tried to send value of type 'local_date_time'");
+      return MG_ERROR_INVALID_VALUE;
+    case MG_VALUE_TYPE_DURATION:
+      mg_session_set_error(session, "tried to send value of type 'duration'");
+      return MG_ERROR_INVALID_VALUE;
+    case MG_VALUE_TYPE_POINT_2D:
+      mg_session_set_error(session, "tried to send value of type 'point_2d'");
+      return MG_ERROR_INVALID_VALUE;
+    case MG_VALUE_TYPE_POINT_3D:
+      mg_session_set_error(session, "tried to send value of type 'point_3d'");
+      return MG_ERROR_INVALID_VALUE;
     case MG_VALUE_TYPE_UNKNOWN:
       mg_session_set_error(session, "tried to send value of unknown type");
       return MG_ERROR_INVALID_VALUE;
@@ -183,28 +212,48 @@ int mg_session_send_init_message(mg_session *session, const char *client_name,
   MG_RETURN_IF_FAILED(
       mg_session_write_uint8(session, (uint8_t)(MG_MARKER_TINY_STRUCT + 2)));
   MG_RETURN_IF_FAILED(
-      mg_session_write_uint8(session, MG_SIGNATURE_MESSAGE_INIT));
+      mg_session_write_uint8(session, MG_SIGNATURE_MESSAGE_HELLO));
   MG_RETURN_IF_FAILED(mg_session_write_string2(
       session, (uint32_t)client_name_len, client_name));
   MG_RETURN_IF_FAILED(mg_session_write_map(session, auth_token));
   return mg_session_flush_message(session);
 }
 
+int mg_session_send_hello_message(mg_session *session, const mg_map *extra,
+                                  const mg_map *routing) {
+  MG_RETURN_IF_FAILED(
+      mg_session_write_uint8(session, (uint8_t)(MG_MARKER_TINY_STRUCT + 2)));
+  MG_RETURN_IF_FAILED(
+      mg_session_write_uint8(session, MG_SIGNATURE_MESSAGE_HELLO));
+  MG_RETURN_IF_FAILED(mg_session_write_map(session, extra));
+  MG_RETURN_IF_FAILED(mg_session_write_map(session, routing));
+  return mg_session_flush_message(session);
+}
+
 int mg_session_send_run_message(mg_session *session, const char *statement,
-                                const mg_map *parameters) {
+                                const mg_map *parameters, const mg_map *extra) {
   MG_RETURN_IF_FAILED(
       mg_session_write_uint8(session, (uint8_t)(MG_MARKER_TINY_STRUCT + 2)));
   MG_RETURN_IF_FAILED(
       mg_session_write_uint8(session, MG_SIGNATURE_MESSAGE_RUN));
   MG_RETURN_IF_FAILED(mg_session_write_string(session, statement));
   MG_RETURN_IF_FAILED(mg_session_write_map(session, parameters));
+
+  if (session->version == 4) {
+    MG_RETURN_IF_FAILED(mg_session_write_map(session, extra));
+  }
   return mg_session_flush_message(session);
 }
 
-int mg_session_send_pull_all_message(mg_session *session) {
+int mg_session_send_pull_message(mg_session *session, const mg_map *extra) {
   MG_RETURN_IF_FAILED(mg_session_write_uint8(session, MG_MARKER_TINY_STRUCT));
   MG_RETURN_IF_FAILED(
-      mg_session_write_uint8(session, MG_SIGNATURE_MESSAGE_PULL_ALL));
+      mg_session_write_uint8(session, MG_SIGNATURE_MESSAGE_PULL));
+
+  if (session->version == 4) {
+    MG_RETURN_IF_FAILED(mg_session_write_map(session, extra));
+  }
+
   return mg_session_flush_message(session);
 }
 
@@ -212,6 +261,13 @@ int mg_session_send_ack_failure_message(mg_session *session) {
   MG_RETURN_IF_FAILED(mg_session_write_uint8(session, MG_MARKER_TINY_STRUCT));
   MG_RETURN_IF_FAILED(
       mg_session_write_uint8(session, MG_SIGNATURE_MESSAGE_ACK_FAILURE));
+  return mg_session_flush_message(session);
+}
+
+int mg_session_send_reset_message(mg_session *session) {
+  MG_RETURN_IF_FAILED(mg_session_write_uint8(session, MG_MARKER_TINY_STRUCT));
+  MG_RETURN_IF_FAILED(
+      mg_session_write_uint8(session, MG_SIGNATURE_MESSAGE_RESET));
   return mg_session_flush_message(session);
 }
 
@@ -240,5 +296,30 @@ int mg_session_send_record_message(mg_session *session, const mg_list *fields) {
   MG_RETURN_IF_FAILED(
       mg_session_write_uint8(session, MG_SIGNATURE_MESSAGE_RECORD));
   MG_RETURN_IF_FAILED(mg_session_write_list(session, fields));
+  return mg_session_flush_message(session);
+}
+
+int mg_session_send_begin_message(mg_session *session, const mg_map *extra) {
+  MG_RETURN_IF_FAILED(
+      mg_session_write_uint8(session, (uint8_t)(MG_MARKER_TINY_STRUCT + 1)));
+  MG_RETURN_IF_FAILED(
+      mg_session_write_uint8(session, MG_SIGNATURE_MESSAGE_BEGIN));
+  MG_RETURN_IF_FAILED(mg_session_write_map(session, extra));
+  return mg_session_flush_message(session);
+}
+
+int mg_session_send_commit_messsage(mg_session *session) {
+  MG_RETURN_IF_FAILED(
+      mg_session_write_uint8(session, (uint8_t)(MG_MARKER_TINY_STRUCT)));
+  MG_RETURN_IF_FAILED(
+      mg_session_write_uint8(session, MG_SIGNATURE_MESSAGE_COMMIT));
+  return mg_session_flush_message(session);
+}
+
+int mg_session_send_rollback_messsage(mg_session *session) {
+  MG_RETURN_IF_FAILED(
+      mg_session_write_uint8(session, (uint8_t)(MG_MARKER_TINY_STRUCT)));
+  MG_RETURN_IF_FAILED(
+      mg_session_write_uint8(session, MG_SIGNATURE_MESSAGE_ROLLBACK));
   return mg_session_flush_message(session);
 }
