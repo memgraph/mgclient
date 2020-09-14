@@ -232,8 +232,9 @@ int mg_session_send_hello_message(mg_session *session, const mg_map *extra,
 
 int mg_session_send_run_message(mg_session *session, const char *statement,
                                 const mg_map *parameters, const mg_map *extra) {
+  int field_number = 2 + (session->version == 4);
   MG_RETURN_IF_FAILED(
-      mg_session_write_uint8(session, (uint8_t)(MG_MARKER_TINY_STRUCT + 2)));
+      mg_session_write_uint8(session, (uint8_t)(MG_MARKER_TINY_STRUCT + field_number)));
   MG_RETURN_IF_FAILED(
       mg_session_write_uint8(session, MG_SIGNATURE_MESSAGE_RUN));
   MG_RETURN_IF_FAILED(mg_session_write_string(session, statement));

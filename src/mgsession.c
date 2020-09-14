@@ -132,7 +132,9 @@ void mg_session_destroy(mg_session *session) {
   mg_allocator_free(session->allocator, session->out_buffer);
 
   mg_message_destroy_ca(session->result.message, session->decoder_allocator);
+  session->result.message = NULL;
   mg_list_destroy_ca(session->result.columns, session->allocator);
+  session->result.columns = NULL;
 
   mg_linear_allocator_destroy(
       (mg_linear_allocator *)session->decoder_allocator);
