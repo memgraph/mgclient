@@ -1815,7 +1815,6 @@ TEST_F(RunTest, TransactionBasic) {
   mg_session_destroy(session);
   StopServer();
   ASSERT_MEMORY_OK();
-
 }
 
 TEST_F(RunTest, TransactionWithMultipleRuns) {

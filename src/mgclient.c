@@ -685,7 +685,8 @@ int mg_session_run(mg_session *session, const char *query, const mg_map *params,
     mg_session_set_error(session, "bad session");
     return MG_ERROR_BAD_CALL;
   }
-  if (!session->explicit_transaction && session->status == MG_SESSION_EXECUTING) {
+  if (!session->explicit_transaction &&
+      session->status == MG_SESSION_EXECUTING) {
     mg_session_set_error(session, "already executing a query");
     return MG_ERROR_BAD_CALL;
   }
