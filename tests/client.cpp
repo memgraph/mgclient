@@ -353,6 +353,84 @@ TEST_F(ConnectTest, InitFail) {
   ASSERT_MEMORY_OK();
 }
 
+TEST_F(ConnectTest, InitFail_v4) {
+  RunServer([](int sockfd) {
+    // Perform handshake.
+    {
+      char handshake[20];
+      ASSERT_EQ(RecvData(sockfd, handshake, 20), 0);
+      ASSERT_EQ(std::string(handshake, 4), "\x60\x60\xB0\x17"s);
+      ASSERT_EQ(std::string(handshake + 4, 4), "\x00\x00\x01\x04"s);
+      ASSERT_EQ(std::string(handshake + 8, 4), "\x00\x00\x00\x01"s);
+      ASSERT_EQ(std::string(handshake + 12, 4), "\x00\x00\x00\x00"s);
+      ASSERT_EQ(std::string(handshake + 16, 4), "\x00\x00\x00\x00"s);
+
+      uint32_t version = htobe32(0x0104);
+      ASSERT_EQ(SendData(sockfd, (char *)&version, 4), 0);
+    }
+
+    mg_session *session = mg_session_init(&mg_system_allocator);
+    ASSERT_TRUE(session);
+    session->version = 4;
+    mg_raw_transport_init(sockfd, (mg_raw_transport **)&session->transport,
+                          &mg_system_allocator);
+
+    // Read HELLO message.
+    {
+      mg_message *message;
+      ASSERT_EQ(mg_session_receive_message(session), 0);
+      ASSERT_EQ(mg_session_read_bolt_message(session, &message), 0);
+      ASSERT_EQ(message->type, MG_MESSAGE_TYPE_HELLO);
+
+      mg_message_hello *msg_hello = message->hello_v;
+      {
+        ASSERT_EQ(mg_map_size(msg_hello->extra), 2);
+
+        const mg_value *user_agent_val =
+            mg_map_at(msg_hello->extra, "user_agent");
+        ASSERT_TRUE(user_agent_val);
+        ASSERT_EQ(mg_value_get_type(user_agent_val), MG_VALUE_TYPE_STRING);
+        const mg_string *user_agent = mg_value_string(user_agent_val);
+        ASSERT_EQ(std::string(user_agent->data, user_agent->size),
+                  "MemgraphBolt/0.1");
+
+        const mg_value *scheme_val = mg_map_at(msg_hello->extra, "scheme");
+        ASSERT_TRUE(scheme_val);
+        ASSERT_EQ(mg_value_get_type(scheme_val), MG_VALUE_TYPE_STRING);
+        const mg_string *scheme = mg_value_string(scheme_val);
+        ASSERT_EQ(std::string(scheme->data, scheme->size), "none");
+      }
+
+      mg_message_destroy_ca(message, session->decoder_allocator);
+    }
+
+    // Send FAILURE message.
+    {
+      mg_map *metadata = mg_map_make_empty(2);
+      mg_map_insert_unsafe(
+          metadata, "code",
+          mg_value_make_string("Memgraph.ClientError.Security.Authenticated"));
+      mg_map_insert_unsafe(metadata, "message",
+                           mg_value_make_string("Authentication failure"));
+      ASSERT_EQ(mg_session_send_failure_message(session, metadata), 0);
+      mg_map_destroy(metadata);
+    }
+    mg_session_destroy(session);
+  });
+  mg_session_params *params = mg_session_params_make();
+  mg_session_params_set_host(params, "127.0.0.1");
+  mg_session_params_set_port(params, port);
+  mg_session *session;
+  ASSERT_EQ(mg_connect_ca(params, &session, (mg_allocator *)&allocator),
+            MG_ERROR_CLIENT_ERROR);
+  ASSERT_THAT(std::string(mg_session_error(session)),
+              HasSubstr("Authentication failure"));
+  EXPECT_EQ(mg_session_status(session), MG_SESSION_BAD);
+  mg_session_params_destroy(params);
+  mg_session_destroy(session);
+  ASSERT_MEMORY_OK();
+}
+
 TEST_F(ConnectTest, Success) {
   RunServer([](int sockfd) {
     // Perform handshake.
@@ -404,6 +482,89 @@ TEST_F(ConnectTest, Success) {
 
         const mg_value *credentials_val =
             mg_map_at(msg_init->auth_token, "credentials");
+        ASSERT_TRUE(credentials_val);
+        ASSERT_EQ(mg_value_get_type(credentials_val), MG_VALUE_TYPE_STRING);
+        const mg_string *credentials = mg_value_string(credentials_val);
+        ASSERT_EQ(std::string(credentials->data, credentials->size), "pass");
+      }
+
+      mg_message_destroy_ca(message, session->decoder_allocator);
+    }
+
+    // Send SUCCESS message.
+    ASSERT_EQ(mg_session_send_success_message(session, &mg_empty_map), 0);
+
+    mg_session_destroy(session);
+  });
+  mg_session_params *params = mg_session_params_make();
+  mg_session_params_set_host(params, "127.0.0.1");
+  mg_session_params_set_port(params, port);
+  mg_session_params_set_username(params, "user");
+  mg_session_params_set_password(params, "pass");
+  mg_session *session;
+  ASSERT_EQ(mg_connect_ca(params, &session, (mg_allocator *)&allocator), 0);
+  EXPECT_EQ(mg_session_status(session), MG_SESSION_READY);
+  mg_session_params_destroy(params);
+  mg_session_destroy(session);
+  ASSERT_MEMORY_OK();
+}
+
+TEST_F(ConnectTest, Success_v4) {
+  RunServer([](int sockfd) {
+    // Perform handshake.
+    {
+      char handshake[20];
+      ASSERT_EQ(RecvData(sockfd, handshake, 20), 0);
+      ASSERT_EQ(std::string(handshake, 4), "\x60\x60\xB0\x17"s);
+      ASSERT_EQ(std::string(handshake + 4, 4), "\x00\x00\x01\x04"s);
+      ASSERT_EQ(std::string(handshake + 8, 4), "\x00\x00\x00\x01"s);
+      ASSERT_EQ(std::string(handshake + 12, 4), "\x00\x00\x00\x00"s);
+      ASSERT_EQ(std::string(handshake + 16, 4), "\x00\x00\x00\x00"s);
+
+      uint32_t version = htobe32(0x0104);
+      ASSERT_EQ(SendData(sockfd, (char *)&version, 4), 0);
+    }
+
+    mg_session *session = mg_session_init(&mg_system_allocator);
+    ASSERT_TRUE(session);
+    session->version = 4;
+    mg_raw_transport_init(sockfd, (mg_raw_transport **)&session->transport,
+                          &mg_system_allocator);
+
+    // Read HELLO message.
+    {
+      mg_message *message;
+      ASSERT_EQ(mg_session_receive_message(session), 0);
+      ASSERT_EQ(mg_session_read_bolt_message(session, &message), 0);
+      ASSERT_EQ(message->type, MG_MESSAGE_TYPE_HELLO);
+
+      mg_message_hello *msg_hello = message->hello_v;
+      {
+        ASSERT_EQ(mg_map_size(msg_hello->extra), 4);
+
+        const mg_value *user_agent_val =
+            mg_map_at(msg_hello->extra, "user_agent");
+        ASSERT_TRUE(user_agent_val);
+        ASSERT_EQ(mg_value_get_type(user_agent_val), MG_VALUE_TYPE_STRING);
+        const mg_string *user_agent = mg_value_string(user_agent_val);
+        ASSERT_EQ(std::string(user_agent->data, user_agent->size),
+                  "MemgraphBolt/0.1");
+
+        const mg_value *scheme_val = mg_map_at(msg_hello->extra, "scheme");
+        ASSERT_TRUE(scheme_val);
+        ASSERT_EQ(mg_value_get_type(scheme_val), MG_VALUE_TYPE_STRING);
+        const mg_string *scheme = mg_value_string(scheme_val);
+        ASSERT_EQ(std::string(scheme->data, scheme->size), "basic");
+
+        const mg_value *principal_val =
+            mg_map_at(msg_hello->extra, "principal");
+        ASSERT_TRUE(principal_val);
+        ASSERT_EQ(mg_value_get_type(principal_val), MG_VALUE_TYPE_STRING);
+        const mg_string *principal = mg_value_string(principal_val);
+        ASSERT_EQ(std::string(principal->data, principal->size), "user");
+
+        const mg_value *credentials_val =
+            mg_map_at(msg_hello->extra, "credentials");
         ASSERT_TRUE(credentials_val);
         ASSERT_EQ(mg_value_get_type(credentials_val), MG_VALUE_TYPE_STRING);
         const mg_string *credentials = mg_value_string(credentials_val);
@@ -532,7 +693,6 @@ class RunTest : public ::testing::Test {
     session = mg_session_init((mg_allocator *)&allocator);
     mg_raw_transport_init(sc, (mg_raw_transport **)&session->transport,
                           (mg_allocator *)&allocator);
-    session->version = 1;
     session->status = MG_SESSION_READY;
   }
 
@@ -551,6 +711,15 @@ class RunTest : public ::testing::Test {
   std::thread server_thread;
 
   tracking_allocator allocator;
+
+  void protocolViolation(int version);
+  void invalidStatement(int version);
+  void okNoResults(int version);
+  void multipleQueries(int version);
+  void okWithResults(int version);
+  void queryRuntimeError(int version);
+  void queryDatabaseError(int version);
+  void runWithParams(int version);
 };
 
 bool CheckColumns(const mg_result *result,
@@ -588,9 +757,10 @@ bool CheckSummary(const mg_result *result, double exp_execution_time) {
   return mg_value_float(execution_time) == exp_execution_time;
 }
 
-TEST_F(RunTest, ProtocolViolation) {
-  RunServer([](int sockfd) {
+void RunTest::protocolViolation(int version) {
+  RunServer([version](int sockfd) {
     mg_session *session = mg_session_init(&mg_system_allocator);
+    session->version = version;
     mg_raw_transport_init(sockfd, (mg_raw_transport **)&session->transport,
                           &mg_system_allocator);
 
@@ -606,6 +776,10 @@ TEST_F(RunTest, ProtocolViolation) {
                 "MATCH (n) RETURN n");
 
       ASSERT_EQ(mg_map_size(msg_run->parameters), 0);
+      if (version == 4) {
+        ASSERT_TRUE(msg_run->extra);
+        ASSERT_EQ(mg_map_size(msg_run->extra), 0);
+      }
       mg_message_destroy_ca(message, session->decoder_allocator);
     }
 
@@ -618,17 +792,25 @@ TEST_F(RunTest, ProtocolViolation) {
 
     mg_session_destroy(session);
   });
-  ASSERT_EQ(mg_session_run(session, "MATCH (n) RETURN n", NULL, NULL, NULL, NULL),
-            MG_ERROR_PROTOCOL_VIOLATION);
+
+  session->version = version;
+  ASSERT_EQ(
+      mg_session_run(session, "MATCH (n) RETURN n", NULL, NULL, NULL, NULL),
+      MG_ERROR_PROTOCOL_VIOLATION);
   ASSERT_EQ(mg_session_status(session), MG_SESSION_BAD);
   mg_session_destroy(session);
   StopServer();
   ASSERT_MEMORY_OK();
 }
 
-TEST_F(RunTest, InvalidStatement) {
-  RunServer([](int sockfd) {
+TEST_F(RunTest, ProtocolViolation_v1) { protocolViolation(1); }
+
+TEST_F(RunTest, ProtocolViolation_v4) { protocolViolation(4); }
+
+void RunTest::invalidStatement(int version) {
+  RunServer([version](int sockfd) {
     mg_session *session = mg_session_init(&mg_system_allocator);
+    session->version = version;
     mg_raw_transport_init(sockfd, (mg_raw_transport **)&session->transport,
                           &mg_system_allocator);
 
@@ -642,6 +824,10 @@ TEST_F(RunTest, InvalidStatement) {
       EXPECT_EQ(std::string(msg_run->statement->data, msg_run->statement->size),
                 "MATCH (n) RETURN m");
       ASSERT_EQ(mg_map_size(msg_run->parameters), 0);
+      if (version == 4) {
+        ASSERT_TRUE(msg_run->extra);
+        ASSERT_EQ(mg_map_size(msg_run->extra), 0);
+      }
       mg_message_destroy_ca(message, session->decoder_allocator);
     }
 
@@ -657,22 +843,30 @@ TEST_F(RunTest, InvalidStatement) {
       mg_map_destroy(summary);
     }
 
-    // Client must send ACK_FAILURE now.
-    {
+    if (version == 1) {
+      // Client must send ACK_FAILURE now.
       mg_message *message;
       ASSERT_EQ(mg_session_receive_message(session), 0);
       ASSERT_EQ(mg_session_read_bolt_message(session, &message), 0);
       ASSERT_EQ(message->type, MG_MESSAGE_TYPE_ACK_FAILURE);
       mg_message_destroy_ca(message, session->decoder_allocator);
-    }
 
-    // Server responds with SUCCESS.
-    { ASSERT_EQ(mg_session_send_success_message(session, &mg_empty_map), 0); }
+      // Server responds with SUCCESS.
+      { ASSERT_EQ(mg_session_send_success_message(session, &mg_empty_map), 0); }
+    } else {
+      mg_message *message;
+      ASSERT_EQ(mg_session_receive_message(session), 0);
+      ASSERT_EQ(mg_session_read_bolt_message(session, &message), 0);
+      ASSERT_EQ(message->type, MG_MESSAGE_TYPE_RESET);
+      mg_message_destroy_ca(message, session->decoder_allocator);
+    }
 
     mg_session_destroy(session);
   });
-  ASSERT_EQ(mg_session_run(session, "MATCH (n) RETURN m", NULL, NULL, NULL, NULL),
-            MG_ERROR_CLIENT_ERROR);
+  session->version = version;
+  ASSERT_EQ(
+      mg_session_run(session, "MATCH (n) RETURN m", NULL, NULL, NULL, NULL),
+      MG_ERROR_CLIENT_ERROR);
   ASSERT_THAT(std::string(mg_session_error(session)),
               HasSubstr("Unbound variable: m"));
   ASSERT_EQ(mg_session_status(session), MG_SESSION_READY);
@@ -681,10 +875,14 @@ TEST_F(RunTest, InvalidStatement) {
   ASSERT_MEMORY_OK();
 }
 
-TEST_F(RunTest, OkNoResults) {
-  RunServer([](int sockfd) {
+TEST_F(RunTest, InvalidStatement_v1) { invalidStatement(1); }
+
+TEST_F(RunTest, InvalidStatement_v4) { invalidStatement(4); }
+
+void RunTest::okNoResults(int version) {
+  RunServer([version](int sockfd) {
     mg_session *session = mg_session_init(&mg_system_allocator);
-    session->version = 1;
+    session->version = version;
     mg_raw_transport_init(sockfd, (mg_raw_transport **)&session->transport,
                           &mg_system_allocator);
 
@@ -698,6 +896,10 @@ TEST_F(RunTest, OkNoResults) {
       EXPECT_EQ(std::string(msg_run->statement->data, msg_run->statement->size),
                 "MATCH (n) RETURN n");
       ASSERT_EQ(mg_map_size(msg_run->parameters), 0);
+      if (version == 4) {
+        ASSERT_TRUE(msg_run->extra);
+        ASSERT_EQ(mg_map_size(msg_run->extra), 0);
+      }
       mg_message_destroy_ca(message, session->decoder_allocator);
     }
 
@@ -720,6 +922,11 @@ TEST_F(RunTest, OkNoResults) {
       ASSERT_EQ(mg_session_receive_message(session), 0);
       ASSERT_EQ(mg_session_read_bolt_message(session, &message), 0);
       ASSERT_EQ(message->type, MG_MESSAGE_TYPE_PULL);
+      if (version == 4) {
+        mg_message_pull *pull_message = message->pull_v;
+        ASSERT_TRUE(pull_message->extra);
+        ASSERT_EQ(mg_map_size(pull_message->extra), 0);
+      }
       mg_message_destroy_ca(message, session->decoder_allocator);
     }
 
@@ -735,7 +942,10 @@ TEST_F(RunTest, OkNoResults) {
     mg_session_destroy(session);
   });
 
-  ASSERT_EQ(mg_session_run(session, "MATCH (n) RETURN n", NULL, NULL, NULL, NULL), 0);
+  session->version = version;
+
+  ASSERT_EQ(
+      mg_session_run(session, "MATCH (n) RETURN n", NULL, NULL, NULL, NULL), 0);
   ASSERT_EQ(mg_session_status(session), MG_SESSION_EXECUTING);
 
   mg_result *result;
@@ -753,9 +963,14 @@ TEST_F(RunTest, OkNoResults) {
   ASSERT_MEMORY_OK();
 }
 
-TEST_F(RunTest, MultipleQueries) {
-  RunServer([](int sockfd) {
+TEST_F(RunTest, OkNoResults_v1) { okNoResults(1); }
+
+TEST_F(RunTest, OkNoResults_v4) { okNoResults(4); }
+
+void RunTest::multipleQueries(int version) {
+  RunServer([version](int sockfd) {
     mg_session *session = mg_session_init(&mg_system_allocator);
+    session->version = version;
     mg_raw_transport_init(sockfd, (mg_raw_transport **)&session->transport,
                           &mg_system_allocator);
 
@@ -771,6 +986,10 @@ TEST_F(RunTest, MultipleQueries) {
             std::string(msg_run->statement->data, msg_run->statement->size),
             "RETURN " + std::to_string(i) + " AS n");
         ASSERT_EQ(mg_map_size(msg_run->parameters), 0);
+        if (version == 4) {
+          ASSERT_TRUE(msg_run->extra);
+          ASSERT_EQ(mg_map_size(msg_run->extra), 0);
+        }
         mg_message_destroy_ca(message, session->decoder_allocator);
       }
 
@@ -793,6 +1012,11 @@ TEST_F(RunTest, MultipleQueries) {
         ASSERT_EQ(mg_session_receive_message(session), 0);
         ASSERT_EQ(mg_session_read_bolt_message(session, &message), 0);
         ASSERT_EQ(message->type, MG_MESSAGE_TYPE_PULL);
+        if (version == 4) {
+          mg_message_pull *pull_message = message->pull_v;
+          ASSERT_TRUE(pull_message->extra);
+          ASSERT_EQ(mg_map_size(pull_message->extra), 0);
+        }
         mg_message_destroy_ca(message, session->decoder_allocator);
       }
 
@@ -816,6 +1040,8 @@ TEST_F(RunTest, MultipleQueries) {
 
     mg_session_destroy(session);
   });
+
+  session->version = version;
 
   for (int i = 0; i < 10; ++i) {
     ASSERT_EQ(mg_session_run(session,
@@ -854,9 +1080,14 @@ TEST_F(RunTest, MultipleQueries) {
   ASSERT_MEMORY_OK();
 }
 
-TEST_F(RunTest, OkWithResults) {
-  RunServer([](int sockfd) {
+TEST_F(RunTest, MultipleQueries_v1) { multipleQueries(1); }
+
+TEST_F(RunTest, MultipleQueries_v4) { multipleQueries(4); }
+
+void RunTest::okWithResults(int version) {
+  RunServer([version](int sockfd) {
     mg_session *session = mg_session_init(&mg_system_allocator);
+    session->version = version;
     mg_raw_transport_init(sockfd, (mg_raw_transport **)&session->transport,
                           &mg_system_allocator);
 
@@ -870,6 +1101,10 @@ TEST_F(RunTest, OkWithResults) {
       EXPECT_EQ(std::string(msg_run->statement->data, msg_run->statement->size),
                 "UNWIND [1, 2, 3] AS n RETURN n, n + 5 AS m");
       ASSERT_EQ(mg_map_size(msg_run->parameters), 0);
+      if (version == 4) {
+        ASSERT_TRUE(msg_run->extra);
+        ASSERT_EQ(mg_map_size(msg_run->extra), 0);
+      }
       mg_message_destroy_ca(message, session->decoder_allocator);
     }
 
@@ -893,6 +1128,11 @@ TEST_F(RunTest, OkWithResults) {
       ASSERT_EQ(mg_session_receive_message(session), 0);
       ASSERT_EQ(mg_session_read_bolt_message(session, &message), 0);
       ASSERT_EQ(message->type, MG_MESSAGE_TYPE_PULL);
+      if (version == 4) {
+        mg_message_pull *pull_message = message->pull_v;
+        ASSERT_TRUE(pull_message->extra);
+        ASSERT_EQ(mg_map_size(pull_message->extra), 0);
+      }
       mg_message_destroy_ca(message, session->decoder_allocator);
     }
 
@@ -918,6 +1158,8 @@ TEST_F(RunTest, OkWithResults) {
 
     mg_session_destroy(session);
   });
+
+  session->version = version;
 
   ASSERT_EQ(
       mg_session_run(session, "UNWIND [1, 2, 3] AS n RETURN n, n + 5 AS m",
@@ -959,9 +1201,14 @@ TEST_F(RunTest, OkWithResults) {
   ASSERT_MEMORY_OK();
 }
 
-TEST_F(RunTest, QueryRuntimeError) {
-  RunServer([](int sockfd) {
+TEST_F(RunTest, OkWithResults_v1) { okWithResults(1); }
+
+TEST_F(RunTest, OkWithResults_v4) { okWithResults(4); }
+
+void RunTest::queryRuntimeError(int version) {
+  RunServer([version](int sockfd) {
     mg_session *session = mg_session_init(&mg_system_allocator);
+    session->version = version;
     mg_raw_transport_init(sockfd, (mg_raw_transport **)&session->transport,
                           &mg_system_allocator);
 
@@ -975,6 +1222,10 @@ TEST_F(RunTest, QueryRuntimeError) {
       EXPECT_EQ(std::string(msg_run->statement->data, msg_run->statement->size),
                 "MATCH (n) RETURN size(n.prop)");
       ASSERT_EQ(mg_map_size(msg_run->parameters), 0);
+      if (version == 4) {
+        ASSERT_TRUE(msg_run->extra);
+        ASSERT_EQ(mg_map_size(msg_run->extra), 0);
+      }
       mg_message_destroy_ca(message, session->decoder_allocator);
     }
 
@@ -997,6 +1248,11 @@ TEST_F(RunTest, QueryRuntimeError) {
       ASSERT_EQ(mg_session_receive_message(session), 0);
       ASSERT_EQ(mg_session_read_bolt_message(session, &message), 0);
       ASSERT_EQ(message->type, MG_MESSAGE_TYPE_PULL);
+      if (version == 4) {
+        mg_message_pull *pull_message = message->pull_v;
+        ASSERT_TRUE(pull_message->extra);
+        ASSERT_EQ(mg_map_size(pull_message->extra), 0);
+      }
       mg_message_destroy_ca(message, session->decoder_allocator);
     }
 
@@ -1015,23 +1271,32 @@ TEST_F(RunTest, QueryRuntimeError) {
       mg_map_destroy(summary);
     }
 
-    // Client should send ACK_FAILURE now.
-    {
+    if (version == 1) {
+      // Client should send ACK_FAILURE now.
       mg_message *message;
       ASSERT_EQ(mg_session_receive_message(session), 0);
       ASSERT_EQ(mg_session_read_bolt_message(session, &message), 0);
       ASSERT_EQ(message->type, MG_MESSAGE_TYPE_ACK_FAILURE);
       mg_message_destroy_ca(message, session->decoder_allocator);
-    }
 
-    // Server responds with SUCCESS.
-    { ASSERT_EQ(mg_session_send_success_message(session, &mg_empty_map), 0); }
+      // Server responds with SUCCESS.
+      { ASSERT_EQ(mg_session_send_success_message(session, &mg_empty_map), 0); }
+    } else {
+      mg_message *message;
+      ASSERT_EQ(mg_session_receive_message(session), 0);
+      ASSERT_EQ(mg_session_read_bolt_message(session, &message), 0);
+      ASSERT_EQ(message->type, MG_MESSAGE_TYPE_RESET);
+      mg_message_destroy_ca(message, session->decoder_allocator);
+    }
 
     mg_session_destroy(session);
   });
 
-  ASSERT_EQ(
-      mg_session_run(session, "MATCH (n) RETURN size(n.prop)", NULL, NULL, NULL, NULL), 0);
+  session->version = version;
+
+  ASSERT_EQ(mg_session_run(session, "MATCH (n) RETURN size(n.prop)", NULL, NULL,
+                           NULL, NULL),
+            0);
   ASSERT_EQ(mg_session_status(session), MG_SESSION_EXECUTING);
 
   mg_result *result;
@@ -1048,9 +1313,14 @@ TEST_F(RunTest, QueryRuntimeError) {
   ASSERT_MEMORY_OK();
 }
 
-TEST_F(RunTest, QueryDatabaseError) {
-  RunServer([](int sockfd) {
+TEST_F(RunTest, QueryRuntimeError_v1) { queryRuntimeError(1); }
+
+TEST_F(RunTest, QueryRuntimeError_v4) { queryRuntimeError(4); }
+
+void RunTest::queryDatabaseError(int version) {
+  RunServer([version](int sockfd) {
     mg_session *session = mg_session_init(&mg_system_allocator);
+    session->version = version;
     mg_raw_transport_init(sockfd, (mg_raw_transport **)&session->transport,
                           &mg_system_allocator);
 
@@ -1064,6 +1334,10 @@ TEST_F(RunTest, QueryDatabaseError) {
       EXPECT_EQ(std::string(msg_run->statement->data, msg_run->statement->size),
                 "MATCH (n) RETURN size(n.prop)");
       ASSERT_EQ(mg_map_size(msg_run->parameters), 0);
+      if (version == 4) {
+        ASSERT_TRUE(msg_run->extra);
+        ASSERT_EQ(mg_map_size(msg_run->extra), 0);
+      }
       mg_message_destroy_ca(message, session->decoder_allocator);
     }
 
@@ -1085,6 +1359,11 @@ TEST_F(RunTest, QueryDatabaseError) {
       ASSERT_EQ(mg_session_receive_message(session), 0);
       ASSERT_EQ(mg_session_read_bolt_message(session, &message), 0);
       ASSERT_EQ(message->type, MG_MESSAGE_TYPE_PULL);
+      if (version == 4) {
+        mg_message_pull *pull_message = message->pull_v;
+        ASSERT_TRUE(pull_message->extra);
+        ASSERT_EQ(mg_map_size(pull_message->extra), 0);
+      }
       mg_message_destroy_ca(message, session->decoder_allocator);
     }
 
@@ -1098,8 +1377,11 @@ TEST_F(RunTest, QueryDatabaseError) {
     mg_session_destroy(session);
   });
 
-  ASSERT_EQ(
-      mg_session_run(session, "MATCH (n) RETURN size(n.prop)", NULL, NULL, NULL, NULL), 0);
+  session->version = version;
+
+  ASSERT_EQ(mg_session_run(session, "MATCH (n) RETURN size(n.prop)", NULL, NULL,
+                           NULL, NULL),
+            0);
   ASSERT_EQ(mg_session_status(session), MG_SESSION_EXECUTING);
 
   mg_result *result;
@@ -1115,9 +1397,14 @@ TEST_F(RunTest, QueryDatabaseError) {
   ASSERT_MEMORY_OK();
 }
 
-TEST_F(RunTest, RunWithParams) {
-  RunServer([](int sockfd) {
+TEST_F(RunTest, QueryDatabaseError_v1) { queryDatabaseError(1); }
+
+TEST_F(RunTest, QueryDatabaseError_v4) { queryDatabaseError(4); }
+
+void RunTest::runWithParams(int version) {
+  RunServer([version](int sockfd) {
     mg_session *session = mg_session_init(&mg_system_allocator);
+    session->version = version;
     mg_raw_transport_init(sockfd, (mg_raw_transport **)&session->transport,
                           &mg_system_allocator);
 
@@ -1136,6 +1423,10 @@ TEST_F(RunTest, RunWithParams) {
         ASSERT_TRUE(param);
         ASSERT_EQ(mg_value_get_type(param), MG_VALUE_TYPE_INTEGER);
         ASSERT_EQ(mg_value_integer(param), 42);
+        if (version == 4) {
+          ASSERT_TRUE(msg_run->extra);
+          ASSERT_EQ(mg_map_size(msg_run->extra), 0);
+        }
       }
       mg_message_destroy_ca(message, session->decoder_allocator);
     }
@@ -1159,6 +1450,11 @@ TEST_F(RunTest, RunWithParams) {
       ASSERT_EQ(mg_session_receive_message(session), 0);
       ASSERT_EQ(mg_session_read_bolt_message(session, &message), 0);
       ASSERT_EQ(message->type, MG_MESSAGE_TYPE_PULL);
+      if (version == 4) {
+        mg_message_pull *pull_message = message->pull_v;
+        ASSERT_TRUE(pull_message->extra);
+        ASSERT_EQ(mg_map_size(pull_message->extra), 0);
+      }
       mg_message_destroy_ca(message, session->decoder_allocator);
     }
 
@@ -1182,9 +1478,12 @@ TEST_F(RunTest, RunWithParams) {
     mg_session_destroy(session);
   });
 
+  session->version = version;
+
   mg_map *params = mg_map_make_empty(1);
   mg_map_insert_unsafe(params, "param", mg_value_make_integer(42));
-  ASSERT_EQ(mg_session_run(session, "WITH $param AS x RETURN x", params, NULL, NULL, NULL),
+  ASSERT_EQ(mg_session_run(session, "WITH $param AS x RETURN x", params, NULL,
+                           NULL, NULL),
             0);
   mg_map_destroy(params);
 
@@ -1203,6 +1502,640 @@ TEST_F(RunTest, RunWithParams) {
   ASSERT_TRUE(CheckColumns(result, std::vector<std::string>{"x"}));
   ASSERT_TRUE(CheckSummary(result, 0.01));
   ASSERT_EQ(mg_session_status(session), MG_SESSION_READY);
+
+  mg_session_destroy(session);
+  StopServer();
+  ASSERT_MEMORY_OK();
+}
+
+TEST_F(RunTest, RunWithParams_v1) { runWithParams(1); }
+
+TEST_F(RunTest, RunWithParams_v4) { runWithParams(4); }
+
+/////////// Tests for Bolt v4 ///////////
+
+mg_map *CreatePullInfo(int n = -1, std::optional<int> qid = std::nullopt) {
+  int capacity = qid ? 2 : 1;
+  mg_map *pull_info = mg_map_make_empty(capacity);
+  if (!pull_info) {
+    return nullptr;
+  }
+
+  mg_map_insert_unsafe(pull_info, "n", mg_value_make_integer(n));
+
+  if (qid) {
+    mg_map_insert_unsafe(pull_info, "qid", mg_value_make_integer(*qid));
+  }
+
+  return pull_info;
+}
+
+TEST_F(RunTest, MultipleResultPull) {
+  RunServer([](int sockfd) {
+    mg_session *session = mg_session_init(&mg_system_allocator);
+    session->version = 4;
+    mg_raw_transport_init(sockfd, (mg_raw_transport **)&session->transport,
+                          &mg_system_allocator);
+
+    // Read RUN message.
+    {
+      mg_message *message;
+      ASSERT_EQ(mg_session_receive_message(session), 0);
+      ASSERT_EQ(mg_session_read_bolt_message(session, &message), 0);
+      ASSERT_EQ(message->type, MG_MESSAGE_TYPE_RUN);
+      mg_message_run *msg_run = message->run_v;
+      EXPECT_EQ(std::string(msg_run->statement->data, msg_run->statement->size),
+                "UNWIND [1, 2, 3] AS n RETURN n, n + 5 AS m");
+      ASSERT_EQ(mg_map_size(msg_run->parameters), 0);
+      ASSERT_EQ(mg_map_size(msg_run->extra), 0);
+      mg_message_destroy_ca(message, session->decoder_allocator);
+    }
+
+    // Send SUCCESS to client.
+    {
+      mg_map *summary = mg_map_make_empty(2);
+      mg_list *fields = mg_list_make_empty(2);
+      mg_list_append(fields, mg_value_make_string("n"));
+      mg_list_append(fields, mg_value_make_string("m"));
+      mg_map_insert_unsafe(summary, "fields", mg_value_make_list(fields));
+      mg_map_insert_unsafe(summary, "result_available_after",
+                           mg_value_make_float(0.01));
+
+      ASSERT_EQ(mg_session_send_success_message(session, summary), 0);
+      mg_map_destroy(summary);
+    }
+
+    // Read PULL 1 message.
+    {
+      mg_message *message;
+      ASSERT_EQ(mg_session_receive_message(session), 0);
+      ASSERT_EQ(mg_session_read_bolt_message(session, &message), 0);
+      ASSERT_EQ(message->type, MG_MESSAGE_TYPE_PULL);
+      mg_message_pull *msg_pull = message->pull_v;
+      ASSERT_EQ(mg_map_size(msg_pull->extra), 1);
+      const mg_value *n_val = mg_map_at(msg_pull->extra, "n");
+      ASSERT_TRUE(n_val);
+      ASSERT_EQ(n_val->type, MG_VALUE_TYPE_INTEGER);
+      ASSERT_EQ(mg_value_integer(n_val), 1);
+      mg_message_destroy_ca(message, session->decoder_allocator);
+    }
+
+    const auto send_record = [&](int i) {
+      mg_list *fields = mg_list_make_empty(2);
+      mg_list_append(fields, mg_value_make_integer(i));
+      mg_list_append(fields, mg_value_make_integer(i + 5));
+      ASSERT_EQ(mg_session_send_record_message(session, fields), 0);
+      mg_list_destroy(fields);
+    };
+
+    // Send 1 RECORD message to client
+    send_record(1);
+
+    // Send SUCCESS with has_more set to true.
+    {
+      mg_map *metadata = mg_map_make_empty(1);
+      mg_map_insert_unsafe(metadata, "has_more", mg_value_make_bool(true));
+      ASSERT_EQ(mg_session_send_success_message(session, metadata), 0);
+      mg_map_destroy(metadata);
+    }
+
+    // Read PULL rest of messages.
+    {
+      mg_message *message;
+      ASSERT_EQ(mg_session_receive_message(session), 0);
+      ASSERT_EQ(mg_session_read_bolt_message(session, &message), 0);
+      ASSERT_EQ(message->type, MG_MESSAGE_TYPE_PULL);
+      mg_message_pull *msg_pull = message->pull_v;
+      ASSERT_EQ(mg_map_size(msg_pull->extra), 1);
+      const mg_value *n_val = mg_map_at(msg_pull->extra, "n");
+      ASSERT_TRUE(n_val);
+      ASSERT_EQ(n_val->type, MG_VALUE_TYPE_INTEGER);
+      ASSERT_EQ(mg_value_integer(n_val), -1);
+      mg_message_destroy_ca(message, session->decoder_allocator);
+    }
+
+    // Send 2 RECORD messages to client.
+    {
+      for (int i = 2; i <= 3; ++i) {
+        send_record(i);
+      }
+    }
+
+    // Send SUCCESS with execution summary.
+    {
+      mg_map *metadata = mg_map_make_empty(1);
+      mg_map_insert_unsafe(metadata, "execution_time",
+                           mg_value_make_float(0.01));
+      ASSERT_EQ(mg_session_send_success_message(session, metadata), 0);
+      mg_map_destroy(metadata);
+    }
+
+    mg_session_destroy(session);
+  });
+
+  session->version = 4;
+
+  ASSERT_EQ(
+      mg_session_run(session, "UNWIND [1, 2, 3] AS n RETURN n, n + 5 AS m",
+                     NULL, NULL, NULL, NULL),
+      0);
+  ASSERT_EQ(mg_session_status(session), MG_SESSION_EXECUTING);
+
+  {
+    mg_map *pull_info = CreatePullInfo(1);
+    ASSERT_EQ(mg_session_pull(session, pull_info), 0);
+    ASSERT_EQ(mg_session_status(session), MG_SESSION_FETCHING);
+    mg_map_destroy(pull_info);
+  }
+
+  mg_result *result;
+  const auto checkResults = [&](const int i) {
+    ASSERT_EQ(mg_session_fetch(session, &result), 1);
+    ASSERT_EQ(mg_session_status(session), MG_SESSION_FETCHING);
+
+    ASSERT_TRUE(CheckColumns(result, std::vector<std::string>{"n", "m"}));
+
+    const mg_list *row = mg_result_row(result);
+    EXPECT_EQ(mg_list_size(row), 2);
+    EXPECT_EQ(mg_value_get_type(mg_list_at(row, 0)), MG_VALUE_TYPE_INTEGER);
+    EXPECT_EQ(mg_value_integer(mg_list_at(row, 0)), i);
+
+    EXPECT_EQ(mg_value_get_type(mg_list_at(row, 1)), MG_VALUE_TYPE_INTEGER);
+    EXPECT_EQ(mg_value_integer(mg_list_at(row, 1)), i + 5);
+  };
+
+  // Check first result
+  checkResults(1);
+
+  ASSERT_EQ(mg_session_fetch(session, &result), 0);
+  ASSERT_TRUE(CheckColumns(result, std::vector<std::string>{"n", "m"}));
+  const mg_map *summary = mg_result_summary(result);
+  ASSERT_TRUE(summary);
+  const mg_value *has_more = mg_map_at(summary, "has_more");
+  ASSERT_TRUE(has_more);
+  ASSERT_EQ(mg_value_get_type(has_more), MG_VALUE_TYPE_BOOL);
+  ASSERT_TRUE(mg_value_bool(has_more));
+
+  ASSERT_EQ(mg_session_status(session), MG_SESSION_EXECUTING);
+
+  // Pull rest of the results
+  {
+    mg_map *pull_info = CreatePullInfo(-1);
+    ASSERT_EQ(mg_session_pull(session, pull_info), 0);
+    ASSERT_EQ(mg_session_status(session), MG_SESSION_FETCHING);
+    mg_map_destroy(pull_info);
+  }
+
+  // Check results.
+  for (int i = 2; i <= 3; ++i) {
+    checkResults(i);
+  }
+
+  ASSERT_EQ(mg_session_fetch(session, &result), 0);
+  ASSERT_TRUE(CheckColumns(result, std::vector<std::string>{"n", "m"}));
+  ASSERT_TRUE(CheckSummary(result, 0.01));
+  ASSERT_EQ(mg_session_status(session), MG_SESSION_READY);
+
+  ASSERT_EQ(mg_session_fetch(session, &result), MG_ERROR_BAD_CALL);
+  ASSERT_EQ(mg_session_pull(session, nullptr), MG_ERROR_BAD_CALL);
+  ASSERT_EQ(mg_session_status(session), MG_SESSION_READY);
+
+  mg_session_destroy(session);
+  StopServer();
+  ASSERT_MEMORY_OK();
+}
+
+TEST_F(RunTest, TransactionBasic) {
+  RunServer([](int sockfd) {
+    mg_session *session = mg_session_init(&mg_system_allocator);
+    session->version = 4;
+    mg_raw_transport_init(sockfd, (mg_raw_transport **)&session->transport,
+                          &mg_system_allocator);
+
+    // Read BEGIN message
+    {
+      mg_message *message;
+      ASSERT_EQ(mg_session_receive_message(session), 0);
+      ASSERT_EQ(mg_session_read_bolt_message(session, &message), 0);
+      ASSERT_EQ(message->type, MG_MESSAGE_TYPE_BEGIN);
+      mg_message_destroy_ca(message, session->decoder_allocator);
+    }
+
+    // Send SUCCESS to client
+    ASSERT_EQ(mg_session_send_success_message(session, &mg_empty_map), 0);
+
+    // Read RUN message.
+    {
+      mg_message *message;
+      ASSERT_EQ(mg_session_receive_message(session), 0);
+      ASSERT_EQ(mg_session_read_bolt_message(session, &message), 0);
+      ASSERT_EQ(message->type, MG_MESSAGE_TYPE_RUN);
+      mg_message_run *msg_run = message->run_v;
+      EXPECT_EQ(std::string(msg_run->statement->data, msg_run->statement->size),
+                "MATCH (n) RETURN n");
+      ASSERT_EQ(mg_map_size(msg_run->parameters), 0);
+      ASSERT_TRUE(msg_run->extra);
+      ASSERT_EQ(mg_map_size(msg_run->extra), 0);
+      mg_message_destroy_ca(message, session->decoder_allocator);
+    }
+
+    // Send SUCCESS to client.
+    {
+      mg_map *summary = mg_map_make_empty(2);
+      mg_list *fields = mg_list_make_empty(1);
+      mg_list_append(fields, mg_value_make_string("n"));
+      mg_map_insert_unsafe(summary, "fields", mg_value_make_list(fields));
+      mg_map_insert_unsafe(summary, "qid", mg_value_make_integer(0));
+      ASSERT_EQ(mg_session_send_success_message(session, summary), 0);
+      mg_map_destroy(summary);
+    }
+
+    // Read PULL_ALL.
+    {
+      mg_message *message;
+      ASSERT_EQ(mg_session_receive_message(session), 0);
+      ASSERT_EQ(mg_session_read_bolt_message(session, &message), 0);
+      ASSERT_EQ(message->type, MG_MESSAGE_TYPE_PULL);
+      mg_message_pull *pull_message = message->pull_v;
+      ASSERT_TRUE(pull_message->extra);
+      ASSERT_EQ(mg_map_size(pull_message->extra), 0);
+      mg_message_destroy_ca(message, session->decoder_allocator);
+    }
+
+    // Send SUCCESS again because there are no results.
+    {
+      mg_map *metadata = mg_map_make_empty(1);
+      mg_map_insert_unsafe(metadata, "execution_time",
+                           mg_value_make_float(0.01));
+      ASSERT_EQ(mg_session_send_success_message(session, metadata), 0);
+      mg_map_destroy(metadata);
+    }
+
+    {
+      mg_message *message;
+      ASSERT_EQ(mg_session_receive_message(session), 0);
+      ASSERT_EQ(mg_session_read_bolt_message(session, &message), 0);
+      ASSERT_EQ(message->type, MG_MESSAGE_TYPE_ROLLBACK);
+      mg_message_destroy_ca(message, session->decoder_allocator);
+    }
+
+    {
+      mg_map *metadata = mg_map_make_empty(1);
+      mg_map_insert_unsafe(metadata, "execution_time",
+                           mg_value_make_float(0.01));
+      ASSERT_EQ(mg_session_send_success_message(session, metadata), 0);
+      mg_map_destroy(metadata);
+    }
+
+    mg_session_destroy(session);
+  });
+
+  session->version = 4;
+
+  ASSERT_EQ(mg_session_begin_transaction(session, NULL), 0);
+
+  ASSERT_EQ(
+      mg_session_run(session, "MATCH (n) RETURN n", NULL, NULL, NULL, NULL), 0);
+  ASSERT_EQ(mg_session_status(session), MG_SESSION_EXECUTING);
+
+  mg_result *result;
+  ASSERT_EQ(mg_session_end_transaction(session, 0, &result), MG_ERROR_BAD_CALL);
+
+  ASSERT_EQ(mg_session_pull(session, NULL), 0);
+  ASSERT_EQ(mg_session_fetch(session, &result), 0);
+  ASSERT_TRUE(CheckColumns(result, std::vector<std::string>{"n"}));
+  ASSERT_TRUE(CheckSummary(result, 0.01));
+  ASSERT_EQ(mg_session_status(session), MG_SESSION_READY);
+
+  ASSERT_EQ(mg_session_fetch(session, &result), MG_ERROR_BAD_CALL);
+  ASSERT_EQ(mg_session_status(session), MG_SESSION_READY);
+
+  ASSERT_EQ(mg_session_end_transaction(session, 0, &result), 0);
+
+  mg_session_destroy(session);
+  StopServer();
+  ASSERT_MEMORY_OK();
+
+}
+
+TEST_F(RunTest, TransactionWithMultipleRuns) {
+  RunServer([](int sockfd) {
+    mg_session *session = mg_session_init(&mg_system_allocator);
+    session->version = 4;
+    mg_raw_transport_init(sockfd, (mg_raw_transport **)&session->transport,
+                          &mg_system_allocator);
+
+    const auto read_run_message =
+        [&](const std::string_view expected_statement) {
+          mg_message *message;
+          ASSERT_EQ(mg_session_receive_message(session), 0);
+          ASSERT_EQ(mg_session_read_bolt_message(session, &message), 0);
+          ASSERT_EQ(message->type, MG_MESSAGE_TYPE_RUN);
+          mg_message_run *msg_run = message->run_v;
+          EXPECT_EQ(std::string_view(msg_run->statement->data,
+                                     msg_run->statement->size),
+                    expected_statement);
+          ASSERT_EQ(mg_map_size(msg_run->parameters), 0);
+          ASSERT_EQ(mg_map_size(msg_run->extra), 0);
+          mg_message_destroy_ca(message, session->decoder_allocator);
+        };
+
+    const auto send_success_run = [&](const int qid) {
+      mg_map *summary = mg_map_make_empty(2);
+      mg_list *fields = mg_list_make_empty(2);
+      mg_list_append(fields, mg_value_make_string("n"));
+      mg_list_append(fields, mg_value_make_string("m"));
+      mg_map_insert_unsafe(summary, "fields", mg_value_make_list(fields));
+      mg_map_insert_unsafe(summary, "qid", mg_value_make_integer(qid));
+      ASSERT_EQ(mg_session_send_success_message(session, summary), 0);
+      mg_map_destroy(summary);
+    };
+
+    const auto read_pull_message = [&](const int expected_n,
+                                       const std::optional<int> expected_qid =
+                                           std::nullopt) {
+      mg_message *message;
+      ASSERT_EQ(mg_session_receive_message(session), 0);
+      ASSERT_EQ(mg_session_read_bolt_message(session, &message), 0);
+      ASSERT_EQ(message->type, MG_MESSAGE_TYPE_PULL);
+      mg_message_pull *msg_pull = message->pull_v;
+
+      const int extra_size = expected_qid ? 2 : 1;
+      ASSERT_EQ(mg_map_size(msg_pull->extra), extra_size);
+      const mg_value *n_val = mg_map_at(msg_pull->extra, "n");
+      ASSERT_TRUE(n_val);
+      ASSERT_EQ(n_val->type, MG_VALUE_TYPE_INTEGER);
+      ASSERT_EQ(mg_value_integer(n_val), expected_n);
+
+      if (expected_qid) {
+        const mg_value *qid_val = mg_map_at(msg_pull->extra, "qid");
+        ASSERT_TRUE(qid_val);
+        ASSERT_EQ(qid_val->type, MG_VALUE_TYPE_INTEGER);
+        ASSERT_EQ(mg_value_integer(qid_val), *expected_qid);
+      }
+      mg_message_destroy_ca(message, session->decoder_allocator);
+    };
+
+    const auto send_record = [&](const int run_idx, const int result_idx) {
+      mg_list *fields = mg_list_make_empty(2);
+      const int n = 2 * run_idx + 1 + result_idx;
+      mg_list_append(fields, mg_value_make_integer(n));
+      mg_list_append(fields, mg_value_make_integer(n + 5));
+      ASSERT_EQ(mg_session_send_record_message(session, fields), 0);
+      mg_list_destroy(fields);
+    };
+
+    const auto send_has_more_success = [&]() {
+      mg_map *metadata = mg_map_make_empty(1);
+      mg_map_insert_unsafe(metadata, "has_more", mg_value_make_bool(true));
+      ASSERT_EQ(mg_session_send_success_message(session, metadata), 0);
+      mg_map_destroy(metadata);
+    };
+
+    const auto send_success_with_summary = [&]() {
+      mg_map *metadata = mg_map_make_empty(1);
+      mg_map_insert_unsafe(metadata, "execution_time",
+                           mg_value_make_float(0.01));
+      ASSERT_EQ(mg_session_send_success_message(session, metadata), 0);
+      mg_map_destroy(metadata);
+    };
+
+    // Read BEGIN message
+    {
+      mg_message *message;
+      ASSERT_EQ(mg_session_receive_message(session), 0);
+      ASSERT_EQ(mg_session_read_bolt_message(session, &message), 0);
+      ASSERT_EQ(message->type, MG_MESSAGE_TYPE_BEGIN);
+      mg_message_destroy_ca(message, session->decoder_allocator);
+    }
+
+    // Send SUCCESS to client
+    ASSERT_EQ(mg_session_send_success_message(session, &mg_empty_map), 0);
+
+    // Read first RUN message.
+    read_run_message("UNWIND [1, 2] AS n RETURN n, n + 5 AS m");
+
+    const int r1_qid = 0;
+    // Send SUCCESS to client.
+    send_success_run(r1_qid);
+
+    // Read second RUN message
+    read_run_message("UNWIND [3, 4] AS n RETURN n, n + 5 AS m");
+
+    const int r2_qid = 1;
+    // Send SUCCESS to client.
+    send_success_run(r2_qid);
+
+    // Read PULL 1 message from first run
+    read_pull_message(1, r1_qid);
+
+    // Send 1 RECORD message to client
+    send_record(0, 0);
+
+    // Send SUCCESS with has_more set to true.
+    send_has_more_success();
+
+    // Read third RUN
+    read_run_message("UNWIND [5, 6] AS n RETURN n, n + 5 AS m");
+
+    const int r3_qid = 2;
+    // Send SUCCESS to client
+    send_success_run(r3_qid);
+
+    // Read PULL all messages from second run
+    read_pull_message(-1, r2_qid);
+
+    // Send records from second run
+    send_record(1, 0);
+    send_record(1, 1);
+
+    // Send SUCCESS with execution summary for second run
+    send_success_with_summary();
+
+    // Read PULL 1 message from third run
+    read_pull_message(1, r3_qid);
+
+    // Send first record from third run
+    send_record(2, 0);
+
+    // Send SUCCESS with has more in third run
+    send_has_more_success();
+
+    // Read PULL all messages from first run
+    read_pull_message(-1, r1_qid);
+
+    // Send record from first run
+    send_record(0, 1);
+
+    // Send SUCCESS with execution summary for first run
+    send_success_with_summary();
+
+    // Read PULL all messages from third run
+    read_pull_message(-1);
+
+    // Send record from third run
+    send_record(2, 1);
+
+    // Send SUCCESS with execution summary for third run
+    send_success_with_summary();
+
+    // Read COMMIT transaction
+    {
+      mg_message *message;
+      ASSERT_EQ(mg_session_receive_message(session), 0);
+      ASSERT_EQ(mg_session_read_bolt_message(session, &message), 0);
+      ASSERT_EQ(message->type, MG_MESSAGE_TYPE_COMMIT);
+      mg_message_destroy_ca(message, session->decoder_allocator);
+    }
+
+    send_success_with_summary();
+
+    mg_session_destroy(session);
+  });
+
+  session->version = 4;
+
+  ASSERT_EQ(mg_session_begin_transaction(session, NULL), 0);
+  ASSERT_EQ(mg_session_status(session), MG_SESSION_READY);
+
+  int64_t r1_qid;
+  ASSERT_EQ(mg_session_run(session, "UNWIND [1, 2] AS n RETURN n, n + 5 AS m",
+                           NULL, NULL, NULL, &r1_qid),
+            0);
+  ASSERT_EQ(mg_session_status(session), MG_SESSION_EXECUTING);
+
+  int64_t r2_qid;
+  ASSERT_EQ(mg_session_run(session, "UNWIND [3, 4] AS n RETURN n, n + 5 AS m",
+                           NULL, NULL, NULL, &r2_qid),
+            0);
+  ASSERT_EQ(mg_session_status(session), MG_SESSION_EXECUTING);
+
+  // Pull first result from first run
+  {
+    mg_map *pull_info = CreatePullInfo(1, r1_qid);
+    ASSERT_EQ(mg_session_pull(session, pull_info), 0);
+    ASSERT_EQ(mg_session_status(session), MG_SESSION_FETCHING);
+    mg_map_destroy(pull_info);
+  }
+
+  mg_result *result;
+  const auto check_result = [&](const int run_idx, const int result_idx) {
+    ASSERT_EQ(mg_session_fetch(session, &result), 1);
+    ASSERT_EQ(mg_session_status(session), MG_SESSION_FETCHING);
+
+    ASSERT_TRUE(CheckColumns(result, std::vector<std::string>{"n", "m"}));
+
+    const int n = 2 * run_idx + 1 + result_idx;
+    const mg_list *row = mg_result_row(result);
+    EXPECT_EQ(mg_list_size(row), 2);
+    EXPECT_EQ(mg_value_get_type(mg_list_at(row, 0)), MG_VALUE_TYPE_INTEGER);
+    EXPECT_EQ(mg_value_integer(mg_list_at(row, 0)), n);
+
+    EXPECT_EQ(mg_value_get_type(mg_list_at(row, 1)), MG_VALUE_TYPE_INTEGER);
+    EXPECT_EQ(mg_value_integer(mg_list_at(row, 1)), n + 5);
+  };
+
+  // Check first result
+  check_result(0, 0);
+
+  // First run should have more results
+  {
+    ASSERT_EQ(mg_session_fetch(session, &result), 0);
+    ASSERT_TRUE(CheckColumns(result, std::vector<std::string>{"n", "m"}));
+    const mg_map *summary = mg_result_summary(result);
+    ASSERT_TRUE(summary);
+    const mg_value *has_more = mg_map_at(summary, "has_more");
+    ASSERT_TRUE(has_more);
+    ASSERT_EQ(mg_value_get_type(has_more), MG_VALUE_TYPE_BOOL);
+    ASSERT_TRUE(mg_value_bool(has_more));
+
+    ASSERT_EQ(mg_session_status(session), MG_SESSION_EXECUTING);
+  }
+
+  // Send third RUN
+  int64_t r3_qid;
+  ASSERT_EQ(mg_session_run(session, "UNWIND [5, 6] AS n RETURN n, n + 5 AS m",
+                           NULL, NULL, NULL, &r3_qid),
+            0);
+  ASSERT_EQ(mg_session_status(session), MG_SESSION_EXECUTING);
+
+  // Pull all of the results from second run
+  {
+    mg_map *pull_info = CreatePullInfo(-1, r2_qid);
+    ASSERT_EQ(mg_session_pull(session, pull_info), 0);
+    ASSERT_EQ(mg_session_status(session), MG_SESSION_FETCHING);
+    mg_map_destroy(pull_info);
+  }
+
+  check_result(1, 0);
+  check_result(1, 1);
+
+  // Second run shouldn't have more results
+  ASSERT_EQ(mg_session_fetch(session, &result), 0);
+  ASSERT_TRUE(CheckColumns(result, std::vector<std::string>{"n", "m"}));
+  ASSERT_TRUE(CheckSummary(result, 0.01));
+  ASSERT_EQ(mg_session_status(session), MG_SESSION_EXECUTING);
+
+  // Pull one result from third run
+  {
+    mg_map *pull_info = CreatePullInfo(1, r3_qid);
+    ASSERT_EQ(mg_session_pull(session, pull_info), 0);
+    ASSERT_EQ(mg_session_status(session), MG_SESSION_FETCHING);
+    mg_map_destroy(pull_info);
+  }
+
+  check_result(2, 0);
+
+  // Third run should have more results
+  {
+    ASSERT_EQ(mg_session_fetch(session, &result), 0);
+    ASSERT_TRUE(CheckColumns(result, std::vector<std::string>{"n", "m"}));
+    const mg_map *summary = mg_result_summary(result);
+    ASSERT_TRUE(summary);
+    const mg_value *has_more = mg_map_at(summary, "has_more");
+    ASSERT_TRUE(has_more);
+    ASSERT_EQ(mg_value_get_type(has_more), MG_VALUE_TYPE_BOOL);
+    ASSERT_TRUE(mg_value_bool(has_more));
+  }
+
+  ASSERT_EQ(mg_session_status(session), MG_SESSION_EXECUTING);
+
+  // Pull rest of the results from first run
+  {
+    mg_map *pull_info = CreatePullInfo(-1, r1_qid);
+    ASSERT_EQ(mg_session_pull(session, pull_info), 0);
+    ASSERT_EQ(mg_session_status(session), MG_SESSION_FETCHING);
+    mg_map_destroy(pull_info);
+  }
+
+  check_result(0, 1);
+
+  // First run shouldn't have more results
+  ASSERT_EQ(mg_session_fetch(session, &result), 0);
+  ASSERT_TRUE(CheckColumns(result, std::vector<std::string>{"n", "m"}));
+  ASSERT_TRUE(CheckSummary(result, 0.01));
+  ASSERT_EQ(mg_session_status(session), MG_SESSION_EXECUTING);
+
+  // Pull rest of the results from third run
+  {
+    // If no qid is used, results from last run should be pulled
+    mg_map *pull_info = CreatePullInfo(-1);
+    ASSERT_EQ(mg_session_pull(session, pull_info), 0);
+    ASSERT_EQ(mg_session_status(session), MG_SESSION_FETCHING);
+    mg_map_destroy(pull_info);
+  }
+
+  check_result(2, 1);
+
+  ASSERT_EQ(mg_session_fetch(session, &result), 0);
+  ASSERT_TRUE(CheckColumns(result, std::vector<std::string>{"n", "m"}));
+  ASSERT_TRUE(CheckSummary(result, 0.01));
+  ASSERT_EQ(mg_session_status(session), MG_SESSION_READY);
+
+  ASSERT_EQ(mg_session_fetch(session, &result), MG_ERROR_BAD_CALL);
+  ASSERT_EQ(mg_session_pull(session, nullptr), MG_ERROR_BAD_CALL);
+
+  ASSERT_EQ(mg_session_end_transaction(session, true, &result), 0);
 
   mg_session_destroy(session);
   StopServer();
