@@ -211,19 +211,26 @@ mg_date *mg_date_copy_ca(const mg_date *date, mg_allocator *allocator);
 
 mg_time *mg_time_copy_ca(const mg_time *time, mg_allocator *allocator);
 
-mg_local_time *mg_local_time_copy_ca(const mg_local_time *local_time, mg_allocator *allocator);
+mg_local_time *mg_local_time_copy_ca(const mg_local_time *local_time,
+                                     mg_allocator *allocator);
 
-mg_date_time *mg_date_time_copy_ca(const mg_date_time *date_time, mg_allocator *allocator);
+mg_date_time *mg_date_time_copy_ca(const mg_date_time *date_time,
+                                   mg_allocator *allocator);
 
-mg_date_time_zone_id *mg_date_time_zone_id_copy_ca(const mg_date_time_zone_id *date_time_zone_id, mg_allocator *allocator);
+mg_date_time_zone_id *mg_date_time_zone_id_copy_ca(
+    const mg_date_time_zone_id *date_time_zone_id, mg_allocator *allocator);
 
-mg_local_date_time *mg_local_date_time_copy_ca(const mg_local_date_time *local_date_time, mg_allocator *allocator);
+mg_local_date_time *mg_local_date_time_copy_ca(
+    const mg_local_date_time *local_date_time, mg_allocator *allocator);
 
-mg_duration *mg_duration_copy_ca(const mg_duration *duration, mg_allocator *allocator);
+mg_duration *mg_duration_copy_ca(const mg_duration *duration,
+                                 mg_allocator *allocator);
 
-mg_point_2d *mg_point_2d_copy_ca(const mg_point_2d *point_2d, mg_allocator *allocator);
+mg_point_2d *mg_point_2d_copy_ca(const mg_point_2d *point_2d,
+                                 mg_allocator *allocator);
 
-mg_point_3d *mg_point_3d_copy_ca(const mg_point_3d *point_3d, mg_allocator *allocator);
+mg_point_3d *mg_point_3d_copy_ca(const mg_point_3d *point_3d,
+                                 mg_allocator *allocator);
 
 void mg_path_destroy_ca(mg_path *path, mg_allocator *allocator);
 
@@ -248,13 +255,16 @@ void mg_date_destroy_ca(mg_date *date, mg_allocator *allocator);
 
 void mg_time_destroy_ca(mg_time *time, mg_allocator *allocator);
 
-void mg_local_time_destroy_ca(mg_local_time *local_time, mg_allocator *allocator);
+void mg_local_time_destroy_ca(mg_local_time *local_time,
+                              mg_allocator *allocator);
 
 void mg_date_time_destroy_ca(mg_date_time *date_time, mg_allocator *allocator);
 
-void mg_date_time_zone_id_destroy_ca(mg_date_time_zone_id *date_time_zone_id, mg_allocator *allocator);
+void mg_date_time_zone_id_destroy_ca(mg_date_time_zone_id *date_time_zone_id,
+                                     mg_allocator *allocator);
 
-void mg_local_date_time_destroy_ca(mg_local_date_time *local_date_time, mg_allocator *allocator);
+void mg_local_date_time_destroy_ca(mg_local_date_time *local_date_time,
+                                   mg_allocator *allocator);
 
 void mg_duration_destroy_ca(mg_duration *duration, mg_allocator *allocator);
 

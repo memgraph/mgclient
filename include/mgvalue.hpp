@@ -780,14 +780,14 @@ class Date final {
   bool operator!=(const ConstDate &other) const { return !(*this == other); }
 
   const mg_date *ptr() const { return ptr_; }
+
  private:
-  mg_date* ptr_;
+  mg_date *ptr_;
 };
 
 class ConstDate final {
  public:
-  explicit ConstDate(const mg_date *const_ptr)
-    : const_ptr_(const_ptr) {}
+  explicit ConstDate(const mg_date *const_ptr) : const_ptr_(const_ptr) {}
 
   int64_t days() const { return mg_date_days(const_ptr_); }
 
@@ -834,17 +834,19 @@ class Time final {
   bool operator!=(const ConstTime &other) const { return !(*this == other); }
 
   const mg_time *ptr() const { return ptr_; }
+
  private:
-  mg_time* ptr_;
+  mg_time *ptr_;
 };
 
 class ConstTime final {
  public:
-  explicit ConstTime(const mg_time *const_ptr)
-    : const_ptr_(const_ptr) {}
+  explicit ConstTime(const mg_time *const_ptr) : const_ptr_(const_ptr) {}
 
   int64_t nanoseconds() const { return mg_time_nanoseconds(const_ptr_); }
-  int64_t tz_offset_seconds() const { return mg_time_tz_offset_seconds(const_ptr_); }
+  int64_t tz_offset_seconds() const {
+    return mg_time_tz_offset_seconds(const_ptr_);
+  }
 
   bool operator==(const ConstTime &other) const;
   bool operator==(const Time &other) const;
@@ -868,7 +870,8 @@ class LocalTime final {
  public:
   explicit LocalTime(mg_local_time *ptr) : ptr_(ptr) {}
 
-  explicit LocalTime(const mg_local_time *const_ptr) : LocalTime(mg_local_time_copy(const_ptr)) {}
+  explicit LocalTime(const mg_local_time *const_ptr)
+      : LocalTime(mg_local_time_copy(const_ptr)) {}
 
   LocalTime(const LocalTime &other);
   LocalTime(LocalTime &&other);
@@ -885,23 +888,28 @@ class LocalTime final {
   bool operator==(const LocalTime &other) const;
   bool operator==(const ConstLocalTime &other) const;
   bool operator!=(const LocalTime &other) const { return !(*this == other); }
-  bool operator!=(const ConstLocalTime &other) const { return !(*this == other); }
+  bool operator!=(const ConstLocalTime &other) const {
+    return !(*this == other);
+  }
 
   const mg_local_time *ptr() const { return ptr_; }
+
  private:
-  mg_local_time* ptr_;
+  mg_local_time *ptr_;
 };
 
 class ConstLocalTime final {
  public:
   explicit ConstLocalTime(const mg_local_time *const_ptr)
-    : const_ptr_(const_ptr) {}
+      : const_ptr_(const_ptr) {}
 
   int64_t nanoseconds() const { return mg_local_time_nanoseconds(const_ptr_); }
 
   bool operator==(const ConstLocalTime &other) const;
   bool operator==(const LocalTime &other) const;
-  bool operator!=(const ConstLocalTime &other) const { return !(*this == other); }
+  bool operator!=(const ConstLocalTime &other) const {
+    return !(*this == other);
+  }
   bool operator!=(const LocalTime &other) const { return !(*this == other); }
 
   const mg_local_time *ptr() const { return const_ptr_; };
@@ -921,7 +929,8 @@ class DateTime final {
  public:
   explicit DateTime(mg_date_time *ptr) : ptr_(ptr) {}
 
-  explicit DateTime(const mg_date_time *const_ptr) : DateTime(mg_date_time_copy(const_ptr)) {}
+  explicit DateTime(const mg_date_time *const_ptr)
+      : DateTime(mg_date_time_copy(const_ptr)) {}
 
   DateTime(const DateTime &other);
   DateTime(DateTime &&other);
@@ -933,32 +942,41 @@ class DateTime final {
 
   int64_t seconds() const { return mg_date_time_seconds(ptr_); }
   int64_t nanoseconds() const { return mg_date_time_nanoseconds(ptr_); }
-  int64_t tz_offset_minutes() const { return mg_date_time_tz_offset_minutes(ptr_); }
+  int64_t tz_offset_minutes() const {
+    return mg_date_time_tz_offset_minutes(ptr_);
+  }
 
   ConstDateTime AsConstDateTime() const;
 
   bool operator==(const DateTime &other) const;
   bool operator==(const ConstDateTime &other) const;
   bool operator!=(const DateTime &other) const { return !(*this == other); }
-  bool operator!=(const ConstDateTime &other) const { return !(*this == other); }
+  bool operator!=(const ConstDateTime &other) const {
+    return !(*this == other);
+  }
 
   const mg_date_time *ptr() const { return ptr_; }
+
  private:
-  mg_date_time* ptr_;
+  mg_date_time *ptr_;
 };
 
 class ConstDateTime final {
  public:
   explicit ConstDateTime(const mg_date_time *const_ptr)
-    : const_ptr_(const_ptr) {}
+      : const_ptr_(const_ptr) {}
 
   int64_t seconds() const { return mg_date_time_seconds(const_ptr_); }
   int64_t nanoseconds() const { return mg_date_time_nanoseconds(const_ptr_); }
-  int64_t tz_offset_minutes() const { return mg_date_time_tz_offset_minutes(const_ptr_); }
+  int64_t tz_offset_minutes() const {
+    return mg_date_time_tz_offset_minutes(const_ptr_);
+  }
 
   bool operator==(const ConstDateTime &other) const;
   bool operator==(const DateTime &other) const;
-  bool operator!=(const ConstDateTime &other) const { return !(*this == other); }
+  bool operator!=(const ConstDateTime &other) const {
+    return !(*this == other);
+  }
   bool operator!=(const DateTime &other) const { return !(*this == other); }
 
   const mg_date_time *ptr() const { return const_ptr_; };
@@ -978,7 +996,8 @@ class DateTimeZoneId final {
  public:
   explicit DateTimeZoneId(mg_date_time_zone_id *ptr) : ptr_(ptr) {}
 
-  explicit DateTimeZoneId(const mg_date_time_zone_id *const_ptr) : DateTimeZoneId(mg_date_time_zone_id_copy(const_ptr)) {}
+  explicit DateTimeZoneId(const mg_date_time_zone_id *const_ptr)
+      : DateTimeZoneId(mg_date_time_zone_id_copy(const_ptr)) {}
 
   DateTimeZoneId(const DateTimeZoneId &other);
   DateTimeZoneId(DateTimeZoneId &&other);
@@ -996,27 +1015,38 @@ class DateTimeZoneId final {
 
   bool operator==(const DateTimeZoneId &other) const;
   bool operator==(const ConstDateTimeZoneId &other) const;
-  bool operator!=(const DateTimeZoneId &other) const { return !(*this == other); }
-  bool operator!=(const ConstDateTimeZoneId &other) const { return !(*this == other); }
+  bool operator!=(const DateTimeZoneId &other) const {
+    return !(*this == other);
+  }
+  bool operator!=(const ConstDateTimeZoneId &other) const {
+    return !(*this == other);
+  }
 
   const mg_date_time_zone_id *ptr() const { return ptr_; }
+
  private:
-  mg_date_time_zone_id* ptr_;
+  mg_date_time_zone_id *ptr_;
 };
 
 class ConstDateTimeZoneId final {
  public:
   explicit ConstDateTimeZoneId(const mg_date_time_zone_id *const_ptr)
-    : const_ptr_(const_ptr) {}
+      : const_ptr_(const_ptr) {}
 
   int64_t seconds() const { return mg_date_time_zone_id_seconds(const_ptr_); };
-  int64_t nanoseconds() const { return mg_date_time_zone_id_nanoseconds(const_ptr_); }
+  int64_t nanoseconds() const {
+    return mg_date_time_zone_id_nanoseconds(const_ptr_);
+  }
   int64_t tzId() const { return mg_date_time_zone_id_tz_id(const_ptr_); }
 
   bool operator==(const ConstDateTimeZoneId &other) const;
   bool operator==(const DateTimeZoneId &other) const;
-  bool operator!=(const ConstDateTimeZoneId &other) const { return !(*this == other); }
-  bool operator!=(const DateTimeZoneId &other) const { return !(*this == other); }
+  bool operator!=(const ConstDateTimeZoneId &other) const {
+    return !(*this == other);
+  }
+  bool operator!=(const DateTimeZoneId &other) const {
+    return !(*this == other);
+  }
 
   const mg_date_time_zone_id *ptr() const { return const_ptr_; };
 
@@ -1035,7 +1065,8 @@ class LocalDateTime final {
  public:
   explicit LocalDateTime(mg_local_date_time *ptr) : ptr_(ptr) {}
 
-  explicit LocalDateTime(const mg_local_date_time *const_ptr) : LocalDateTime(mg_local_date_time_copy(const_ptr)) {}
+  explicit LocalDateTime(const mg_local_date_time *const_ptr)
+      : LocalDateTime(mg_local_date_time_copy(const_ptr)) {}
 
   LocalDateTime(const LocalDateTime &other);
   LocalDateTime(LocalDateTime &&other);
@@ -1052,26 +1083,37 @@ class LocalDateTime final {
 
   bool operator==(const LocalDateTime &other) const;
   bool operator==(const ConstLocalDateTime &other) const;
-  bool operator!=(const LocalDateTime &other) const { return !(*this == other); }
-  bool operator!=(const ConstLocalDateTime &other) const { return !(*this == other); }
+  bool operator!=(const LocalDateTime &other) const {
+    return !(*this == other);
+  }
+  bool operator!=(const ConstLocalDateTime &other) const {
+    return !(*this == other);
+  }
 
   const mg_local_date_time *ptr() const { return ptr_; }
+
  private:
-  mg_local_date_time* ptr_;
+  mg_local_date_time *ptr_;
 };
 
 class ConstLocalDateTime final {
  public:
   explicit ConstLocalDateTime(const mg_local_date_time *const_ptr)
-    : const_ptr_(const_ptr) {}
+      : const_ptr_(const_ptr) {}
 
   int64_t seconds() const { return mg_local_date_time_seconds(const_ptr_); }
-  int64_t nanoseconds() const { return mg_local_date_time_nanoseconds(const_ptr_); }
+  int64_t nanoseconds() const {
+    return mg_local_date_time_nanoseconds(const_ptr_);
+  }
 
   bool operator==(const ConstLocalDateTime &other) const;
   bool operator==(const LocalDateTime &other) const;
-  bool operator!=(const ConstLocalDateTime &other) const { return !(*this == other); }
-  bool operator!=(const LocalDateTime &other) const { return !(*this == other); }
+  bool operator!=(const ConstLocalDateTime &other) const {
+    return !(*this == other);
+  }
+  bool operator!=(const LocalDateTime &other) const {
+    return !(*this == other);
+  }
 
   const mg_local_date_time *ptr() const { return const_ptr_; };
 
@@ -1090,7 +1132,8 @@ class Duration final {
  public:
   explicit Duration(mg_duration *ptr) : ptr_(ptr) {}
 
-  explicit Duration(const mg_duration *const_ptr) : Duration(mg_duration_copy(const_ptr)) {}
+  explicit Duration(const mg_duration *const_ptr)
+      : Duration(mg_duration_copy(const_ptr)) {}
 
   Duration(const Duration &other);
   Duration(Duration &&other);
@@ -1110,17 +1153,20 @@ class Duration final {
   bool operator==(const Duration &other) const;
   bool operator==(const ConstDuration &other) const;
   bool operator!=(const Duration &other) const { return !(*this == other); }
-  bool operator!=(const ConstDuration &other) const { return !(*this == other); }
+  bool operator!=(const ConstDuration &other) const {
+    return !(*this == other);
+  }
 
   const mg_duration *ptr() const { return ptr_; }
+
  private:
-  mg_duration* ptr_;
+  mg_duration *ptr_;
 };
 
 class ConstDuration final {
  public:
   explicit ConstDuration(const mg_duration *const_ptr)
-    : const_ptr_(const_ptr) {}
+      : const_ptr_(const_ptr) {}
 
   int64_t months() const { return mg_duration_months(const_ptr_); }
   int64_t days() const { return mg_duration_days(const_ptr_); }
@@ -1129,7 +1175,9 @@ class ConstDuration final {
 
   bool operator==(const ConstDuration &other) const;
   bool operator==(const Duration &other) const;
-  bool operator!=(const ConstDuration &other) const { return !(*this == other); }
+  bool operator!=(const ConstDuration &other) const {
+    return !(*this == other);
+  }
   bool operator!=(const Duration &other) const { return !(*this == other); }
 
   const mg_duration *ptr() const { return const_ptr_; };
@@ -1149,7 +1197,8 @@ class Point2d final {
  public:
   explicit Point2d(mg_point_2d *ptr) : ptr_(ptr) {}
 
-  explicit Point2d(const mg_point_2d *const_ptr) : Point2d(mg_point_2d_copy(const_ptr)) {}
+  explicit Point2d(const mg_point_2d *const_ptr)
+      : Point2d(mg_point_2d_copy(const_ptr)) {}
 
   Point2d(const Point2d &other);
   Point2d(Point2d &&other);
@@ -1171,14 +1220,14 @@ class Point2d final {
   bool operator!=(const ConstPoint2d &other) const { return !(*this == other); }
 
   const mg_point_2d *ptr() const { return ptr_; }
+
  private:
-  mg_point_2d* ptr_;
+  mg_point_2d *ptr_;
 };
 
 class ConstPoint2d final {
  public:
-  explicit ConstPoint2d(const mg_point_2d *const_ptr)
-    : const_ptr_(const_ptr) {}
+  explicit ConstPoint2d(const mg_point_2d *const_ptr) : const_ptr_(const_ptr) {}
 
   int64_t srid() const { return mg_point_2d_srid(const_ptr_); }
   double x() const { return mg_point_2d_x(const_ptr_); }
@@ -1206,7 +1255,8 @@ class Point3d final {
  public:
   explicit Point3d(mg_point_3d *ptr) : ptr_(ptr) {}
 
-  explicit Point3d(const mg_point_3d *const_ptr) : Point3d(mg_point_3d_copy(const_ptr)) {}
+  explicit Point3d(const mg_point_3d *const_ptr)
+      : Point3d(mg_point_3d_copy(const_ptr)) {}
 
   Point3d(const Point3d &other);
   Point3d(Point3d &&other);
@@ -1229,14 +1279,14 @@ class Point3d final {
   bool operator!=(const ConstPoint3d &other) const { return !(*this == other); }
 
   const mg_point_3d *ptr() const { return ptr_; }
+
  private:
-  mg_point_3d* ptr_;
+  mg_point_3d *ptr_;
 };
 
 class ConstPoint3d final {
  public:
-  explicit ConstPoint3d(const mg_point_3d *const_ptr)
-    : const_ptr_(const_ptr) {}
+  explicit ConstPoint3d(const mg_point_3d *const_ptr) : const_ptr_(const_ptr) {}
 
   int64_t srid() const { return mg_point_3d_srid(const_ptr_); }
   double x() const { return mg_point_3d_x(const_ptr_); }
@@ -1361,7 +1411,7 @@ class Value final {
   explicit Value(LocalDateTime &&localDateTime);
 
   explicit Value(Duration &&duration);
-  
+
   explicit Value(Point2d &&point2d);
 
   explicit Value(Point3d &&point3d);
@@ -1389,7 +1439,7 @@ class Value final {
   /// \pre value type is Type::Date
   const ConstDate ValueDate() const;
   /// \pre value type is Type::Time
-  const ConstTime  ValueTime() const;
+  const ConstTime ValueTime() const;
   /// \pre value type is Type::LocalTime
   const ConstLocalTime ValueLocalTime() const;
   /// \pre value type is Type::DateTime
@@ -1452,7 +1502,7 @@ class ConstValue final {
   /// \pre value type is Type::Date
   const ConstDate ValueDate() const;
   /// \pre value type is Type::Time
-  const ConstTime  ValueTime() const;
+  const ConstTime ValueTime() const;
   /// \pre value type is Type::LocalTime
   const ConstLocalTime ValueLocalTime() const;
   /// \pre value type is Type::DateTime
@@ -1606,7 +1656,7 @@ inline bool AreNodesEqual(const mg_node *node1, const mg_node *node2) {
 }
 
 inline bool AreRelationshipsEqual(const mg_relationship *rel1,
-                           const mg_relationship *rel2) {
+                                  const mg_relationship *rel2) {
   if (rel1 == rel2) {
     return true;
   }
@@ -1628,7 +1678,7 @@ inline bool AreRelationshipsEqual(const mg_relationship *rel1,
 }
 
 inline bool AreUnboundRelationshipsEqual(const mg_unbound_relationship *rel1,
-                                  const mg_unbound_relationship *rel2) {
+                                         const mg_unbound_relationship *rel2) {
   if (rel1 == rel2) {
     return true;
   }
@@ -1679,41 +1729,58 @@ inline bool AreTimesEqual(const mg_time *time1, const mg_time *time2) {
          mg_time_tz_offset_seconds(time1) == mg_time_tz_offset_seconds(time2);
 }
 
-inline bool AreLocalTimesEqual(const mg_local_time *local_time1, const mg_local_time *local_time2) {
-  return mg_local_time_nanoseconds(local_time1) == mg_local_time_nanoseconds(local_time2);
+inline bool AreLocalTimesEqual(const mg_local_time *local_time1,
+                               const mg_local_time *local_time2) {
+  return mg_local_time_nanoseconds(local_time1) ==
+         mg_local_time_nanoseconds(local_time2);
 }
 
-inline bool AreDateTimesEqual(const mg_date_time *date_time1, const mg_date_time *date_time2) {
+inline bool AreDateTimesEqual(const mg_date_time *date_time1,
+                              const mg_date_time *date_time2) {
   return mg_date_time_seconds(date_time1) == mg_date_time_seconds(date_time2) &&
-         mg_date_time_nanoseconds(date_time1) == mg_date_time_nanoseconds(date_time2) &&
-         mg_date_time_tz_offset_minutes(date_time1) == mg_date_time_tz_offset_minutes(date_time2);
+         mg_date_time_nanoseconds(date_time1) ==
+             mg_date_time_nanoseconds(date_time2) &&
+         mg_date_time_tz_offset_minutes(date_time1) ==
+             mg_date_time_tz_offset_minutes(date_time2);
 }
 
-inline bool AreDateTimeZoneIdsEqual(const mg_date_time_zone_id *date_time_zone_id1, const mg_date_time_zone_id *date_time_zone_id2) {
-  return mg_date_time_zone_id_seconds(date_time_zone_id1) == mg_date_time_zone_id_nanoseconds(date_time_zone_id2) &&
-         mg_date_time_zone_id_nanoseconds(date_time_zone_id1) == mg_date_time_zone_id_nanoseconds(date_time_zone_id2) &&
-         mg_date_time_zone_id_tz_id(date_time_zone_id1) == mg_date_time_zone_id_tz_id(date_time_zone_id2);
+inline bool AreDateTimeZoneIdsEqual(
+    const mg_date_time_zone_id *date_time_zone_id1,
+    const mg_date_time_zone_id *date_time_zone_id2) {
+  return mg_date_time_zone_id_seconds(date_time_zone_id1) ==
+             mg_date_time_zone_id_nanoseconds(date_time_zone_id2) &&
+         mg_date_time_zone_id_nanoseconds(date_time_zone_id1) ==
+             mg_date_time_zone_id_nanoseconds(date_time_zone_id2) &&
+         mg_date_time_zone_id_tz_id(date_time_zone_id1) ==
+             mg_date_time_zone_id_tz_id(date_time_zone_id2);
 }
 
-inline bool AreLocalDateTimesEqual(const mg_local_date_time *local_date_time1, const mg_local_date_time *local_date_time2) {
-  return mg_local_date_time_seconds(local_date_time1) == mg_local_date_time_nanoseconds(local_date_time2) &&
-         mg_local_date_time_nanoseconds(local_date_time1) == mg_local_date_time_nanoseconds(local_date_time2);
+inline bool AreLocalDateTimesEqual(const mg_local_date_time *local_date_time1,
+                                   const mg_local_date_time *local_date_time2) {
+  return mg_local_date_time_seconds(local_date_time1) ==
+             mg_local_date_time_nanoseconds(local_date_time2) &&
+         mg_local_date_time_nanoseconds(local_date_time1) ==
+             mg_local_date_time_nanoseconds(local_date_time2);
 }
 
-inline bool AreDurationsEqual(const mg_duration *duration1, const mg_duration *duration2) {
+inline bool AreDurationsEqual(const mg_duration *duration1,
+                              const mg_duration *duration2) {
   return mg_duration_months(duration1) == mg_duration_months(duration2) &&
          mg_duration_days(duration1) == mg_duration_days(duration2) &&
          mg_duration_seconds(duration1) == mg_duration_seconds(duration2) &&
-         mg_duration_nanoseconds(duration1) == mg_duration_nanoseconds(duration2);
+         mg_duration_nanoseconds(duration1) ==
+             mg_duration_nanoseconds(duration2);
 }
 
-inline bool ArePoint2dsEqual(const mg_point_2d *point_2d1, const mg_point_2d *point_2d2) {
+inline bool ArePoint2dsEqual(const mg_point_2d *point_2d1,
+                             const mg_point_2d *point_2d2) {
   return mg_point_2d_srid(point_2d1) == mg_point_2d_srid(point_2d2) &&
          mg_point_2d_x(point_2d1) == mg_point_2d_x(point_2d2) &&
          mg_point_2d_y(point_2d1) == mg_point_2d_y(point_2d2);
 }
 
-inline bool ArePoint3dsEqual(const mg_point_3d *point_3d1, const mg_point_3d *point_3d2) {
+inline bool ArePoint3dsEqual(const mg_point_3d *point_3d1,
+                             const mg_point_3d *point_3d2) {
   return mg_point_3d_srid(point_3d1) == mg_point_3d_srid(point_3d2) &&
          mg_point_3d_x(point_3d1) == mg_point_3d_x(point_3d2) &&
          mg_point_3d_y(point_3d1) == mg_point_3d_y(point_3d2) &&
@@ -1758,23 +1825,33 @@ inline bool AreValuesEqual(const mg_value *value1, const mg_value *value2) {
       return detail::ArePathsEqual(mg_value_path(value1),
                                    mg_value_path(value2));
     case MG_VALUE_TYPE_DATE:
-      return detail::AreDatesEqual(mg_value_date(value1), mg_value_date(value2));
+      return detail::AreDatesEqual(mg_value_date(value1),
+                                   mg_value_date(value2));
     case MG_VALUE_TYPE_TIME:
-      return detail::AreTimesEqual(mg_value_time(value1), mg_value_time(value2));
+      return detail::AreTimesEqual(mg_value_time(value1),
+                                   mg_value_time(value2));
     case MG_VALUE_TYPE_LOCAL_TIME:
-      return detail::AreLocalTimesEqual(mg_value_local_time(value1), mg_value_local_time(value2));
+      return detail::AreLocalTimesEqual(mg_value_local_time(value1),
+                                        mg_value_local_time(value2));
     case MG_VALUE_TYPE_DATE_TIME:
-      return detail::AreDateTimesEqual(mg_value_date_time(value1), mg_value_date_time(value2));
+      return detail::AreDateTimesEqual(mg_value_date_time(value1),
+                                       mg_value_date_time(value2));
     case MG_VALUE_TYPE_DATE_TIME_ZONE_ID:
-      return detail::AreDateTimeZoneIdsEqual(mg_value_date_time_zone_id(value1), mg_value_date_time_zone_id(value2));
+      return detail::AreDateTimeZoneIdsEqual(
+          mg_value_date_time_zone_id(value1),
+          mg_value_date_time_zone_id(value2));
     case MG_VALUE_TYPE_LOCAL_DATE_TIME:
-      return detail::AreLocalDateTimesEqual(mg_value_local_date_time(value1), mg_value_local_date_time(value2));
+      return detail::AreLocalDateTimesEqual(mg_value_local_date_time(value1),
+                                            mg_value_local_date_time(value2));
     case MG_VALUE_TYPE_DURATION:
-      return detail::AreDurationsEqual(mg_value_duration(value1), mg_value_duration(value2));
+      return detail::AreDurationsEqual(mg_value_duration(value1),
+                                       mg_value_duration(value2));
     case MG_VALUE_TYPE_POINT_2D:
-      return detail::ArePoint2dsEqual(mg_value_point_2d(value1), mg_value_point_2d(value2));
+      return detail::ArePoint2dsEqual(mg_value_point_2d(value1),
+                                      mg_value_point_2d(value2));
     case MG_VALUE_TYPE_POINT_3D:
-      return detail::ArePoint3dsEqual(mg_value_point_3d(value1), mg_value_point_3d(value2));
+      return detail::ArePoint3dsEqual(mg_value_point_3d(value1),
+                                      mg_value_point_3d(value2));
     case MG_VALUE_TYPE_UNKNOWN:
       throw std::runtime_error("Comparing values of unknown types!");
   }
@@ -1784,7 +1861,9 @@ inline bool AreValuesEqual(const mg_value *value1, const mg_value *value2) {
 ////////////////////////////////////////////////////////////////////////////////
 // List:
 
-inline ConstValue List::Iterator::operator*() const { return (*iterable_)[index_]; }
+inline ConstValue List::Iterator::operator*() const {
+  return (*iterable_)[index_];
+}
 
 inline List::List(const List &other) : ptr_(mg_list_copy(other.ptr_)) {}
 
@@ -1863,7 +1942,8 @@ inline bool ConstList::operator==(const List &other) const {
 ////////////////////////////////////////////////////////////////////////////////
 // Map:
 
-inline std::pair<std::string_view, ConstValue> Map::Iterator::operator*() const {
+inline std::pair<std::string_view, ConstValue> Map::Iterator::operator*()
+    const {
   return std::make_pair(
       detail::ConvertString(mg_map_key_at(iterable_->ptr(), index_)),
       ConstValue(mg_map_value_at(iterable_->ptr(), index_)));
@@ -1923,7 +2003,8 @@ inline bool Map::InsertUnsafe(const std::string_view key, const Value &value) {
                                mg_value_copy(value.ptr())) == 0;
 }
 
-inline bool Map::InsertUnsafe(const std::string_view key, const ConstValue &value) {
+inline bool Map::InsertUnsafe(const std::string_view key,
+                              const ConstValue &value) {
   return mg_map_insert_unsafe2(ptr_, mg_string_make2(key.size(), key.data()),
                                mg_value_copy(value.ptr())) == 0;
 }
@@ -1946,7 +2027,8 @@ inline bool Map::operator==(const ConstMap &other) const {
   return detail::AreMapsEqual(ptr_, other.ptr());
 }
 
-inline std::pair<std::string_view, ConstValue> ConstMap::Iterator::operator*() const {
+inline std::pair<std::string_view, ConstValue> ConstMap::Iterator::operator*()
+    const {
   return std::make_pair(
       detail::ConvertString(mg_map_key_at(iterable_->ptr(), index_)),
       ConstValue(mg_map_value_at(iterable_->ptr(), index_)));
@@ -2020,7 +2102,8 @@ inline bool ConstNode::operator==(const Node &other) const {
 inline Relationship::Relationship(const Relationship &other)
     : Relationship(mg_relationship_copy(other.ptr_)) {}
 
-inline Relationship::Relationship(Relationship &&other) : Relationship(other.ptr_) {
+inline Relationship::Relationship(Relationship &&other)
+    : Relationship(other.ptr_) {
   other.ptr_ = nullptr;
 }
 
@@ -2053,7 +2136,8 @@ inline std::string_view ConstRelationship::type() const {
   return detail::ConvertString(mg_relationship_type(const_ptr_));
 }
 
-inline bool ConstRelationship::operator==(const ConstRelationship &other) const {
+inline bool ConstRelationship::operator==(
+    const ConstRelationship &other) const {
   return detail::AreRelationshipsEqual(const_ptr_, other.const_ptr_);
 }
 
@@ -2064,7 +2148,8 @@ inline bool ConstRelationship::operator==(const Relationship &other) const {
 ////////////////////////////////////////////////////////////////////////////////
 // UnboundRelationship:
 
-inline UnboundRelationship::UnboundRelationship(const UnboundRelationship &other)
+inline UnboundRelationship::UnboundRelationship(
+    const UnboundRelationship &other)
     : ptr_(mg_unbound_relationship_copy(other.ptr_)) {}
 
 inline UnboundRelationship::UnboundRelationship(UnboundRelationship &&other)
@@ -2078,19 +2163,21 @@ inline UnboundRelationship::~UnboundRelationship() {
   }
 }
 
-inline UnboundRelationship::UnboundRelationship(const ConstUnboundRelationship &rel)
+inline UnboundRelationship::UnboundRelationship(
+    const ConstUnboundRelationship &rel)
     : ptr_(mg_unbound_relationship_copy(rel.ptr())) {}
 
 inline std::string_view UnboundRelationship::type() const {
   return detail::ConvertString(mg_unbound_relationship_type(ptr_));
 }
 
-inline ConstUnboundRelationship UnboundRelationship::AsConstUnboundRelationship()
-    const {
+inline ConstUnboundRelationship
+UnboundRelationship::AsConstUnboundRelationship() const {
   return ConstUnboundRelationship(ptr_);
 }
 
-inline bool UnboundRelationship::operator==(const UnboundRelationship &other) const {
+inline bool UnboundRelationship::operator==(
+    const UnboundRelationship &other) const {
   return detail::AreUnboundRelationshipsEqual(ptr_, other.ptr_);
 }
 
@@ -2170,7 +2257,8 @@ inline ConstNode ConstPath::GetNodeAt(size_t index) const {
   return ConstNode(vertex_ptr);
 }
 
-inline ConstUnboundRelationship ConstPath::GetRelationshipAt(size_t index) const {
+inline ConstUnboundRelationship ConstPath::GetRelationshipAt(
+    size_t index) const {
   auto edge_ptr = mg_path_relationship_at(const_ptr_, index);
   if (edge_ptr == nullptr) {
     std::abort();
@@ -2285,9 +2373,12 @@ inline bool ConstTime::operator==(const Time &other) const {
 ////////////////////////////////////////////////////////////////////////////////
 // LocalTime:
 
-inline LocalTime::LocalTime(const LocalTime &other) : ptr_(mg_local_time_copy(other.ptr_)) {}
+inline LocalTime::LocalTime(const LocalTime &other)
+    : ptr_(mg_local_time_copy(other.ptr_)) {}
 
-inline LocalTime::LocalTime(LocalTime &&other) : ptr_(other.ptr_) { other.ptr_ = nullptr; }
+inline LocalTime::LocalTime(LocalTime &&other) : ptr_(other.ptr_) {
+  other.ptr_ = nullptr;
+}
 
 inline LocalTime &LocalTime::operator=(const LocalTime &other) {
   ptr_ = mg_local_time_copy(other.ptr_);
@@ -2306,9 +2397,12 @@ inline LocalTime::~LocalTime() {
   }
 }
 
-inline LocalTime::LocalTime(const ConstLocalTime &local_time) : ptr_(mg_local_time_copy(local_time.ptr())) {}
+inline LocalTime::LocalTime(const ConstLocalTime &local_time)
+    : ptr_(mg_local_time_copy(local_time.ptr())) {}
 
-inline ConstLocalTime LocalTime::AsConstLocalTime() const { return ConstLocalTime(ptr_); }
+inline ConstLocalTime LocalTime::AsConstLocalTime() const {
+  return ConstLocalTime(ptr_);
+}
 
 inline bool LocalTime::operator==(const LocalTime &other) const {
   return detail::AreLocalTimesEqual(ptr_, other.ptr_);
@@ -2329,9 +2423,12 @@ inline bool ConstLocalTime::operator==(const LocalTime &other) const {
 ////////////////////////////////////////////////////////////////////////////////
 // DateTime:
 
-inline DateTime::DateTime(const DateTime &other) : ptr_(mg_date_time_copy(other.ptr_)) {}
+inline DateTime::DateTime(const DateTime &other)
+    : ptr_(mg_date_time_copy(other.ptr_)) {}
 
-inline DateTime::DateTime(DateTime &&other) : ptr_(other.ptr_) { other.ptr_ = nullptr; }
+inline DateTime::DateTime(DateTime &&other) : ptr_(other.ptr_) {
+  other.ptr_ = nullptr;
+}
 
 inline DateTime &DateTime::operator=(const DateTime &other) {
   ptr_ = mg_date_time_copy(other.ptr_);
@@ -2350,9 +2447,12 @@ inline DateTime::~DateTime() {
   }
 }
 
-inline DateTime::DateTime(const ConstDateTime &date_time) : ptr_(mg_date_time_copy(date_time.ptr())) {}
+inline DateTime::DateTime(const ConstDateTime &date_time)
+    : ptr_(mg_date_time_copy(date_time.ptr())) {}
 
-inline ConstDateTime DateTime::AsConstDateTime() const { return ConstDateTime(ptr_); }
+inline ConstDateTime DateTime::AsConstDateTime() const {
+  return ConstDateTime(ptr_);
+}
 
 inline bool DateTime::operator==(const DateTime &other) const {
   return detail::AreDateTimesEqual(ptr_, other.ptr_);
@@ -2373,9 +2473,13 @@ inline bool ConstDateTime::operator==(const DateTime &other) const {
 ////////////////////////////////////////////////////////////////////////////////
 // DateTimeZoneId:
 
-inline DateTimeZoneId::DateTimeZoneId(const DateTimeZoneId &other) : ptr_(mg_date_time_zone_id_copy(other.ptr_)) {}
+inline DateTimeZoneId::DateTimeZoneId(const DateTimeZoneId &other)
+    : ptr_(mg_date_time_zone_id_copy(other.ptr_)) {}
 
-inline DateTimeZoneId::DateTimeZoneId(DateTimeZoneId &&other) : ptr_(other.ptr_) { other.ptr_ = nullptr; }
+inline DateTimeZoneId::DateTimeZoneId(DateTimeZoneId &&other)
+    : ptr_(other.ptr_) {
+  other.ptr_ = nullptr;
+}
 
 inline DateTimeZoneId &DateTimeZoneId::operator=(const DateTimeZoneId &other) {
   ptr_ = mg_date_time_zone_id_copy(other.ptr_);
@@ -2394,9 +2498,13 @@ inline DateTimeZoneId::~DateTimeZoneId() {
   }
 }
 
-inline DateTimeZoneId::DateTimeZoneId(const ConstDateTimeZoneId &date_time_zone_id) : ptr_(mg_date_time_zone_id_copy(date_time_zone_id.ptr())) {}
+inline DateTimeZoneId::DateTimeZoneId(
+    const ConstDateTimeZoneId &date_time_zone_id)
+    : ptr_(mg_date_time_zone_id_copy(date_time_zone_id.ptr())) {}
 
-inline ConstDateTimeZoneId DateTimeZoneId::AsConstDateTimeZoneId() const { return ConstDateTimeZoneId(ptr_); }
+inline ConstDateTimeZoneId DateTimeZoneId::AsConstDateTimeZoneId() const {
+  return ConstDateTimeZoneId(ptr_);
+}
 
 inline bool DateTimeZoneId::operator==(const DateTimeZoneId &other) const {
   return detail::AreDateTimeZoneIdsEqual(ptr_, other.ptr_);
@@ -2406,7 +2514,8 @@ inline bool DateTimeZoneId::operator==(const ConstDateTimeZoneId &other) const {
   return detail::AreDateTimeZoneIdsEqual(ptr_, other.ptr());
 }
 
-inline bool ConstDateTimeZoneId::operator==(const ConstDateTimeZoneId &other) const {
+inline bool ConstDateTimeZoneId::operator==(
+    const ConstDateTimeZoneId &other) const {
   return detail::AreDateTimeZoneIdsEqual(const_ptr_, other.const_ptr_);
 }
 
@@ -2417,9 +2526,12 @@ inline bool ConstDateTimeZoneId::operator==(const DateTimeZoneId &other) const {
 ////////////////////////////////////////////////////////////////////////////////
 // LocalDateTime:
 
-inline LocalDateTime::LocalDateTime(const LocalDateTime &other) : ptr_(mg_local_date_time_copy(other.ptr_)) {}
+inline LocalDateTime::LocalDateTime(const LocalDateTime &other)
+    : ptr_(mg_local_date_time_copy(other.ptr_)) {}
 
-inline LocalDateTime::LocalDateTime(LocalDateTime &&other) : ptr_(other.ptr_) { other.ptr_ = nullptr; }
+inline LocalDateTime::LocalDateTime(LocalDateTime &&other) : ptr_(other.ptr_) {
+  other.ptr_ = nullptr;
+}
 
 inline LocalDateTime &LocalDateTime::operator=(const LocalDateTime &other) {
   ptr_ = mg_local_date_time_copy(other.ptr_);
@@ -2438,9 +2550,12 @@ inline LocalDateTime::~LocalDateTime() {
   }
 }
 
-inline LocalDateTime::LocalDateTime(const ConstLocalDateTime &local_date_time) : ptr_(mg_local_date_time_copy(local_date_time.ptr())) {}
+inline LocalDateTime::LocalDateTime(const ConstLocalDateTime &local_date_time)
+    : ptr_(mg_local_date_time_copy(local_date_time.ptr())) {}
 
-inline ConstLocalDateTime LocalDateTime::AsConstLocalDateTime() const { return ConstLocalDateTime(ptr_); }
+inline ConstLocalDateTime LocalDateTime::AsConstLocalDateTime() const {
+  return ConstLocalDateTime(ptr_);
+}
 
 inline bool LocalDateTime::operator==(const LocalDateTime &other) const {
   return detail::AreLocalDateTimesEqual(ptr_, other.ptr_);
@@ -2450,7 +2565,8 @@ inline bool LocalDateTime::operator==(const ConstLocalDateTime &other) const {
   return detail::AreLocalDateTimesEqual(ptr_, other.ptr());
 }
 
-inline bool ConstLocalDateTime::operator==(const ConstLocalDateTime &other) const {
+inline bool ConstLocalDateTime::operator==(
+    const ConstLocalDateTime &other) const {
   return detail::AreLocalDateTimesEqual(const_ptr_, other.const_ptr_);
 }
 
@@ -2461,9 +2577,12 @@ inline bool ConstLocalDateTime::operator==(const LocalDateTime &other) const {
 ////////////////////////////////////////////////////////////////////////////////
 // Duration:
 
-inline Duration::Duration(const Duration &other) : ptr_(mg_duration_copy(other.ptr_)) {}
+inline Duration::Duration(const Duration &other)
+    : ptr_(mg_duration_copy(other.ptr_)) {}
 
-inline Duration::Duration(Duration &&other) : ptr_(other.ptr_) { other.ptr_ = nullptr; }
+inline Duration::Duration(Duration &&other) : ptr_(other.ptr_) {
+  other.ptr_ = nullptr;
+}
 
 inline Duration &Duration::operator=(const Duration &other) {
   ptr_ = mg_duration_copy(other.ptr_);
@@ -2482,9 +2601,12 @@ inline Duration::~Duration() {
   }
 }
 
-inline Duration::Duration(const ConstDuration &duration) : ptr_(mg_duration_copy(duration.ptr())) {}
+inline Duration::Duration(const ConstDuration &duration)
+    : ptr_(mg_duration_copy(duration.ptr())) {}
 
-inline ConstDuration Duration::AsConstDuration() const { return ConstDuration(ptr_); }
+inline ConstDuration Duration::AsConstDuration() const {
+  return ConstDuration(ptr_);
+}
 
 inline bool Duration::operator==(const Duration &other) const {
   return detail::AreDurationsEqual(ptr_, other.ptr_);
@@ -2505,9 +2627,12 @@ inline bool ConstDuration::operator==(const Duration &other) const {
 ////////////////////////////////////////////////////////////////////////////////
 // Point2d:
 
-inline Point2d::Point2d(const Point2d &other) : ptr_(mg_point_2d_copy(other.ptr_)) {}
+inline Point2d::Point2d(const Point2d &other)
+    : ptr_(mg_point_2d_copy(other.ptr_)) {}
 
-inline Point2d::Point2d(Point2d &&other) : ptr_(other.ptr_) { other.ptr_ = nullptr; }
+inline Point2d::Point2d(Point2d &&other) : ptr_(other.ptr_) {
+  other.ptr_ = nullptr;
+}
 
 inline Point2d &Point2d::operator=(const Point2d &other) {
   ptr_ = mg_point_2d_copy(other.ptr_);
@@ -2526,9 +2651,12 @@ inline Point2d::~Point2d() {
   }
 }
 
-inline Point2d::Point2d(const ConstPoint2d &point_2d) : ptr_(mg_point_2d_copy(point_2d.ptr())) {}
+inline Point2d::Point2d(const ConstPoint2d &point_2d)
+    : ptr_(mg_point_2d_copy(point_2d.ptr())) {}
 
-inline ConstPoint2d Point2d::AsConstPoint2d() const { return ConstPoint2d(ptr_); }
+inline ConstPoint2d Point2d::AsConstPoint2d() const {
+  return ConstPoint2d(ptr_);
+}
 
 inline bool Point2d::operator==(const Point2d &other) const {
   return detail::ArePoint2dsEqual(ptr_, other.ptr_);
@@ -2549,9 +2677,12 @@ inline bool ConstPoint2d::operator==(const Point2d &other) const {
 ////////////////////////////////////////////////////////////////////////////////
 // Point3d:
 
-inline Point3d::Point3d(const Point3d &other) : ptr_(mg_point_3d_copy(other.ptr_)) {}
+inline Point3d::Point3d(const Point3d &other)
+    : ptr_(mg_point_3d_copy(other.ptr_)) {}
 
-inline Point3d::Point3d(Point3d &&other) : ptr_(other.ptr_) { other.ptr_ = nullptr; }
+inline Point3d::Point3d(Point3d &&other) : ptr_(other.ptr_) {
+  other.ptr_ = nullptr;
+}
 
 inline Point3d &Point3d::operator=(const Point3d &other) {
   ptr_ = mg_point_3d_copy(other.ptr_);
@@ -2570,9 +2701,12 @@ inline Point3d::~Point3d() {
   }
 }
 
-inline Point3d::Point3d(const ConstPoint3d &point_3d) : ptr_(mg_point_3d_copy(point_3d.ptr())) {}
+inline Point3d::Point3d(const ConstPoint3d &point_3d)
+    : ptr_(mg_point_3d_copy(point_3d.ptr())) {}
 
-inline ConstPoint3d Point3d::AsConstPoint3d() const { return ConstPoint3d(ptr_); }
+inline ConstPoint3d Point3d::AsConstPoint3d() const {
+  return ConstPoint3d(ptr_);
+}
 
 inline bool Point3d::operator==(const Point3d &other) const {
   return detail::ArePoint3dsEqual(ptr_, other.ptr_);
@@ -2603,7 +2737,8 @@ inline Value::~Value() {
   }
 }
 
-inline Value::Value(const ConstValue &value) : ptr_(mg_value_copy(value.ptr())) {}
+inline Value::Value(const ConstValue &value)
+    : ptr_(mg_value_copy(value.ptr())) {}
 
 inline Value::Value(const std::string_view value)
     : Value(
@@ -2645,31 +2780,38 @@ inline Value::Value(Time &&time) : Value(mg_value_make_time(time.ptr_)) {
   time.ptr_ = nullptr;
 }
 
-inline Value::Value(LocalTime &&local_time) : Value(mg_value_make_local_time(local_time.ptr_)) {
+inline Value::Value(LocalTime &&local_time)
+    : Value(mg_value_make_local_time(local_time.ptr_)) {
   local_time.ptr_ = nullptr;
 }
 
-inline Value::Value(DateTime &&date_time) : Value(mg_value_make_date_time(date_time.ptr_)) {
+inline Value::Value(DateTime &&date_time)
+    : Value(mg_value_make_date_time(date_time.ptr_)) {
   date_time.ptr_ = nullptr;
 }
 
-inline Value::Value(DateTimeZoneId &&date_time_zone_id) : Value(mg_value_make_date_time_zone_id(date_time_zone_id.ptr_)) {
+inline Value::Value(DateTimeZoneId &&date_time_zone_id)
+    : Value(mg_value_make_date_time_zone_id(date_time_zone_id.ptr_)) {
   date_time_zone_id.ptr_ = nullptr;
 }
 
-inline Value::Value(LocalDateTime &&local_date_time) : Value(mg_value_make_local_date_time(local_date_time.ptr_)) {
+inline Value::Value(LocalDateTime &&local_date_time)
+    : Value(mg_value_make_local_date_time(local_date_time.ptr_)) {
   local_date_time.ptr_ = nullptr;
 }
 
-inline Value::Value(Duration &&duration) : Value(mg_value_make_duration(duration.ptr_)) {
+inline Value::Value(Duration &&duration)
+    : Value(mg_value_make_duration(duration.ptr_)) {
   duration.ptr_ = nullptr;
 }
 
-inline Value::Value(Point2d &&point_2d) : Value(mg_value_make_point_2d(point_2d.ptr_)) {
+inline Value::Value(Point2d &&point_2d)
+    : Value(mg_value_make_point_2d(point_2d.ptr_)) {
   point_2d.ptr_ = nullptr;
 }
 
-inline Value::Value(Point3d &&point_3d) : Value(mg_value_make_point_3d(point_3d.ptr_)) {
+inline Value::Value(Point3d &&point_3d)
+    : Value(mg_value_make_point_3d(point_3d.ptr_)) {
   point_3d.ptr_ = nullptr;
 }
 
@@ -2876,7 +3018,8 @@ inline const ConstRelationship ConstValue::ValueRelationship() const {
   return ConstRelationship(mg_value_relationship(const_ptr_));
 }
 
-inline const ConstUnboundRelationship ConstValue::ValueUnboundRelationship() const {
+inline const ConstUnboundRelationship ConstValue::ValueUnboundRelationship()
+    const {
   if (type() != Value::Type::UnboundRelationship) {
     std::abort();
   }

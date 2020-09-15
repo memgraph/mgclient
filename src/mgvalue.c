@@ -524,7 +524,8 @@ mg_value *mg_value_copy_ca(const mg_value *val, mg_allocator *allocator) {
       }
       break;
     case MG_VALUE_TYPE_LOCAL_TIME:
-      new_val->local_time_v = mg_local_time_copy_ca(val->local_time_v, allocator);
+      new_val->local_time_v =
+          mg_local_time_copy_ca(val->local_time_v, allocator);
       if (!new_val->local_time_v) {
         goto cleanup;
       }
@@ -536,13 +537,15 @@ mg_value *mg_value_copy_ca(const mg_value *val, mg_allocator *allocator) {
       }
       break;
     case MG_VALUE_TYPE_DATE_TIME_ZONE_ID:
-      new_val->date_time_zone_id_v = mg_date_time_zone_id_copy_ca(val->date_time_zone_id_v, allocator);
+      new_val->date_time_zone_id_v =
+          mg_date_time_zone_id_copy_ca(val->date_time_zone_id_v, allocator);
       if (!new_val->date_time_zone_id_v) {
         goto cleanup;
       }
       break;
     case MG_VALUE_TYPE_LOCAL_DATE_TIME:
-      new_val->local_date_time_v = mg_local_date_time_copy_ca(val->local_date_time_v, allocator);
+      new_val->local_date_time_v =
+          mg_local_date_time_copy_ca(val->local_date_time_v, allocator);
       if (!new_val->local_date_time_v) {
         goto cleanup;
       }
@@ -1374,7 +1377,8 @@ void mg_time_destroy(mg_time *time) {
   mg_time_destroy_ca(time, &mg_system_allocator);
 }
 
-mg_local_time *mg_local_time_copy_ca(const mg_local_time *src, mg_allocator *allocator) {
+mg_local_time *mg_local_time_copy_ca(const mg_local_time *src,
+                                     mg_allocator *allocator) {
   if (!src) {
     return NULL;
   }
@@ -1390,7 +1394,8 @@ mg_local_time *mg_local_time_copy(const mg_local_time *local_time) {
   return mg_local_time_copy_ca(local_time, &mg_system_allocator);
 }
 
-void mg_local_time_destroy_ca(mg_local_time *local_time, mg_allocator *allocator) {
+void mg_local_time_destroy_ca(mg_local_time *local_time,
+                              mg_allocator *allocator) {
   if (!local_time) {
     return;
   }
@@ -1401,7 +1406,8 @@ void mg_local_time_destroy(mg_local_time *local_time) {
   mg_local_time_destroy_ca(local_time, &mg_system_allocator);
 }
 
-mg_date_time *mg_date_time_copy_ca(const mg_date_time *src, mg_allocator *allocator) {
+mg_date_time *mg_date_time_copy_ca(const mg_date_time *src,
+                                   mg_allocator *allocator) {
   if (!src) {
     return NULL;
   }
@@ -1428,11 +1434,13 @@ void mg_date_time_destroy(mg_date_time *date_time) {
   mg_date_time_destroy_ca(date_time, &mg_system_allocator);
 }
 
-mg_date_time_zone_id *mg_date_time_zone_id_copy_ca(const mg_date_time_zone_id *src, mg_allocator *allocator) {
+mg_date_time_zone_id *mg_date_time_zone_id_copy_ca(
+    const mg_date_time_zone_id *src, mg_allocator *allocator) {
   if (!src) {
     return NULL;
   }
-  mg_date_time_zone_id *date_time_zone_id = mg_date_time_zone_id_alloc(allocator);
+  mg_date_time_zone_id *date_time_zone_id =
+      mg_date_time_zone_id_alloc(allocator);
   if (!date_time_zone_id) {
     return NULL;
   }
@@ -1440,11 +1448,13 @@ mg_date_time_zone_id *mg_date_time_zone_id_copy_ca(const mg_date_time_zone_id *s
   return date_time_zone_id;
 }
 
-mg_date_time_zone_id *mg_date_time_zone_id_copy(const mg_date_time_zone_id *date_time_zone_id) {
+mg_date_time_zone_id *mg_date_time_zone_id_copy(
+    const mg_date_time_zone_id *date_time_zone_id) {
   return mg_date_time_zone_id_copy_ca(date_time_zone_id, &mg_system_allocator);
 }
 
-void mg_date_time_zone_id_destroy_ca(mg_date_time_zone_id *date_time_zone_id, mg_allocator *allocator) {
+void mg_date_time_zone_id_destroy_ca(mg_date_time_zone_id *date_time_zone_id,
+                                     mg_allocator *allocator) {
   if (!date_time_zone_id) {
     return;
   }
@@ -1455,7 +1465,8 @@ void mg_date_time_zone_id_destroy(mg_date_time_zone_id *date_time_zone_id) {
   mg_date_time_zone_id_destroy_ca(date_time_zone_id, &mg_system_allocator);
 }
 
-mg_local_date_time *mg_local_date_time_copy_ca(const mg_local_date_time *src, mg_allocator *allocator) {
+mg_local_date_time *mg_local_date_time_copy_ca(const mg_local_date_time *src,
+                                               mg_allocator *allocator) {
   if (!src) {
     return NULL;
   }
@@ -1467,11 +1478,13 @@ mg_local_date_time *mg_local_date_time_copy_ca(const mg_local_date_time *src, mg
   return local_date_time;
 }
 
-mg_local_date_time *mg_local_date_time_copy(const mg_local_date_time *local_date_time) {
+mg_local_date_time *mg_local_date_time_copy(
+    const mg_local_date_time *local_date_time) {
   return mg_local_date_time_copy_ca(local_date_time, &mg_system_allocator);
 }
 
-void mg_local_date_time_destroy_ca(mg_local_date_time *local_date_time, mg_allocator *allocator) {
+void mg_local_date_time_destroy_ca(mg_local_date_time *local_date_time,
+                                   mg_allocator *allocator) {
   if (!local_date_time) {
     return;
   }
@@ -1482,7 +1495,8 @@ void mg_local_date_time_destroy(mg_local_date_time *local_date_time) {
   mg_local_date_time_destroy_ca(local_date_time, &mg_system_allocator);
 }
 
-mg_duration *mg_duration_copy_ca(const mg_duration *src, mg_allocator *allocator) {
+mg_duration *mg_duration_copy_ca(const mg_duration *src,
+                                 mg_allocator *allocator) {
   if (!src) {
     return NULL;
   }
@@ -1509,7 +1523,8 @@ void mg_duration_destroy(mg_duration *duration) {
   mg_duration_destroy_ca(duration, &mg_system_allocator);
 }
 
-mg_point_2d *mg_point_2d_copy_ca(const mg_point_2d *src, mg_allocator *allocator) {
+mg_point_2d *mg_point_2d_copy_ca(const mg_point_2d *src,
+                                 mg_allocator *allocator) {
   if (!src) {
     return NULL;
   }
@@ -1536,7 +1551,8 @@ void mg_point_2d_destroy(mg_point_2d *point_2d) {
   mg_point_2d_destroy_ca(point_2d, &mg_system_allocator);
 }
 
-mg_point_3d *mg_point_3d_copy_ca(const mg_point_3d *src, mg_allocator *allocator) {
+mg_point_3d *mg_point_3d_copy_ca(const mg_point_3d *src,
+                                 mg_allocator *allocator) {
   if (!src) {
     return NULL;
   }
@@ -1720,39 +1736,32 @@ int mg_local_time_equal(const mg_local_time *lhs, const mg_local_time *rhs) {
 }
 
 int mg_date_time_equal(const mg_date_time *lhs, const mg_date_time *rhs) {
-  return lhs->seconds == rhs->seconds &&
-         lhs->nanoseconds == rhs->nanoseconds &&
+  return lhs->seconds == rhs->seconds && lhs->nanoseconds == rhs->nanoseconds &&
          lhs->tz_offset_minutes == rhs->tz_offset_minutes;
 }
 
-int mg_local_date_time_equal(const mg_local_date_time *lhs, const mg_local_date_time *rhs) {
-  return lhs->seconds == rhs->seconds &&
-         lhs->nanoseconds == rhs->nanoseconds;
+int mg_local_date_time_equal(const mg_local_date_time *lhs,
+                             const mg_local_date_time *rhs) {
+  return lhs->seconds == rhs->seconds && lhs->nanoseconds == rhs->nanoseconds;
 }
 
-int mg_date_time_zone_id_equal(const mg_date_time_zone_id *lhs, const mg_date_time_zone_id *rhs) {
-  return lhs->seconds == rhs->seconds &&
-         lhs->nanoseconds == rhs->nanoseconds &&
-         lhs->tz_id == rhs->tz_id; 
+int mg_date_time_zone_id_equal(const mg_date_time_zone_id *lhs,
+                               const mg_date_time_zone_id *rhs) {
+  return lhs->seconds == rhs->seconds && lhs->nanoseconds == rhs->nanoseconds &&
+         lhs->tz_id == rhs->tz_id;
 }
 
 int mg_duration_equal(const mg_duration *lhs, const mg_duration *rhs) {
-  return lhs->days == rhs->days &&
-         lhs->months == rhs->months &&
-         lhs->seconds == rhs->seconds &&
-         lhs->nanoseconds == rhs->nanoseconds;
+  return lhs->days == rhs->days && lhs->months == rhs->months &&
+         lhs->seconds == rhs->seconds && lhs->nanoseconds == rhs->nanoseconds;
 }
 
 int mg_point_2d_equal(const mg_point_2d *lhs, const mg_point_2d *rhs) {
-  return lhs->srid == rhs->srid &&
-         lhs->x == rhs->x &&
-         lhs->y == rhs->y;
+  return lhs->srid == rhs->srid && lhs->x == rhs->x && lhs->y == rhs->y;
 }
 
 int mg_point_3d_equal(const mg_point_3d *lhs, const mg_point_3d *rhs) {
-  return lhs->srid == rhs->srid &&
-         lhs->x == rhs->x &&
-         lhs->y == rhs->y &&
+  return lhs->srid == rhs->srid && lhs->x == rhs->x && lhs->y == rhs->y &&
          lhs->z == rhs->z;
 }
 
@@ -1804,9 +1813,11 @@ int mg_value_equal(const mg_value *lhs, const mg_value *rhs) {
     case MG_VALUE_TYPE_DATE_TIME:
       return mg_date_time_equal(lhs->date_time_v, rhs->date_time_v);
     case MG_VALUE_TYPE_DATE_TIME_ZONE_ID:
-      return mg_date_time_zone_id_equal(lhs->date_time_zone_id_v, rhs->date_time_zone_id_v);
+      return mg_date_time_zone_id_equal(lhs->date_time_zone_id_v,
+                                        rhs->date_time_zone_id_v);
     case MG_VALUE_TYPE_LOCAL_DATE_TIME:
-      return mg_local_date_time_equal(lhs->local_date_time_v, rhs->local_date_time_v);
+      return mg_local_date_time_equal(lhs->local_date_time_v,
+                                      rhs->local_date_time_v);
     case MG_VALUE_TYPE_DURATION:
       return mg_duration_equal(lhs->duration_v, rhs->duration_v);
     case MG_VALUE_TYPE_POINT_2D:

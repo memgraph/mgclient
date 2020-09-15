@@ -767,9 +767,11 @@ MGCLIENT_EXPORT mg_time *mg_time_copy(const mg_time *time);
 
 MGCLIENT_EXPORT void mg_time_destroy(mg_time *time);
 
-MGCLIENT_EXPORT int64_t mg_local_time_nanoseconds(const mg_local_time *local_time);
+MGCLIENT_EXPORT int64_t
+mg_local_time_nanoseconds(const mg_local_time *local_time);
 
-MGCLIENT_EXPORT mg_local_time *mg_local_time_copy(const mg_local_time *local_time);
+MGCLIENT_EXPORT mg_local_time *mg_local_time_copy(
+    const mg_local_time *local_time);
 
 MGCLIENT_EXPORT void mg_local_time_destroy(mg_local_time *local_time);
 
@@ -777,33 +779,39 @@ MGCLIENT_EXPORT int64_t mg_date_time_seconds(const mg_date_time *date_time);
 
 MGCLIENT_EXPORT int64_t mg_date_time_nanoseconds(const mg_date_time *date_time);
 
-MGCLIENT_EXPORT int64_t mg_date_time_tz_offset_minutes(const mg_date_time *date_time);
+MGCLIENT_EXPORT int64_t
+mg_date_time_tz_offset_minutes(const mg_date_time *date_time);
 
 MGCLIENT_EXPORT mg_date_time *mg_date_time_copy(const mg_date_time *date_time);
 
 MGCLIENT_EXPORT void mg_date_time_destroy(mg_date_time *date_time);
 
-MGCLIENT_EXPORT int64_t mg_date_time_zone_id_seconds(
-                    const mg_date_time_zone_id *date_time_zone_id);
+MGCLIENT_EXPORT int64_t
+mg_date_time_zone_id_seconds(const mg_date_time_zone_id *date_time_zone_id);
 
-MGCLIENT_EXPORT int64_t mg_date_time_zone_id_nanoseconds(
-                    const mg_date_time_zone_id *date_time_zone_id);
+MGCLIENT_EXPORT int64_t
+mg_date_time_zone_id_nanoseconds(const mg_date_time_zone_id *date_time_zone_id);
 
-MGCLIENT_EXPORT int64_t mg_date_time_zone_id_tz_id(
-                    const mg_date_time_zone_id *date_time_zone_id);
+MGCLIENT_EXPORT int64_t
+mg_date_time_zone_id_tz_id(const mg_date_time_zone_id *date_time_zone_id);
 
-MGCLIENT_EXPORT mg_date_time_zone_id *mg_date_time_zone_id_copy(const mg_date_time_zone_id *date_time_zone_id);
+MGCLIENT_EXPORT mg_date_time_zone_id *mg_date_time_zone_id_copy(
+    const mg_date_time_zone_id *date_time_zone_id);
 
-MGCLIENT_EXPORT void mg_date_time_zone_id_destroy(mg_date_time_zone_id *date_time_zone_id);
+MGCLIENT_EXPORT void mg_date_time_zone_id_destroy(
+    mg_date_time_zone_id *date_time_zone_id);
 
-MGCLIENT_EXPORT int64_t mg_local_date_time_seconds(const mg_local_date_time *local_date_time);
+MGCLIENT_EXPORT int64_t
+mg_local_date_time_seconds(const mg_local_date_time *local_date_time);
 
-MGCLIENT_EXPORT int64_t mg_local_date_time_nanoseconds(
-                    const mg_local_date_time *local_date_time);
+MGCLIENT_EXPORT int64_t
+mg_local_date_time_nanoseconds(const mg_local_date_time *local_date_time);
 
-MGCLIENT_EXPORT mg_local_date_time *mg_local_date_time_copy(const mg_local_date_time *local_date_time);
+MGCLIENT_EXPORT mg_local_date_time *mg_local_date_time_copy(
+    const mg_local_date_time *local_date_time);
 
-MGCLIENT_EXPORT void mg_local_date_time_destroy(mg_local_date_time *local_date_time);
+MGCLIENT_EXPORT void mg_local_date_time_destroy(
+    mg_local_date_time *local_date_time);
 
 MGCLIENT_EXPORT int64_t mg_duration_months(const mg_duration *duration);
 

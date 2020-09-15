@@ -107,7 +107,8 @@ inline bool Client::Execute(const std::string &statement) {
   return true;
 }
 
-inline bool Client::Execute(const std::string &statement, const ConstMap &params) {
+inline bool Client::Execute(const std::string &statement,
+                            const ConstMap &params) {
   int status = mg_session_run(session_, statement.c_str(), params.ptr(),
                               nullptr, nullptr, nullptr);
   if (status < 0) {
