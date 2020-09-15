@@ -1489,11 +1489,11 @@ class ConstValue final {
 #undef CREATE_ITERATOR
 
 namespace detail {
-std::string_view ConvertString(const mg_string *str) {
+inline std::string_view ConvertString(const mg_string *str) {
   return std::string_view(mg_string_data(str), mg_string_size(str));
 }
 
-Value::Type ConvertType(mg_value_type type) {
+inline Value::Type ConvertType(mg_value_type type) {
   switch (type) {
     case MG_VALUE_TYPE_NULL:
       return Value::Type::Null;
@@ -1540,9 +1540,9 @@ Value::Type ConvertType(mg_value_type type) {
   }
 }
 
-bool AreValuesEqual(const mg_value *value1, const mg_value *value2);
+inline bool AreValuesEqual(const mg_value *value1, const mg_value *value2);
 
-bool AreListsEqual(const mg_list *list1, const mg_list *list2) {
+inline bool AreListsEqual(const mg_list *list1, const mg_list *list2) {
   if (list1 == list2) {
     return true;
   }
@@ -1558,7 +1558,7 @@ bool AreListsEqual(const mg_list *list1, const mg_list *list2) {
   return true;
 }
 
-bool AreMapsEqual(const mg_map *map1, const mg_map *map2) {
+inline bool AreMapsEqual(const mg_map *map1, const mg_map *map2) {
   if (map1 == map2) {
     return true;
   }
@@ -1581,7 +1581,7 @@ bool AreMapsEqual(const mg_map *map1, const mg_map *map2) {
   return true;
 }
 
-bool AreNodesEqual(const mg_node *node1, const mg_node *node2) {
+inline bool AreNodesEqual(const mg_node *node1, const mg_node *node2) {
   if (node1 == node2) {
     return true;
   }
@@ -1605,7 +1605,7 @@ bool AreNodesEqual(const mg_node *node1, const mg_node *node2) {
                               mg_node_properties(node2));
 }
 
-bool AreRelationshipsEqual(const mg_relationship *rel1,
+inline bool AreRelationshipsEqual(const mg_relationship *rel1,
                            const mg_relationship *rel2) {
   if (rel1 == rel2) {
     return true;
@@ -1627,7 +1627,7 @@ bool AreRelationshipsEqual(const mg_relationship *rel1,
                               mg_relationship_properties(rel2));
 }
 
-bool AreUnboundRelationshipsEqual(const mg_unbound_relationship *rel1,
+inline bool AreUnboundRelationshipsEqual(const mg_unbound_relationship *rel1,
                                   const mg_unbound_relationship *rel2) {
   if (rel1 == rel2) {
     return true;
@@ -1643,7 +1643,7 @@ bool AreUnboundRelationshipsEqual(const mg_unbound_relationship *rel1,
                               mg_unbound_relationship_properties(rel2));
 }
 
-bool ArePathsEqual(const mg_path *path1, const mg_path *path2) {
+inline bool ArePathsEqual(const mg_path *path1, const mg_path *path2) {
   if (path1 == path2) {
     return true;
   }
@@ -1720,7 +1720,7 @@ inline bool ArePoint3dsEqual(const mg_point_3d *point_3d1, const mg_point_3d *po
          mg_point_3d_z(point_3d1) == mg_point_3d_z(point_3d2);
 }
 
-bool AreValuesEqual(const mg_value *value1, const mg_value *value2) {
+inline bool AreValuesEqual(const mg_value *value1, const mg_value *value2) {
   if (value1 == value2) {
     return true;
   }
@@ -1784,115 +1784,115 @@ bool AreValuesEqual(const mg_value *value1, const mg_value *value2) {
 ////////////////////////////////////////////////////////////////////////////////
 // List:
 
-ConstValue List::Iterator::operator*() const { return (*iterable_)[index_]; }
+inline ConstValue List::Iterator::operator*() const { return (*iterable_)[index_]; }
 
-List::List(const List &other) : ptr_(mg_list_copy(other.ptr_)) {}
+inline List::List(const List &other) : ptr_(mg_list_copy(other.ptr_)) {}
 
-List::List(List &&other) : ptr_(other.ptr_) { other.ptr_ = nullptr; }
+inline List::List(List &&other) : ptr_(other.ptr_) { other.ptr_ = nullptr; }
 
-List::~List() {
+inline List::~List() {
   if (ptr_ != nullptr) {
     mg_list_destroy(ptr_);
   }
 }
 
-List::List(const ConstList &list) : ptr_(mg_list_copy(list.ptr())) {}
+inline List::List(const ConstList &list) : ptr_(mg_list_copy(list.ptr())) {}
 
-List::List(const std::vector<mg::Value> &values) : List(values.size()) {
+inline List::List(const std::vector<mg::Value> &values) : List(values.size()) {
   for (const auto &value : values) {
     Append(value);
   }
 }
 
-List::List(std::vector<mg::Value> &&values) : List(values.size()) {
+inline List::List(std::vector<mg::Value> &&values) : List(values.size()) {
   for (auto &value : values) {
     Append(std::move(value));
   }
 }
 
-List::List(std::initializer_list<Value> values) : List(values.size()) {
+inline List::List(std::initializer_list<Value> values) : List(values.size()) {
   for (const auto &value : values) {
     Append(value);
   }
 }
 
-const ConstValue List::operator[](size_t index) const {
+inline const ConstValue List::operator[](size_t index) const {
   return ConstValue(mg_list_at(ptr_, index));
 }
 
-bool List::Append(const Value &value) {
+inline bool List::Append(const Value &value) {
   return mg_list_append(ptr_, mg_value_copy(value.ptr())) == 0;
 }
 
-bool List::Append(const ConstValue &value) {
+inline bool List::Append(const ConstValue &value) {
   return mg_list_append(ptr_, mg_value_copy(value.ptr())) == 0;
 }
 
-bool List::Append(Value &&value) {
+inline bool List::Append(Value &&value) {
   bool result = mg_list_append(ptr_, value.ptr_) == 0;
   value.ptr_ = nullptr;
   return result;
 }
 
-const ConstList List::AsConstList() const { return ConstList(ptr_); }
+inline const ConstList List::AsConstList() const { return ConstList(ptr_); }
 
-bool List::operator==(const List &other) const {
+inline bool List::operator==(const List &other) const {
   return detail::AreListsEqual(ptr_, other.ptr_);
 }
 
-bool List::operator==(const ConstList &other) const {
+inline bool List::operator==(const ConstList &other) const {
   return detail::AreListsEqual(ptr_, other.ptr());
 }
 
-ConstValue ConstList::Iterator::operator*() const {
+inline ConstValue ConstList::Iterator::operator*() const {
   return (*iterable_)[index_];
 }
 
-const ConstValue ConstList::operator[](size_t index) const {
+inline const ConstValue ConstList::operator[](size_t index) const {
   return ConstValue(mg_list_at(const_ptr_, index));
 }
 
-bool ConstList::operator==(const ConstList &other) const {
+inline bool ConstList::operator==(const ConstList &other) const {
   return detail::AreListsEqual(const_ptr_, other.const_ptr_);
 }
 
-bool ConstList::operator==(const List &other) const {
+inline bool ConstList::operator==(const List &other) const {
   return detail::AreListsEqual(const_ptr_, other.ptr());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Map:
 
-std::pair<std::string_view, ConstValue> Map::Iterator::operator*() const {
+inline std::pair<std::string_view, ConstValue> Map::Iterator::operator*() const {
   return std::make_pair(
       detail::ConvertString(mg_map_key_at(iterable_->ptr(), index_)),
       ConstValue(mg_map_value_at(iterable_->ptr(), index_)));
 }
 
-Map::Map(const Map &other) : Map(mg_map_copy(other.ptr_)) {}
+inline Map::Map(const Map &other) : Map(mg_map_copy(other.ptr_)) {}
 
-Map::Map(Map &&other) : Map(other.ptr_) { other.ptr_ = nullptr; }
+inline Map::Map(Map &&other) : Map(other.ptr_) { other.ptr_ = nullptr; }
 
-Map::Map(const ConstMap &map) : ptr_(mg_map_copy(map.ptr())) {}
+inline Map::Map(const ConstMap &map) : ptr_(mg_map_copy(map.ptr())) {}
 
-Map::~Map() {
+inline Map::~Map() {
   if (ptr_ != nullptr) {
     mg_map_destroy(ptr_);
   }
 }
 
-Map::Map(std::initializer_list<std::pair<std::string, Value>> list)
+inline Map::Map(std::initializer_list<std::pair<std::string, Value>> list)
     : Map(list.size()) {
   for (const auto &[key, value] : list) {
     Insert(key, value.AsConstValue());
   }
 }
 
-ConstValue Map::operator[](const std::string_view key) const {
+inline ConstValue Map::operator[](const std::string_view key) const {
   return ConstValue(mg_map_at2(ptr_, key.size(), key.data()));
 }
 
-Map::Iterator Map::find(const std::string_view key) const {
+inline Map::Iterator Map::find(const std::string_view key) const {
   for (size_t i = 0; i < size(); ++i) {
     if (key == detail::ConvertString(mg_map_key_at(ptr_, i))) {
       return Iterator(this, i);
@@ -1901,34 +1901,34 @@ Map::Iterator Map::find(const std::string_view key) const {
   return end();
 }
 
-bool Map::Insert(const std::string_view key, const Value &value) {
+inline bool Map::Insert(const std::string_view key, const Value &value) {
   return mg_map_insert2(ptr_, mg_string_make2(key.size(), key.data()),
                         mg_value_copy(value.ptr())) == 0;
 }
 
-bool Map::Insert(const std::string_view key, const ConstValue &value) {
+inline bool Map::Insert(const std::string_view key, const ConstValue &value) {
   return mg_map_insert2(ptr_, mg_string_make2(key.size(), key.data()),
                         mg_value_copy(value.ptr())) == 0;
 }
 
-bool Map::Insert(const std::string_view key, Value &&value) {
+inline bool Map::Insert(const std::string_view key, Value &&value) {
   bool result = mg_map_insert2(ptr_, mg_string_make2(key.size(), key.data()),
                                value.ptr_) == 0;
   value.ptr_ = nullptr;
   return result;
 }
 
-bool Map::InsertUnsafe(const std::string_view key, const Value &value) {
+inline bool Map::InsertUnsafe(const std::string_view key, const Value &value) {
   return mg_map_insert_unsafe2(ptr_, mg_string_make2(key.size(), key.data()),
                                mg_value_copy(value.ptr())) == 0;
 }
 
-bool Map::InsertUnsafe(const std::string_view key, const ConstValue &value) {
+inline bool Map::InsertUnsafe(const std::string_view key, const ConstValue &value) {
   return mg_map_insert_unsafe2(ptr_, mg_string_make2(key.size(), key.data()),
                                mg_value_copy(value.ptr())) == 0;
 }
 
-bool Map::InsertUnsafe(const std::string_view key, Value &&value) {
+inline bool Map::InsertUnsafe(const std::string_view key, Value &&value) {
   bool result =
       mg_map_insert_unsafe2(ptr_, mg_string_make2(key.size(), key.data()),
                             value.ptr_) == 0;
@@ -1936,27 +1936,27 @@ bool Map::InsertUnsafe(const std::string_view key, Value &&value) {
   return result;
 }
 
-const ConstMap Map::AsConstMap() const { return ConstMap(ptr_); }
+inline const ConstMap Map::AsConstMap() const { return ConstMap(ptr_); }
 
-bool Map::operator==(const Map &other) const {
+inline bool Map::operator==(const Map &other) const {
   return detail::AreMapsEqual(ptr_, other.ptr_);
 }
 
-bool Map::operator==(const ConstMap &other) const {
+inline bool Map::operator==(const ConstMap &other) const {
   return detail::AreMapsEqual(ptr_, other.ptr());
 }
 
-std::pair<std::string_view, ConstValue> ConstMap::Iterator::operator*() const {
+inline std::pair<std::string_view, ConstValue> ConstMap::Iterator::operator*() const {
   return std::make_pair(
       detail::ConvertString(mg_map_key_at(iterable_->ptr(), index_)),
       ConstValue(mg_map_value_at(iterable_->ptr(), index_)));
 }
 
-ConstValue ConstMap::operator[](const std::string_view key) const {
+inline ConstValue ConstMap::operator[](const std::string_view key) const {
   return ConstValue(mg_map_at2(const_ptr_, key.size(), key.data()));
 }
 
-ConstMap::Iterator ConstMap::find(const std::string_view key) const {
+inline ConstMap::Iterator ConstMap::find(const std::string_view key) const {
   for (size_t i = 0; i < size(); ++i) {
     if (key == detail::ConvertString(mg_map_key_at(const_ptr_, i))) {
       return Iterator(this, i);
@@ -1965,150 +1965,150 @@ ConstMap::Iterator ConstMap::find(const std::string_view key) const {
   return end();
 }
 
-bool ConstMap::operator==(const ConstMap &other) const {
+inline bool ConstMap::operator==(const ConstMap &other) const {
   return detail::AreMapsEqual(const_ptr_, other.const_ptr_);
 }
 
-bool ConstMap::operator==(const Map &other) const {
+inline bool ConstMap::operator==(const Map &other) const {
   return detail::AreMapsEqual(const_ptr_, other.ptr());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Node:
 
-std::string_view Node::Labels::Iterator::operator*() const {
+inline std::string_view Node::Labels::Iterator::operator*() const {
   return (*iterable_)[index_];
 }
 
-std::string_view Node::Labels::operator[](size_t index) const {
+inline std::string_view Node::Labels::operator[](size_t index) const {
   return detail::ConvertString(mg_node_label_at(node_, index));
 }
 
-Node::Node(const Node &other) : Node(mg_node_copy(other.ptr_)) {}
+inline Node::Node(const Node &other) : Node(mg_node_copy(other.ptr_)) {}
 
-Node::Node(Node &&other) : ptr_(other.ptr_) { other.ptr_ = nullptr; }
+inline Node::Node(Node &&other) : ptr_(other.ptr_) { other.ptr_ = nullptr; }
 
-Node::~Node() {
+inline Node::~Node() {
   if (ptr_ != nullptr) {
     mg_node_destroy(ptr_);
   }
 }
 
-Node::Node(const ConstNode &node) : ptr_(mg_node_copy(node.ptr())) {}
+inline Node::Node(const ConstNode &node) : ptr_(mg_node_copy(node.ptr())) {}
 
-bool Node::operator==(const Node &other) const {
+inline bool Node::operator==(const Node &other) const {
   return detail::AreNodesEqual(ptr_, other.ptr_);
 }
 
-bool Node::operator==(const ConstNode &other) const {
+inline bool Node::operator==(const ConstNode &other) const {
   return detail::AreNodesEqual(ptr_, other.ptr());
 }
 
-ConstNode Node::AsConstNode() const { return ConstNode(ptr_); }
+inline ConstNode Node::AsConstNode() const { return ConstNode(ptr_); }
 
-bool ConstNode::operator==(const ConstNode &other) const {
+inline bool ConstNode::operator==(const ConstNode &other) const {
   return detail::AreNodesEqual(const_ptr_, other.const_ptr_);
 }
 
-bool ConstNode::operator==(const Node &other) const {
+inline bool ConstNode::operator==(const Node &other) const {
   return detail::AreNodesEqual(const_ptr_, other.ptr());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Relationship:
 
-Relationship::Relationship(const Relationship &other)
+inline Relationship::Relationship(const Relationship &other)
     : Relationship(mg_relationship_copy(other.ptr_)) {}
 
-Relationship::Relationship(Relationship &&other) : Relationship(other.ptr_) {
+inline Relationship::Relationship(Relationship &&other) : Relationship(other.ptr_) {
   other.ptr_ = nullptr;
 }
 
-Relationship::~Relationship() {
+inline Relationship::~Relationship() {
   if (ptr_ != nullptr) {
     mg_relationship_destroy(ptr_);
   }
 }
 
-Relationship::Relationship(const ConstRelationship &rel)
+inline Relationship::Relationship(const ConstRelationship &rel)
     : ptr_(mg_relationship_copy(rel.ptr())) {}
 
-std::string_view Relationship::type() const {
+inline std::string_view Relationship::type() const {
   return detail::ConvertString(mg_relationship_type(ptr_));
 }
 
-ConstRelationship Relationship::AsConstRelationship() const {
+inline ConstRelationship Relationship::AsConstRelationship() const {
   return ConstRelationship(ptr_);
 }
 
-bool Relationship::operator==(const Relationship &other) const {
+inline bool Relationship::operator==(const Relationship &other) const {
   return detail::AreRelationshipsEqual(ptr_, other.ptr_);
 }
 
-bool Relationship::operator==(const ConstRelationship &other) const {
+inline bool Relationship::operator==(const ConstRelationship &other) const {
   return detail::AreRelationshipsEqual(ptr_, other.ptr());
 }
 
-std::string_view ConstRelationship::type() const {
+inline std::string_view ConstRelationship::type() const {
   return detail::ConvertString(mg_relationship_type(const_ptr_));
 }
 
-bool ConstRelationship::operator==(const ConstRelationship &other) const {
+inline bool ConstRelationship::operator==(const ConstRelationship &other) const {
   return detail::AreRelationshipsEqual(const_ptr_, other.const_ptr_);
 }
 
-bool ConstRelationship::operator==(const Relationship &other) const {
+inline bool ConstRelationship::operator==(const Relationship &other) const {
   return detail::AreRelationshipsEqual(const_ptr_, other.ptr());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // UnboundRelationship:
 
-UnboundRelationship::UnboundRelationship(const UnboundRelationship &other)
+inline UnboundRelationship::UnboundRelationship(const UnboundRelationship &other)
     : ptr_(mg_unbound_relationship_copy(other.ptr_)) {}
 
-UnboundRelationship::UnboundRelationship(UnboundRelationship &&other)
+inline UnboundRelationship::UnboundRelationship(UnboundRelationship &&other)
     : ptr_(other.ptr_) {
   other.ptr_ = nullptr;
 }
 
-UnboundRelationship::~UnboundRelationship() {
+inline UnboundRelationship::~UnboundRelationship() {
   if (ptr_ != nullptr) {
     mg_unbound_relationship_destroy(ptr_);
   }
 }
 
-UnboundRelationship::UnboundRelationship(const ConstUnboundRelationship &rel)
+inline UnboundRelationship::UnboundRelationship(const ConstUnboundRelationship &rel)
     : ptr_(mg_unbound_relationship_copy(rel.ptr())) {}
 
-std::string_view UnboundRelationship::type() const {
+inline std::string_view UnboundRelationship::type() const {
   return detail::ConvertString(mg_unbound_relationship_type(ptr_));
 }
 
-ConstUnboundRelationship UnboundRelationship::AsConstUnboundRelationship()
+inline ConstUnboundRelationship UnboundRelationship::AsConstUnboundRelationship()
     const {
   return ConstUnboundRelationship(ptr_);
 }
 
-bool UnboundRelationship::operator==(const UnboundRelationship &other) const {
+inline bool UnboundRelationship::operator==(const UnboundRelationship &other) const {
   return detail::AreUnboundRelationshipsEqual(ptr_, other.ptr_);
 }
 
-bool UnboundRelationship::operator==(
+inline bool UnboundRelationship::operator==(
     const ConstUnboundRelationship &other) const {
   return detail::AreUnboundRelationshipsEqual(ptr_, other.ptr());
 }
 
-std::string_view ConstUnboundRelationship::type() const {
+inline std::string_view ConstUnboundRelationship::type() const {
   return detail::ConvertString(mg_unbound_relationship_type(const_ptr_));
 }
 
-bool ConstUnboundRelationship::operator==(
+inline bool ConstUnboundRelationship::operator==(
     const ConstUnboundRelationship &other) const {
   return detail::AreUnboundRelationshipsEqual(const_ptr_, other.const_ptr_);
 }
 
-bool ConstUnboundRelationship::operator==(
+inline bool ConstUnboundRelationship::operator==(
     const UnboundRelationship &other) const {
   return detail::AreUnboundRelationshipsEqual(const_ptr_, other.ptr());
 }
@@ -2116,19 +2116,19 @@ bool ConstUnboundRelationship::operator==(
 ////////////////////////////////////////////////////////////////////////////////
 // Path:
 
-Path::Path(const Path &other) : ptr_(mg_path_copy(other.ptr_)) {}
+inline Path::Path(const Path &other) : ptr_(mg_path_copy(other.ptr_)) {}
 
-Path::Path(Path &&other) : ptr_(other.ptr_) { other.ptr_ = nullptr; }
+inline Path::Path(Path &&other) : ptr_(other.ptr_) { other.ptr_ = nullptr; }
 
-Path::~Path() {
+inline Path::~Path() {
   if (ptr_ != nullptr) {
     mg_path_destroy(ptr_);
   }
 }
 
-Path::Path(const ConstPath &path) : ptr_(mg_path_copy(path.ptr())) {}
+inline Path::Path(const ConstPath &path) : ptr_(mg_path_copy(path.ptr())) {}
 
-ConstNode Path::GetNodeAt(size_t index) const {
+inline ConstNode Path::GetNodeAt(size_t index) const {
   auto vertex_ptr = mg_path_node_at(ptr_, index);
   if (vertex_ptr == nullptr) {
     std::abort();
@@ -2136,7 +2136,7 @@ ConstNode Path::GetNodeAt(size_t index) const {
   return ConstNode(vertex_ptr);
 }
 
-ConstUnboundRelationship Path::GetRelationshipAt(size_t index) const {
+inline ConstUnboundRelationship Path::GetRelationshipAt(size_t index) const {
   auto edge_ptr = mg_path_relationship_at(ptr_, index);
   if (edge_ptr == nullptr) {
     std::abort();
@@ -2144,7 +2144,7 @@ ConstUnboundRelationship Path::GetRelationshipAt(size_t index) const {
   return ConstUnboundRelationship(edge_ptr);
 }
 
-bool Path::IsReversedRelationshipAt(size_t index) const {
+inline bool Path::IsReversedRelationshipAt(size_t index) const {
   auto is_reversed = mg_path_relationship_reversed_at(ptr_, index);
   if (is_reversed == -1) {
     std::abort();
@@ -2152,17 +2152,17 @@ bool Path::IsReversedRelationshipAt(size_t index) const {
   return is_reversed == 1;
 }
 
-ConstPath Path::AsConstPath() const { return ConstPath(ptr_); }
+inline ConstPath Path::AsConstPath() const { return ConstPath(ptr_); }
 
-bool Path::operator==(const Path &other) const {
+inline bool Path::operator==(const Path &other) const {
   return detail::ArePathsEqual(ptr_, other.ptr_);
 }
 
-bool Path::operator==(const ConstPath &other) const {
+inline bool Path::operator==(const ConstPath &other) const {
   return detail::ArePathsEqual(ptr_, other.ptr());
 }
 
-ConstNode ConstPath::GetNodeAt(size_t index) const {
+inline ConstNode ConstPath::GetNodeAt(size_t index) const {
   auto vertex_ptr = mg_path_node_at(const_ptr_, index);
   if (vertex_ptr == nullptr) {
     std::abort();
@@ -2170,7 +2170,7 @@ ConstNode ConstPath::GetNodeAt(size_t index) const {
   return ConstNode(vertex_ptr);
 }
 
-ConstUnboundRelationship ConstPath::GetRelationshipAt(size_t index) const {
+inline ConstUnboundRelationship ConstPath::GetRelationshipAt(size_t index) const {
   auto edge_ptr = mg_path_relationship_at(const_ptr_, index);
   if (edge_ptr == nullptr) {
     std::abort();
@@ -2178,7 +2178,7 @@ ConstUnboundRelationship ConstPath::GetRelationshipAt(size_t index) const {
   return ConstUnboundRelationship(edge_ptr);
 }
 
-bool ConstPath::IsReversedRelationshipAt(size_t index) const {
+inline bool ConstPath::IsReversedRelationshipAt(size_t index) const {
   auto is_reversed = mg_path_relationship_reversed_at(const_ptr_, index);
   if (is_reversed == -1) {
     std::abort();
@@ -2186,11 +2186,11 @@ bool ConstPath::IsReversedRelationshipAt(size_t index) const {
   return is_reversed == 1;
 }
 
-bool ConstPath::operator==(const ConstPath &other) const {
+inline bool ConstPath::operator==(const ConstPath &other) const {
   return detail::ArePathsEqual(const_ptr_, other.const_ptr_);
 }
 
-bool ConstPath::operator==(const Path &other) const {
+inline bool ConstPath::operator==(const Path &other) const {
   return detail::ArePathsEqual(const_ptr_, other.ptr());
 }
 
@@ -2593,374 +2593,375 @@ inline bool ConstPoint3d::operator==(const Point3d &other) const {
 ////////////////////////////////////////////////////////////////////////////////
 // Value:
 
-Value::Value(const Value &other) : Value(mg_value_copy(other.ptr_)) {}
+inline Value::Value(const Value &other) : Value(mg_value_copy(other.ptr_)) {}
 
-Value::Value(Value &&other) : ptr_(other.ptr_) { other.ptr_ = nullptr; }
+inline Value::Value(Value &&other) : ptr_(other.ptr_) { other.ptr_ = nullptr; }
 
-Value::~Value() {
+inline Value::~Value() {
   if (ptr_ != nullptr) {
     mg_value_destroy(ptr_);
   }
 }
 
-Value::Value(const ConstValue &value) : ptr_(mg_value_copy(value.ptr())) {}
+inline Value::Value(const ConstValue &value) : ptr_(mg_value_copy(value.ptr())) {}
 
-Value::Value(const std::string_view value)
+inline Value::Value(const std::string_view value)
     : Value(
           mg_value_make_string2(mg_string_make2(value.size(), value.data()))) {}
 
-Value::Value(const char *value) : Value(mg_value_make_string(value)) {}
+inline Value::Value(const char *value) : Value(mg_value_make_string(value)) {}
 
-Value::Value(List &&list) : Value(mg_value_make_list(list.ptr_)) {
+inline Value::Value(List &&list) : Value(mg_value_make_list(list.ptr_)) {
   list.ptr_ = nullptr;
 }
 
-Value::Value(Map &&map) : Value(mg_value_make_map(map.ptr_)) {
+inline Value::Value(Map &&map) : Value(mg_value_make_map(map.ptr_)) {
   map.ptr_ = nullptr;
 }
 
-Value::Value(Node &&vertex) : Value(mg_value_make_node(vertex.ptr_)) {
+inline Value::Value(Node &&vertex) : Value(mg_value_make_node(vertex.ptr_)) {
   vertex.ptr_ = nullptr;
 }
 
-Value::Value(Relationship &&edge)
+inline Value::Value(Relationship &&edge)
     : Value(mg_value_make_relationship(edge.ptr_)) {
   edge.ptr_ = nullptr;
 }
 
-Value::Value(UnboundRelationship &&edge)
+inline Value::Value(UnboundRelationship &&edge)
     : Value(mg_value_make_unbound_relationship(edge.ptr_)) {
   edge.ptr_ = nullptr;
 }
 
-Value::Value(Path &&path) : Value(mg_value_make_path(path.ptr_)) {
+inline Value::Value(Path &&path) : Value(mg_value_make_path(path.ptr_)) {
   path.ptr_ = nullptr;
 }
 
-Value::Value(Date &&date) : Value(mg_value_make_date(date.ptr_)) {
+inline Value::Value(Date &&date) : Value(mg_value_make_date(date.ptr_)) {
   date.ptr_ = nullptr;
 }
 
-Value::Value(Time &&time) : Value(mg_value_make_time(time.ptr_)) {
+inline Value::Value(Time &&time) : Value(mg_value_make_time(time.ptr_)) {
   time.ptr_ = nullptr;
 }
 
-Value::Value(LocalTime &&local_time) : Value(mg_value_make_local_time(local_time.ptr_)) {
+inline Value::Value(LocalTime &&local_time) : Value(mg_value_make_local_time(local_time.ptr_)) {
   local_time.ptr_ = nullptr;
 }
 
-Value::Value(DateTime &&date_time) : Value(mg_value_make_date_time(date_time.ptr_)) {
+inline Value::Value(DateTime &&date_time) : Value(mg_value_make_date_time(date_time.ptr_)) {
   date_time.ptr_ = nullptr;
 }
 
-Value::Value(DateTimeZoneId &&date_time_zone_id) : Value(mg_value_make_date_time_zone_id(date_time_zone_id.ptr_)) {
+inline Value::Value(DateTimeZoneId &&date_time_zone_id) : Value(mg_value_make_date_time_zone_id(date_time_zone_id.ptr_)) {
   date_time_zone_id.ptr_ = nullptr;
 }
 
-Value::Value(LocalDateTime &&local_date_time) : Value(mg_value_make_local_date_time(local_date_time.ptr_)) {
+inline Value::Value(LocalDateTime &&local_date_time) : Value(mg_value_make_local_date_time(local_date_time.ptr_)) {
   local_date_time.ptr_ = nullptr;
 }
 
-Value::Value(Duration &&duration) : Value(mg_value_make_duration(duration.ptr_)) {
+inline Value::Value(Duration &&duration) : Value(mg_value_make_duration(duration.ptr_)) {
   duration.ptr_ = nullptr;
 }
 
-Value::Value(Point2d &&point_2d) : Value(mg_value_make_point_2d(point_2d.ptr_)) {
+inline Value::Value(Point2d &&point_2d) : Value(mg_value_make_point_2d(point_2d.ptr_)) {
   point_2d.ptr_ = nullptr;
 }
 
-Value::Value(Point3d &&point_3d) : Value(mg_value_make_point_3d(point_3d.ptr_)) {
+inline Value::Value(Point3d &&point_3d) : Value(mg_value_make_point_3d(point_3d.ptr_)) {
   point_3d.ptr_ = nullptr;
 }
 
-bool Value::ValueBool() const {
+inline bool Value::ValueBool() const {
   if (type() != Type::Bool) {
     std::abort();
   }
   return static_cast<bool>(mg_value_bool(ptr_));
 }
 
-int64_t Value::ValueInt() const {
+inline int64_t Value::ValueInt() const {
   if (type() != Type::Int) {
     std::abort();
   }
   return mg_value_integer(ptr_);
 }
 
-double Value::ValueDouble() const {
+inline double Value::ValueDouble() const {
   if (type() != Type::Double) {
     std::abort();
   }
   return mg_value_float(ptr_);
 }
 
-std::string_view Value::ValueString() const {
+inline std::string_view Value::ValueString() const {
   if (type() != Type::String) {
     std::abort();
   }
   return detail::ConvertString(mg_value_string(ptr_));
 }
 
-const ConstList Value::ValueList() const {
+inline const ConstList Value::ValueList() const {
   if (type() != Type::List) {
     std::abort();
   }
   return ConstList(mg_value_list(ptr_));
 }
 
-const ConstMap Value::ValueMap() const {
+inline const ConstMap Value::ValueMap() const {
   if (type() != Type::Map) {
     std::abort();
   }
   return ConstMap(mg_value_map(ptr_));
 }
 
-const ConstNode Value::ValueNode() const {
+inline const ConstNode Value::ValueNode() const {
   if (type() != Type::Node) {
     std::abort();
   }
   return ConstNode(mg_value_node(ptr_));
 }
 
-const ConstRelationship Value::ValueRelationship() const {
+inline const ConstRelationship Value::ValueRelationship() const {
   if (type() != Type::Relationship) {
     std::abort();
   }
   return ConstRelationship(mg_value_relationship(ptr_));
 }
 
-const ConstUnboundRelationship Value::ValueUnboundRelationship() const {
+inline const ConstUnboundRelationship Value::ValueUnboundRelationship() const {
   if (type() != Type::UnboundRelationship) {
     std::abort();
   }
   return ConstUnboundRelationship(mg_value_unbound_relationship(ptr_));
 }
 
-const ConstPath Value::ValuePath() const {
+inline const ConstPath Value::ValuePath() const {
   if (type() != Type::Path) {
     std::abort();
   }
   return ConstPath(mg_value_path(ptr_));
 }
 
-const ConstDate Value::ValueDate() const {
+inline const ConstDate Value::ValueDate() const {
   if (type() != Type::Date) {
     std::abort();
   }
   return ConstDate(mg_value_date(ptr_));
 }
 
-const ConstTime Value::ValueTime() const {
+inline const ConstTime Value::ValueTime() const {
   if (type() != Type::Time) {
     std::abort();
   }
   return ConstTime(mg_value_time(ptr_));
 }
 
-const ConstLocalTime Value::ValueLocalTime() const {
+inline const ConstLocalTime Value::ValueLocalTime() const {
   if (type() != Type::LocalTime) {
     std::abort();
   }
   return ConstLocalTime(mg_value_local_time(ptr_));
 }
 
-const ConstDateTime Value::ValueDateTime() const {
+inline const ConstDateTime Value::ValueDateTime() const {
   if (type() != Type::DateTime) {
     std::abort();
   }
   return ConstDateTime(mg_value_date_time(ptr_));
 }
 
-const ConstDateTimeZoneId Value::ValueDateTimeZoneId() const {
+inline const ConstDateTimeZoneId Value::ValueDateTimeZoneId() const {
   if (type() != Type::DateTimeZoneId) {
     std::abort();
   }
   return ConstDateTimeZoneId(mg_value_date_time_zone_id(ptr_));
 }
 
-const ConstLocalDateTime Value::ValueLocalDateTime() const {
+inline const ConstLocalDateTime Value::ValueLocalDateTime() const {
   if (type() != Type::LocalDateTime) {
     std::abort();
   }
   return ConstLocalDateTime(mg_value_local_date_time(ptr_));
 }
 
-const ConstDuration Value::ValueDuration() const {
+inline const ConstDuration Value::ValueDuration() const {
   if (type() != Type::Duration) {
     std::abort();
   }
   return ConstDuration(mg_value_duration(ptr_));
 }
 
-const ConstPoint2d Value::ValuePoint2d() const {
+inline const ConstPoint2d Value::ValuePoint2d() const {
   if (type() != Type::Point2d) {
     std::abort();
   }
   return ConstPoint2d(mg_value_point_2d(ptr_));
 }
 
-const ConstPoint3d Value::ValuePoint3d() const {
+inline const ConstPoint3d Value::ValuePoint3d() const {
   if (type() != Type::Point3d) {
     std::abort();
   }
   return ConstPoint3d(mg_value_point_3d(ptr_));
 }
 
-Value::Type Value::type() const {
+inline Value::Type Value::type() const {
   return detail::ConvertType(mg_value_get_type(ptr_));
 }
 
-ConstValue Value::AsConstValue() const { return ConstValue(ptr_); }
+inline ConstValue Value::AsConstValue() const { return ConstValue(ptr_); }
 
-bool Value::operator==(const Value &other) const {
+inline bool Value::operator==(const Value &other) const {
   return detail::AreValuesEqual(ptr_, other.ptr_);
 }
 
-bool Value::operator==(const ConstValue &other) const {
+inline bool Value::operator==(const ConstValue &other) const {
   return detail::AreValuesEqual(ptr_, other.ptr());
 }
 
-bool ConstValue::ValueBool() const {
+inline bool ConstValue::ValueBool() const {
   if (type() != Value::Type::Bool) {
     std::abort();
   }
   return static_cast<bool>(mg_value_bool(const_ptr_));
 }
 
-int64_t ConstValue::ValueInt() const {
+inline int64_t ConstValue::ValueInt() const {
   if (type() != Value::Type::Int) {
     std::abort();
   }
   return mg_value_integer(const_ptr_);
 }
 
-double ConstValue::ValueDouble() const {
+inline double ConstValue::ValueDouble() const {
   if (type() != Value::Type::Double) {
     std::abort();
   }
   return mg_value_float(const_ptr_);
 }
 
-std::string_view ConstValue::ValueString() const {
+inline std::string_view ConstValue::ValueString() const {
   if (type() != Value::Type::String) {
     std::abort();
   }
   return detail::ConvertString(mg_value_string(const_ptr_));
 }
 
-const ConstList ConstValue::ValueList() const {
+inline const ConstList ConstValue::ValueList() const {
   if (type() != Value::Type::List) {
     std::abort();
   }
   return ConstList(mg_value_list(const_ptr_));
 }
 
-const ConstMap ConstValue::ValueMap() const {
+inline const ConstMap ConstValue::ValueMap() const {
   if (type() != Value::Type::List) {
     std::abort();
   }
   return ConstMap(mg_value_map(const_ptr_));
 }
 
-const ConstNode ConstValue::ValueNode() const {
+inline const ConstNode ConstValue::ValueNode() const {
   if (type() != Value::Type::Node) {
     std::abort();
   }
   return ConstNode(mg_value_node(const_ptr_));
 }
 
-const ConstRelationship ConstValue::ValueRelationship() const {
+inline const ConstRelationship ConstValue::ValueRelationship() const {
   if (type() != Value::Type::Relationship) {
     std::abort();
   }
   return ConstRelationship(mg_value_relationship(const_ptr_));
 }
 
-const ConstUnboundRelationship ConstValue::ValueUnboundRelationship() const {
+inline const ConstUnboundRelationship ConstValue::ValueUnboundRelationship() const {
   if (type() != Value::Type::UnboundRelationship) {
     std::abort();
   }
   return ConstUnboundRelationship(mg_value_unbound_relationship(const_ptr_));
 }
 
-const ConstPath ConstValue::ValuePath() const {
+inline const ConstPath ConstValue::ValuePath() const {
   if (type() != Value::Type::Path) {
     std::abort();
   }
   return ConstPath(mg_value_path(const_ptr_));
 }
-Value::Type ConstValue::type() const {
+
+inline Value::Type ConstValue::type() const {
   return detail::ConvertType(mg_value_get_type(const_ptr_));
 }
 
-const ConstDate ConstValue::ValueDate() const {
+inline const ConstDate ConstValue::ValueDate() const {
   if (type() != Value::Type::Date) {
     std::abort();
   }
   return ConstDate(mg_value_date(const_ptr_));
 }
 
-const ConstTime ConstValue::ValueTime() const {
+inline const ConstTime ConstValue::ValueTime() const {
   if (type() != Value::Type::Time) {
     std::abort();
   }
   return ConstTime(mg_value_time(const_ptr_));
 }
 
-const ConstLocalTime ConstValue::ValueLocalTime() const {
+inline const ConstLocalTime ConstValue::ValueLocalTime() const {
   if (type() != Value::Type::LocalTime) {
     std::abort();
   }
   return ConstLocalTime(mg_value_local_time(const_ptr_));
 }
 
-const ConstDateTime ConstValue::ValueDateTime() const {
+inline const ConstDateTime ConstValue::ValueDateTime() const {
   if (type() != Value::Type::DateTime) {
     std::abort();
   }
   return ConstDateTime(mg_value_date_time(const_ptr_));
 }
 
-const ConstDateTimeZoneId ConstValue::ValueDateTimeZoneId() const {
+inline const ConstDateTimeZoneId ConstValue::ValueDateTimeZoneId() const {
   if (type() != Value::Type::DateTimeZoneId) {
     std::abort();
   }
   return ConstDateTimeZoneId(mg_value_date_time_zone_id(const_ptr_));
 }
 
-const ConstLocalDateTime ConstValue::ValueLocalDateTime() const {
+inline const ConstLocalDateTime ConstValue::ValueLocalDateTime() const {
   if (type() != Value::Type::LocalDateTime) {
     std::abort();
   }
   return ConstLocalDateTime(mg_value_local_date_time(const_ptr_));
 }
 
-const ConstDuration ConstValue::ValueDuration() const {
+inline const ConstDuration ConstValue::ValueDuration() const {
   if (type() != Value::Type::Duration) {
     std::abort();
   }
   return ConstDuration(mg_value_duration(const_ptr_));
 }
 
-const ConstPoint2d ConstValue::ValuePoint2d() const {
+inline const ConstPoint2d ConstValue::ValuePoint2d() const {
   if (type() != Value::Type::Point2d) {
     std::abort();
   }
   return ConstPoint2d(mg_value_point_2d(const_ptr_));
 }
 
-const ConstPoint3d ConstValue::ValuePoint3d() const {
+inline const ConstPoint3d ConstValue::ValuePoint3d() const {
   if (type() != Value::Type::Point3d) {
     std::abort();
   }
   return ConstPoint3d(mg_value_point_3d(const_ptr_));
 }
 
-bool ConstValue::operator==(const ConstValue &other) const {
+inline bool ConstValue::operator==(const ConstValue &other) const {
   return detail::AreValuesEqual(const_ptr_, other.const_ptr_);
 }
 
-bool ConstValue::operator==(const Value &other) const {
+inline bool ConstValue::operator==(const Value &other) const {
   return detail::AreValuesEqual(const_ptr_, other.ptr());
 }
 

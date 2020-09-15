@@ -62,7 +62,7 @@ class Client {
   mg_session *session_;
 };
 
-std::unique_ptr<Client> Client::Connect(const Client::Params &params) {
+inline std::unique_ptr<Client> Client::Connect(const Client::Params &params) {
   mg_session_params *mg_params = mg_session_params_make();
   if (!mg_params) {
     return nullptr;
@@ -88,11 +88,11 @@ std::unique_ptr<Client> Client::Connect(const Client::Params &params) {
   return std::unique_ptr<Client>(new Client(session));
 }
 
-Client::Client(mg_session *session) : session_(session) {}
+inline Client::Client(mg_session *session) : session_(session) {}
 
-Client::~Client() { mg_session_destroy(session_); }
+inline Client::~Client() { mg_session_destroy(session_); }
 
-bool Client::Execute(const std::string &statement) {
+inline bool Client::Execute(const std::string &statement) {
   int status = mg_session_run(session_, statement.c_str(), nullptr, nullptr,
                               nullptr, nullptr);
   if (status < 0) {
@@ -107,7 +107,7 @@ bool Client::Execute(const std::string &statement) {
   return true;
 }
 
-bool Client::Execute(const std::string &statement, const ConstMap &params) {
+inline bool Client::Execute(const std::string &statement, const ConstMap &params) {
   int status = mg_session_run(session_, statement.c_str(), params.ptr(),
                               nullptr, nullptr, nullptr);
   if (status < 0) {
@@ -121,7 +121,7 @@ bool Client::Execute(const std::string &statement, const ConstMap &params) {
   return true;
 }
 
-std::optional<std::vector<Value>> Client::FetchOne() {
+inline std::optional<std::vector<Value>> Client::FetchOne() {
   mg_result *result;
   int status = mg_session_fetch(session_, &result);
   if (status != 1) {
