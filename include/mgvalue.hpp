@@ -37,6 +37,7 @@ class ConstNode;
 class ConstRelationship;
 class ConstUnboundRelationship;
 class ConstPath;
+class ConstDateTime;
 class ConstValue;
 class Value;
 
@@ -739,6 +740,12 @@ class ConstPath final {
  private:
   const mg_path *const_ptr_;
 };
+
+////////////////////////////////////////////////////////////////////////////////
+// DateTime:
+
+/// \brief Wrapper class for temporal structures
+//
 
 ////////////////////////////////////////////////////////////////////////////////
 // Value:

@@ -586,8 +586,7 @@ cleanup_nodes:
 int mg_session_read_date(mg_session *session, mg_date **date) {
   MG_RETURN_IF_FAILED(mg_session_check_struct_header(
       session, (uint8_t)(MG_MARKER_TINY_STRUCT + 1), MG_SIGNATURE_DATE));
-  mg_date *date_tmp =
-      mg_allocator_malloc(session->decoder_allocator, sizeof(mg_date));
+  mg_date *date_tmp = mg_date_alloc(session->decoder_allocator);
   if (!date_tmp) {
     mg_session_set_error(session, "out of memory");
     return MG_ERROR_OOM;
@@ -611,7 +610,7 @@ int mg_session_read_time(mg_session *session, mg_time **time) {
   MG_RETURN_IF_FAILED(mg_session_check_struct_header(
       session, (uint8_t)(MG_MARKER_TINY_STRUCT + 2), MG_SIGNATURE_TIME));
   mg_time *time_tmp =
-      mg_allocator_malloc(session->decoder_allocator, sizeof(mg_time));
+      mg_time_alloc(session->decoder_allocator);
   if (!time_tmp) {
     mg_session_set_error(session, "out of memory");
     return MG_ERROR_OOM;
@@ -641,7 +640,7 @@ int mg_session_read_local_time(mg_session *session,
   MG_RETURN_IF_FAILED(mg_session_check_struct_header(
       session, (uint8_t)(MG_MARKER_TINY_STRUCT + 1), MG_SIGNATURE_LOCAL_TIME));
   mg_local_time *local_time_tmp =
-      mg_allocator_malloc(session->decoder_allocator, sizeof(mg_local_time));
+      mg_local_time_alloc(session->decoder_allocator);
   if (!local_time_tmp) {
     mg_session_set_error(session, "out of memory");
     return MG_ERROR_OOM;
@@ -665,7 +664,7 @@ int mg_session_read_date_time(mg_session *session, mg_date_time **date_time) {
   MG_RETURN_IF_FAILED(mg_session_check_struct_header(
       session, (uint8_t)(MG_MARKER_TINY_STRUCT + 3), MG_SIGNATURE_DATE_TIME));
   mg_date_time *date_time_tmp =
-      mg_allocator_malloc(session->decoder_allocator, sizeof(mg_date_time));
+      mg_date_time_alloc(session->decoder_allocator);
   if (!date_time_tmp) {
     mg_session_set_error(session, "out of memory");
     return MG_ERROR_OOM;
@@ -700,8 +699,8 @@ int mg_session_read_date_time_zone_id(
   MG_RETURN_IF_FAILED(mg_session_check_struct_header(
       session, (uint8_t)(MG_MARKER_TINY_STRUCT + 3),
       MG_SIGNATURE_DATE_TIME_ZONE_ID));
-  mg_date_time_zone_id *date_time_zone_id_tmp = mg_allocator_malloc(
-      session->decoder_allocator, sizeof(mg_date_time_zone_id));
+  mg_date_time_zone_id *date_time_zone_id_tmp = mg_date_time_zone_id_alloc(
+      session->decoder_allocator);
   if (!date_time_zone_id_tmp) {
     mg_session_set_error(session, "out of memory");
     return MG_ERROR_OOM;
@@ -734,8 +733,8 @@ int mg_session_read_local_date_time(mg_session *session,
   MG_RETURN_IF_FAILED(mg_session_check_struct_header(
       session, (uint8_t)(MG_MARKER_TINY_STRUCT + 2),
       MG_SIGNATURE_LOCAL_DATE_TIME));
-  mg_local_date_time *local_date_time_tmp = mg_allocator_malloc(
-      session->decoder_allocator, sizeof(mg_local_date_time));
+  mg_local_date_time *local_date_time_tmp = mg_local_date_time_alloc(
+      session->decoder_allocator);
   if (!local_date_time_tmp) {
     mg_session_set_error(session, "out of memory");
     return MG_ERROR_OOM;
@@ -764,7 +763,7 @@ int mg_session_read_duration(mg_session *session, mg_duration **duration) {
   MG_RETURN_IF_FAILED(mg_session_check_struct_header(
       session, (uint8_t)(MG_MARKER_TINY_STRUCT + 4), MG_SIGNATURE_DURATION));
   mg_duration *duration_tmp =
-      mg_allocator_malloc(session->decoder_allocator, sizeof(mg_duration));
+      mg_duration_alloc(session->decoder_allocator);
   if (!duration_tmp) {
     mg_session_set_error(session, "out of memory");
     return MG_ERROR_OOM;
@@ -803,7 +802,7 @@ int mg_session_read_point_2d(mg_session *session, mg_point_2d **point_2d) {
   MG_RETURN_IF_FAILED(mg_session_check_struct_header(
       session, (uint8_t)(MG_MARKER_TINY_STRUCT + 3), MG_SIGNATURE_POINT_2D));
   mg_point_2d *point_2d_tmp =
-      mg_allocator_malloc(session->decoder_allocator, sizeof(mg_point_2d));
+      mg_point_2d_alloc(session->decoder_allocator);
   if (!point_2d_tmp) {
     mg_session_set_error(session, "out of memory");
     return MG_ERROR_OOM;
@@ -837,7 +836,7 @@ int mg_session_read_point_3d(mg_session *session, mg_point_3d **point_3d) {
   MG_RETURN_IF_FAILED(mg_session_check_struct_header(
       session, (uint8_t)(MG_MARKER_TINY_STRUCT + 4), MG_SIGNATURE_POINT_2D));
   mg_point_3d *point_3d_tmp =
-      mg_allocator_malloc(session->decoder_allocator, sizeof(mg_point_3d));
+      mg_point_3d_alloc(session->decoder_allocator);
   if (!point_3d_tmp) {
     mg_session_set_error(session, "out of memory");
     return MG_ERROR_OOM;

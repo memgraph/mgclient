@@ -89,6 +89,96 @@ mg_path *mg_path_alloc(uint32_t node_count, uint32_t relationship_count,
   return path;
 }
 
+mg_date *mg_date_alloc(mg_allocator *allocator) {
+  char *block = mg_allocator_malloc(allocator, sizeof(mg_date));
+
+  if (!block) {
+    return NULL;
+  }
+  mg_date *date = (mg_date *)block;
+  return date;
+}
+
+mg_time *mg_time_alloc(mg_allocator *allocator) {
+  char *block = mg_allocator_malloc(allocator, sizeof(mg_time));
+
+  if (!block) {
+    return NULL;
+  }
+  mg_time *time = (mg_time *)block;
+  return time;
+}
+
+mg_local_time *mg_local_time_alloc(mg_allocator *allocator) {
+  char *block = mg_allocator_malloc(allocator, sizeof(mg_local_time));
+
+  if (!block) {
+    return NULL;
+  }
+  mg_local_time *local_time = (mg_local_time *)block;
+  return local_time;
+}
+
+mg_date_time *mg_date_time_alloc(mg_allocator *allocator) {
+  char *block = mg_allocator_malloc(allocator, sizeof(mg_date_time));
+
+  if (!block) {
+    return NULL;
+  }
+  mg_date_time *date_time = (mg_date_time *)block;
+  return date_time;
+}
+
+mg_date_time_zone_id *mg_date_time_zone_id_alloc(mg_allocator *allocator) {
+  char *block = mg_allocator_malloc(allocator, sizeof(mg_date_time_zone_id));
+
+  if (!block) {
+    return NULL;
+  }
+  mg_date_time_zone_id *date_time_zone_id = (mg_date_time_zone_id *)block;
+  return date_time_zone_id;
+}
+
+mg_local_date_time *mg_local_date_time_alloc(mg_allocator *allocator) {
+  char *block = mg_allocator_malloc(allocator, sizeof(mg_local_date_time));
+
+  if (!block) {
+    return NULL;
+  }
+  mg_local_date_time *local_date_time = (mg_local_date_time *)block;
+  return local_date_time;
+}
+
+mg_duration *mg_duration_alloc(mg_allocator *allocator) {
+  char *block = mg_allocator_malloc(allocator, sizeof(mg_duration));
+
+  if (!block) {
+    return NULL;
+  }
+  mg_duration *duration = (mg_duration *)block;
+  return duration;
+}
+
+mg_point_2d *mg_point_2d_alloc(mg_allocator *allocator) {
+  char *block = mg_allocator_malloc(allocator, sizeof(mg_point_2d));
+
+  if (!block) {
+    return NULL;
+  }
+  mg_point_2d *point_2d = (mg_point_2d *)block;
+  return point_2d;
+}
+
+mg_point_3d *mg_point_3d_alloc(mg_allocator *allocator) {
+  char *block = mg_allocator_malloc(allocator, sizeof(mg_point_3d));
+
+  if (!block) {
+    return NULL;
+  }
+  mg_point_3d *point_3d = (mg_point_3d *)block;
+  return point_3d;
+}
+
 mg_value *mg_value_make_null() {
   mg_value *value = mg_allocator_malloc(&mg_system_allocator, sizeof(mg_value));
   if (!value) {
@@ -422,31 +512,58 @@ mg_value *mg_value_copy_ca(const mg_value *val, mg_allocator *allocator) {
       }
       break;
     case MG_VALUE_TYPE_DATE:
-      new_val->date_v = val->date_v;
+      new_val->date_v = mg_date_copy_ca(val->date_v, allocator);
+      if (!new_val->date_v) {
+        goto cleanup;
+      }
       break;
     case MG_VALUE_TYPE_TIME:
-      new_val->time_v = val->time_v;
+      new_val->time_v = mg_time_copy_ca(val->time_v, allocator);
+      if (!new_val->time_v) {
+        goto cleanup;
+      }
       break;
     case MG_VALUE_TYPE_LOCAL_TIME:
-      new_val->local_time_v = val->local_time_v;
+      new_val->local_time_v = mg_local_time_copy_ca(val->local_time_v, allocator);
+      if (!new_val->local_time_v) {
+        goto cleanup;
+      }
       break;
     case MG_VALUE_TYPE_DATE_TIME:
-      new_val->date_time_v = val->date_time_v;
+      new_val->date_time_v = mg_date_time_copy_ca(val->date_time_v, allocator);
+      if (!new_val->date_time_v) {
+        goto cleanup;
+      }
       break;
     case MG_VALUE_TYPE_DATE_TIME_ZONE_ID:
-      new_val->date_time_zone_id_v = val->date_time_zone_id_v;
+      new_val->date_time_zone_id_v = mg_date_time_zone_id_copy_ca(val->date_time_zone_id_v, allocator);
+      if (!new_val->date_time_zone_id_v) {
+        goto cleanup;
+      }
       break;
     case MG_VALUE_TYPE_LOCAL_DATE_TIME:
-      new_val->local_date_time_v = val->local_date_time_v;
+      new_val->local_date_time_v = mg_local_date_time_copy_ca(val->local_date_time_v, allocator);
+      if (!new_val->local_date_time_v) {
+        goto cleanup;
+      }
       break;
     case MG_VALUE_TYPE_DURATION:
-      new_val->duration_v = val->duration_v;
+      new_val->duration_v = mg_duration_copy_ca(val->duration_v, allocator);
+      if (!new_val->duration_v) {
+        goto cleanup;
+      }
       break;
     case MG_VALUE_TYPE_POINT_2D:
-      new_val->point_2d_v = val->point_2d_v;
+      new_val->point_2d_v = mg_point_2d_copy_ca(val->point_2d_v, allocator);
+      if (!new_val->point_2d_v) {
+        goto cleanup;
+      }
       break;
     case MG_VALUE_TYPE_POINT_3D:
-      new_val->point_3d_v = val->point_3d_v;
+      new_val->point_3d_v = mg_point_3d_copy_ca(val->point_3d_v, allocator);
+      if (!new_val->point_3d_v) {
+        goto cleanup;
+      }
       break;
     case MG_VALUE_TYPE_UNKNOWN:
       break;
@@ -471,15 +588,33 @@ void mg_value_destroy_ca(mg_value *val, mg_allocator *allocator) {
     case MG_VALUE_TYPE_BOOL:
     case MG_VALUE_TYPE_INTEGER:
     case MG_VALUE_TYPE_FLOAT:
+      break;
     case MG_VALUE_TYPE_DATE:
+      mg_date_destroy_ca(val->date_v, allocator);
+      break;
     case MG_VALUE_TYPE_TIME:
+      mg_time_destroy_ca(val->time_v, allocator);
+      break;
     case MG_VALUE_TYPE_LOCAL_TIME:
+      mg_local_time_destroy_ca(val->local_time_v, allocator);
+      break;
     case MG_VALUE_TYPE_DATE_TIME:
+      mg_date_time_destroy_ca(val->date_time_v, allocator);
+      break;
     case MG_VALUE_TYPE_DATE_TIME_ZONE_ID:
+      mg_date_time_zone_id_destroy_ca(val->date_time_zone_id_v, allocator);
+      break;
     case MG_VALUE_TYPE_LOCAL_DATE_TIME:
+      mg_local_date_time_destroy_ca(val->local_date_time_v, allocator);
+      break;
     case MG_VALUE_TYPE_DURATION:
+      mg_duration_destroy_ca(val->duration_v, allocator);
+      break;
     case MG_VALUE_TYPE_POINT_2D:
+      mg_point_2d_destroy_ca(val->point_2d_v, allocator);
+      break;
     case MG_VALUE_TYPE_POINT_3D:
+      mg_point_3d_destroy_ca(val->point_3d_v, allocator);
       break;
     case MG_VALUE_TYPE_STRING:
       mg_string_destroy_ca(val->string_v, allocator);
@@ -1185,6 +1320,249 @@ double mg_point_3d_y(const mg_point_3d *point_3d) { return point_3d->y; }
 
 double mg_point_3d_z(const mg_point_3d *point_3d) { return point_3d->z; }
 
+mg_date *mg_date_copy_ca(const mg_date *src, mg_allocator *allocator) {
+  if (!src) {
+    return NULL;
+  }
+  mg_date *date = mg_date_alloc(allocator);
+  if (!date) {
+    return NULL;
+  }
+  memcpy(date, src, sizeof(mg_date));
+  return date;
+}
+
+mg_date *mg_date_copy(const mg_date *date) {
+  return mg_date_copy_ca(date, &mg_system_allocator);
+}
+
+void mg_date_destroy_ca(mg_date *date, mg_allocator *allocator) {
+  if (!date) {
+    return;
+  }
+  mg_allocator_free(allocator, date);
+}
+
+void mg_date_destroy(mg_date *date) {
+  mg_date_destroy_ca(date, &mg_system_allocator);
+}
+
+mg_time *mg_time_copy_ca(const mg_time *src, mg_allocator *allocator) {
+  if (!src) {
+    return NULL;
+  }
+  mg_time *time = mg_time_alloc(allocator);
+  if (!time) {
+    return NULL;
+  }
+  memcpy(time, src, sizeof(mg_time));
+  return time;
+}
+
+mg_time *mg_time_copy(const mg_time *time) {
+  return mg_time_copy_ca(time, &mg_system_allocator);
+}
+
+void mg_time_destroy_ca(mg_time *time, mg_allocator *allocator) {
+  if (!time) {
+    return;
+  }
+  mg_allocator_free(allocator, time);
+}
+
+void mg_time_destroy(mg_time *time) {
+  mg_time_destroy_ca(time, &mg_system_allocator);
+}
+
+mg_local_time *mg_local_time_copy_ca(const mg_local_time *src, mg_allocator *allocator) {
+  if (!src) {
+    return NULL;
+  }
+  mg_local_time *local_time = mg_local_time_alloc(allocator);
+  if (!local_time) {
+    return NULL;
+  }
+  memcpy(local_time, src, sizeof(mg_local_time));
+  return local_time;
+}
+
+mg_local_time *mg_local_time_copy(const mg_local_time *local_time) {
+  return mg_local_time_copy_ca(local_time, &mg_system_allocator);
+}
+
+void mg_local_time_destroy_ca(mg_local_time *local_time, mg_allocator *allocator) {
+  if (!local_time) {
+    return;
+  }
+  mg_allocator_free(allocator, local_time);
+}
+
+void mg_local_time_destroy(mg_local_time *local_time) {
+  mg_local_time_destroy_ca(local_time, &mg_system_allocator);
+}
+
+mg_date_time *mg_date_time_copy_ca(const mg_date_time *src, mg_allocator *allocator) {
+  if (!src) {
+    return NULL;
+  }
+  mg_date_time *date_time = mg_date_time_alloc(allocator);
+  if (!date_time) {
+    return NULL;
+  }
+  memcpy(date_time, src, sizeof(mg_date_time));
+  return date_time;
+}
+
+mg_date_time *mg_date_time_copy(const mg_date_time *date_time) {
+  return mg_date_time_copy_ca(date_time, &mg_system_allocator);
+}
+
+void mg_date_time_destroy_ca(mg_date_time *date_time, mg_allocator *allocator) {
+  if (!date_time) {
+    return;
+  }
+  mg_allocator_free(allocator, date_time);
+}
+
+void mg_date_time_destroy(mg_date_time *date_time) {
+  mg_date_time_destroy_ca(date_time, &mg_system_allocator);
+}
+
+mg_date_time_zone_id *mg_date_time_zone_id_copy_ca(const mg_date_time_zone_id *src, mg_allocator *allocator) {
+  if (!src) {
+    return NULL;
+  }
+  mg_date_time_zone_id *date_time_zone_id = mg_date_time_zone_id_alloc(allocator);
+  if (!date_time_zone_id) {
+    return NULL;
+  }
+  memcpy(date_time_zone_id, src, sizeof(mg_date_time_zone_id));
+  return date_time_zone_id;
+}
+
+mg_date_time_zone_id *mg_date_time_zone_id_copy(const mg_date_time_zone_id *date_time_zone_id) {
+  return mg_date_time_zone_id_copy_ca(date_time_zone_id, &mg_system_allocator);
+}
+
+void mg_date_time_zone_id_destroy_ca(mg_date_time_zone_id *date_time_zone_id, mg_allocator *allocator) {
+  if (!date_time_zone_id) {
+    return;
+  }
+  mg_allocator_free(allocator, date_time_zone_id);
+}
+
+void mg_date_time_zone_id_destroy(mg_date_time_zone_id *date_time_zone_id) {
+  mg_date_time_zone_id_destroy_ca(date_time_zone_id, &mg_system_allocator);
+}
+
+mg_local_date_time *mg_local_date_time_copy_ca(const mg_local_date_time *src, mg_allocator *allocator) {
+  if (!src) {
+    return NULL;
+  }
+  mg_local_date_time *local_date_time = mg_local_date_time_alloc(allocator);
+  if (!local_date_time) {
+    return NULL;
+  }
+  memcpy(local_date_time, src, sizeof(mg_local_date_time));
+  return local_date_time;
+}
+
+mg_local_date_time *mg_local_date_time_copy(const mg_local_date_time *local_date_time) {
+  return mg_local_date_time_copy_ca(local_date_time, &mg_system_allocator);
+}
+
+void mg_local_date_time_destroy_ca(mg_local_date_time *local_date_time, mg_allocator *allocator) {
+  if (!local_date_time) {
+    return;
+  }
+  mg_allocator_free(allocator, local_date_time);
+}
+
+void mg_local_date_time_destroy(mg_local_date_time *local_date_time) {
+  mg_local_date_time_destroy_ca(local_date_time, &mg_system_allocator);
+}
+
+mg_duration *mg_duration_copy_ca(const mg_duration *src, mg_allocator *allocator) {
+  if (!src) {
+    return NULL;
+  }
+  mg_duration *duration = mg_duration_alloc(allocator);
+  if (!duration) {
+    return NULL;
+  }
+  memcpy(duration, src, sizeof(mg_duration));
+  return duration;
+}
+
+mg_duration *mg_duration_copy(const mg_duration *duration) {
+  return mg_duration_copy_ca(duration, &mg_system_allocator);
+}
+
+void mg_duration_destroy_ca(mg_duration *duration, mg_allocator *allocator) {
+  if (!duration) {
+    return;
+  }
+  mg_allocator_free(allocator, duration);
+}
+
+void mg_duration_destroy(mg_duration *duration) {
+  mg_duration_destroy_ca(duration, &mg_system_allocator);
+}
+
+mg_point_2d *mg_point_2d_copy_ca(const mg_point_2d *src, mg_allocator *allocator) {
+  if (!src) {
+    return NULL;
+  }
+  mg_point_2d *point_2d = mg_point_2d_alloc(allocator);
+  if (!point_2d) {
+    return NULL;
+  }
+  memcpy(point_2d, src, sizeof(mg_point_2d));
+  return point_2d;
+}
+
+mg_point_2d *mg_point_2d_copy(const mg_point_2d *point_2d) {
+  return mg_point_2d_copy_ca(point_2d, &mg_system_allocator);
+}
+
+void mg_point_2d_destroy_ca(mg_point_2d *point_2d, mg_allocator *allocator) {
+  if (!point_2d) {
+    return;
+  }
+  mg_allocator_free(allocator, point_2d);
+}
+
+void mg_point_2d_destroy(mg_point_2d *point_2d) {
+  mg_point_2d_destroy_ca(point_2d, &mg_system_allocator);
+}
+
+mg_point_3d *mg_point_3d_copy_ca(const mg_point_3d *src, mg_allocator *allocator) {
+  if (!src) {
+    return NULL;
+  }
+  mg_point_3d *point_3d = mg_point_3d_alloc(allocator);
+  if (!point_3d) {
+    return NULL;
+  }
+  memcpy(point_3d, src, sizeof(mg_point_3d));
+  return point_3d;
+}
+
+mg_point_3d *mg_point_3d_copy(const mg_point_3d *point_3d) {
+  return mg_point_3d_copy_ca(point_3d, &mg_system_allocator);
+}
+
+void mg_point_3d_destroy_ca(mg_point_3d *point_3d, mg_allocator *allocator) {
+  if (!point_3d) {
+    return;
+  }
+  mg_allocator_free(allocator, point_3d);
+}
+
+void mg_point_3d_destroy(mg_point_3d *point_3d) {
+  mg_point_3d_destroy_ca(point_3d, &mg_system_allocator);
+}
+
 mg_node *mg_node_make(int64_t id, uint32_t label_count, mg_string **labels,
                       mg_map *properties) {
   mg_node *node = mg_node_alloc(label_count, &mg_system_allocator);
@@ -1328,6 +1706,56 @@ int mg_path_equal(const mg_path *lhs, const mg_path *rhs) {
   return 1;
 }
 
+int mg_date_equal(const mg_date *lhs, const mg_date *rhs) {
+  return lhs->days == rhs->days;
+}
+
+int mg_time_equal(const mg_time *lhs, const mg_time *rhs) {
+  return lhs->nanoseconds == rhs->nanoseconds &&
+         lhs->tz_offset_seconds == rhs->tz_offset_seconds;
+}
+
+int mg_local_time_equal(const mg_local_time *lhs, const mg_local_time *rhs) {
+  return lhs->nanoseconds == rhs->nanoseconds;
+}
+
+int mg_date_time_equal(const mg_date_time *lhs, const mg_date_time *rhs) {
+  return lhs->seconds == rhs->seconds &&
+         lhs->nanoseconds == rhs->nanoseconds &&
+         lhs->tz_offset_minutes == rhs->tz_offset_minutes;
+}
+
+int mg_local_date_time_equal(const mg_local_date_time *lhs, const mg_local_date_time *rhs) {
+  return lhs->seconds == rhs->seconds &&
+         lhs->nanoseconds == rhs->nanoseconds;
+}
+
+int mg_date_time_zone_id_equal(const mg_date_time_zone_id *lhs, const mg_date_time_zone_id *rhs) {
+  return lhs->seconds == rhs->seconds &&
+         lhs->nanoseconds == rhs->nanoseconds &&
+         lhs->tz_id == rhs->tz_id; 
+}
+
+int mg_duration_equal(const mg_duration *lhs, const mg_duration *rhs) {
+  return lhs->days == rhs->days &&
+         lhs->months == rhs->months &&
+         lhs->seconds == rhs->seconds &&
+         lhs->nanoseconds == rhs->nanoseconds;
+}
+
+int mg_point_2d_equal(const mg_point_2d *lhs, const mg_point_2d *rhs) {
+  return lhs->srid == rhs->srid &&
+         lhs->x == rhs->x &&
+         lhs->y == rhs->y;
+}
+
+int mg_point_3d_equal(const mg_point_3d *lhs, const mg_point_3d *rhs) {
+  return lhs->srid == rhs->srid &&
+         lhs->x == rhs->x &&
+         lhs->y == rhs->y &&
+         lhs->z == rhs->z;
+}
+
 int mg_value_equal(const mg_value *lhs, const mg_value *rhs) {
   if (lhs->type != rhs->type) {
     return 0;
@@ -1368,23 +1796,23 @@ int mg_value_equal(const mg_value *lhs, const mg_value *rhs) {
     case MG_VALUE_TYPE_PATH:
       return mg_path_equal(lhs->path_v, rhs->path_v);
     case MG_VALUE_TYPE_DATE:
-      return lhs->date_v == rhs->date_v;
+      return mg_date_equal(lhs->date_v, rhs->date_v);
     case MG_VALUE_TYPE_TIME:
-      return lhs->time_v == rhs->time_v;
+      return mg_time_equal(lhs->time_v, rhs->time_v);
     case MG_VALUE_TYPE_LOCAL_TIME:
-      return lhs->local_time_v == rhs->local_time_v;
+      return mg_local_time_equal(lhs->local_time_v, rhs->local_time_v);
     case MG_VALUE_TYPE_DATE_TIME:
-      return lhs->date_time_v == rhs->date_time_v;
+      return mg_date_time_equal(lhs->date_time_v, rhs->date_time_v);
     case MG_VALUE_TYPE_DATE_TIME_ZONE_ID:
-      return lhs->date_time_zone_id_v == rhs->date_time_zone_id_v;
+      return mg_date_time_zone_id_equal(lhs->date_time_zone_id_v, rhs->date_time_zone_id_v);
     case MG_VALUE_TYPE_LOCAL_DATE_TIME:
-      return lhs->local_date_time_v == rhs->local_date_time_v;
+      return mg_local_date_time_equal(lhs->local_date_time_v, rhs->local_date_time_v);
     case MG_VALUE_TYPE_DURATION:
-      return lhs->duration_v == rhs->duration_v;
+      return mg_duration_equal(lhs->duration_v, rhs->duration_v);
     case MG_VALUE_TYPE_POINT_2D:
-      return lhs->point_2d_v == rhs->point_2d_v;
+      return mg_point_2d_equal(lhs->point_2d_v, rhs->point_2d_v);
     case MG_VALUE_TYPE_POINT_3D:
-      return lhs->point_3d_v == rhs->point_3d_v;
+      return mg_point_3d_equal(lhs->point_3d_v, rhs->point_3d_v);
     case MG_VALUE_TYPE_UNKNOWN:
       return 0;
   }

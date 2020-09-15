@@ -220,6 +220,7 @@ typedef struct mg_unbound_relationship mg_unbound_relationship;
 /// data graph.
 typedef struct mg_path mg_path;
 
+/// Date
 typedef struct mg_date mg_date;
 
 typedef struct mg_time mg_time;
@@ -752,55 +753,91 @@ MGCLIENT_EXPORT mg_path *mg_path_copy(const mg_path *path);
 /// Destroys the given path.
 MGCLIENT_EXPORT void mg_path_destroy(mg_path *path);
 
-int64_t mg_date_days(const mg_date *date);
+MGCLIENT_EXPORT int64_t mg_date_days(const mg_date *date);
 
-int64_t mg_time_nanoseconds(const mg_time *time);
+MGCLIENT_EXPORT mg_date *mg_date_copy(const mg_date *date);
 
-int64_t mg_time_tz_offset_seconds(const mg_time *time);
+MGCLIENT_EXPORT void mg_date_destroy(mg_date *date);
 
-int64_t mg_local_time_nanoseconds(const mg_local_time *local_time);
+MGCLIENT_EXPORT int64_t mg_time_nanoseconds(const mg_time *time);
 
-int64_t mg_date_time_seconds(const mg_date_time *date_time);
+MGCLIENT_EXPORT int64_t mg_time_tz_offset_seconds(const mg_time *time);
 
-int64_t mg_date_time_nanoseconds(const mg_date_time *date_time);
+MGCLIENT_EXPORT mg_time *mg_time_copy(const mg_time *time);
 
-int64_t mg_date_time_tz_offset_minutes(const mg_date_time *date_time);
+MGCLIENT_EXPORT void mg_time_destroy(mg_time *time);
 
-int64_t mg_date_time_zone_id_seconds(
-    const mg_date_time_zone_id *date_time_zone_id);
+MGCLIENT_EXPORT int64_t mg_local_time_nanoseconds(const mg_local_time *local_time);
 
-int64_t mg_date_time_zone_id_nanoseconds(
-    const mg_date_time_zone_id *date_time_zone_id);
+MGCLIENT_EXPORT mg_local_time *mg_local_time_copy(const mg_local_time *local_time);
 
-int64_t mg_date_time_zone_id_tz_id(
-    const mg_date_time_zone_id *date_time_zone_id);
+MGCLIENT_EXPORT void mg_local_time_destroy(mg_local_time *local_time);
 
-int64_t mg_local_date_time_seconds(const mg_local_date_time *local_date_time);
+MGCLIENT_EXPORT int64_t mg_date_time_seconds(const mg_date_time *date_time);
 
-int64_t mg_local_date_time_nanoseconds(
-    const mg_local_date_time *local_date_time);
+MGCLIENT_EXPORT int64_t mg_date_time_nanoseconds(const mg_date_time *date_time);
 
-int64_t mg_duration_months(const mg_duration *duration);
+MGCLIENT_EXPORT int64_t mg_date_time_tz_offset_minutes(const mg_date_time *date_time);
 
-int64_t mg_duration_days(const mg_duration *duration);
+MGCLIENT_EXPORT mg_date_time *mg_date_time_copy(const mg_date_time *date_time);
 
-int64_t mg_duration_seconds(const mg_duration *duration);
+MGCLIENT_EXPORT void mg_date_time_destroy(mg_date_time *date_time);
 
-int64_t mg_duration_nanoseconds(const mg_duration *duration);
+MGCLIENT_EXPORT int64_t mg_date_time_zone_id_seconds(
+                    const mg_date_time_zone_id *date_time_zone_id);
 
-int64_t mg_point_2d_srid(const mg_point_2d *point_2d);
+MGCLIENT_EXPORT int64_t mg_date_time_zone_id_nanoseconds(
+                    const mg_date_time_zone_id *date_time_zone_id);
 
-double mg_point_2d_x(const mg_point_2d *point_2d);
+MGCLIENT_EXPORT int64_t mg_date_time_zone_id_tz_id(
+                    const mg_date_time_zone_id *date_time_zone_id);
 
-double mg_point_2d_y(const mg_point_2d *point_2d);
+MGCLIENT_EXPORT mg_date_time_zone_id *mg_date_time_zone_id_copy(const mg_date_time_zone_id *date_time_zone_id);
 
-int64_t mg_point_3d_srid(const mg_point_3d *point_3d);
+MGCLIENT_EXPORT void mg_date_time_zone_id_destroy(mg_date_time_zone_id *date_time_zone_id);
 
-double mg_point_3d_x(const mg_point_3d *point_3d);
+MGCLIENT_EXPORT int64_t mg_local_date_time_seconds(const mg_local_date_time *local_date_time);
 
-double mg_point_3d_y(const mg_point_3d *point_3d);
+MGCLIENT_EXPORT int64_t mg_local_date_time_nanoseconds(
+                    const mg_local_date_time *local_date_time);
 
-double mg_point_3d_z(const mg_point_3d *point_3d);
+MGCLIENT_EXPORT mg_local_date_time *mg_local_date_time_copy(const mg_local_date_time *local_date_time);
+
+MGCLIENT_EXPORT void mg_local_date_time_destroy(mg_local_date_time *local_date_time);
+
+MGCLIENT_EXPORT int64_t mg_duration_months(const mg_duration *duration);
+
+MGCLIENT_EXPORT int64_t mg_duration_days(const mg_duration *duration);
+
+MGCLIENT_EXPORT int64_t mg_duration_seconds(const mg_duration *duration);
+
+MGCLIENT_EXPORT int64_t mg_duration_nanoseconds(const mg_duration *duration);
+
+MGCLIENT_EXPORT mg_duration *mg_duration_copy(const mg_duration *duration);
+
+MGCLIENT_EXPORT void mg_duration_destroy(mg_duration *duration);
+
+MGCLIENT_EXPORT int64_t mg_point_2d_srid(const mg_point_2d *point_2d);
+
+MGCLIENT_EXPORT double mg_point_2d_x(const mg_point_2d *point_2d);
+
+MGCLIENT_EXPORT double mg_point_2d_y(const mg_point_2d *point_2d);
+
+MGCLIENT_EXPORT mg_point_2d *mg_point_2d_copy(const mg_point_2d *point_2d);
+
+MGCLIENT_EXPORT void mg_point_2d_destroy(mg_point_2d *point_2d);
+
+MGCLIENT_EXPORT int64_t mg_point_3d_srid(const mg_point_3d *point_3d);
+
+MGCLIENT_EXPORT double mg_point_3d_x(const mg_point_3d *point_3d);
+
+MGCLIENT_EXPORT double mg_point_3d_y(const mg_point_3d *point_3d);
+
+MGCLIENT_EXPORT double mg_point_3d_z(const mg_point_3d *point_3d);
+
+MGCLIENT_EXPORT mg_point_3d *mg_point_3d_copy(const mg_point_3d *point_3d);
+
+MGCLIENT_EXPORT void mg_point_3d_destroy(mg_point_3d *point_3d);
 
 /// Marks a \ref mg_session ready to execute a new query using \ref
 /// mg_session_run.

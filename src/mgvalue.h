@@ -155,6 +155,24 @@ mg_node *mg_node_alloc(uint32_t label_count, mg_allocator *allocator);
 mg_path *mg_path_alloc(uint32_t node_count, uint32_t relationship_count,
                        uint32_t sequence_length, mg_allocator *allocator);
 
+mg_date *mg_date_alloc(mg_allocator *allocator);
+
+mg_time *mg_time_alloc(mg_allocator *allocator);
+
+mg_local_time *mg_local_time_alloc(mg_allocator *allocator);
+
+mg_date_time *mg_date_time_alloc(mg_allocator *allocator);
+
+mg_date_time_zone_id *mg_date_time_zone_id_alloc(mg_allocator *allocator);
+
+mg_local_date_time *mg_local_date_time_alloc(mg_allocator *allocator);
+
+mg_duration *mg_duration_alloc(mg_allocator *allocator);
+
+mg_point_2d *mg_point_2d_alloc(mg_allocator *allocator);
+
+mg_point_3d *mg_point_3d_alloc(mg_allocator *allocator);
+
 mg_node *mg_node_make(int64_t id, uint32_t label_count, mg_string **labels,
                       mg_map *properties);
 
@@ -189,6 +207,24 @@ mg_unbound_relationship *mg_unbound_relationship_copy_ca(
 
 mg_path *mg_path_copy_ca(const mg_path *path, mg_allocator *allocator);
 
+mg_date *mg_date_copy_ca(const mg_date *date, mg_allocator *allocator);
+
+mg_time *mg_time_copy_ca(const mg_time *time, mg_allocator *allocator);
+
+mg_local_time *mg_local_time_copy_ca(const mg_local_time *local_time, mg_allocator *allocator);
+
+mg_date_time *mg_date_time_copy_ca(const mg_date_time *date_time, mg_allocator *allocator);
+
+mg_date_time_zone_id *mg_date_time_zone_id_copy_ca(const mg_date_time_zone_id *date_time_zone_id, mg_allocator *allocator);
+
+mg_local_date_time *mg_local_date_time_copy_ca(const mg_local_date_time *local_date_time, mg_allocator *allocator);
+
+mg_duration *mg_duration_copy_ca(const mg_duration *duration, mg_allocator *allocator);
+
+mg_point_2d *mg_point_2d_copy_ca(const mg_point_2d *point_2d, mg_allocator *allocator);
+
+mg_point_3d *mg_point_3d_copy_ca(const mg_point_3d *point_3d, mg_allocator *allocator);
+
 void mg_path_destroy_ca(mg_path *path, mg_allocator *allocator);
 
 void mg_value_destroy_ca(mg_value *val, mg_allocator *allocator);
@@ -207,6 +243,24 @@ void mg_unbound_relationship_destroy_ca(mg_unbound_relationship *rel,
                                         mg_allocator *allocator);
 
 void mg_path_destroy_ca(mg_path *path, mg_allocator *allocator);
+
+void mg_date_destroy_ca(mg_date *date, mg_allocator *allocator);
+
+void mg_time_destroy_ca(mg_time *time, mg_allocator *allocator);
+
+void mg_local_time_destroy_ca(mg_local_time *local_time, mg_allocator *allocator);
+
+void mg_date_time_destroy_ca(mg_date_time *date_time, mg_allocator *allocator);
+
+void mg_date_time_zone_id_destroy_ca(mg_date_time_zone_id *date_time_zone_id, mg_allocator *allocator);
+
+void mg_local_date_time_destroy_ca(mg_local_date_time *local_date_time, mg_allocator *allocator);
+
+void mg_duration_destroy_ca(mg_duration *duration, mg_allocator *allocator);
+
+void mg_point_2d_destroy_ca(mg_point_2d *point_2d, mg_allocator *allocator);
+
+void mg_point_3d_destroy_ca(mg_point_3d *point_3d, mg_allocator *allocator);
 
 int mg_string_equal(const mg_string *lhs, const mg_string *rhs);
 
