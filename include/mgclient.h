@@ -220,23 +220,58 @@ typedef struct mg_unbound_relationship mg_unbound_relationship;
 /// data graph.
 typedef struct mg_path mg_path;
 
-/// Date
+/// \brief Represents a date.
+/// 
+/// Date is defined with number of days since the Unix epoch.
 typedef struct mg_date mg_date;
 
+/// \brief Represents time with its time zone.
+///
+/// Time is defined with nanoseconds since midnight.
+/// Timezone is defined with seconds from UTC.
 typedef struct mg_time mg_time;
 
+/// \brief Represents local time.
+///
+/// Time is defined with nanoseconds since midnight.
 typedef struct mg_local_time mg_local_time;
 
+/// \brief Represents date and time with its time zone.
+///
+/// Date is defined with seconds since the adjusted Unix epoch.
+/// Time is defined with nanoseconds since midnight.
+/// Time zone is defined with minutes from UTC.
 typedef struct mg_date_time mg_date_time;
 
+/// \brief Represents date and time with its time zone.
+///
+/// Date is defined with seconds since the adjusted Unix epoch.
+/// Time is defined with nanoseconds since midnight.
+/// Timezone is defined with an identifier for a specific time zone.
 typedef struct mg_date_time_zone_id mg_date_time_zone_id;
 
+/// \brief Represents date and time without its time zone.
+///
+/// Date is defined with seconds since the Unix epoch.
+/// Time is defined with nanoseconds since midnight.
 typedef struct mg_local_date_time mg_local_date_time;
 
+/// \brief Represents a temporal amount which captures the difference in time between
+/// two instants.
+///
+/// Duration is defined with months, days, seconds, and nanoseconds.
+/// \note
+/// Duration can be negative.
 typedef struct mg_duration mg_duration;
 
+/// \brief Represents a single location in 2-dimensional space.
+/// 
+/// Contains SRID along with its x and y coordinates.
 typedef struct mg_point_2d mg_point_2d;
 
+/// \brief Represents a single location in 3-dimensional space.
+/// 
+/// Contains SRID along with its x, y and z coordinates.
 typedef struct mg_point_3d mg_point_3d;
 
 /// Constructs a nil \ref mg_value.
@@ -309,24 +344,51 @@ MGCLIENT_EXPORT mg_value *mg_value_make_unbound_relationship(
 /// \return Pointer to the newly constructed value or NULL if error occurred.
 MGCLIENT_EXPORT mg_value *mg_value_make_path(mg_path *path);
 
+/// Constructs a date \ref mg_value given the underlying \ref mg_date.
+///
+/// \return Pointer to the newly constructed value or NULL if error occurred.
 MGCLIENT_EXPORT mg_value *mg_value_make_date(mg_date *date);
 
+/// Constructs a time \ref mg_value given the underlying \ref mg_time.
+///
+/// \return Pointer to the newly constructed value or NULL if error occurred.
 MGCLIENT_EXPORT mg_value *mg_value_make_time(mg_time *time);
 
+/// Constructs a local time \ref mg_value given the underlying \ref mg_local_time.
+///
+/// \return Pointer to the newly constructed value or NULL if error occurred.
 MGCLIENT_EXPORT mg_value *mg_value_make_local_time(mg_local_time *local_time);
 
+/// Constructs a date and time \ref mg_value given the underlying \ref mg_date_time.
+///
+/// \return Pointer to the newly constructed value or NULL if error occurred.
 MGCLIENT_EXPORT mg_value *mg_value_make_date_time(mg_date_time *date_time);
 
+/// Constructs a date and time \ref mg_value given the underlying \ref mg_date_time_zone_id.
+///
+/// \return Pointer to the newly constructed value or NULL if error occurred.
 MGCLIENT_EXPORT mg_value *mg_value_make_date_time_zone_id(
     mg_date_time_zone_id *date_time_zone_id);
 
+/// Constructs a local date and time \ref mg_value given the underlying \ref mg_local_date_time.
+///
+/// \return Pointer to the newly constructed value or NULL if error occurred.
 MGCLIENT_EXPORT mg_value *mg_value_make_local_date_time(
     mg_local_date_time *local_date_time);
 
+/// Constructs a duration \ref mg_value given the underlying \ref mg_duration.
+///
+/// \return Pointer to the newly constructed value or NULL if error occurred.
 MGCLIENT_EXPORT mg_value *mg_value_make_duration(mg_duration *duration);
 
+/// Constructs a 2D point \ref mg_value given the underlying \ref mg_point_2d.
+///
+/// \return Pointer to the newly constructed value or NULL if error occurred.
 MGCLIENT_EXPORT mg_value *mg_value_make_point_2d(mg_point_2d *point_2d);
 
+/// Constructs a 3D point \ref mg_value given the underlying \ref mg_point_3d.
+///
+/// \return Pointer to the newly constructed value or NULL if error occurred.
 MGCLIENT_EXPORT mg_value *mg_value_make_point_3d(mg_point_3d *point_3d);
 
 /// Returns the type of the given \ref mg_value.
@@ -394,24 +456,60 @@ MGCLIENT_EXPORT const mg_unbound_relationship *mg_value_unbound_relationship(
 /// undefined behavior.
 MGCLIENT_EXPORT const mg_path *mg_value_path(const mg_value *val);
 
+/// Returns the underlying \ref mg_date value.
+///
+/// Type check should be made first. Accessing the wrong value results in
+/// undefined behavior.
 MGCLIENT_EXPORT const mg_date *mg_value_date(const mg_value *val);
 
+/// Returns the underlying \ref mg_time value.
+///
+/// Type check should be made first. Accessing the wrong value results in
+/// undefined behavior.
 MGCLIENT_EXPORT const mg_time *mg_value_time(const mg_value *val);
 
+/// Returns the underlying \ref mg_local_time value.
+///
+/// Type check should be made first. Accessing the wrong value results in
+/// undefined behavior.
 MGCLIENT_EXPORT const mg_local_time *mg_value_local_time(const mg_value *val);
 
+/// Returns the underlying \ref mg_date_time value.
+///
+/// Type check should be made first. Accessing the wrong value results in
+/// undefined behavior.
 MGCLIENT_EXPORT const mg_date_time *mg_value_date_time(const mg_value *val);
 
+/// Returns the underlying \ref mg_date_time_zone_id value.
+///
+/// Type check should be made first. Accessing the wrong value results in
+/// undefined behavior.
 MGCLIENT_EXPORT const mg_date_time_zone_id *mg_value_date_time_zone_id(
     const mg_value *val);
 
+/// Returns the underlying \ref mg_local_date_time value.
+///
+/// Type check should be made first. Accessing the wrong value results in
+/// undefined behavior.
 MGCLIENT_EXPORT const mg_local_date_time *mg_value_local_date_time(
     const mg_value *val);
 
+/// Returns the underlying \ref mg_duration value.
+///
+/// Type check should be made first. Accessing the wrong value results in
+/// undefined behavior.
 MGCLIENT_EXPORT const mg_duration *mg_value_duration(const mg_value *val);
 
+/// Returns the underlying \ref mg_point_2d value.
+///
+/// Type check should be made first. Accessing the wrong value results in
+/// undefined behavior.
 MGCLIENT_EXPORT const mg_point_2d *mg_value_point_2d(const mg_value *val);
 
+/// Returns the underlying \ref mg_point_3d value.
+///
+/// Type check should be made first. Accessing the wrong value results in
+/// undefined behavior.
 MGCLIENT_EXPORT const mg_point_3d *mg_value_point_3d(const mg_value *val);
 
 /// Creates a copy of the given value.
@@ -753,98 +851,157 @@ MGCLIENT_EXPORT mg_path *mg_path_copy(const mg_path *path);
 /// Destroys the given path.
 MGCLIENT_EXPORT void mg_path_destroy(mg_path *path);
 
+/// Returns days since the Unix epoch.
 MGCLIENT_EXPORT int64_t mg_date_days(const mg_date *date);
 
+/// Creates a copy of the given date.
+///
+/// \return A pointer to the copy or NULL if an error occured. 
 MGCLIENT_EXPORT mg_date *mg_date_copy(const mg_date *date);
 
+/// Destroys the given date.
 MGCLIENT_EXPORT void mg_date_destroy(mg_date *date);
 
+/// Returns nanoseconds since midnight.
 MGCLIENT_EXPORT int64_t mg_time_nanoseconds(const mg_time *time);
 
+/// Returns time zone offset in seconds from UTC.
 MGCLIENT_EXPORT int64_t mg_time_tz_offset_seconds(const mg_time *time);
 
+/// Creates a copy of the given time.
+///
+/// \return A pointer to the copy or NULL if an error occured. 
 MGCLIENT_EXPORT mg_time *mg_time_copy(const mg_time *time);
 
+/// Destroys the given time.
 MGCLIENT_EXPORT void mg_time_destroy(mg_time *time);
 
+/// Returns nanoseconds since midnight.
 MGCLIENT_EXPORT int64_t
 mg_local_time_nanoseconds(const mg_local_time *local_time);
 
+/// Creates a copy of the given local time.
+///
+/// \return A pointer to the copy or NULL if an error occured. 
 MGCLIENT_EXPORT mg_local_time *mg_local_time_copy(
     const mg_local_time *local_time);
 
+/// Destroys the given local time.
 MGCLIENT_EXPORT void mg_local_time_destroy(mg_local_time *local_time);
 
+/// Returns seconds since Unix epoch.
 MGCLIENT_EXPORT int64_t mg_date_time_seconds(const mg_date_time *date_time);
 
+/// Returns nanoseconds since midnight.
 MGCLIENT_EXPORT int64_t mg_date_time_nanoseconds(const mg_date_time *date_time);
 
+/// Returns time zone offset in minutes from UTC.
 MGCLIENT_EXPORT int64_t
 mg_date_time_tz_offset_minutes(const mg_date_time *date_time);
 
+/// Creates a copy of the given date and time.
+///
+/// \return A pointer to the copy or NULL if an error occured. 
 MGCLIENT_EXPORT mg_date_time *mg_date_time_copy(const mg_date_time *date_time);
 
+/// Destroys the given date and time.
 MGCLIENT_EXPORT void mg_date_time_destroy(mg_date_time *date_time);
 
+/// Returns seconds since Unix epoch.
 MGCLIENT_EXPORT int64_t
 mg_date_time_zone_id_seconds(const mg_date_time_zone_id *date_time_zone_id);
 
+/// Returns nanoseconds since midnight.
 MGCLIENT_EXPORT int64_t
 mg_date_time_zone_id_nanoseconds(const mg_date_time_zone_id *date_time_zone_id);
 
+/// Returns time zone represented by the identifier.
 MGCLIENT_EXPORT int64_t
 mg_date_time_zone_id_tz_id(const mg_date_time_zone_id *date_time_zone_id);
 
+/// Creates a copy of the given date and time.
+///
+/// \return A pointer to the copy or NULL if an error occured. 
 MGCLIENT_EXPORT mg_date_time_zone_id *mg_date_time_zone_id_copy(
     const mg_date_time_zone_id *date_time_zone_id);
 
+/// Destroys the given date and time.
 MGCLIENT_EXPORT void mg_date_time_zone_id_destroy(
     mg_date_time_zone_id *date_time_zone_id);
 
+/// Returns seconds since Unix epoch.
 MGCLIENT_EXPORT int64_t
 mg_local_date_time_seconds(const mg_local_date_time *local_date_time);
 
+/// Returns nanoseconds since midnight.
 MGCLIENT_EXPORT int64_t
 mg_local_date_time_nanoseconds(const mg_local_date_time *local_date_time);
 
+/// Creates a copy of the given local date and time.
+///
+/// \return A pointer to the copy or NULL if an error occured. 
 MGCLIENT_EXPORT mg_local_date_time *mg_local_date_time_copy(
     const mg_local_date_time *local_date_time);
 
+/// Destroy the given local date and time.
 MGCLIENT_EXPORT void mg_local_date_time_destroy(
     mg_local_date_time *local_date_time);
 
+/// Returns the months part of the temporal amount.
 MGCLIENT_EXPORT int64_t mg_duration_months(const mg_duration *duration);
 
+/// Returns the days part of the temporal amount.
 MGCLIENT_EXPORT int64_t mg_duration_days(const mg_duration *duration);
 
+/// Returns the seconds part of the temporal amount.
 MGCLIENT_EXPORT int64_t mg_duration_seconds(const mg_duration *duration);
 
+/// Returns the nanoseconds part of the temporal amount.
 MGCLIENT_EXPORT int64_t mg_duration_nanoseconds(const mg_duration *duration);
 
+/// Creates a copy of the given duration.
+///
+/// \return A pointer to the copy or NULL if an error occured. 
 MGCLIENT_EXPORT mg_duration *mg_duration_copy(const mg_duration *duration);
 
+/// Destroy the given duration.
 MGCLIENT_EXPORT void mg_duration_destroy(mg_duration *duration);
 
+/// Returns SRID of the 2D point.
 MGCLIENT_EXPORT int64_t mg_point_2d_srid(const mg_point_2d *point_2d);
 
+/// Returns the x coordinate of the 2D point.
 MGCLIENT_EXPORT double mg_point_2d_x(const mg_point_2d *point_2d);
 
+/// Returns the y coordinate of the 2D point.
 MGCLIENT_EXPORT double mg_point_2d_y(const mg_point_2d *point_2d);
 
+/// Creates a copy of the given 2D point.
+///
+/// \return A pointer to the copy or NULL if an error occured. 
 MGCLIENT_EXPORT mg_point_2d *mg_point_2d_copy(const mg_point_2d *point_2d);
 
+/// Destroys the given 2D point.
 MGCLIENT_EXPORT void mg_point_2d_destroy(mg_point_2d *point_2d);
 
+/// Returns SRID of the 3D point.
 MGCLIENT_EXPORT int64_t mg_point_3d_srid(const mg_point_3d *point_3d);
 
+/// Returns the x coordinate of the 3D point.
 MGCLIENT_EXPORT double mg_point_3d_x(const mg_point_3d *point_3d);
 
+/// Returns the y coordinate of the 3D point.
 MGCLIENT_EXPORT double mg_point_3d_y(const mg_point_3d *point_3d);
 
+/// Returns the z coordinate of the 3D point.
 MGCLIENT_EXPORT double mg_point_3d_z(const mg_point_3d *point_3d);
 
+/// Creates a copy of the given 3D point.
+///
+/// \return A pointer to the copy or NULL if an error occured. 
 MGCLIENT_EXPORT mg_point_3d *mg_point_3d_copy(const mg_point_3d *point_3d);
 
+/// Destroys the given 3D point.
 MGCLIENT_EXPORT void mg_point_3d_destroy(mg_point_3d *point_3d);
 
 /// Marks a \ref mg_session ready to execute a new query using \ref
@@ -956,7 +1113,7 @@ typedef struct mg_session mg_session;
 ///
 ///      Password to be used if the server demands password authentication.
 ///
-///  - client_name
+///  - user_agent 
 ///
 ///      Alternate name and version of the client to send to server. Default is
 ///      "MemgraphBolt/0.1".
@@ -1099,15 +1256,23 @@ typedef struct mg_result mg_result;
 /// All records from the previous query must be pulled before executing the
 /// next query.
 ///
-/// \param session A \ref mg_session to be used for query execution.
-/// \param query   Query string.
-/// \param params  A \ref mg_map containing query parameters. NULL can be
-///                supplied instead of an empty parameter map.
-/// \param columns Names of the columns output by the query execution will be
-///                stored in here. This is the same as the value obtained by
-///                \ref mg_result_columns on a pulled \ref mg_result. NULL can
-///                be supplied if we're not interested in the columns names.
+/// \param session               A \ref mg_session to be used for query execution.
+/// \param query                 Query string.
+/// \param params                A \ref mg_map containing query parameters. NULL can be
+///                              supplied instead of an empty parameter map.
+/// \param columns               Names of the columns output by the query execution will be
+///                              stored in here. This is the same as the value obtained by
+///                              \ref mg_result_columns on a pulled \ref mg_result. NULL can
+///                              be supplied if we're not interested in the columns names.
 ///
+/// \param extra_run_information A \ref mg_map containing extra information for running the statement.
+///                              It can contain the following information:
+///                               - bookmarks - list of strings containing some kind of bookmark identification 
+///                               - tx_timeout - integer that specifies a transaction timeout in ms.
+///                               - tx_metadata - dictionary taht can contain some metadata information, mainly used for logging.
+///                               - mode - specifies what kind of server is the run targeting. For write access use "w" and for read access use "r". Defaults to write access.
+///                               - db - specifies the database name for multi-database to select where the transaction takes place. If no `db` is sent or empty string it implies that it is the default database.
+/// \param qid                   QID for the statement will be stored in here if an Explicit transaction was started.
 /// \return Returns 0 if query was submitted for execution successfuly.
 ///         Otherwise, a non-zero error code is returned.
 MGCLIENT_EXPORT int mg_session_run(mg_session *session, const char *query,
@@ -1115,17 +1280,38 @@ MGCLIENT_EXPORT int mg_session_run(mg_session *session, const char *query,
                                    const mg_map *extra_run_information,
                                    const mg_list **columns, int64_t *qid);
 
+/// Starts an Explicit transaction on the server.
+/// 
+/// Every run will be part of that transaction until its explicitly ended.
+///
+/// \param session               A \ref mg_session on which the transaction should be started.
+/// \param extra_run_information A \ref mg_map containing extra information that will be used for every statement that is ran as part of the transaction.
+///                              It can contain the following information:
+///                               - bookmarks - list of strings containing some kind of bookmark identification 
+///                               - tx_timeout - integer that specifies a transaction timeout in ms.
+///                               - tx_metadata - dictionary taht can contain some metadata information, mainly used for logging.
+///                               - mode - specifies what kind of server is the run targeting. For write access use "w" and for read access use "r". Defaults to write access.
+///                               - db - specifies the database name for multi-database to select where the transaction takes place. If no `db` is sent or empty string it implies that it is the default database.
+/// \return Returns 0 if the transaction was started successfuly.
+///         Otherwise, a non-zero error code is returned.
 MGCLIENT_EXPORT int mg_session_begin_transaction(
     mg_session *session, const mg_map *extra_run_information);
 
+/// Ends current Explicit transaction.
+///
+/// \param session            A \ref mg_session on which the transaction should be started.
+/// \param commit_transaction Whether the transaction should be commited or rollbacked.
+/// \param result             Contains the information about the ended transaction if it was successful.
+/// \return Returns 0 if the transaction was ended successfuly.
+///         Otherwise, a non-zero error code is returned.
 MGCLIENT_EXPORT int mg_session_end_transaction(mg_session *session,
                                                int commit_transaction,
                                                mg_result **result);
 
-/// Tries to pull the next query result from \ref mg_session.
+/// Tries to fetch the next query result from \ref mg_session.
 ///
 /// The owner of the returned result is \ref mg_session \p session, and the
-/// result is destroyed on next call to \ref mg_session_pull.
+/// result is destroyed on next call to \ref mg_session_fetch.
 ///
 /// \return On success, 0 or 1 is returned. Exit code 1 means that a new result
 ///         row was obtained and stored in \p result and its contents may be
@@ -1135,6 +1321,15 @@ MGCLIENT_EXPORT int mg_session_end_transaction(mg_session *session,
 ///         mg_result_summary. On failure, a non-zero exit code is returned.
 MGCLIENT_EXPORT int mg_session_fetch(mg_session *session, mg_result **result);
 
+/// Tries to pull results of a statement.
+/// 
+/// \param session          A \ref mg_session from which the results should be pulled.
+/// \param pull_information A \ref mg_map that contains extra information for pulling the results.
+///                         It can contain the following information:
+///                         - n - how many records to fetch. `n=-1` will fetch all records.
+///                         - qid - query identification, specifies the result from which statement the results should be pulled . `qid=-1` denotes the last executed statement. This is only for Explicit transactions.
+/// \return Returns 0 if the result was pulled successfuly.
+///         Otherwise, a non-zero error code is returned.
 MGCLIENT_EXPORT int mg_session_pull(mg_session *session,
                                     const mg_map *pull_information);
 
