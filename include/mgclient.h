@@ -221,7 +221,7 @@ typedef struct mg_unbound_relationship mg_unbound_relationship;
 typedef struct mg_path mg_path;
 
 /// \brief Represents a date.
-/// 
+///
 /// Date is defined with number of days since the Unix epoch.
 typedef struct mg_date mg_date;
 
@@ -256,8 +256,8 @@ typedef struct mg_date_time_zone_id mg_date_time_zone_id;
 /// Time is defined with nanoseconds since midnight.
 typedef struct mg_local_date_time mg_local_date_time;
 
-/// \brief Represents a temporal amount which captures the difference in time between
-/// two instants.
+/// \brief Represents a temporal amount which captures the difference in time
+/// between two instants.
 ///
 /// Duration is defined with months, days, seconds, and nanoseconds.
 /// \note
@@ -265,12 +265,12 @@ typedef struct mg_local_date_time mg_local_date_time;
 typedef struct mg_duration mg_duration;
 
 /// \brief Represents a single location in 2-dimensional space.
-/// 
+///
 /// Contains SRID along with its x and y coordinates.
 typedef struct mg_point_2d mg_point_2d;
 
 /// \brief Represents a single location in 3-dimensional space.
-/// 
+///
 /// Contains SRID along with its x, y and z coordinates.
 typedef struct mg_point_3d mg_point_3d;
 
@@ -354,23 +354,27 @@ MGCLIENT_EXPORT mg_value *mg_value_make_date(mg_date *date);
 /// \return Pointer to the newly constructed value or NULL if error occurred.
 MGCLIENT_EXPORT mg_value *mg_value_make_time(mg_time *time);
 
-/// Constructs a local time \ref mg_value given the underlying \ref mg_local_time.
+/// Constructs a local time \ref mg_value given the underlying \ref
+/// mg_local_time.
 ///
 /// \return Pointer to the newly constructed value or NULL if error occurred.
 MGCLIENT_EXPORT mg_value *mg_value_make_local_time(mg_local_time *local_time);
 
-/// Constructs a date and time \ref mg_value given the underlying \ref mg_date_time.
+/// Constructs a date and time \ref mg_value given the underlying \ref
+/// mg_date_time.
 ///
 /// \return Pointer to the newly constructed value or NULL if error occurred.
 MGCLIENT_EXPORT mg_value *mg_value_make_date_time(mg_date_time *date_time);
 
-/// Constructs a date and time \ref mg_value given the underlying \ref mg_date_time_zone_id.
+/// Constructs a date and time \ref mg_value given the underlying \ref
+/// mg_date_time_zone_id.
 ///
 /// \return Pointer to the newly constructed value or NULL if error occurred.
 MGCLIENT_EXPORT mg_value *mg_value_make_date_time_zone_id(
     mg_date_time_zone_id *date_time_zone_id);
 
-/// Constructs a local date and time \ref mg_value given the underlying \ref mg_local_date_time.
+/// Constructs a local date and time \ref mg_value given the underlying \ref
+/// mg_local_date_time.
 ///
 /// \return Pointer to the newly constructed value or NULL if error occurred.
 MGCLIENT_EXPORT mg_value *mg_value_make_local_date_time(
@@ -856,7 +860,7 @@ MGCLIENT_EXPORT int64_t mg_date_days(const mg_date *date);
 
 /// Creates a copy of the given date.
 ///
-/// \return A pointer to the copy or NULL if an error occured. 
+/// \return A pointer to the copy or NULL if an error occured.
 MGCLIENT_EXPORT mg_date *mg_date_copy(const mg_date *date);
 
 /// Destroys the given date.
@@ -870,7 +874,7 @@ MGCLIENT_EXPORT int64_t mg_time_tz_offset_seconds(const mg_time *time);
 
 /// Creates a copy of the given time.
 ///
-/// \return A pointer to the copy or NULL if an error occured. 
+/// \return A pointer to the copy or NULL if an error occured.
 MGCLIENT_EXPORT mg_time *mg_time_copy(const mg_time *time);
 
 /// Destroys the given time.
@@ -882,7 +886,7 @@ mg_local_time_nanoseconds(const mg_local_time *local_time);
 
 /// Creates a copy of the given local time.
 ///
-/// \return A pointer to the copy or NULL if an error occured. 
+/// \return A pointer to the copy or NULL if an error occured.
 MGCLIENT_EXPORT mg_local_time *mg_local_time_copy(
     const mg_local_time *local_time);
 
@@ -901,7 +905,7 @@ mg_date_time_tz_offset_minutes(const mg_date_time *date_time);
 
 /// Creates a copy of the given date and time.
 ///
-/// \return A pointer to the copy or NULL if an error occured. 
+/// \return A pointer to the copy or NULL if an error occured.
 MGCLIENT_EXPORT mg_date_time *mg_date_time_copy(const mg_date_time *date_time);
 
 /// Destroys the given date and time.
@@ -921,7 +925,7 @@ mg_date_time_zone_id_tz_id(const mg_date_time_zone_id *date_time_zone_id);
 
 /// Creates a copy of the given date and time.
 ///
-/// \return A pointer to the copy or NULL if an error occured. 
+/// \return A pointer to the copy or NULL if an error occured.
 MGCLIENT_EXPORT mg_date_time_zone_id *mg_date_time_zone_id_copy(
     const mg_date_time_zone_id *date_time_zone_id);
 
@@ -939,7 +943,7 @@ mg_local_date_time_nanoseconds(const mg_local_date_time *local_date_time);
 
 /// Creates a copy of the given local date and time.
 ///
-/// \return A pointer to the copy or NULL if an error occured. 
+/// \return A pointer to the copy or NULL if an error occured.
 MGCLIENT_EXPORT mg_local_date_time *mg_local_date_time_copy(
     const mg_local_date_time *local_date_time);
 
@@ -961,7 +965,7 @@ MGCLIENT_EXPORT int64_t mg_duration_nanoseconds(const mg_duration *duration);
 
 /// Creates a copy of the given duration.
 ///
-/// \return A pointer to the copy or NULL if an error occured. 
+/// \return A pointer to the copy or NULL if an error occured.
 MGCLIENT_EXPORT mg_duration *mg_duration_copy(const mg_duration *duration);
 
 /// Destroy the given duration.
@@ -978,7 +982,7 @@ MGCLIENT_EXPORT double mg_point_2d_y(const mg_point_2d *point_2d);
 
 /// Creates a copy of the given 2D point.
 ///
-/// \return A pointer to the copy or NULL if an error occured. 
+/// \return A pointer to the copy or NULL if an error occured.
 MGCLIENT_EXPORT mg_point_2d *mg_point_2d_copy(const mg_point_2d *point_2d);
 
 /// Destroys the given 2D point.
@@ -998,7 +1002,7 @@ MGCLIENT_EXPORT double mg_point_3d_z(const mg_point_3d *point_3d);
 
 /// Creates a copy of the given 3D point.
 ///
-/// \return A pointer to the copy or NULL if an error occured. 
+/// \return A pointer to the copy or NULL if an error occured.
 MGCLIENT_EXPORT mg_point_3d *mg_point_3d_copy(const mg_point_3d *point_3d);
 
 /// Destroys the given 3D point.
@@ -1113,7 +1117,7 @@ typedef struct mg_session mg_session;
 ///
 ///      Password to be used if the server demands password authentication.
 ///
-///  - user_agent 
+///  - user_agent
 ///
 ///      Alternate name and version of the client to send to server. Default is
 ///      "MemgraphBolt/0.1".
@@ -1256,24 +1260,39 @@ typedef struct mg_result mg_result;
 /// All records from the previous query must be pulled before executing the
 /// next query.
 ///
-/// \param session               A \ref mg_session to be used for query execution.
-/// \param query                 Query string.
-/// \param params                A \ref mg_map containing query parameters. NULL can be
+/// \param session               A \ref mg_session to be used for query
+/// execution. \param query                 Query string. \param params A \ref
+/// mg_map containing query parameters. NULL can be
 ///                              supplied instead of an empty parameter map.
-/// \param columns               Names of the columns output by the query execution will be
-///                              stored in here. This is the same as the value obtained by
-///                              \ref mg_result_columns on a pulled \ref mg_result. NULL can
-///                              be supplied if we're not interested in the columns names.
+/// \param columns               Names of the columns output by the query
+/// execution will be
+///                              stored in here. This is the same as the value
+///                              obtained by \ref mg_result_columns on a pulled
+///                              \ref mg_result. NULL can be supplied if we're
+///                              not interested in the columns names.
 ///
-/// \param extra_run_information A \ref mg_map containing extra information for running the statement.
+/// \param extra_run_information A \ref mg_map containing extra information for
+/// running the statement.
 ///                              It can contain the following information:
-///                               - bookmarks - list of strings containing some kind of bookmark identification 
-///                               - tx_timeout - integer that specifies a transaction timeout in ms.
-///                               - tx_metadata - dictionary taht can contain some metadata information, mainly used for logging.
-///                               - mode - specifies what kind of server is the run targeting. For write access use "w" and for read access use "r". Defaults to write access.
-///                               - db - specifies the database name for multi-database to select where the transaction takes place. If no `db` is sent or empty string it implies that it is the default database.
-/// \param qid                   QID for the statement will be stored in here if an Explicit transaction was started.
-/// \return Returns 0 if query was submitted for execution successfuly.
+///                               - bookmarks - list of strings containing some
+///                               kind of bookmark identification
+///                               - tx_timeout - integer that specifies a
+///                               transaction timeout in ms.
+///                               - tx_metadata - dictionary taht can contain
+///                               some metadata information, mainly used for
+///                               logging.
+///                               - mode - specifies what kind of server is the
+///                               run targeting. For write access use "w" and
+///                               for read access use "r". Defaults to write
+///                               access.
+///                               - db - specifies the database name for
+///                               multi-database to select where the transaction
+///                               takes place. If no `db` is sent or empty
+///                               string it implies that it is the default
+///                               database.
+/// \param qid                   QID for the statement will be stored in here if
+/// an Explicit transaction was started. \return Returns 0 if query was
+/// submitted for execution successfuly.
 ///         Otherwise, a non-zero error code is returned.
 MGCLIENT_EXPORT int mg_session_run(mg_session *session, const char *query,
                                    const mg_map *params,
@@ -1281,17 +1300,30 @@ MGCLIENT_EXPORT int mg_session_run(mg_session *session, const char *query,
                                    const mg_list **columns, int64_t *qid);
 
 /// Starts an Explicit transaction on the server.
-/// 
+///
 /// Every run will be part of that transaction until its explicitly ended.
 ///
-/// \param session               A \ref mg_session on which the transaction should be started.
-/// \param extra_run_information A \ref mg_map containing extra information that will be used for every statement that is ran as part of the transaction.
+/// \param session               A \ref mg_session on which the transaction
+/// should be started. \param extra_run_information A \ref mg_map containing
+/// extra information that will be used for every statement that is ran as part
+/// of the transaction.
 ///                              It can contain the following information:
-///                               - bookmarks - list of strings containing some kind of bookmark identification 
-///                               - tx_timeout - integer that specifies a transaction timeout in ms.
-///                               - tx_metadata - dictionary taht can contain some metadata information, mainly used for logging.
-///                               - mode - specifies what kind of server is the run targeting. For write access use "w" and for read access use "r". Defaults to write access.
-///                               - db - specifies the database name for multi-database to select where the transaction takes place. If no `db` is sent or empty string it implies that it is the default database.
+///                               - bookmarks - list of strings containing some
+///                               kind of bookmark identification
+///                               - tx_timeout - integer that specifies a
+///                               transaction timeout in ms.
+///                               - tx_metadata - dictionary taht can contain
+///                               some metadata information, mainly used for
+///                               logging.
+///                               - mode - specifies what kind of server is the
+///                               run targeting. For write access use "w" and
+///                               for read access use "r". Defaults to write
+///                               access.
+///                               - db - specifies the database name for
+///                               multi-database to select where the transaction
+///                               takes place. If no `db` is sent or empty
+///                               string it implies that it is the default
+///                               database.
 /// \return Returns 0 if the transaction was started successfuly.
 ///         Otherwise, a non-zero error code is returned.
 MGCLIENT_EXPORT int mg_session_begin_transaction(
@@ -1299,10 +1331,11 @@ MGCLIENT_EXPORT int mg_session_begin_transaction(
 
 /// Ends current Explicit transaction.
 ///
-/// \param session            A \ref mg_session on which the transaction should be started.
-/// \param commit_transaction Whether the transaction should be commited or rollbacked.
-/// \param result             Contains the information about the ended transaction if it was successful.
-/// \return Returns 0 if the transaction was ended successfuly.
+/// \param session            A \ref mg_session on which the transaction should
+/// be started. \param commit_transaction Whether the transaction should be
+/// commited or rollbacked. \param result             Contains the information
+/// about the ended transaction if it was successful. \return Returns 0 if the
+/// transaction was ended successfuly.
 ///         Otherwise, a non-zero error code is returned.
 MGCLIENT_EXPORT int mg_session_end_transaction(mg_session *session,
                                                int commit_transaction,
@@ -1322,12 +1355,17 @@ MGCLIENT_EXPORT int mg_session_end_transaction(mg_session *session,
 MGCLIENT_EXPORT int mg_session_fetch(mg_session *session, mg_result **result);
 
 /// Tries to pull results of a statement.
-/// 
-/// \param session          A \ref mg_session from which the results should be pulled.
-/// \param pull_information A \ref mg_map that contains extra information for pulling the results.
+///
+/// \param session          A \ref mg_session from which the results should be
+/// pulled. \param pull_information A \ref mg_map that contains extra
+/// information for pulling the results.
 ///                         It can contain the following information:
-///                         - n - how many records to fetch. `n=-1` will fetch all records.
-///                         - qid - query identification, specifies the result from which statement the results should be pulled . `qid=-1` denotes the last executed statement. This is only for Explicit transactions.
+///                         - n - how many records to fetch. `n=-1` will fetch
+///                         all records.
+///                         - qid - query identification, specifies the result
+///                         from which statement the results should be pulled .
+///                         `qid=-1` denotes the last executed statement. This
+///                         is only for Explicit transactions.
 /// \return Returns 0 if the result was pulled successfuly.
 ///         Otherwise, a non-zero error code is returned.
 MGCLIENT_EXPORT int mg_session_pull(mg_session *session,

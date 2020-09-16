@@ -770,6 +770,7 @@ class Date final {
 
   explicit Date(const ConstDate &date);
 
+  /// \brief Returns days since Unix epoch.
   int64_t days() const { return mg_date_days(ptr_); }
 
   ConstDate AsConstDate() const;
@@ -789,6 +790,7 @@ class ConstDate final {
  public:
   explicit ConstDate(const mg_date *const_ptr) : const_ptr_(const_ptr) {}
 
+  /// \brief Returns days since Unix epoch.
   int64_t days() const { return mg_date_days(const_ptr_); }
 
   bool operator==(const ConstDate &other) const;
@@ -823,7 +825,9 @@ class Time final {
 
   explicit Time(const ConstTime &time);
 
+  /// Returns nanoseconds since midnight.
   int64_t nanoseconds() const { return mg_time_nanoseconds(ptr_); }
+  /// Returns time zone offset in seconds from UTC.
   int64_t tz_offset_seconds() const { return mg_time_tz_offset_seconds(ptr_); }
 
   ConstTime AsConstTime() const;
@@ -843,7 +847,9 @@ class ConstTime final {
  public:
   explicit ConstTime(const mg_time *const_ptr) : const_ptr_(const_ptr) {}
 
+  /// Returns nanoseconds since midnight.
   int64_t nanoseconds() const { return mg_time_nanoseconds(const_ptr_); }
+  /// Returns time zone offset in seconds from UTC.
   int64_t tz_offset_seconds() const {
     return mg_time_tz_offset_seconds(const_ptr_);
   }
@@ -881,6 +887,7 @@ class LocalTime final {
 
   explicit LocalTime(const ConstLocalTime &local_time);
 
+  /// Returns nanoseconds since midnight.
   int64_t nanoseconds() const { return mg_local_time_nanoseconds(ptr_); }
 
   ConstLocalTime AsConstLocalTime() const;
@@ -903,6 +910,7 @@ class ConstLocalTime final {
   explicit ConstLocalTime(const mg_local_time *const_ptr)
       : const_ptr_(const_ptr) {}
 
+  /// Returns nanoseconds since midnight.
   int64_t nanoseconds() const { return mg_local_time_nanoseconds(const_ptr_); }
 
   bool operator==(const ConstLocalTime &other) const;
@@ -940,8 +948,11 @@ class DateTime final {
 
   explicit DateTime(const ConstDateTime &date_time);
 
+  /// Returns seconds since Unix epoch.
   int64_t seconds() const { return mg_date_time_seconds(ptr_); }
+  /// Returns nanoseconds since midnight.
   int64_t nanoseconds() const { return mg_date_time_nanoseconds(ptr_); }
+  /// Returns time zone offset in minutes from UTC.
   int64_t tz_offset_minutes() const {
     return mg_date_time_tz_offset_minutes(ptr_);
   }
@@ -966,8 +977,11 @@ class ConstDateTime final {
   explicit ConstDateTime(const mg_date_time *const_ptr)
       : const_ptr_(const_ptr) {}
 
+  /// Returns seconds since Unix epoch.
   int64_t seconds() const { return mg_date_time_seconds(const_ptr_); }
+  /// Returns nanoseconds since midnight.
   int64_t nanoseconds() const { return mg_date_time_nanoseconds(const_ptr_); }
+  /// Returns time zone offset in minutes from UTC.
   int64_t tz_offset_minutes() const {
     return mg_date_time_tz_offset_minutes(const_ptr_);
   }
@@ -1007,8 +1021,11 @@ class DateTimeZoneId final {
 
   explicit DateTimeZoneId(const ConstDateTimeZoneId &date_time_zone_id);
 
+  /// Returns seconds since Unix epoch.
   int64_t seconds() const { return mg_date_time_zone_id_seconds(ptr_); };
+  /// Returns nanoseconds since midnight.
   int64_t nanoseconds() const { return mg_date_time_zone_id_nanoseconds(ptr_); }
+  /// Returns time zone represented by the identifier.
   int64_t tzId() const { return mg_date_time_zone_id_tz_id(ptr_); }
 
   ConstDateTimeZoneId AsConstDateTimeZoneId() const;
@@ -1033,10 +1050,13 @@ class ConstDateTimeZoneId final {
   explicit ConstDateTimeZoneId(const mg_date_time_zone_id *const_ptr)
       : const_ptr_(const_ptr) {}
 
+  /// Returns seconds since Unix epoch.
   int64_t seconds() const { return mg_date_time_zone_id_seconds(const_ptr_); };
+  /// Returns nanoseconds since midnight.
   int64_t nanoseconds() const {
     return mg_date_time_zone_id_nanoseconds(const_ptr_);
   }
+  /// Returns time zone represented by the identifier.
   int64_t tzId() const { return mg_date_time_zone_id_tz_id(const_ptr_); }
 
   bool operator==(const ConstDateTimeZoneId &other) const;
@@ -1076,7 +1096,9 @@ class LocalDateTime final {
 
   explicit LocalDateTime(const ConstLocalDateTime &local_date_time);
 
+  /// Returns seconds since Unix epoch.
   int64_t seconds() const { return mg_local_date_time_seconds(ptr_); }
+  /// Returns nanoseconds since midnight.
   int64_t nanoseconds() const { return mg_local_date_time_nanoseconds(ptr_); }
 
   ConstLocalDateTime AsConstLocalDateTime() const;
@@ -1101,7 +1123,9 @@ class ConstLocalDateTime final {
   explicit ConstLocalDateTime(const mg_local_date_time *const_ptr)
       : const_ptr_(const_ptr) {}
 
+  /// Returns seconds since Unix epoch.
   int64_t seconds() const { return mg_local_date_time_seconds(const_ptr_); }
+  /// Returns nanoseconds since midnight.
   int64_t nanoseconds() const {
     return mg_local_date_time_nanoseconds(const_ptr_);
   }
@@ -1143,9 +1167,13 @@ class Duration final {
 
   explicit Duration(const ConstDuration &duration);
 
+  /// Returns the months part of the temporal amount.
   int64_t months() const { return mg_duration_months(ptr_); }
+  /// Returns the days part of the temporal amount.
   int64_t days() const { return mg_duration_days(ptr_); }
+  /// Returns the seconds part of the temporal amount.
   int64_t seconds() const { return mg_duration_seconds(ptr_); }
+  /// Returns the nanoseconds part of the temporal amount.
   int64_t nanoseconds() const { return mg_duration_nanoseconds(ptr_); }
 
   ConstDuration AsConstDuration() const;
@@ -1168,9 +1196,13 @@ class ConstDuration final {
   explicit ConstDuration(const mg_duration *const_ptr)
       : const_ptr_(const_ptr) {}
 
+  /// Returns the months part of the temporal amount.
   int64_t months() const { return mg_duration_months(const_ptr_); }
+  /// Returns the days part of the temporal amount.
   int64_t days() const { return mg_duration_days(const_ptr_); }
+  /// Returns the seconds part of the temporal amount.
   int64_t seconds() const { return mg_duration_seconds(const_ptr_); }
+  /// Returns the nanoseconds part of the temporal amount.
   int64_t nanoseconds() const { return mg_duration_nanoseconds(const_ptr_); }
 
   bool operator==(const ConstDuration &other) const;
@@ -1208,8 +1240,11 @@ class Point2d final {
 
   explicit Point2d(const ConstPoint2d &point_2d);
 
+  /// Returns SRID of the 2D point.
   int64_t srid() const { return mg_point_2d_srid(ptr_); }
+  /// Returns the x coordinate of the 2D point.
   double x() const { return mg_point_2d_x(ptr_); }
+  /// Returns the y coordinate of the 2D point.
   double y() const { return mg_point_2d_y(ptr_); }
 
   ConstPoint2d AsConstPoint2d() const;
@@ -1229,8 +1264,11 @@ class ConstPoint2d final {
  public:
   explicit ConstPoint2d(const mg_point_2d *const_ptr) : const_ptr_(const_ptr) {}
 
+  /// Returns SRID of the 2D point.
   int64_t srid() const { return mg_point_2d_srid(const_ptr_); }
+  /// Returns the x coordinate of the 2D point.
   double x() const { return mg_point_2d_x(const_ptr_); }
+  /// Returns the y coordinate of the 2D point.
   double y() const { return mg_point_2d_y(const_ptr_); }
 
   bool operator==(const ConstPoint2d &other) const;
@@ -1266,9 +1304,13 @@ class Point3d final {
 
   explicit Point3d(const ConstPoint3d &point_3d);
 
+  /// Returns SRID of the 3D point.
   int64_t srid() const { return mg_point_3d_srid(ptr_); }
+  /// Returns the x coordinate of the 3D point.
   double x() const { return mg_point_3d_x(ptr_); }
+  /// Returns the y coordinate of the 3D point.
   double y() const { return mg_point_3d_y(ptr_); }
+  /// Returns the z coordinate of the 3D point.
   double z() const { return mg_point_3d_z(ptr_); }
 
   ConstPoint3d AsConstPoint3d() const;
@@ -1288,9 +1330,13 @@ class ConstPoint3d final {
  public:
   explicit ConstPoint3d(const mg_point_3d *const_ptr) : const_ptr_(const_ptr) {}
 
+  /// Returns SRID of the 3D point.
   int64_t srid() const { return mg_point_3d_srid(const_ptr_); }
+  /// Returns the x coordinate of the 3D point.
   double x() const { return mg_point_3d_x(const_ptr_); }
+  /// Returns the y coordinate of the 3D point.
   double y() const { return mg_point_3d_y(const_ptr_); }
+  /// Returns the z coordinate of the 3D point.
   double z() const { return mg_point_3d_z(const_ptr_); }
 
   bool operator==(const ConstPoint3d &other) const;
@@ -1398,22 +1444,49 @@ class Value final {
   /// operation is considered undefined.
   explicit Value(Path &&path);
 
+  /// \brief Constructs a date value and takes the ownership of the given
+  /// `date`. \note Behaviour of accessing the `date` after performing this
+  /// operation is considered undefined.
   explicit Value(Date &&date);
 
+  /// \brief Constructs a time value and takes the ownership of the given
+  /// `time`. \note Behaviour of accessing the `time` after performing this
+  /// operation is considered undefined.
   explicit Value(Time &&time);
 
+  /// \brief Constructs a LocalTime value and takes the ownership of the given
+  /// `localTime`. \note Behaviour of accessing the `localTime` after performing
+  /// this operation is considered undefined.
   explicit Value(LocalTime &&localTime);
 
+  /// \brief Constructs a DateTime value and takes the ownership of the given
+  /// `dateTime`. \note Behaviour of accessing the `dateTime` after performing
+  /// this operation is considered undefined.
   explicit Value(DateTime &&dateTime);
 
+  /// \brief Constructs a DateTimeZoneId value and takes the ownership of the
+  /// given `dateTimeZoneId`. \note Behaviour of accessing the `dateTimeZoneId`
+  /// after performing this operation is considered undefined.
   explicit Value(DateTimeZoneId &&dateTimeZoneId);
 
+  /// \brief Constructs a LocalDateTime value and takes the ownership of the
+  /// given `localDateTime`. \note Behaviour of accessing the `localDateTime`
+  /// after performing this operation is considered undefined.
   explicit Value(LocalDateTime &&localDateTime);
 
+  /// \brief Constructs a Duration value and takes the ownership of the given
+  /// `duration`. \note Behaviour of accessing the `duration` after performing
+  /// this operation is considered undefined.
   explicit Value(Duration &&duration);
 
+  /// \brief Constructs a Point2d value and takes the ownership of the given
+  /// `point2d`. \note Behaviour of accessing the `point2d` after performing
+  /// this operation is considered undefined.
   explicit Value(Point2d &&point2d);
 
+  /// \brief Constructs a Point3d value and takes the ownership of the given
+  /// `point3d`. \note Behaviour of accessing the `point3d` after performing
+  /// this operation is considered undefined.
   explicit Value(Point3d &&point3d);
 
   /// \pre value type is Type::Bool
