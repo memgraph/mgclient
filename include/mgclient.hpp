@@ -50,6 +50,18 @@ class Client {
   /// If there is nothing to fetch, `std::nullopt` is returned.
   std::optional<std::vector<Value>> FetchOne();
 
+  /// \brief Start a transaction.
+  /// \return true when the transaction was successfully started, false
+  /// otherwise.
+  bool BeginTransaction();
+
+  /// \brief End current transaction.
+  /// \param commitTransaction whether the transaction should be commited
+  /// or rollbacked.
+  /// \return true when the transaction was successfully ended, false
+  /// otherwise.
+  bool EndTransaction(bool commitTransaction);
+
   /// \brief Static method that creates a Memgraph client instance.
   /// \return pointer to the created client instance.
   /// If the connection couldn't be established given the `params`, it returns
@@ -137,6 +149,15 @@ inline std::optional<std::vector<Value>> Client::FetchOne() {
     values.emplace_back(Value(mg_list_at(list, i)));
   }
   return values;
+}
+
+inline bool Client::BeginTransaction() {
+  return mg_session_begin_transaction(session_, nullptr) == 0;
+}
+
+inline bool Client::EndTransaction(bool commitTransaction) {
+  mg_result *result;
+  return mg_session_end_transaction(session_, commitTransaction, &result) == 0;
 }
 
 }  // namespace mg
