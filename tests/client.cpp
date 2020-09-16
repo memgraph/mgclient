@@ -712,14 +712,14 @@ class RunTest : public ::testing::Test {
 
   tracking_allocator allocator;
 
-  void protocolViolation(int version);
-  void invalidStatement(int version);
-  void okNoResults(int version);
-  void multipleQueries(int version);
-  void okWithResults(int version);
-  void queryRuntimeError(int version);
-  void queryDatabaseError(int version);
-  void runWithParams(int version);
+  void ProtocolViolation(int version);
+  void InvalidStatement(int version);
+  void OkNoResults(int version);
+  void MultipleQueries(int version);
+  void OkWithResults(int version);
+  void QueryRuntimeError(int version);
+  void QueryDatabaseError(int version);
+  void RunWithParams(int version);
 };
 
 bool CheckColumns(const mg_result *result,
@@ -757,7 +757,7 @@ bool CheckSummary(const mg_result *result, double exp_execution_time) {
   return mg_value_float(execution_time) == exp_execution_time;
 }
 
-void RunTest::protocolViolation(int version) {
+void RunTest::ProtocolViolation(int version) {
   RunServer([version](int sockfd) {
     mg_session *session = mg_session_init(&mg_system_allocator);
     session->version = version;
@@ -803,11 +803,11 @@ void RunTest::protocolViolation(int version) {
   ASSERT_MEMORY_OK();
 }
 
-TEST_F(RunTest, ProtocolViolation_v1) { protocolViolation(1); }
+TEST_F(RunTest, ProtocolViolation_v1) { ProtocolViolation(1); }
 
-TEST_F(RunTest, ProtocolViolation_v4) { protocolViolation(4); }
+TEST_F(RunTest, ProtocolViolation_v4) { ProtocolViolation(4); }
 
-void RunTest::invalidStatement(int version) {
+void RunTest::InvalidStatement(int version) {
   RunServer([version](int sockfd) {
     mg_session *session = mg_session_init(&mg_system_allocator);
     session->version = version;
@@ -875,11 +875,11 @@ void RunTest::invalidStatement(int version) {
   ASSERT_MEMORY_OK();
 }
 
-TEST_F(RunTest, InvalidStatement_v1) { invalidStatement(1); }
+TEST_F(RunTest, InvalidStatement_v1) { InvalidStatement(1); }
 
-TEST_F(RunTest, InvalidStatement_v4) { invalidStatement(4); }
+TEST_F(RunTest, InvalidStatement_v4) { InvalidStatement(4); }
 
-void RunTest::okNoResults(int version) {
+void RunTest::OkNoResults(int version) {
   RunServer([version](int sockfd) {
     mg_session *session = mg_session_init(&mg_system_allocator);
     session->version = version;
@@ -963,11 +963,11 @@ void RunTest::okNoResults(int version) {
   ASSERT_MEMORY_OK();
 }
 
-TEST_F(RunTest, OkNoResults_v1) { okNoResults(1); }
+TEST_F(RunTest, OkNoResults_v1) { OkNoResults(1); }
 
-TEST_F(RunTest, OkNoResults_v4) { okNoResults(4); }
+TEST_F(RunTest, OkNoResults_v4) { OkNoResults(4); }
 
-void RunTest::multipleQueries(int version) {
+void RunTest::MultipleQueries(int version) {
   RunServer([version](int sockfd) {
     mg_session *session = mg_session_init(&mg_system_allocator);
     session->version = version;
@@ -1080,11 +1080,11 @@ void RunTest::multipleQueries(int version) {
   ASSERT_MEMORY_OK();
 }
 
-TEST_F(RunTest, MultipleQueries_v1) { multipleQueries(1); }
+TEST_F(RunTest, MultipleQueries_v1) { MultipleQueries(1); }
 
-TEST_F(RunTest, MultipleQueries_v4) { multipleQueries(4); }
+TEST_F(RunTest, MultipleQueries_v4) { MultipleQueries(4); }
 
-void RunTest::okWithResults(int version) {
+void RunTest::OkWithResults(int version) {
   RunServer([version](int sockfd) {
     mg_session *session = mg_session_init(&mg_system_allocator);
     session->version = version;
@@ -1201,11 +1201,11 @@ void RunTest::okWithResults(int version) {
   ASSERT_MEMORY_OK();
 }
 
-TEST_F(RunTest, OkWithResults_v1) { okWithResults(1); }
+TEST_F(RunTest, OkWithResults_v1) { OkWithResults(1); }
 
-TEST_F(RunTest, OkWithResults_v4) { okWithResults(4); }
+TEST_F(RunTest, OkWithResults_v4) { OkWithResults(4); }
 
-void RunTest::queryRuntimeError(int version) {
+void RunTest::QueryRuntimeError(int version) {
   RunServer([version](int sockfd) {
     mg_session *session = mg_session_init(&mg_system_allocator);
     session->version = version;
@@ -1313,11 +1313,11 @@ void RunTest::queryRuntimeError(int version) {
   ASSERT_MEMORY_OK();
 }
 
-TEST_F(RunTest, QueryRuntimeError_v1) { queryRuntimeError(1); }
+TEST_F(RunTest, QueryRuntimeError_v1) { QueryRuntimeError(1); }
 
-TEST_F(RunTest, QueryRuntimeError_v4) { queryRuntimeError(4); }
+TEST_F(RunTest, QueryRuntimeError_v4) { QueryRuntimeError(4); }
 
-void RunTest::queryDatabaseError(int version) {
+void RunTest::QueryDatabaseError(int version) {
   RunServer([version](int sockfd) {
     mg_session *session = mg_session_init(&mg_system_allocator);
     session->version = version;
@@ -1397,11 +1397,11 @@ void RunTest::queryDatabaseError(int version) {
   ASSERT_MEMORY_OK();
 }
 
-TEST_F(RunTest, QueryDatabaseError_v1) { queryDatabaseError(1); }
+TEST_F(RunTest, QueryDatabaseError_v1) { QueryDatabaseError(1); }
 
-TEST_F(RunTest, QueryDatabaseError_v4) { queryDatabaseError(4); }
+TEST_F(RunTest, QueryDatabaseError_v4) { QueryDatabaseError(4); }
 
-void RunTest::runWithParams(int version) {
+void RunTest::RunWithParams(int version) {
   RunServer([version](int sockfd) {
     mg_session *session = mg_session_init(&mg_system_allocator);
     session->version = version;
@@ -1508,9 +1508,9 @@ void RunTest::runWithParams(int version) {
   ASSERT_MEMORY_OK();
 }
 
-TEST_F(RunTest, RunWithParams_v1) { runWithParams(1); }
+TEST_F(RunTest, RunWithParams_v1) { RunWithParams(1); }
 
-TEST_F(RunTest, RunWithParams_v4) { runWithParams(4); }
+TEST_F(RunTest, RunWithParams_v4) { RunWithParams(4); }
 
 /////////// Tests for Bolt v4 ///////////
 
