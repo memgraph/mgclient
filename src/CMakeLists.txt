@@ -12,6 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+add_library(project_options INTERFACE)
+include(../cmake/Sanitizers.cmake)
+enable_sanitizers(project_options)
+
 set(mgclient_src_files
         mgallocator.c
         mgclient.c
@@ -35,7 +39,8 @@ target_include_directories(mgclient-static
         "${CMAKE_SOURCE_DIR}/include"
         "${CMAKE_CURRENT_BINARY_DIR}"
         "${OPENSSL_INCLUDE_DIR}")
-target_link_libraries(mgclient-static PRIVATE ${OPENSSL_LIBRARIES})
+target_link_libraries(mgclient-static PRIVATE ${OPENSSL_LIBRARIES} project_options)
+
 
 add_library(mgclient-shared SHARED ${mgclient_src_files})
 set_target_properties(mgclient-shared PROPERTIES
