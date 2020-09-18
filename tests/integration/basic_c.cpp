@@ -74,6 +74,7 @@ class MemgraphConnection : public ::testing::Test {
     mg_session_params_set_port(params, memgraph_port);
     mg_session_params_set_sslmode(
         params, memgraph_ssl ? MG_SSLMODE_REQUIRE : MG_SSLMODE_DISABLE);
+    ASSERT_EQ(mg_connect(params, &session), 0);
   }
 
   virtual void TearDown() override {
@@ -102,7 +103,6 @@ TEST_F(MemgraphConnection, InsertAndRetriveFromMemegraph) {
       "'test2', is_deleted: false})";
   const char *get_query = "MATCH (n)-[r]->(m) RETURN n, r, m";
 
-  ASSERT_EQ(mg_connect(params, &session), 0);
   ASSERT_EQ(mg_session_run(session, create_query, NULL, NULL), 0);
   ASSERT_EQ(mg_session_pull(session, &result), 0);
   ASSERT_EQ(mg_session_pull(session, &result), MG_ERROR_BAD_CALL);
