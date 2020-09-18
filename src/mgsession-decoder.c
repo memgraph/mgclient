@@ -830,7 +830,7 @@ cleanup:
 
 int mg_session_read_point_3d(mg_session *session, mg_point_3d **point_3d) {
   MG_RETURN_IF_FAILED(mg_session_check_struct_header(
-      session, (uint8_t)(MG_MARKER_TINY_STRUCT + 4), MG_SIGNATURE_POINT_2D));
+      session, (uint8_t)(MG_MARKER_TINY_STRUCT + 4), MG_SIGNATURE_POINT_3D));
   mg_point_3d *point_3d_tmp = mg_point_3d_alloc(session->decoder_allocator);
   if (!point_3d_tmp) {
     mg_session_set_error(session, "out of memory");

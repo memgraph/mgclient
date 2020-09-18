@@ -16,6 +16,7 @@
 
 #include <gtest/gtest.h>
 
+#include "mgallocator.h"
 #include "mgclient.h"
 
 extern "C" {
@@ -455,4 +456,154 @@ TEST(Value, Path) {
   EXPECT_EQ(mg_value_get_type(val2), MG_VALUE_TYPE_PATH);
   check_path(mg_value_path(val2));
   mg_value_destroy(val2);
+}
+
+TEST(Value, Date) {
+  {
+    mg_date *date = mg_date_alloc(&mg_system_allocator);
+    date->days = 1;
+    EXPECT_EQ(mg_date_days(date), static_cast<int64_t>(1));
+    mg_date *date2 = mg_date_copy(date);
+    mg_date_destroy(date);
+    EXPECT_EQ(mg_date_days(date2), static_cast<int64_t>(1)); 
+    mg_date_destroy(date2);
+  }
+}
+
+TEST(Value, Time) {
+  {
+    mg_time *time = mg_time_alloc(&mg_system_allocator);
+    time->nanoseconds = 1;
+    time->tz_offset_seconds = 1;
+    EXPECT_EQ(mg_time_nanoseconds(time), static_cast<int64_t>(1));
+    EXPECT_EQ(mg_time_tz_offset_seconds(time), static_cast<int64_t>(1));
+    mg_time *time2 = mg_time_copy(time);
+    mg_time_destroy(time);
+    EXPECT_EQ(mg_time_nanoseconds(time2), static_cast<int64_t>(1));
+    EXPECT_EQ(mg_time_tz_offset_seconds(time2), static_cast<int64_t>(1));
+    mg_time_destroy(time2);
+  }
+}
+
+TEST(Value, LocalTime) {
+  {
+    mg_local_time *local_time = mg_local_time_alloc(&mg_system_allocator);
+    local_time->nanoseconds = 1;
+    EXPECT_EQ(mg_local_time_nanoseconds(local_time), static_cast<int64_t>(1));
+    mg_local_time *local_time2 = mg_local_time_copy(local_time);
+    mg_local_time_destroy(local_time);
+    EXPECT_EQ(mg_local_time_nanoseconds(local_time2), static_cast<int64_t>(1));
+    mg_local_time_destroy(local_time2);
+  }
+}
+
+TEST(Value, DateTime) {
+  {
+    mg_date_time *date_time = mg_date_time_alloc(&mg_system_allocator);
+    date_time->seconds = 1;
+    date_time->nanoseconds = 1;
+    date_time->tz_offset_minutes = 1;
+    EXPECT_EQ(mg_date_time_seconds(date_time), static_cast<int64_t>(1));
+    EXPECT_EQ(mg_date_time_nanoseconds(date_time), static_cast<int64_t>(1));
+    EXPECT_EQ(mg_date_time_tz_offset_minutes(date_time), static_cast<int64_t>(1));
+    mg_date_time *date_time2 = mg_date_time_copy(date_time);
+    mg_date_time_destroy(date_time);
+    EXPECT_EQ(mg_date_time_seconds(date_time2), static_cast<int64_t>(1));
+    EXPECT_EQ(mg_date_time_nanoseconds(date_time2), static_cast<int64_t>(1));
+    EXPECT_EQ(mg_date_time_tz_offset_minutes(date_time2), static_cast<int64_t>(1));
+    mg_date_time_destroy(date_time2);
+  }
+}
+
+TEST(Value, DateTimeZoneId) {
+  {
+    mg_date_time_zone_id *date_time_zone_id = mg_date_time_zone_id_alloc(&mg_system_allocator);
+    date_time_zone_id->seconds = 1;
+    date_time_zone_id->nanoseconds = 1;
+    date_time_zone_id->tz_id = 1;
+    EXPECT_EQ(mg_date_time_zone_id_seconds(date_time_zone_id), static_cast<int64_t>(1));
+    EXPECT_EQ(mg_date_time_zone_id_nanoseconds(date_time_zone_id), static_cast<int64_t>(1));
+    EXPECT_EQ(mg_date_time_zone_id_tz_id(date_time_zone_id), static_cast<int64_t>(1));
+    mg_date_time_zone_id *date_time_zone_id2 = mg_date_time_zone_id_copy(date_time_zone_id);
+    mg_date_time_zone_id_destroy(date_time_zone_id);
+    EXPECT_EQ(mg_date_time_zone_id_seconds(date_time_zone_id2), static_cast<int64_t>(1));
+    EXPECT_EQ(mg_date_time_zone_id_nanoseconds(date_time_zone_id2), static_cast<int64_t>(1));
+    EXPECT_EQ(mg_date_time_zone_id_tz_id(date_time_zone_id2), static_cast<int64_t>(1));
+    mg_date_time_zone_id_destroy(date_time_zone_id2);
+  }
+}
+
+TEST(Value, LocalDateTime) {
+  {
+    mg_local_date_time *local_date_time = mg_local_date_time_alloc(&mg_system_allocator);
+    local_date_time->seconds = 1;
+    local_date_time->nanoseconds = 1;
+    EXPECT_EQ(mg_local_date_time_seconds(local_date_time), static_cast<int64_t>(1));
+    EXPECT_EQ(mg_local_date_time_nanoseconds(local_date_time), static_cast<int64_t>(1));
+    mg_local_date_time *local_date_time2 = mg_local_date_time_copy(local_date_time);
+    mg_local_date_time_destroy(local_date_time);
+    EXPECT_EQ(mg_local_date_time_seconds(local_date_time2), static_cast<int64_t>(1));
+    EXPECT_EQ(mg_local_date_time_nanoseconds(local_date_time2), static_cast<int64_t>(1));
+    mg_local_date_time_destroy(local_date_time2);
+  }
+}
+
+TEST(Value, Duration) {
+  {
+    mg_duration *duration = mg_duration_alloc(&mg_system_allocator);
+    duration->months = 1;
+    duration->days = 1;
+    duration->seconds = 1;
+    duration->nanoseconds = 1;
+    EXPECT_EQ(mg_duration_months(duration), static_cast<int64_t>(1));
+    EXPECT_EQ(mg_duration_days(duration), static_cast<int64_t>(1));
+    EXPECT_EQ(mg_duration_seconds(duration), static_cast<int64_t>(1));
+    EXPECT_EQ(mg_duration_nanoseconds(duration), static_cast<int64_t>(1));
+    mg_duration *duration2 = mg_duration_copy(duration);
+    mg_duration_destroy(duration);
+    EXPECT_EQ(mg_duration_months(duration2), static_cast<int64_t>(1));
+    EXPECT_EQ(mg_duration_days(duration2), static_cast<int64_t>(1));
+    EXPECT_EQ(mg_duration_seconds(duration2), static_cast<int64_t>(1));
+    EXPECT_EQ(mg_duration_nanoseconds(duration2), static_cast<int64_t>(1));
+    mg_duration_destroy(duration2);
+  }
+}
+
+TEST(Value, Point2d) {
+  {
+    mg_point_2d *point_2d = mg_point_2d_alloc(&mg_system_allocator);
+    point_2d->srid = 1;
+    point_2d->x = 1.0;
+    point_2d->y = 1.0;
+    EXPECT_EQ(mg_point_2d_srid(point_2d), static_cast<int64_t>(1));
+    EXPECT_EQ(mg_point_2d_x(point_2d), 1.0);
+    EXPECT_EQ(mg_point_2d_y(point_2d), 1.0);
+    mg_point_2d *point_2d2 = mg_point_2d_copy(point_2d);
+    mg_point_2d_destroy(point_2d);
+    EXPECT_EQ(mg_point_2d_srid(point_2d2), static_cast<int64_t>(1));
+    EXPECT_EQ(mg_point_2d_x(point_2d2), 1.0);
+    EXPECT_EQ(mg_point_2d_y(point_2d2), 1.0);
+    mg_point_2d_destroy(point_2d2);
+  }
+}
+
+TEST(Value, Point3d) {
+  {
+    mg_point_3d *point_3d = mg_point_3d_alloc(&mg_system_allocator);
+    point_3d->srid = 1;
+    point_3d->x = 1.0;
+    point_3d->y = 1.0;
+    point_3d->z = 1.0;
+    EXPECT_EQ(mg_point_3d_srid(point_3d), static_cast<int64_t>(1));
+    EXPECT_EQ(mg_point_3d_x(point_3d), 1.0);
+    EXPECT_EQ(mg_point_3d_y(point_3d), 1.0);
+    EXPECT_EQ(mg_point_3d_z(point_3d), 1.0);
+    mg_point_3d *point_3d2 = mg_point_3d_copy(point_3d);
+    mg_point_3d_destroy(point_3d);
+    EXPECT_EQ(mg_point_3d_srid(point_3d2), static_cast<int64_t>(1));
+    EXPECT_EQ(mg_point_3d_x(point_3d2), 1.0);
+    EXPECT_EQ(mg_point_3d_y(point_3d2), 1.0);
+    EXPECT_EQ(mg_point_3d_z(point_3d2), 1.0);
+    mg_point_3d_destroy(point_3d2);
+  }
 }
