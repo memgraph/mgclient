@@ -1,6 +1,9 @@
 # build directory
 build/
 
+# coverage generated report directory
+tool/generated/
+
 # vim temporary files
 *.swp
 *.swo
