@@ -16,15 +16,19 @@ cmake_minimum_required(VERSION 3.8)
 project(mgclient VERSION 0.1)
 # Building tests is disabled by default to simplify the default build config.
 option(BUILD_TESTING "" OFF)
+message(STATUS "BUILD_TESTING: ${BUILD_TESTING}")
 # Integration tests are disabled by default, since the memgraph instance is
 # neccessary to execute them.
 option(BUILD_TESTING_INTEGRATION "" OFF)
+message(STATUS "BUILD_TESTING_INTEGRATION: ${BUILD_TESTING_INTEGRATION}")
+
 include(CTest)
 
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 17)
 set(C_STANDARD_REQUIRED ON)
 set(CXX_STANDARD_REQUIRED ON)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # Set default build type to 'Release'
 if(NOT CMAKE_BUILD_TYPE)

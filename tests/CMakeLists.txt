@@ -54,7 +54,12 @@ macro(add_gtest target_name target_path)
   add_executable(${target_name} ${target_path})
   target_include_directories(${target_name} PRIVATE ${GTEST_INCLUDE_DIRS} "${CMAKE_SOURCE_DIR}/src")
   target_link_libraries(${target_name} mgclient-static gtest gtest-main)
-  add_test(${target_name} ${target_name})
+
+  if (ENABLE_COVERAGE)
+    add_test(${target_name} env LLVM_PROFILE_FILE=${target_name}.profraw ./${target_name})
+  else()
+    add_test(${target_name} ${target_name})
+  endif()
 endmacro()
 
 add_gtest(value value.cpp)

@@ -8,10 +8,10 @@ database.
 # Building and installing
 
 To build and install mgclient from source you will need:
-   - CMake version >= 3.4
+   - CMake version >= 3.8
    - OpenSSL version >= 1.0.2
    - C compiler supporting C11
-   - C++ compiler supporting C++14
+   - C++ compiler supporting C++17
 
 To install minimum compile dependencies on Debian / Ubuntu:
 
