@@ -988,8 +988,7 @@ int mg_session_begin_transaction(mg_session *session,
   if (response->type == MG_MESSAGE_TYPE_FAILURE) {
     int failure_status = handle_failure_message(session, response->failure_v);
 
-    status = session->version == 1 ? handle_failure_v1(session)
-                                   : mg_session_send_reset_message(session);
+    status = mg_session_send_reset_message(session);
     if (status != 0) {
       goto fatal_failure;
     }
@@ -1067,8 +1066,7 @@ int mg_session_end_transaction(mg_session *session, int commit_transaction,
   if (response->type == MG_MESSAGE_TYPE_FAILURE) {
     int failure_status = handle_failure_message(session, response->failure_v);
 
-    status = session->version == 1 ? handle_failure_v1(session)
-                                   : mg_session_send_reset_message(session);
+    status = mg_session_send_reset_message(session);
     if (status != 0) {
       goto fatal_failure;
     }
