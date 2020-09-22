@@ -1799,7 +1799,8 @@ TEST_F(RunTest, TransactionBasic) {
   ASSERT_EQ(mg_session_status(session), MG_SESSION_EXECUTING);
 
   mg_result *result;
-  ASSERT_EQ(mg_session_end_transaction(session, 0, &result), MG_ERROR_BAD_CALL);
+  ASSERT_EQ(mg_session_rollback_transaction(session, &result),
+            MG_ERROR_BAD_CALL);
 
   ASSERT_EQ(mg_session_pull(session, NULL), 0);
   ASSERT_EQ(mg_session_fetch(session, &result), 0);
@@ -1810,7 +1811,7 @@ TEST_F(RunTest, TransactionBasic) {
   ASSERT_EQ(mg_session_fetch(session, &result), MG_ERROR_BAD_CALL);
   ASSERT_EQ(mg_session_status(session), MG_SESSION_READY);
 
-  ASSERT_EQ(mg_session_end_transaction(session, 0, &result), 0);
+  ASSERT_EQ(mg_session_rollback_transaction(session, &result), 0);
 
   mg_session_destroy(session);
   StopServer();
@@ -2134,7 +2135,7 @@ TEST_F(RunTest, TransactionWithMultipleRuns) {
   ASSERT_EQ(mg_session_fetch(session, &result), MG_ERROR_BAD_CALL);
   ASSERT_EQ(mg_session_pull(session, nullptr), MG_ERROR_BAD_CALL);
 
-  ASSERT_EQ(mg_session_end_transaction(session, true, &result), 0);
+  ASSERT_EQ(mg_session_commit_transaction(session, &result), 0);
 
   mg_session_destroy(session);
   StopServer();

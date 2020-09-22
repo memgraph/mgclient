@@ -1329,17 +1329,27 @@ MGCLIENT_EXPORT int mg_session_run(mg_session *session, const char *query,
 MGCLIENT_EXPORT int mg_session_begin_transaction(
     mg_session *session, const mg_map *extra_run_information);
 
-/// Ends current Explicit transaction.
+/// Commits current Explicit transaction.
 ///
-/// \param session            A \ref mg_session on which the transaction should
-/// be started. \param commit_transaction Whether the transaction should be
-/// commited or rollbacked. \param result             Contains the information
-/// about the ended transaction if it was successful. \return Returns 0 if the
-/// transaction was ended successfuly.
+/// \param session A \ref mg_session on which the transaction should
+///                be commited.
+/// \param result  Contains the information about the commited transaction
+///                if it was successful.
+/// \return Returns 0 if the  transaction was ended successfuly.
 ///         Otherwise, a non-zero error code is returned.
-MGCLIENT_EXPORT int mg_session_end_transaction(mg_session *session,
-                                               int commit_transaction,
-                                               mg_result **result);
+MGCLIENT_EXPORT int mg_session_commit_transaction(mg_session *session,
+                                                  mg_result **result);
+
+/// Rollbacks current Explicit transaction.
+///
+/// \param session A \ref mg_session on which the transaction should
+///                be rollbacked.
+/// \param result  Contains the information about the rollbacked transaction
+///                if it was successful.
+/// \return Returns 0 if the transaction was ended successfuly.
+///         Otherwise, a non-zero error code is returned.
+MGCLIENT_EXPORT int mg_session_rollback_transaction(mg_session *session,
+                                                    mg_result **result);
 
 /// Tries to fetch the next query result from \ref mg_session.
 ///

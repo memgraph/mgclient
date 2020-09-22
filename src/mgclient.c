@@ -1085,6 +1085,14 @@ fatal_failure:
   return status;
 }
 
+int mg_session_commit_transaction(mg_session *session, mg_result **result) {
+  return mg_session_end_transaction(session, 1, result);
+}
+
+int mg_session_rollback_transaction(mg_session *session, mg_result **result) {
+  return mg_session_end_transaction(session, 0, result);
+}
+
 const mg_list *mg_result_columns(const mg_result *result) {
   return result->columns;
 }

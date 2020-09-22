@@ -55,12 +55,15 @@ class Client {
   /// otherwise.
   bool BeginTransaction();
 
-  /// \brief End current transaction.
-  /// \param commitTransaction whether the transaction should be commited
-  /// or rollbacked.
-  /// \return true when the transaction was successfully ended, false
+  /// \brief Commit current transaction.
+  /// \return true when the transaction was successfully committed, false
   /// otherwise.
-  bool EndTransaction(bool commitTransaction);
+  bool CommitTransaction();
+
+  /// \brief Rollback current transaction.
+  /// \return true when the transaction was successfully rollbacked, false
+  /// otherwise.
+  bool RollbackTransaction();
 
   /// \brief Static method that creates a Memgraph client instance.
   /// \return pointer to the created client instance.
@@ -155,9 +158,14 @@ inline bool Client::BeginTransaction() {
   return mg_session_begin_transaction(session_, nullptr) == 0;
 }
 
-inline bool Client::EndTransaction(bool commitTransaction) {
+inline bool Client::CommitTransaction() {
   mg_result *result;
-  return mg_session_end_transaction(session_, commitTransaction, &result) == 0;
+  return mg_session_commit_transaction(session_, &result) == 0;
+}
+
+inline bool Client::RollbackTransaction() {
+  mg_result *result;
+  return mg_session_rollback_transaction(session_, &result) == 0;
 }
 
 }  // namespace mg
