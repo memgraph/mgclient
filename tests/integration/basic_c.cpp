@@ -105,12 +105,14 @@ TEST_F(MemgraphConnection, InsertAndRetriveFromMemegraph) {
       "'test2', is_deleted: false})";
   const char *get_query = "MATCH (n)-[r]->(m) RETURN n, r, m";
 
-  ASSERT_EQ(mg_session_run(session, create_query, NULL, NULL), 0);
-  ASSERT_EQ(mg_session_pull(session, &result), 0);
-  ASSERT_EQ(mg_session_pull(session, &result), MG_ERROR_BAD_CALL);
-  ASSERT_EQ(mg_session_run(session, get_query, NULL, NULL), 0);
+  ASSERT_EQ(mg_session_run(session, create_query, NULL, NULL, NULL, NULL), 0);
+  ASSERT_EQ(mg_session_pull(session, NULL), 0);
+  ASSERT_EQ(mg_session_fetch(session, &result), 0);
+  ASSERT_EQ(mg_session_fetch(session, &result), MG_ERROR_BAD_CALL);
 
-  while ((status = mg_session_pull(session, &result)) == 1) {
+  ASSERT_EQ(mg_session_run(session, get_query, NULL, NULL, NULL, NULL), 0);
+  ASSERT_EQ(mg_session_pull(session, NULL), 0);
+  while ((status = mg_session_fetch(session, &result)) == 1) {
     const mg_list *mg_columns = mg_result_columns(result);
     const mg_list *mg_row = mg_result_row(result);
 
