@@ -465,7 +465,7 @@ TEST(Value, Date) {
     EXPECT_EQ(mg_date_days(date), static_cast<int64_t>(1));
     mg_date *date2 = mg_date_copy(date);
     mg_date_destroy(date);
-    EXPECT_EQ(mg_date_days(date2), static_cast<int64_t>(1)); 
+    EXPECT_EQ(mg_date_days(date2), static_cast<int64_t>(1));
     mg_date_destroy(date2);
   }
 }
@@ -505,45 +505,61 @@ TEST(Value, DateTime) {
     date_time->tz_offset_minutes = 1;
     EXPECT_EQ(mg_date_time_seconds(date_time), static_cast<int64_t>(1));
     EXPECT_EQ(mg_date_time_nanoseconds(date_time), static_cast<int64_t>(1));
-    EXPECT_EQ(mg_date_time_tz_offset_minutes(date_time), static_cast<int64_t>(1));
+    EXPECT_EQ(mg_date_time_tz_offset_minutes(date_time),
+              static_cast<int64_t>(1));
     mg_date_time *date_time2 = mg_date_time_copy(date_time);
     mg_date_time_destroy(date_time);
     EXPECT_EQ(mg_date_time_seconds(date_time2), static_cast<int64_t>(1));
     EXPECT_EQ(mg_date_time_nanoseconds(date_time2), static_cast<int64_t>(1));
-    EXPECT_EQ(mg_date_time_tz_offset_minutes(date_time2), static_cast<int64_t>(1));
+    EXPECT_EQ(mg_date_time_tz_offset_minutes(date_time2),
+              static_cast<int64_t>(1));
     mg_date_time_destroy(date_time2);
   }
 }
 
 TEST(Value, DateTimeZoneId) {
   {
-    mg_date_time_zone_id *date_time_zone_id = mg_date_time_zone_id_alloc(&mg_system_allocator);
+    mg_date_time_zone_id *date_time_zone_id =
+        mg_date_time_zone_id_alloc(&mg_system_allocator);
     date_time_zone_id->seconds = 1;
     date_time_zone_id->nanoseconds = 1;
     date_time_zone_id->tz_id = 1;
-    EXPECT_EQ(mg_date_time_zone_id_seconds(date_time_zone_id), static_cast<int64_t>(1));
-    EXPECT_EQ(mg_date_time_zone_id_nanoseconds(date_time_zone_id), static_cast<int64_t>(1));
-    EXPECT_EQ(mg_date_time_zone_id_tz_id(date_time_zone_id), static_cast<int64_t>(1));
-    mg_date_time_zone_id *date_time_zone_id2 = mg_date_time_zone_id_copy(date_time_zone_id);
+    EXPECT_EQ(mg_date_time_zone_id_seconds(date_time_zone_id),
+              static_cast<int64_t>(1));
+    EXPECT_EQ(mg_date_time_zone_id_nanoseconds(date_time_zone_id),
+              static_cast<int64_t>(1));
+    EXPECT_EQ(mg_date_time_zone_id_tz_id(date_time_zone_id),
+              static_cast<int64_t>(1));
+    mg_date_time_zone_id *date_time_zone_id2 =
+        mg_date_time_zone_id_copy(date_time_zone_id);
     mg_date_time_zone_id_destroy(date_time_zone_id);
-    EXPECT_EQ(mg_date_time_zone_id_seconds(date_time_zone_id2), static_cast<int64_t>(1));
-    EXPECT_EQ(mg_date_time_zone_id_nanoseconds(date_time_zone_id2), static_cast<int64_t>(1));
-    EXPECT_EQ(mg_date_time_zone_id_tz_id(date_time_zone_id2), static_cast<int64_t>(1));
+    EXPECT_EQ(mg_date_time_zone_id_seconds(date_time_zone_id2),
+              static_cast<int64_t>(1));
+    EXPECT_EQ(mg_date_time_zone_id_nanoseconds(date_time_zone_id2),
+              static_cast<int64_t>(1));
+    EXPECT_EQ(mg_date_time_zone_id_tz_id(date_time_zone_id2),
+              static_cast<int64_t>(1));
     mg_date_time_zone_id_destroy(date_time_zone_id2);
   }
 }
 
 TEST(Value, LocalDateTime) {
   {
-    mg_local_date_time *local_date_time = mg_local_date_time_alloc(&mg_system_allocator);
+    mg_local_date_time *local_date_time =
+        mg_local_date_time_alloc(&mg_system_allocator);
     local_date_time->seconds = 1;
     local_date_time->nanoseconds = 1;
-    EXPECT_EQ(mg_local_date_time_seconds(local_date_time), static_cast<int64_t>(1));
-    EXPECT_EQ(mg_local_date_time_nanoseconds(local_date_time), static_cast<int64_t>(1));
-    mg_local_date_time *local_date_time2 = mg_local_date_time_copy(local_date_time);
+    EXPECT_EQ(mg_local_date_time_seconds(local_date_time),
+              static_cast<int64_t>(1));
+    EXPECT_EQ(mg_local_date_time_nanoseconds(local_date_time),
+              static_cast<int64_t>(1));
+    mg_local_date_time *local_date_time2 =
+        mg_local_date_time_copy(local_date_time);
     mg_local_date_time_destroy(local_date_time);
-    EXPECT_EQ(mg_local_date_time_seconds(local_date_time2), static_cast<int64_t>(1));
-    EXPECT_EQ(mg_local_date_time_nanoseconds(local_date_time2), static_cast<int64_t>(1));
+    EXPECT_EQ(mg_local_date_time_seconds(local_date_time2),
+              static_cast<int64_t>(1));
+    EXPECT_EQ(mg_local_date_time_nanoseconds(local_date_time2),
+              static_cast<int64_t>(1));
     mg_local_date_time_destroy(local_date_time2);
   }
 }

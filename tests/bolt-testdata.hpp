@@ -408,7 +408,8 @@ std::vector<ValueTestParam> LocalTimeTestCases() {
     encoded_local_time += "\xB1\x74"s;
     encoded_local_time += "\x01"s;
 
-    inputs.push_back({mg_value_make_local_time(local_time), encoded_local_time});
+    inputs.push_back(
+        {mg_value_make_local_time(local_time), encoded_local_time});
   }
   return inputs;
 }
@@ -435,7 +436,8 @@ std::vector<ValueTestParam> DateTimeTestCases() {
 std::vector<ValueTestParam> DateTimeZoneIdTestCases() {
   std::vector<ValueTestParam> inputs;
   {
-    mg_date_time_zone_id *date_time_zone_id = mg_date_time_zone_id_alloc(&mg_system_allocator);
+    mg_date_time_zone_id *date_time_zone_id =
+        mg_date_time_zone_id_alloc(&mg_system_allocator);
 
     date_time_zone_id->seconds = 1;
     date_time_zone_id->nanoseconds = 1;
@@ -447,7 +449,8 @@ std::vector<ValueTestParam> DateTimeZoneIdTestCases() {
     encoded_date_time_zone_id += "\x01"s;
     encoded_date_time_zone_id += "\x01"s;
 
-    inputs.push_back({mg_value_make_date_time_zone_id(date_time_zone_id), encoded_date_time_zone_id});
+    inputs.push_back({mg_value_make_date_time_zone_id(date_time_zone_id),
+                      encoded_date_time_zone_id});
   }
   return inputs;
 }
@@ -455,7 +458,8 @@ std::vector<ValueTestParam> DateTimeZoneIdTestCases() {
 std::vector<ValueTestParam> LocalDateTimeTestCases() {
   std::vector<ValueTestParam> inputs;
   {
-    mg_local_date_time *local_date_time = mg_local_date_time_alloc(&mg_system_allocator);
+    mg_local_date_time *local_date_time =
+        mg_local_date_time_alloc(&mg_system_allocator);
     local_date_time->seconds = 1;
     local_date_time->nanoseconds = 1;
 
@@ -464,7 +468,8 @@ std::vector<ValueTestParam> LocalDateTimeTestCases() {
     encoded_local_date_time += "\x01"s;
     encoded_local_date_time += "\x01"s;
 
-    inputs.push_back({mg_value_make_local_date_time(local_date_time), encoded_local_date_time});
+    inputs.push_back({mg_value_make_local_date_time(local_date_time),
+                      encoded_local_date_time});
   }
   return inputs;
 }

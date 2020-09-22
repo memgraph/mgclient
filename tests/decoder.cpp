@@ -304,19 +304,26 @@ INSTANTIATE_TEST_CASE_P(Date, ValueTest, ::testing::ValuesIn(DateTestCases()));
 
 INSTANTIATE_TEST_CASE_P(Time, ValueTest, ::testing::ValuesIn(TimeTestCases()));
 
-INSTANTIATE_TEST_CASE_P(LocalTime, ValueTest, ::testing::ValuesIn(LocalTimeTestCases()));
+INSTANTIATE_TEST_CASE_P(LocalTime, ValueTest,
+                        ::testing::ValuesIn(LocalTimeTestCases()));
 
-INSTANTIATE_TEST_CASE_P(DateTime, ValueTest, ::testing::ValuesIn(DateTimeTestCases()));
+INSTANTIATE_TEST_CASE_P(DateTime, ValueTest,
+                        ::testing::ValuesIn(DateTimeTestCases()));
 
-INSTANTIATE_TEST_CASE_P(DateTimeZoneId, ValueTest, ::testing::ValuesIn(DateTimeZoneIdTestCases()));
+INSTANTIATE_TEST_CASE_P(DateTimeZoneId, ValueTest,
+                        ::testing::ValuesIn(DateTimeZoneIdTestCases()));
 
-INSTANTIATE_TEST_CASE_P(LocalDateTime, ValueTest, ::testing::ValuesIn(LocalDateTimeTestCases()));
+INSTANTIATE_TEST_CASE_P(LocalDateTime, ValueTest,
+                        ::testing::ValuesIn(LocalDateTimeTestCases()));
 
-INSTANTIATE_TEST_CASE_P(Duration, ValueTest, ::testing::ValuesIn(DurationTestCases()));
+INSTANTIATE_TEST_CASE_P(Duration, ValueTest,
+                        ::testing::ValuesIn(DurationTestCases()));
 
-INSTANTIATE_TEST_CASE_P(Point2d, ValueTest, ::testing::ValuesIn(Point2dTestCases()));
+INSTANTIATE_TEST_CASE_P(Point2d, ValueTest,
+                        ::testing::ValuesIn(Point2dTestCases()));
 
-INSTANTIATE_TEST_CASE_P(Point3d, ValueTest, ::testing::ValuesIn(Point3dTestCases()));
+INSTANTIATE_TEST_CASE_P(Point3d, ValueTest,
+                        ::testing::ValuesIn(Point3dTestCases()));
 
 // TODO(mtomic): When these tests fail, just a bunch of bytes is outputted, we
 // might want to make this nicer (maybe add names or descriptions to
