@@ -34,7 +34,8 @@ int main(int argc, char *argv[]) {
   }
 
   if (mg_session_pull(session, NULL)) {
-    printf("failed to pull results of the query: %s\n", mg_session_error(session));
+    printf("failed to pull results of the query: %s\n",
+           mg_session_error(session));
     mg_session_destroy(session);
     return 1;
   }
