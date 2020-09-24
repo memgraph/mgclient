@@ -53,7 +53,6 @@ typedef struct mg_message_init {
 
 typedef struct mg_message_hello {
   mg_map *extra;
-  mg_map *routing;
 } mg_message_hello;
 
 typedef struct mg_message_run {

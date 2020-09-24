@@ -386,11 +386,8 @@ int mg_bolt_init_v4(mg_session *session, const mg_session_params *params) {
     return MG_ERROR_OOM;
   }
 
-  mg_map *routing = &mg_empty_map;
-
-  int status = mg_session_send_hello_message(session, extra, routing);
+  int status = mg_session_send_hello_message(session, extra);
   mg_map_destroy(extra);
-  mg_map_destroy(routing);
 
   return status;
 }

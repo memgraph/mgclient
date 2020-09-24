@@ -47,7 +47,6 @@ void mg_message_hello_destroy_ca(mg_message_hello *message,
                                  mg_allocator *allocator) {
   if (!message) return;
   mg_map_destroy_ca(message->extra, allocator);
-  mg_map_destroy_ca(message->routing, allocator);
   mg_allocator_free(allocator, message);
 }
 

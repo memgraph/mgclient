@@ -219,14 +219,12 @@ int mg_session_send_init_message(mg_session *session, const char *client_name,
   return mg_session_flush_message(session);
 }
 
-int mg_session_send_hello_message(mg_session *session, const mg_map *extra,
-                                  const mg_map *routing) {
+int mg_session_send_hello_message(mg_session *session, const mg_map *extra) {
   MG_RETURN_IF_FAILED(
-      mg_session_write_uint8(session, (uint8_t)(MG_MARKER_TINY_STRUCT + 2)));
+      mg_session_write_uint8(session, (uint8_t)(MG_MARKER_TINY_STRUCT + 1)));
   MG_RETURN_IF_FAILED(
       mg_session_write_uint8(session, MG_SIGNATURE_MESSAGE_HELLO));
   MG_RETURN_IF_FAILED(mg_session_write_map(session, extra));
-  MG_RETURN_IF_FAILED(mg_session_write_map(session, routing));
   return mg_session_flush_message(session);
 }
 

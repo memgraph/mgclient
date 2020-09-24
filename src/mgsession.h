@@ -152,8 +152,7 @@ int mg_session_read_bolt_message(mg_session *session, mg_message **message);
 int mg_session_send_init_message(mg_session *session, const char *client_name,
                                  const mg_map *auth_token);
 
-int mg_session_send_hello_message(mg_session *session, const mg_map *extra,
-                                  const mg_map *routing);
+int mg_session_send_hello_message(mg_session *session, const mg_map *extra);
 
 int mg_session_send_run_message(mg_session *session, const char *statement,
                                 const mg_map *parameters, const mg_map *extra);

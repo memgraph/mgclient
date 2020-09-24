@@ -1153,12 +1153,6 @@ int mg_session_read_hello_message(mg_session *session,
     return status;
   }
 
-  mg_map *routing;
-  status = mg_session_read_map(session, &routing);
-  if (status != 0) {
-    goto cleanup_extra;
-  }
-
   mg_message_hello *tmessage =
       mg_allocator_malloc(session->decoder_allocator, sizeof(mg_message_hello));
   if (!tmessage) {
@@ -1167,14 +1161,10 @@ int mg_session_read_hello_message(mg_session *session,
   }
 
   tmessage->extra = extra;
-  tmessage->routing = routing;
   *message = tmessage;
   return 0;
 
 cleanup:
-  mg_map_destroy_ca(routing, session->decoder_allocator);
-
-cleanup_extra:
   mg_map_destroy_ca(extra, session->decoder_allocator);
   return status;
 }
@@ -1325,13 +1315,16 @@ int mg_session_read_bolt_message(mg_session *session, mg_message **message) {
       }
       break;
     case MG_SIGNATURE_MESSAGE_HELLO:
-      if (marker != (uint8_t)(MG_MARKER_TINY_STRUCT + 2)) {
-        goto wrong_marker;
-      }
       if (session->version == 1) {
+        if (marker != (uint8_t)(MG_MARKER_TINY_STRUCT + 2)) {
+          goto wrong_marker;
+        }
         tmessage->type = MG_MESSAGE_TYPE_INIT;
         status = mg_session_read_init_message(session, &tmessage->init_v);
       } else {
+        if (marker != (uint8_t)(MG_MARKER_TINY_STRUCT + 1)) {
+          goto wrong_marker;
+        }
         tmessage->type = MG_MESSAGE_TYPE_HELLO;
         status = mg_session_read_hello_message(session, &tmessage->hello_v);
       }
