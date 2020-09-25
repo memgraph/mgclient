@@ -12,8 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include "mgclient.h"
 #include "mgsession.h"
 
+#include <bits/stdint-intn.h>
 #include <string.h>
 
 #include <endian.h>
@@ -581,6 +583,289 @@ cleanup_nodes:
   return status;
 }
 
+int mg_session_read_date(mg_session *session, mg_date **date) {
+  MG_RETURN_IF_FAILED(mg_session_check_struct_header(
+      session, (uint8_t)(MG_MARKER_TINY_STRUCT + 1), MG_SIGNATURE_DATE));
+  mg_date *date_tmp = mg_date_alloc(session->decoder_allocator);
+  if (!date_tmp) {
+    mg_session_set_error(session, "out of memory");
+    return MG_ERROR_OOM;
+  }
+
+  int status = 0;
+  status = mg_session_read_integer(session, &date_tmp->days);
+  if (status != 0) {
+    goto cleanup;
+  }
+
+  *date = date_tmp;
+  return 0;
+
+cleanup:
+  mg_allocator_free(session->decoder_allocator, date_tmp);
+  return status;
+}
+
+int mg_session_read_time(mg_session *session, mg_time **time) {
+  MG_RETURN_IF_FAILED(mg_session_check_struct_header(
+      session, (uint8_t)(MG_MARKER_TINY_STRUCT + 2), MG_SIGNATURE_TIME));
+  mg_time *time_tmp = mg_time_alloc(session->decoder_allocator);
+  if (!time_tmp) {
+    mg_session_set_error(session, "out of memory");
+    return MG_ERROR_OOM;
+  }
+
+  int status = 0;
+  status = mg_session_read_integer(session, &time_tmp->nanoseconds);
+  if (status != 0) {
+    goto cleanup;
+  }
+
+  status = mg_session_read_integer(session, &time_tmp->tz_offset_seconds);
+  if (status != 0) {
+    goto cleanup;
+  }
+
+  *time = time_tmp;
+  return 0;
+
+cleanup:
+  mg_allocator_free(session->decoder_allocator, time_tmp);
+  return status;
+}
+
+int mg_session_read_local_time(mg_session *session,
+                               mg_local_time **local_time) {
+  MG_RETURN_IF_FAILED(mg_session_check_struct_header(
+      session, (uint8_t)(MG_MARKER_TINY_STRUCT + 1), MG_SIGNATURE_LOCAL_TIME));
+  mg_local_time *local_time_tmp =
+      mg_local_time_alloc(session->decoder_allocator);
+  if (!local_time_tmp) {
+    mg_session_set_error(session, "out of memory");
+    return MG_ERROR_OOM;
+  }
+
+  int status = 0;
+  status = mg_session_read_integer(session, &local_time_tmp->nanoseconds);
+  if (status != 0) {
+    goto cleanup;
+  }
+
+  *local_time = local_time_tmp;
+  return 0;
+
+cleanup:
+  mg_allocator_free(session->decoder_allocator, local_time_tmp);
+  return status;
+}
+
+int mg_session_read_date_time(mg_session *session, mg_date_time **date_time) {
+  MG_RETURN_IF_FAILED(mg_session_check_struct_header(
+      session, (uint8_t)(MG_MARKER_TINY_STRUCT + 3), MG_SIGNATURE_DATE_TIME));
+  mg_date_time *date_time_tmp = mg_date_time_alloc(session->decoder_allocator);
+  if (!date_time_tmp) {
+    mg_session_set_error(session, "out of memory");
+    return MG_ERROR_OOM;
+  }
+
+  int status = 0;
+  status = mg_session_read_integer(session, &date_time_tmp->seconds);
+  if (status != 0) {
+    goto cleanup;
+  }
+
+  status = mg_session_read_integer(session, &date_time_tmp->nanoseconds);
+  if (status != 0) {
+    goto cleanup;
+  }
+
+  status = mg_session_read_integer(session, &date_time_tmp->tz_offset_minutes);
+  if (status != 0) {
+    goto cleanup;
+  }
+
+  *date_time = date_time_tmp;
+  return 0;
+
+cleanup:
+  mg_allocator_free(session->decoder_allocator, date_time_tmp);
+  return status;
+}
+
+int mg_session_read_date_time_zone_id(
+    mg_session *session, mg_date_time_zone_id **date_time_zone_id) {
+  MG_RETURN_IF_FAILED(mg_session_check_struct_header(
+      session, (uint8_t)(MG_MARKER_TINY_STRUCT + 3),
+      MG_SIGNATURE_DATE_TIME_ZONE_ID));
+  mg_date_time_zone_id *date_time_zone_id_tmp =
+      mg_date_time_zone_id_alloc(session->decoder_allocator);
+  if (!date_time_zone_id_tmp) {
+    mg_session_set_error(session, "out of memory");
+    return MG_ERROR_OOM;
+  }
+
+  int status = 0;
+  status = mg_session_read_integer(session, &date_time_zone_id_tmp->seconds);
+  if (status != 0) {
+    goto cleanup;
+  }
+
+  status =
+      mg_session_read_integer(session, &date_time_zone_id_tmp->nanoseconds);
+  if (status != 0) {
+    goto cleanup;
+  }
+
+  status = mg_session_read_integer(session, &date_time_zone_id_tmp->tz_id);
+
+  *date_time_zone_id = date_time_zone_id_tmp;
+  return 0;
+
+cleanup:
+  mg_allocator_free(session->decoder_allocator, date_time_zone_id_tmp);
+  return status;
+}
+
+int mg_session_read_local_date_time(mg_session *session,
+                                    mg_local_date_time **local_date_time) {
+  MG_RETURN_IF_FAILED(mg_session_check_struct_header(
+      session, (uint8_t)(MG_MARKER_TINY_STRUCT + 2),
+      MG_SIGNATURE_LOCAL_DATE_TIME));
+  mg_local_date_time *local_date_time_tmp =
+      mg_local_date_time_alloc(session->decoder_allocator);
+  if (!local_date_time_tmp) {
+    mg_session_set_error(session, "out of memory");
+    return MG_ERROR_OOM;
+  }
+
+  int status = 0;
+  status = mg_session_read_integer(session, &local_date_time_tmp->seconds);
+  if (status != 0) {
+    goto cleanup;
+  }
+
+  status = mg_session_read_integer(session, &local_date_time_tmp->nanoseconds);
+  if (status != 0) {
+    goto cleanup;
+  }
+
+  *local_date_time = local_date_time_tmp;
+  return 0;
+
+cleanup:
+  mg_allocator_free(session->decoder_allocator, local_date_time_tmp);
+  return status;
+}
+
+int mg_session_read_duration(mg_session *session, mg_duration **duration) {
+  MG_RETURN_IF_FAILED(mg_session_check_struct_header(
+      session, (uint8_t)(MG_MARKER_TINY_STRUCT + 4), MG_SIGNATURE_DURATION));
+  mg_duration *duration_tmp = mg_duration_alloc(session->decoder_allocator);
+  if (!duration_tmp) {
+    mg_session_set_error(session, "out of memory");
+    return MG_ERROR_OOM;
+  }
+
+  int status = 0;
+  status = mg_session_read_integer(session, &duration_tmp->months);
+  if (status != 0) {
+    goto cleanup;
+  }
+
+  status = mg_session_read_integer(session, &duration_tmp->days);
+  if (status != 0) {
+    goto cleanup;
+  }
+
+  status = mg_session_read_integer(session, &duration_tmp->seconds);
+  if (status != 0) {
+    goto cleanup;
+  }
+
+  status = mg_session_read_integer(session, &duration_tmp->nanoseconds);
+  if (status != 0) {
+    goto cleanup;
+  }
+
+  *duration = duration_tmp;
+  return 0;
+
+cleanup:
+  mg_allocator_free(session->decoder_allocator, duration_tmp);
+  return status;
+}
+
+int mg_session_read_point_2d(mg_session *session, mg_point_2d **point_2d) {
+  MG_RETURN_IF_FAILED(mg_session_check_struct_header(
+      session, (uint8_t)(MG_MARKER_TINY_STRUCT + 3), MG_SIGNATURE_POINT_2D));
+  mg_point_2d *point_2d_tmp = mg_point_2d_alloc(session->decoder_allocator);
+  if (!point_2d_tmp) {
+    mg_session_set_error(session, "out of memory");
+    return MG_ERROR_OOM;
+  }
+
+  int status = 0;
+  status = mg_session_read_integer(session, &point_2d_tmp->srid);
+  if (status != 0) {
+    goto cleanup;
+  }
+
+  status = mg_session_read_float(session, &point_2d_tmp->x);
+  if (status != 0) {
+    goto cleanup;
+  }
+
+  status = mg_session_read_float(session, &point_2d_tmp->y);
+  if (status != 0) {
+    goto cleanup;
+  }
+
+  *point_2d = point_2d_tmp;
+  return 0;
+
+cleanup:
+  mg_allocator_free(session->decoder_allocator, point_2d_tmp);
+  return status;
+}
+
+int mg_session_read_point_3d(mg_session *session, mg_point_3d **point_3d) {
+  MG_RETURN_IF_FAILED(mg_session_check_struct_header(
+      session, (uint8_t)(MG_MARKER_TINY_STRUCT + 4), MG_SIGNATURE_POINT_3D));
+  mg_point_3d *point_3d_tmp = mg_point_3d_alloc(session->decoder_allocator);
+  if (!point_3d_tmp) {
+    mg_session_set_error(session, "out of memory");
+    return MG_ERROR_OOM;
+  }
+
+  int status = 0;
+  status = mg_session_read_integer(session, &point_3d_tmp->srid);
+  if (status != 0) {
+    goto cleanup;
+  }
+
+  status = mg_session_read_float(session, &point_3d_tmp->x);
+  if (status != 0) {
+    goto cleanup;
+  }
+
+  status = mg_session_read_float(session, &point_3d_tmp->y);
+  if (status != 0) {
+    goto cleanup;
+  }
+
+  status = mg_session_read_float(session, &point_3d_tmp->z);
+  if (status != 0) {
+    goto cleanup;
+  }
+
+  *point_3d = point_3d_tmp;
+  return 0;
+
+cleanup:
+  mg_allocator_free(session->decoder_allocator, point_3d_tmp);
+  return status;
+}
+
 int mg_session_read_struct_value(mg_session *session, mg_value *value) {
   if (session->in_cursor + 2 > session->in_end) {
     mg_session_set_error(session, "unexpected end of message");
@@ -609,6 +894,35 @@ int mg_session_read_struct_value(mg_session *session, mg_value *value) {
     case MG_SIGNATURE_PATH:
       value->type = MG_VALUE_TYPE_PATH;
       return mg_session_read_path(session, &value->path_v);
+    case MG_SIGNATURE_DATE:
+      value->type = MG_VALUE_TYPE_DATE;
+      return mg_session_read_date(session, &value->date_v);
+    case MG_SIGNATURE_TIME:
+      value->type = MG_VALUE_TYPE_TIME;
+      return mg_session_read_time(session, &value->time_v);
+    case MG_SIGNATURE_LOCAL_TIME:
+      value->type = MG_VALUE_TYPE_LOCAL_TIME;
+      return mg_session_read_local_time(session, &value->local_time_v);
+    case MG_SIGNATURE_DATE_TIME:
+      value->type = MG_VALUE_TYPE_DATE_TIME;
+      return mg_session_read_date_time(session, &value->date_time_v);
+    case MG_SIGNATURE_DATE_TIME_ZONE_ID:
+      value->type = MG_VALUE_TYPE_DATE_TIME_ZONE_ID;
+      return mg_session_read_date_time_zone_id(session,
+                                               &value->date_time_zone_id_v);
+    case MG_SIGNATURE_LOCAL_DATE_TIME:
+      value->type = MG_VALUE_TYPE_LOCAL_DATE_TIME;
+      return mg_session_read_local_date_time(session,
+                                             &value->local_date_time_v);
+    case MG_SIGNATURE_DURATION:
+      value->type = MG_VALUE_TYPE_DURATION;
+      return mg_session_read_duration(session, &value->duration_v);
+    case MG_SIGNATURE_POINT_2D:
+      value->type = MG_VALUE_TYPE_POINT_2D;
+      return mg_session_read_point_2d(session, &value->point_2d_v);
+    case MG_SIGNATURE_POINT_3D:
+      value->type = MG_VALUE_TYPE_POINT_3D;
+      return mg_session_read_point_3d(session, &value->point_3d_v);
   }
 
   mg_session_set_error(session, "unsupported value");
@@ -829,6 +1143,32 @@ cleanup_client_name:
   return status;
 }
 
+int mg_session_read_hello_message(mg_session *session,
+                                  mg_message_hello **message) {
+  int status = 0;
+
+  mg_map *extra;
+  status = mg_session_read_map(session, &extra);
+  if (status != 0) {
+    return status;
+  }
+
+  mg_message_hello *tmessage =
+      mg_allocator_malloc(session->decoder_allocator, sizeof(mg_message_hello));
+  if (!tmessage) {
+    status = MG_ERROR_OOM;
+    goto cleanup;
+  }
+
+  tmessage->extra = extra;
+  *message = tmessage;
+  return 0;
+
+cleanup:
+  mg_map_destroy_ca(extra, session->decoder_allocator);
+  return status;
+}
+
 int mg_session_read_run_message(mg_session *session, mg_message_run **message) {
   mg_string *statement;
   MG_RETURN_IF_FAILED(mg_session_read_string(session, &statement));
@@ -842,6 +1182,14 @@ int mg_session_read_run_message(mg_session *session, mg_message_run **message) {
     goto cleanup_statement;
   }
 
+  mg_map *extra = NULL;
+  if (session->version == 4) {
+    status = mg_session_read_map(session, &extra);
+    if (status != 0) {
+      goto cleanup_parameters;
+    }
+  }
+
   mg_message_run *tmessage =
       mg_allocator_malloc(session->decoder_allocator, sizeof(mg_message_run));
   if (!tmessage) {
@@ -851,14 +1199,71 @@ int mg_session_read_run_message(mg_session *session, mg_message_run **message) {
 
   tmessage->statement = statement;
   tmessage->parameters = parameters;
+  tmessage->extra = extra;
+
   *message = tmessage;
   return 0;
 
 cleanup:
+  mg_map_destroy_ca(extra, session->decoder_allocator);
+
+cleanup_parameters:
   mg_map_destroy_ca(parameters, session->decoder_allocator);
 
 cleanup_statement:
   mg_string_destroy_ca(statement, session->decoder_allocator);
+  return status;
+}
+
+int mg_session_read_begin_message(mg_session *session,
+                                  mg_message_begin **message) {
+  int status = 0;
+
+  mg_map *extra;
+  status = mg_session_read_map(session, &extra);
+  if (status != 0) {
+    return status;
+  }
+
+  mg_message_begin *tmessage =
+      mg_allocator_malloc(session->decoder_allocator, sizeof(mg_message_begin));
+  if (!tmessage) {
+    status = MG_ERROR_OOM;
+    goto cleanup;
+  }
+
+  tmessage->extra = extra;
+  *message = tmessage;
+
+cleanup:
+  mg_map_destroy_ca(extra, session->decoder_allocator);
+  return status;
+}
+
+int mg_session_read_pull_message(mg_session *session,
+                                 mg_message_pull **message) {
+  int status = 0;
+
+  mg_map *extra = NULL;
+  if (session->version == 4) {
+    status = mg_session_read_map(session, &extra);
+    if (status != 0) {
+      return status;
+    }
+  }
+
+  mg_message_pull *tmessage =
+      mg_allocator_malloc(session->decoder_allocator, sizeof(mg_message_pull));
+  if (!tmessage) {
+    status = MG_ERROR_OOM;
+    goto cleanup;
+  }
+
+  tmessage->extra = extra;
+  *message = tmessage;
+
+cleanup:
+  mg_map_destroy_ca(extra, session->decoder_allocator);
   return status;
 }
 
@@ -881,9 +1286,7 @@ int mg_session_read_bolt_message(mg_session *session, mg_message **message) {
   switch (signature) {
     case MG_SIGNATURE_MESSAGE_SUCCESS:
       if (marker != (uint8_t)(MG_MARKER_TINY_STRUCT + 1)) {
-        mg_session_set_error(session, "wrong value marker");
-        status = MG_ERROR_PROTOCOL_VIOLATION;
-        goto cleanup;
+        goto wrong_marker;
       }
       tmessage->type = MG_MESSAGE_TYPE_SUCCESS;
       status = mg_session_read_success_message(session, &tmessage->success_v);
@@ -893,9 +1296,7 @@ int mg_session_read_bolt_message(mg_session *session, mg_message **message) {
       break;
     case MG_SIGNATURE_MESSAGE_FAILURE:
       if (marker != (uint8_t)(MG_MARKER_TINY_STRUCT + 1)) {
-        mg_session_set_error(session, "wrong value marker");
-        status = MG_ERROR_PROTOCOL_VIOLATION;
-        goto cleanup;
+        goto wrong_marker;
       }
       tmessage->type = MG_MESSAGE_TYPE_FAILURE;
       status = mg_session_read_failure_message(session, &tmessage->failure_v);
@@ -905,9 +1306,7 @@ int mg_session_read_bolt_message(mg_session *session, mg_message **message) {
       break;
     case MG_SIGNATURE_MESSAGE_RECORD:
       if (marker != (uint8_t)(MG_MARKER_TINY_STRUCT + 1)) {
-        mg_session_set_error(session, "wrong value marker");
-        status = MG_ERROR_PROTOCOL_VIOLATION;
-        goto cleanup;
+        goto wrong_marker;
       }
       tmessage->type = MG_MESSAGE_TYPE_RECORD;
       status = mg_session_read_record_message(session, &tmessage->record_v);
@@ -915,23 +1314,28 @@ int mg_session_read_bolt_message(mg_session *session, mg_message **message) {
         goto cleanup;
       }
       break;
-    case MG_SIGNATURE_MESSAGE_INIT:
-      if (marker != (uint8_t)(MG_MARKER_TINY_STRUCT + 2)) {
-        mg_session_set_error(session, "wrong value marker");
-        status = MG_ERROR_PROTOCOL_VIOLATION;
-        goto cleanup;
+    case MG_SIGNATURE_MESSAGE_HELLO:
+      if (session->version == 1) {
+        if (marker != (uint8_t)(MG_MARKER_TINY_STRUCT + 2)) {
+          goto wrong_marker;
+        }
+        tmessage->type = MG_MESSAGE_TYPE_INIT;
+        status = mg_session_read_init_message(session, &tmessage->init_v);
+      } else {
+        if (marker != (uint8_t)(MG_MARKER_TINY_STRUCT + 1)) {
+          goto wrong_marker;
+        }
+        tmessage->type = MG_MESSAGE_TYPE_HELLO;
+        status = mg_session_read_hello_message(session, &tmessage->hello_v);
       }
-      tmessage->type = MG_MESSAGE_TYPE_INIT;
-      status = mg_session_read_init_message(session, &tmessage->init_v);
       if (status != 0) {
         goto cleanup;
       }
       break;
-    case MG_SIGNATURE_MESSAGE_RUN:
-      if (marker != (uint8_t)(MG_MARKER_TINY_STRUCT + 2)) {
-        mg_session_set_error(session, "wrong value marker");
-        status = MG_ERROR_PROTOCOL_VIOLATION;
-        goto cleanup;
+    case MG_SIGNATURE_MESSAGE_RUN: {
+      int field_number = 2 + (session->version == 4);
+      if (marker != (uint8_t)(MG_MARKER_TINY_STRUCT + field_number)) {
+        goto wrong_marker;
       }
       tmessage->type = MG_MESSAGE_TYPE_RUN;
       status = mg_session_read_run_message(session, &tmessage->run_v);
@@ -939,21 +1343,50 @@ int mg_session_read_bolt_message(mg_session *session, mg_message **message) {
         goto cleanup;
       }
       break;
+    }
     case MG_SIGNATURE_MESSAGE_ACK_FAILURE:
       if (marker != MG_MARKER_TINY_STRUCT) {
-        mg_session_set_error(session, "wrong value marker");
-        status = MG_ERROR_PROTOCOL_VIOLATION;
-        goto cleanup;
+        goto wrong_marker;
       }
       tmessage->type = MG_MESSAGE_TYPE_ACK_FAILURE;
       break;
-    case MG_SIGNATURE_MESSAGE_PULL_ALL:
-      if (marker != MG_MARKER_TINY_STRUCT) {
-        mg_session_set_error(session, "wrong value marker");
-        status = MG_ERROR_PROTOCOL_VIOLATION;
+    case MG_SIGNATURE_MESSAGE_BEGIN:
+      if (marker != (uint8_t)(MG_MARKER_TINY_STRUCT + 1)) {
+        goto wrong_marker;
+      }
+      tmessage->type = MG_MESSAGE_TYPE_BEGIN;
+      status = mg_session_read_begin_message(session, &tmessage->begin_v);
+      if (status != 0) {
         goto cleanup;
       }
-      tmessage->type = MG_MESSAGE_TYPE_PULL_ALL;
+      break;
+    case MG_SIGNATURE_MESSAGE_COMMIT:
+      if (marker != (uint8_t)(MG_MARKER_TINY_STRUCT)) {
+        goto wrong_marker;
+      }
+      tmessage->type = MG_MESSAGE_TYPE_COMMIT;
+      break;
+    case MG_SIGNATURE_MESSAGE_ROLLBACK:
+      if (marker != (uint8_t)(MG_MARKER_TINY_STRUCT)) {
+        goto wrong_marker;
+      }
+      tmessage->type = MG_MESSAGE_TYPE_ROLLBACK;
+      break;
+    case MG_SIGNATURE_MESSAGE_RESET:
+      if (marker != MG_MARKER_TINY_STRUCT) {
+        goto wrong_marker;
+      }
+      tmessage->type = MG_MESSAGE_TYPE_RESET;
+      break;
+    case MG_SIGNATURE_MESSAGE_PULL:
+      if (marker != MG_MARKER_TINY_STRUCT) {
+        goto wrong_marker;
+      }
+      tmessage->type = MG_MESSAGE_TYPE_PULL;
+      status = mg_session_read_pull_message(session, &tmessage->pull_v);
+      if (status != 0) {
+        goto cleanup;
+      }
       break;
     default:
       mg_session_set_error(session, "unknown message type");
@@ -964,6 +1397,9 @@ int mg_session_read_bolt_message(mg_session *session, mg_message **message) {
   *message = tmessage;
   return 0;
 
+wrong_marker:
+  mg_session_set_error(session, "wrong value marker");
+  status = MG_ERROR_PROTOCOL_VIOLATION;
 cleanup:
   mg_allocator_free(session->decoder_allocator, tmessage);
   return status;

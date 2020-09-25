@@ -83,3 +83,14 @@ if(BUILD_TESTING_INTEGRATION)
 endif()
 
 add_gtest(unit_mgclient_value unit/mgclient_value.cpp)
+
+# Build examples and add them to tests
+set(EXAMPLE_DIR ${CMAKE_SOURCE_DIR}/examples)
+
+add_executable(example_basic_c ${EXAMPLE_DIR}/basic.c)
+target_link_libraries(example_basic_c mgclient-static)
+add_test(example_basic_c example_basic_c 127.0.0.1 7687 "RETURN 1")
+
+add_executable(example_basic_cpp ${EXAMPLE_DIR}/basic.cpp)
+target_link_libraries(example_basic_cpp mgclient-static)
+add_test(example_basic_cpp example_basic_cpp 127.0.0.1 7687 "RETURN 1")

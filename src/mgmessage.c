@@ -43,11 +43,37 @@ void mg_message_init_destroy_ca(mg_message_init *message,
   mg_allocator_free(allocator, message);
 }
 
+void mg_message_hello_destroy_ca(mg_message_hello *message,
+                                 mg_allocator *allocator) {
+  if (!message) return;
+  mg_map_destroy_ca(message->extra, allocator);
+  mg_allocator_free(allocator, message);
+}
+
 void mg_message_run_destroy_ca(mg_message_run *message,
                                mg_allocator *allocator) {
   if (!message) return;
   mg_string_destroy_ca(message->statement, allocator);
   mg_map_destroy_ca(message->parameters, allocator);
+  mg_map_destroy_ca(message->extra, allocator);
+  mg_allocator_free(allocator, message);
+}
+
+void mg_message_begin_destroy_ca(mg_message_begin *message,
+                                 mg_allocator *allocator) {
+  if (!message) {
+    return;
+  }
+  mg_map_destroy_ca(message->extra, allocator);
+  mg_allocator_free(allocator, message);
+}
+
+void mg_message_pull_destroy_ca(mg_message_pull *message,
+                                mg_allocator *allocator) {
+  if (!message) {
+    return;
+  }
+  mg_map_destroy_ca(message->extra, allocator);
   mg_allocator_free(allocator, message);
 }
 
@@ -66,11 +92,22 @@ void mg_message_destroy_ca(mg_message *message, mg_allocator *allocator) {
     case MG_MESSAGE_TYPE_INIT:
       mg_message_init_destroy_ca(message->init_v, allocator);
       break;
+    case MG_MESSAGE_TYPE_HELLO:
+      mg_message_hello_destroy_ca(message->hello_v, allocator);
+      break;
     case MG_MESSAGE_TYPE_RUN:
       mg_message_run_destroy_ca(message->run_v, allocator);
       break;
+    case MG_MESSAGE_TYPE_BEGIN:
+      mg_message_begin_destroy_ca(message->begin_v, allocator);
+      break;
+    case MG_MESSAGE_TYPE_PULL:
+      mg_message_pull_destroy_ca(message->pull_v, allocator);
+      break;
     case MG_MESSAGE_TYPE_ACK_FAILURE:
-    case MG_MESSAGE_TYPE_PULL_ALL:
+    case MG_MESSAGE_TYPE_RESET:
+    case MG_MESSAGE_TYPE_COMMIT:
+    case MG_MESSAGE_TYPE_ROLLBACK:
       break;
   }
   mg_allocator_free(allocator, message);

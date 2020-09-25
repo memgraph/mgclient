@@ -19,6 +19,7 @@
 
 #include <gtest/gtest.h>
 
+#include "mgallocator.h"
 #include "mgclient.h"
 
 using namespace std::string_literals;
@@ -361,6 +362,175 @@ std::vector<ValueTestParam> PathTestCases() {
     encoded_path += "\x01\x01\xFE\x02\x03\x00\x01\x01\xFC\x03\x05\x03"s;
 
     inputs.push_back({mg_value_make_path(path), encoded_path});
+  }
+  return inputs;
+}
+
+std::vector<ValueTestParam> DateTestCases() {
+  std::vector<ValueTestParam> inputs;
+  {
+    mg_date *date = mg_date_alloc(&mg_system_allocator);
+    date->days = 1;
+
+    std::string encoded_date;
+    encoded_date += "\xB1\x44"s;
+    encoded_date += "\x01"s;
+
+    inputs.push_back({mg_value_make_date(date), encoded_date});
+  }
+  return inputs;
+}
+
+std::vector<ValueTestParam> TimeTestCases() {
+  std::vector<ValueTestParam> inputs;
+  {
+    mg_time *time = mg_time_alloc(&mg_system_allocator);
+    time->nanoseconds = 1;
+    time->tz_offset_seconds = 1;
+
+    std::string encoded_time;
+    encoded_time += "\xB2\x54"s;
+    encoded_time += "\x01"s;
+    encoded_time += "\x01"s;
+
+    inputs.push_back({mg_value_make_time(time), encoded_time});
+  }
+  return inputs;
+}
+
+std::vector<ValueTestParam> LocalTimeTestCases() {
+  std::vector<ValueTestParam> inputs;
+  {
+    mg_local_time *local_time = mg_local_time_alloc(&mg_system_allocator);
+    local_time->nanoseconds = 1;
+
+    std::string encoded_local_time;
+    encoded_local_time += "\xB1\x74"s;
+    encoded_local_time += "\x01"s;
+
+    inputs.push_back(
+        {mg_value_make_local_time(local_time), encoded_local_time});
+  }
+  return inputs;
+}
+
+std::vector<ValueTestParam> DateTimeTestCases() {
+  std::vector<ValueTestParam> inputs;
+  {
+    mg_date_time *date_time = mg_date_time_alloc(&mg_system_allocator);
+    date_time->seconds = 1;
+    date_time->nanoseconds = 1;
+    date_time->tz_offset_minutes = 1;
+
+    std::string encoded_date_time;
+    encoded_date_time += "\xB3\x46"s;
+    encoded_date_time += "\x01"s;
+    encoded_date_time += "\x01"s;
+    encoded_date_time += "\x01"s;
+
+    inputs.push_back({mg_value_make_date_time(date_time), encoded_date_time});
+  }
+  return inputs;
+}
+
+std::vector<ValueTestParam> DateTimeZoneIdTestCases() {
+  std::vector<ValueTestParam> inputs;
+  {
+    mg_date_time_zone_id *date_time_zone_id =
+        mg_date_time_zone_id_alloc(&mg_system_allocator);
+
+    date_time_zone_id->seconds = 1;
+    date_time_zone_id->nanoseconds = 1;
+    date_time_zone_id->tz_id = 1;
+
+    std::string encoded_date_time_zone_id;
+    encoded_date_time_zone_id += "\xB3\x66"s;
+    encoded_date_time_zone_id += "\x01"s;
+    encoded_date_time_zone_id += "\x01"s;
+    encoded_date_time_zone_id += "\x01"s;
+
+    inputs.push_back({mg_value_make_date_time_zone_id(date_time_zone_id),
+                      encoded_date_time_zone_id});
+  }
+  return inputs;
+}
+
+std::vector<ValueTestParam> LocalDateTimeTestCases() {
+  std::vector<ValueTestParam> inputs;
+  {
+    mg_local_date_time *local_date_time =
+        mg_local_date_time_alloc(&mg_system_allocator);
+    local_date_time->seconds = 1;
+    local_date_time->nanoseconds = 1;
+
+    std::string encoded_local_date_time;
+    encoded_local_date_time += "\xB2\x64"s;
+    encoded_local_date_time += "\x01"s;
+    encoded_local_date_time += "\x01"s;
+
+    inputs.push_back({mg_value_make_local_date_time(local_date_time),
+                      encoded_local_date_time});
+  }
+  return inputs;
+}
+
+std::vector<ValueTestParam> DurationTestCases() {
+  std::vector<ValueTestParam> inputs;
+  {
+    mg_duration *duration = mg_duration_alloc(&mg_system_allocator);
+    duration->months = 1;
+    duration->days = 1;
+    duration->seconds = 1;
+    duration->nanoseconds = 1;
+
+    std::string encoded_duration;
+    encoded_duration += "\xB4\x45"s;
+    encoded_duration += "\x01"s;
+    encoded_duration += "\x01"s;
+    encoded_duration += "\x01"s;
+    encoded_duration += "\x01"s;
+
+    inputs.push_back({mg_value_make_duration(duration), encoded_duration});
+  }
+  return inputs;
+}
+
+std::vector<ValueTestParam> Point2dTestCases() {
+  std::vector<ValueTestParam> inputs;
+  {
+    mg_point_2d *point_2d = mg_point_2d_alloc(&mg_system_allocator);
+    point_2d->srid = 1;
+    point_2d->x = 1.0;
+    point_2d->y = 1.0;
+
+    std::string encoded_point_2d;
+    encoded_point_2d += "\xB3\x58"s;
+    encoded_point_2d += "\x01"s;
+    encoded_point_2d += "\xC1\x3F\xF0\x00\x00\x00\x00\x00\x00"s;
+    encoded_point_2d += "\xC1\x3F\xF0\x00\x00\x00\x00\x00\x00"s;
+
+    inputs.push_back({mg_value_make_point_2d(point_2d), encoded_point_2d});
+  }
+  return inputs;
+}
+
+std::vector<ValueTestParam> Point3dTestCases() {
+  std::vector<ValueTestParam> inputs;
+  {
+    mg_point_3d *point_3d = mg_point_3d_alloc(&mg_system_allocator);
+    point_3d->srid = 1;
+    point_3d->x = 1.0;
+    point_3d->y = 1.0;
+    point_3d->z = 1.0;
+
+    std::string encoded_point_3d;
+    encoded_point_3d += "\xB4\x59"s;
+    encoded_point_3d += "\x01"s;
+    encoded_point_3d += "\xC1\x3F\xF0\x00\x00\x00\x00\x00\x00"s;
+    encoded_point_3d += "\xC1\x3F\xF0\x00\x00\x00\x00\x00\x00"s;
+    encoded_point_3d += "\xC1\x3F\xF0\x00\x00\x00\x00\x00\x00"s;
+
+    inputs.push_back({mg_value_make_point_3d(point_3d), encoded_point_3d});
   }
   return inputs;
 }

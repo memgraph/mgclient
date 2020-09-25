@@ -83,6 +83,9 @@ mg_session *mg_session_init(mg_allocator *allocator) {
   session->result.message = NULL;
   session->result.columns = NULL;
 
+  session->explicit_transaction = 0;
+  session->query_number = 0;
+
   return session;
 
 cleanup:
@@ -129,7 +132,9 @@ void mg_session_destroy(mg_session *session) {
   mg_allocator_free(session->allocator, session->out_buffer);
 
   mg_message_destroy_ca(session->result.message, session->decoder_allocator);
+  session->result.message = NULL;
   mg_list_destroy_ca(session->result.columns, session->allocator);
+  session->result.columns = NULL;
 
   mg_linear_allocator_destroy(
       (mg_linear_allocator *)session->decoder_allocator);
