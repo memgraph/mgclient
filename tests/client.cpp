@@ -851,8 +851,6 @@ void RunTest::InvalidStatement(int version) {
       ASSERT_EQ(message->type, MG_MESSAGE_TYPE_ACK_FAILURE);
       mg_message_destroy_ca(message, session->decoder_allocator);
 
-      // Server responds with SUCCESS.
-      { ASSERT_EQ(mg_session_send_success_message(session, &mg_empty_map), 0); }
     } else {
       mg_message *message;
       ASSERT_EQ(mg_session_receive_message(session), 0);
@@ -860,6 +858,9 @@ void RunTest::InvalidStatement(int version) {
       ASSERT_EQ(message->type, MG_MESSAGE_TYPE_RESET);
       mg_message_destroy_ca(message, session->decoder_allocator);
     }
+
+    // Server responds with SUCCESS.
+    { ASSERT_EQ(mg_session_send_success_message(session, &mg_empty_map), 0); }
 
     mg_session_destroy(session);
   });
@@ -1280,7 +1281,6 @@ void RunTest::QueryRuntimeError(int version) {
       mg_message_destroy_ca(message, session->decoder_allocator);
 
       // Server responds with SUCCESS.
-      { ASSERT_EQ(mg_session_send_success_message(session, &mg_empty_map), 0); }
     } else {
       mg_message *message;
       ASSERT_EQ(mg_session_receive_message(session), 0);
@@ -1289,6 +1289,7 @@ void RunTest::QueryRuntimeError(int version) {
       mg_message_destroy_ca(message, session->decoder_allocator);
     }
 
+    { ASSERT_EQ(mg_session_send_success_message(session, &mg_empty_map), 0); }
     mg_session_destroy(session);
   });
 
