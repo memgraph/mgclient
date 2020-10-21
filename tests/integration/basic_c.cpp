@@ -75,17 +75,11 @@ class MemgraphConnection : public ::testing::Test {
     mg_session_params_set_sslmode(
         params, memgraph_ssl ? MG_SSLMODE_REQUIRE : MG_SSLMODE_DISABLE);
     ASSERT_EQ(mg_connect(params, &session), 0);
+    DatabaseCleanup();
   }
 
   virtual void TearDown() override {
-    mg_result *result;
-    const char *delete_all_query = "MATCH (n) DETACH DELETE n";
-
-    ASSERT_EQ(mg_session_run(session, delete_all_query, NULL, NULL, NULL, NULL),
-              0);
-    ASSERT_EQ(mg_session_pull(session, NULL), 0);
-    ASSERT_EQ(mg_session_fetch(session, &result), 0);
-    ASSERT_EQ(mg_session_fetch(session, &result), MG_ERROR_BAD_CALL);
+    DatabaseCleanup();
     mg_session_params_destroy(params);
     if (session) {
       mg_session_destroy(session);
@@ -94,6 +88,17 @@ class MemgraphConnection : public ::testing::Test {
 
   mg_session_params *params;
   mg_session *session;
+
+  void DatabaseCleanup() {
+    mg_result *result;
+    const char *delete_all_query = "MATCH (n) DETACH DELETE n";
+
+    ASSERT_EQ(mg_session_run(session, delete_all_query, NULL, NULL, NULL, NULL),
+              0);
+    ASSERT_EQ(mg_session_pull(session, NULL), 0);
+    ASSERT_EQ(mg_session_fetch(session, &result), 0);
+    ASSERT_EQ(mg_session_fetch(session, &result), MG_ERROR_BAD_CALL);
+  }
 };
 
 TEST_F(MemgraphConnection, InsertAndRetriveFromMemegraph) {
