@@ -36,7 +36,7 @@ jobs:
         platform: [ubuntu-18.04]
     runs-on: ${{ matrix.platform }}
     env:
-      MG_VERSION: "1.1.0"
+      MG_VERSION: "1.2.0"
     steps:
     - name: Set-up repository
       uses: actions/checkout@v1
