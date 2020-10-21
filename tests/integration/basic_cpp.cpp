@@ -33,7 +33,7 @@ class MemgraphConnection : public ::testing::Test {
     client = mg::Client::Connect(
         {GetEnvOrDefault<std::string>("MEMGRAPH_HOST", "127.0.0.1"),
          GetEnvOrDefault<uint16_t>("MEMGRAPH_PORT", 7687), "", "",
-         GetEnvOrDefault<bool>("MEMGRAPH_SSLMODE", true), ""});
+         GetEnvOrDefault<bool>("MEMGRAPH_SSLMODE", false), ""});
 
     ASSERT_TRUE(client);
 

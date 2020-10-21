@@ -68,7 +68,7 @@ class MemgraphConnection : public ::testing::Test {
     std::string memgraph_host =
         GetEnvOrDefault<std::string>("MEMGRAPH_HOST", "127.0.0.1");
     int memgraph_port = GetEnvOrDefault<int>("MEMGRAPH_PORT", 7687);
-    bool memgraph_ssl = GetEnvOrDefault<bool>("MEMGRAPH_SSLMODE", true);
+    bool memgraph_ssl = GetEnvOrDefault<bool>("MEMGRAPH_SSLMODE", false);
 
     mg_session_params_set_host(params, memgraph_host.c_str());
     mg_session_params_set_port(params, memgraph_port);
