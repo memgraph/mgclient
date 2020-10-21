@@ -97,6 +97,7 @@ class MemgraphConnection : public ::testing::Test {
 };
 
 TEST_F(MemgraphConnection, InsertAndRetriveFromMemegraph) {
+  ASSERT_EQ(mg_session_begin_transaction(session, NULL), 0);
   mg_result *result;
   int status = 0, rows = 0;
   const char *create_query =
@@ -157,4 +158,5 @@ TEST_F(MemgraphConnection, InsertAndRetriveFromMemegraph) {
   }
   ASSERT_EQ(rows, 1);
   ASSERT_EQ(status, 0);
+  ASSERT_EQ(mg_session_commit_transaction(session, &result), 0);
 }
