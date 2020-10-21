@@ -16,7 +16,7 @@ int main(int argc, char *argv[]) {
   }
   mg_session_params_set_host(params, argv[1]);
   mg_session_params_set_port(params, (uint16_t)atoi(argv[2]));
-  mg_session_params_set_sslmode(params, MG_SSLMODE_REQUIRE);
+  mg_session_params_set_sslmode(params, MG_SSLMODE_DISABLE);
 
   mg_session *session = NULL;
   int status = mg_connect(params, &session);

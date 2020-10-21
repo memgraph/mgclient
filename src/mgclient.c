@@ -648,9 +648,10 @@ int mg_connect(const mg_session_params *params, mg_session **session) {
   return mg_connect_ca(params, session, &mg_system_allocator);
 }
 
-int handle_failure_v1(mg_session *session) {
+int handle_failure(mg_session *session) {
   int status = 0;
-  status = mg_session_send_ack_failure_message(session);
+  status = session->version == 1 ? mg_session_send_ack_failure_message(session)
+                                 : mg_session_send_reset_message(session);
   if (status != 0) {
     return status;
   }
@@ -778,8 +779,7 @@ int mg_session_run(mg_session *session, const char *query, const mg_map *params,
   if (response->type == MG_MESSAGE_TYPE_FAILURE) {
     int failure_status = handle_failure_message(session, response->failure_v);
 
-    status = session->version == 1 ? handle_failure_v1(session)
-                                   : mg_session_send_reset_message(session);
+    status = handle_failure(session);
     if (status != 0) {
       goto fatal_failure;
     }
@@ -905,8 +905,7 @@ int mg_session_fetch(mg_session *session, mg_result **result) {
     int failure_status = handle_failure_message(session, message->failure_v);
     mg_message_destroy_ca(message, session->decoder_allocator);
 
-    status = session->version == 1 ? handle_failure_v1(session)
-                                   : mg_session_send_reset_message(session);
+    status = handle_failure(session);
     if (status != 0) {
       goto fatal_failure;
     }
@@ -985,7 +984,7 @@ int mg_session_begin_transaction(mg_session *session,
   if (response->type == MG_MESSAGE_TYPE_FAILURE) {
     int failure_status = handle_failure_message(session, response->failure_v);
 
-    status = mg_session_send_reset_message(session);
+    status = handle_failure(session);
     if (status != 0) {
       goto fatal_failure;
     }
@@ -1063,7 +1062,7 @@ int mg_session_end_transaction(mg_session *session, int commit_transaction,
   if (response->type == MG_MESSAGE_TYPE_FAILURE) {
     int failure_status = handle_failure_message(session, response->failure_v);
 
-    status = mg_session_send_reset_message(session);
+    status = handle_failure(session);
     if (status != 0) {
       goto fatal_failure;
     }

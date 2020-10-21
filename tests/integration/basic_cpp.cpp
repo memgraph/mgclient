@@ -33,7 +33,7 @@ class MemgraphConnection : public ::testing::Test {
     client = mg::Client::Connect(
         {GetEnvOrDefault<std::string>("MEMGRAPH_HOST", "127.0.0.1"),
          GetEnvOrDefault<uint16_t>("MEMGRAPH_PORT", 7687), "", "",
-         GetEnvOrDefault<bool>("MEMGRAPH_SSLMODE", true), ""});
+         GetEnvOrDefault<bool>("MEMGRAPH_SSLMODE", false), ""});
 
     ASSERT_TRUE(client);
 
@@ -56,6 +56,7 @@ class MemgraphConnection : public ::testing::Test {
 
 TEST_F(MemgraphConnection, InsertAndRetrieveFromMemgraph) {
   ASSERT_NE(client, nullptr);
+  ASSERT_TRUE(client->BeginTransaction());
 
   const auto create_query =
       "CREATE (n: TestLabel{id: 1, name: 'test1', is_deleted: true}) "
@@ -111,4 +112,5 @@ TEST_F(MemgraphConnection, InsertAndRetrieveFromMemgraph) {
     ++result_counter;
   }
   ASSERT_EQ(result_counter, 1);
+  ASSERT_TRUE(client->CommitTransaction());
 }

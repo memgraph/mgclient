@@ -1378,8 +1378,9 @@ int mg_session_read_bolt_message(mg_session *session, mg_message **message) {
       }
       tmessage->type = MG_MESSAGE_TYPE_RESET;
       break;
-    case MG_SIGNATURE_MESSAGE_PULL:
-      if (marker != MG_MARKER_TINY_STRUCT) {
+    case MG_SIGNATURE_MESSAGE_PULL: {
+      uint8_t expected_marker = MG_MARKER_TINY_STRUCT + (session->version == 4);
+      if (marker != expected_marker) {
         goto wrong_marker;
       }
       tmessage->type = MG_MESSAGE_TYPE_PULL;
@@ -1388,6 +1389,7 @@ int mg_session_read_bolt_message(mg_session *session, mg_message **message) {
         goto cleanup;
       }
       break;
+    }
     default:
       mg_session_set_error(session, "unknown message type");
       status = MG_ERROR_PROTOCOL_VIOLATION;

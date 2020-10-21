@@ -12,7 +12,7 @@ int main(int argc, char *argv[]) {
   mg::Client::Params params;
   params.host = argv[1];
   params.port = static_cast<uint16_t>(atoi(argv[2]));
-  params.use_ssl = true;
+  params.use_ssl = false;
   const auto client = mg::Client::Connect(params);
 
   if (!client) {

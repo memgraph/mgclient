@@ -245,7 +245,8 @@ int mg_session_send_run_message(mg_session *session, const char *statement,
 }
 
 int mg_session_send_pull_message(mg_session *session, const mg_map *extra) {
-  MG_RETURN_IF_FAILED(mg_session_write_uint8(session, MG_MARKER_TINY_STRUCT));
+  uint8_t marker = MG_MARKER_TINY_STRUCT + (session->version == 4);
+  MG_RETURN_IF_FAILED(mg_session_write_uint8(session, marker));
   MG_RETURN_IF_FAILED(
       mg_session_write_uint8(session, MG_SIGNATURE_MESSAGE_PULL));
 

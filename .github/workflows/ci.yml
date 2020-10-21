@@ -36,7 +36,7 @@ jobs:
         platform: [ubuntu-18.04]
     runs-on: ${{ matrix.platform }}
     env:
-      MG_VERSION: "1.1.0"
+      MG_VERSION: "1.2.0"
     steps:
     - name: Set-up repository
       uses: actions/checkout@v1
@@ -46,7 +46,7 @@ jobs:
       uses: actions/cache@v1
       with:
         path: ~/memgraph
-        key: cache-memgraph-v${MG_VERSION}-docker-image
+        key: cache-memgraph-v${{ env.MG_VERSION }}-docker-image
 
     - name: Download Memgraph Docker image
       if: steps.cache-memgraph-docker.outputs.cache-hit != 'true'
