@@ -132,7 +132,7 @@ extern "C" {
 /// Client software version.
 ///
 /// \return Client version in the major.minor.patch format.
-MGCLIENT_EXPORT const char *mg_client_get_version();
+MGCLIENT_EXPORT const char *mg_client_version();
 
 /// An enum listing all the types as specified by Bolt protocol.
 enum mg_value_type {

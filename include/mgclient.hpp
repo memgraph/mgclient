@@ -126,7 +126,7 @@ inline Client::Client(mg_session *session) : session_(session) {}
 
 inline Client::~Client() { mg_session_destroy(session_); }
 
-inline const char *Client::Version() { return mg_client_get_version(); }
+inline const char *Client::Version() { return mg_client_version(); }
 
 inline bool Client::Execute(const std::string &statement) {
   int status = mg_session_run(session_, statement.c_str(), nullptr, nullptr,

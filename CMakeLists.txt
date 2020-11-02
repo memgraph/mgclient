@@ -13,15 +13,12 @@
 # limitations under the License.
 
 cmake_minimum_required(VERSION 3.8)
-project(mgclient VERSION 1.1.0)
 
-# Minor version increase also means ABI incompatibility with previous versions,
-# because of that SO version could be calculated as a sum of major and minor
-# version numbers.
-math(EXPR mgclient_SOVERSION
-     "${mgclient_VERSION_MAJOR} + ${mgclient_VERSION_MINOR}")
-add_definitions(-DMGCLIENT_VERSION="${mgclient_VERSION}"
-                -DMGCLIENT_SOVERSION="${mgclient_SOVERSION}")
+project(mgclient VERSION 1.1.0)
+# Minor version increase can also means ABI incompatibility with previous
+# versions. IMPORTANT: Take care of the SO version manually.
+set(mgclient_SOVERSION 2)
+add_definitions(-DMGCLIENT_VERSION="${mgclient_VERSION}")
 
 # Building tests is disabled by default to simplify the default build config.
 option(BUILD_TESTING "" OFF)
