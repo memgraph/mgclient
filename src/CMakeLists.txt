@@ -40,6 +40,7 @@ target_link_libraries(mgclient-static PRIVATE ${OPENSSL_LIBRARIES})
 add_library(mgclient-shared SHARED ${mgclient_src_files})
 set_target_properties(mgclient-shared PROPERTIES
         OUTPUT_NAME mgclient
+        SOVERSION ${mgclient_SOVERSION}
         C_VISIBILITY_PRESET hidden)
 target_include_directories(mgclient-shared
         PUBLIC

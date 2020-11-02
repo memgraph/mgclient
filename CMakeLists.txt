@@ -13,7 +13,13 @@
 # limitations under the License.
 
 cmake_minimum_required(VERSION 3.4)
-project(mgclient VERSION 0.1)
+
+project(mgclient VERSION 1.0.0)
+# Minor version increase can also mean ABI incompatibility with previous
+# versions. IMPORTANT: Take care of the SO version manually.
+set(mgclient_SOVERSION 1)
+add_definitions(-DMGCLIENT_VERSION="${mgclient_VERSION}")
+
 # Building tests is disabled by default to simplify the default build config.
 option(BUILD_TESTING "" OFF)
 # Integration tests are disabled by default, since the memgraph instance is

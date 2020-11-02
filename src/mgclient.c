@@ -33,6 +33,8 @@
 #include "mgmessage.h"
 #include "mgsession.h"
 
+const char *mg_client_version() { return MGCLIENT_VERSION; }
+
 typedef struct mg_session_params {
   const char *address;
   const char *host;
