@@ -9,6 +9,8 @@ int main(int argc, char *argv[]) {
     exit(1);
   }
 
+  printf("mgclient version: %s\n", mg_client_version());
+
   mg_session_params *params = mg_session_params_make();
   if (!params) {
     fprintf(stderr, "failed to allocate session parameters\n");

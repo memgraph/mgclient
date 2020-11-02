@@ -9,6 +9,7 @@ int main(int argc, char *argv[]) {
     exit(1);
   }
 
+  std::cout << "mgclient version: " << mg::Client::Version() << std::endl;
   mg::Client::Params params;
   params.host = argv[1];
   params.port = static_cast<uint16_t>(atoi(argv[2]));

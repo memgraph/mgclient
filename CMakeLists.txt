@@ -13,7 +13,13 @@
 # limitations under the License.
 
 cmake_minimum_required(VERSION 3.8)
-project(mgclient VERSION 0.1)
+
+project(mgclient VERSION 1.1.0)
+# Minor version increase can also mean ABI incompatibility with previous
+# versions. IMPORTANT: Take care of the SO version manually.
+set(mgclient_SOVERSION 2)
+add_definitions(-DMGCLIENT_VERSION="${mgclient_VERSION}")
+
 # Building tests is disabled by default to simplify the default build config.
 option(BUILD_TESTING "" OFF)
 message(STATUS "BUILD_TESTING: ${BUILD_TESTING}")

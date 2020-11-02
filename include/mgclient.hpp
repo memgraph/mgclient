@@ -18,6 +18,7 @@
 #include <optional>
 
 #include "mgclient.h"
+
 #include "mgvalue.hpp"
 
 namespace mg {
@@ -40,6 +41,10 @@ class Client {
   Client &operator=(const Client &) = delete;
   Client &operator=(Client &&) = delete;
   ~Client();
+
+  /// \brief Client software version.
+  /// \return client version in the major.minor.patch format.
+  static const char *Version();
 
   /// \brief Executes the given Cypher `statement`.
   /// \return true when the statement is successfully executed, false otherwise.
@@ -120,6 +125,8 @@ inline std::unique_ptr<Client> Client::Connect(const Client::Params &params) {
 inline Client::Client(mg_session *session) : session_(session) {}
 
 inline Client::~Client() { mg_session_destroy(session_); }
+
+inline const char *Client::Version() { return mg_client_version(); }
 
 inline bool Client::Execute(const std::string &statement) {
   int status = mg_session_run(session_, statement.c_str(), nullptr, nullptr,
