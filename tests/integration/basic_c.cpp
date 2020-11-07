@@ -68,21 +68,18 @@ class MemgraphConnection : public ::testing::Test {
     std::string memgraph_host =
         GetEnvOrDefault<std::string>("MEMGRAPH_HOST", "127.0.0.1");
     int memgraph_port = GetEnvOrDefault<int>("MEMGRAPH_PORT", 7687);
-    bool memgraph_ssl = GetEnvOrDefault<bool>("MEMGRAPH_SSLMODE", true);
+    bool memgraph_ssl = GetEnvOrDefault<bool>("MEMGRAPH_SSLMODE", false);
 
     mg_session_params_set_host(params, memgraph_host.c_str());
     mg_session_params_set_port(params, memgraph_port);
     mg_session_params_set_sslmode(
         params, memgraph_ssl ? MG_SSLMODE_REQUIRE : MG_SSLMODE_DISABLE);
+    ASSERT_EQ(mg_connect(params, &session), 0);
+    DatabaseCleanup();
   }
 
   virtual void TearDown() override {
-    mg_result *result;
-    const char *delete_all_query = "MATCH (n) DETACH DELETE n";
-
-    ASSERT_EQ(mg_session_run(session, delete_all_query, NULL, NULL), 0);
-    ASSERT_EQ(mg_session_pull(session, &result), 0);
-    ASSERT_EQ(mg_session_pull(session, &result), MG_ERROR_BAD_CALL);
+    DatabaseCleanup();
     mg_session_params_destroy(params);
     if (session) {
       mg_session_destroy(session);
@@ -91,9 +88,21 @@ class MemgraphConnection : public ::testing::Test {
 
   mg_session_params *params;
   mg_session *session;
+
+  void DatabaseCleanup() {
+    mg_result *result;
+    const char *delete_all_query = "MATCH (n) DETACH DELETE n";
+
+    ASSERT_EQ(mg_session_run(session, delete_all_query, NULL, NULL, NULL, NULL),
+              0);
+    ASSERT_EQ(mg_session_pull(session, NULL), 0);
+    ASSERT_EQ(mg_session_fetch(session, &result), 0);
+    ASSERT_EQ(mg_session_fetch(session, &result), MG_ERROR_BAD_CALL);
+  }
 };
 
 TEST_F(MemgraphConnection, InsertAndRetriveFromMemegraph) {
+  ASSERT_EQ(mg_session_begin_transaction(session, NULL), 0);
   mg_result *result;
   int status = 0, rows = 0;
   const char *create_query =
@@ -102,13 +111,14 @@ TEST_F(MemgraphConnection, InsertAndRetriveFromMemegraph) {
       "'test2', is_deleted: false})";
   const char *get_query = "MATCH (n)-[r]->(m) RETURN n, r, m";
 
-  ASSERT_EQ(mg_connect(params, &session), 0);
-  ASSERT_EQ(mg_session_run(session, create_query, NULL, NULL), 0);
-  ASSERT_EQ(mg_session_pull(session, &result), 0);
-  ASSERT_EQ(mg_session_pull(session, &result), MG_ERROR_BAD_CALL);
-  ASSERT_EQ(mg_session_run(session, get_query, NULL, NULL), 0);
+  ASSERT_EQ(mg_session_run(session, create_query, NULL, NULL, NULL, NULL), 0);
+  ASSERT_EQ(mg_session_pull(session, NULL), 0);
+  ASSERT_EQ(mg_session_fetch(session, &result), 0);
+  ASSERT_EQ(mg_session_fetch(session, &result), MG_ERROR_BAD_CALL);
 
-  while ((status = mg_session_pull(session, &result)) == 1) {
+  ASSERT_EQ(mg_session_run(session, get_query, NULL, NULL, NULL, NULL), 0);
+  ASSERT_EQ(mg_session_pull(session, NULL), 0);
+  while ((status = mg_session_fetch(session, &result)) == 1) {
     const mg_list *mg_columns = mg_result_columns(result);
     const mg_list *mg_row = mg_result_row(result);
 
@@ -153,4 +163,5 @@ TEST_F(MemgraphConnection, InsertAndRetriveFromMemegraph) {
   }
   ASSERT_EQ(rows, 1);
   ASSERT_EQ(status, 0);
+  ASSERT_EQ(mg_session_commit_transaction(session, &result), 0);
 }

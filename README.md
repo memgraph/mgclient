@@ -8,10 +8,10 @@ database.
 # Building and installing on Linux
 
 To build and install mgclient from source you will need:
-   - CMake version >= 3.4
+   - CMake version >= 3.8
    - OpenSSL version >= 1.0.2
    - C compiler supporting C11
-   - C++ compiler supporting C++14
+   - C++ compiler supporting C++17
 
 To install minimum compile dependencies on Debian / Ubuntu:
 
@@ -80,65 +80,7 @@ functionality is documented in that file in Doxygen format. You can also build
 HTML version of the documentation by running `doxygen` command from project
 root directory.
 
-Here's a simple client program making a connection to Memgraph server and
-executing a single query:
+# Examples
 
-```c
-#include <stdio.h>
-#include <stdlib.h>
-
-#include <mgclient.h>
-
-int main(int argc, char *argv[]) {
-  int status = mg_init();
-  if (status != 0) {
-    fprintf(stderr, "failed to initialize the client: %d\n", status);
-    exit(1);
-  }
-
-  if (argc != 4) {
-    fprintf(stderr, "Usage: %s [host] [port] [query]\n", argv[0]);
-    exit(1);
-  }
-
-  mg_session_params *params = mg_session_params_make();
-  if (!params) {
-    fprintf(stderr, "failed to allocate session parameters\n");
-    exit(1);
-  }
-  mg_session_params_set_host(params, argv[1]);
-  mg_session_params_set_port(params, (uint16_t)atoi(argv[2]));
-  mg_session_params_set_sslmode(params, MG_SSLMODE_REQUIRE);
-
-  mg_session *session = NULL;
-  status = mg_connect(params, &session);
-  mg_session_params_destroy(params);
-  if (status < 0) {
-    printf("failed to connect to Memgraph: %s\n", mg_session_error(session));
-    mg_session_destroy(session);
-    return 1;
-  }
-
-  if (mg_session_run(session, argv[3], NULL, NULL) < 0) {
-    printf("failed to execute query: %s\n", mg_session_error(session));
-    mg_session_destroy(session);
-    return 1;
-  }
-
-  mg_result *result;
-  int rows = 0;
-  while ((status = mg_session_pull(session, &result)) == 1) {
-    rows++;
-  }
-
-  if (status < 0) {
-    printf("error occurred during query execution: %s\n",
-           mg_session_error(session));
-  } else {
-    printf("query executed successfuly and returned %d rows\n", rows);
-  }
-
-  mg_session_destroy(session);
-  return 0;
-}
-```
+All the examples of the usage of the mgclient are contained in the
+[examples](examples) folder, including the C++ wrapper.

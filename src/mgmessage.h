@@ -24,9 +24,14 @@ enum mg_message_type {
   MG_MESSAGE_TYPE_SUCCESS,
   MG_MESSAGE_TYPE_FAILURE,
   MG_MESSAGE_TYPE_INIT,
+  MG_MESSAGE_TYPE_HELLO,
   MG_MESSAGE_TYPE_RUN,
   MG_MESSAGE_TYPE_ACK_FAILURE,
-  MG_MESSAGE_TYPE_PULL_ALL
+  MG_MESSAGE_TYPE_RESET,
+  MG_MESSAGE_TYPE_PULL,
+  MG_MESSAGE_TYPE_BEGIN,
+  MG_MESSAGE_TYPE_COMMIT,
+  MG_MESSAGE_TYPE_ROLLBACK
 };
 
 typedef struct mg_message_success {
@@ -46,10 +51,23 @@ typedef struct mg_message_init {
   mg_map *auth_token;
 } mg_message_init;
 
+typedef struct mg_message_hello {
+  mg_map *extra;
+} mg_message_hello;
+
 typedef struct mg_message_run {
   mg_string *statement;
   mg_map *parameters;
+  mg_map *extra;
 } mg_message_run;
+
+typedef struct mg_message_begin {
+  mg_map *extra;
+} mg_message_begin;
+
+typedef struct mg_message_pull {
+  mg_map *extra;
+} mg_message_pull;
 
 typedef struct mg_message {
   enum mg_message_type type;
@@ -58,7 +76,10 @@ typedef struct mg_message {
     mg_message_failure *failure_v;
     mg_message_record *record_v;
     mg_message_init *init_v;
+    mg_message_hello *hello_v;
     mg_message_run *run_v;
+    mg_message_begin *begin_v;
+    mg_message_pull *pull_v;
   };
 } mg_message;
 

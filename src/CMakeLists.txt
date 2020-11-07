@@ -12,6 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+add_library(project_options INTERFACE)
+include(../cmake/Sanitizers.cmake)
+enable_sanitizers(project_options)
+
 set(mgclient_src_files
         mgallocator.c
         mgclient.c
@@ -40,7 +44,7 @@ target_include_directories(mgclient-static
         "${CMAKE_SOURCE_DIR}/include"
         "${CMAKE_CURRENT_BINARY_DIR}"
         "${OPENSSL_INCLUDE_DIR}")
-target_link_libraries(mgclient-static PRIVATE ${OPENSSL_LIBRARIES})
+target_link_libraries(mgclient-static PRIVATE ${OPENSSL_LIBRARIES} project_options)
 if(${WIN32})
     target_link_libraries(mgclient-static PUBLIC ws2_32)
 endif()
@@ -48,6 +52,7 @@ endif()
 add_library(mgclient-shared SHARED ${mgclient_src_files})
 set_target_properties(mgclient-shared PROPERTIES
         OUTPUT_NAME mgclient
+        SOVERSION ${mgclient_SOVERSION}
         C_VISIBILITY_PRESET hidden)
 target_include_directories(mgclient-shared
         PUBLIC
@@ -68,6 +73,9 @@ include(GNUInstallDirs)
 install(TARGETS mgclient-static mgclient-shared
         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
+install(DIRECTORY
+        "${CMAKE_SOURCE_DIR}/include/"
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 install(FILES
         "${CMAKE_CURRENT_BINARY_DIR}/mgclient-export.h"
         "${PROJECT_SOURCE_DIR}/include/mgclient.h"

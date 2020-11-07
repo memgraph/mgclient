@@ -14,9 +14,8 @@
 
 include(ExternalProject)
 
-# Setup GTest
 find_package(Threads REQUIRED)
-
+# Setup GTest
 ExternalProject_Add(gtest-proj
         PREFIX            gtest
         GIT_REPOSITORY    https://github.com/google/googletest.git
@@ -58,7 +57,12 @@ macro(add_gtest target_name target_path)
   add_executable(${target_name} ${target_path})
   target_include_directories(${target_name} PRIVATE ${GTEST_INCLUDE_DIRS} "${CMAKE_SOURCE_DIR}/src")
   target_link_libraries(${target_name} mgclient-static gtest gtest-main)
-  add_test(${target_name} ${target_name})
+
+  if (ENABLE_COVERAGE)
+    add_test(${target_name} env LLVM_PROFILE_FILE=${target_name}.profraw ./${target_name})
+  else()
+    add_test(${target_name} ${target_name})
+  endif()
 endmacro()
 
 add_gtest(value value.cpp)
@@ -77,5 +81,19 @@ target_link_libraries(transport stdc++fs)
 add_gtest(allocator allocator.cpp)
 
 if(BUILD_TESTING_INTEGRATION)
-  add_gtest(basic integration/basic.cpp)
+  add_gtest(integration_basic_c integration/basic_c.cpp)
+  add_gtest(integration_basic_cpp integration/basic_cpp.cpp)
 endif()
+
+add_gtest(unit_mgclient_value unit/mgclient_value.cpp)
+
+# Build examples and add them to tests
+set(EXAMPLE_DIR ${CMAKE_SOURCE_DIR}/examples)
+
+add_executable(example_basic_c ${EXAMPLE_DIR}/basic.c)
+target_link_libraries(example_basic_c mgclient-static)
+add_test(example_basic_c example_basic_c 127.0.0.1 7687 "RETURN 1")
+
+add_executable(example_basic_cpp ${EXAMPLE_DIR}/basic.cpp)
+target_link_libraries(example_basic_cpp mgclient-static)
+add_test(example_basic_cpp example_basic_cpp 127.0.0.1 7687 "RETURN 1")
