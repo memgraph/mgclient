@@ -62,9 +62,7 @@ functionality is documented in that file in Doxygen format. You can also build
 HTML version of the documentation by running `doxygen` command from project
 root directory.
 
-Here's a simple client program making a connection to Memgraph server and
-executing a single query:
-
 # Examples
+
 All the examples of the usage of the mgclient are contained in the
 [examples](examples) folder, including the C++ wrapper.
