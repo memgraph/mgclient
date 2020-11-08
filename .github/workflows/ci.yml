@@ -69,11 +69,10 @@ jobs:
   # https://github.com/actions/virtual-environments/issues/1143.
   #
   # The only option to test this project on Windows is to run Memgraph on
-  # [WSL](https://docs.microsoft.com/en-us/windows/wsl/).
+  # [WSL](https://docs.microsoft.com/en-us/windows/wsl/). Memgraph has to be
+  # started manually because systemd is not available on WSL.
   build_and_test_windows:
     runs-on: windows-latest
-    env:
-      MG_VERSION: "1.2.0"
     strategy:
       matrix:
         include: [
@@ -96,9 +95,18 @@ jobs:
       - shell: wsl-bash {0}
         run: |
           mkdir ~/memgraph
-          sudo apt install -y curl
-          curl -L https://memgraph.com/download/memgraph/v${MG_VERSION}/ubuntu-18.04/memgraph-${MG_VERSION}-community-1_amd64.deb > ~/memgraph/memgraph-community.deb
-          ls ~/memgraph
+          curl -L https://memgraph.com/download/memgraph/v1.2.0/ubuntu-18.04/memgraph-1.2.0-community-1_amd64.deb > ~/memgraph/memgraph-community.deb
+          /usr/lib/memgraph/memgraph --bolt-port 7687 \
+                                     --bolt-cert-file="" \
+                                     --bolt-key-file="" \
+                                     --data-directory="~/memgraph/data" \
+                                     --storage-properties-on-edges=true \
+                                     --storage-snapshot-interval-sec=0 \
+                                     --storage-wal-enabled=false \
+                                     --storage-recover-on-startup=false \
+                                     --storage-snapshot-on-exit=false \
+                                     --telemetry-enabled=false \
+                                     --log-file='' &
 
       - name: Build and test mgclient
         run: |
