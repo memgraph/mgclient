@@ -62,6 +62,14 @@ jobs:
         ctest --output-on-failure
         sudo make install
 
+  # This project needs MinGW environment ON_WINDOWS to compile. CMake, make,
+  # gcc are all required.
+  #
+  # GitHub actions can't run Linux Docker container on Windows machine
+  # https://github.com/actions/virtual-environments/issues/1143.
+  #
+  # The only option to test this project on Windows is to run Memgraph on
+  # [WSL](https://docs.microsoft.com/en-us/windows/wsl/).
   build_and_test_windows:
     runs-on: windows-latest
     env:
@@ -83,7 +91,9 @@ jobs:
           update: true
           install: git base-devel mingw-w64-${{ matrix.arch }}-toolchain mingw-w64-${{ matrix.arch }}-cmake mingw-w64-${{ matrix.arch }}-openssl
       - uses: Vampire/setup-wsl@v1
-      - shell: wsl-bash_Ubuntu-18.04 {0}
+        with:
+            distribution: Ubuntu-18.04
+      - shell: wsl-bash {0}
         run: |
           mkdir ~/memgraph
           sudo apt install -y curl
