@@ -88,5 +88,5 @@ jobs:
           mkdir build
           cd build
           cmake .. -G "MinGW Makefiles"
-          cmake --build -DBUILD_TESTING=ON -DBUILD_TESTING_INTEGRATION=ON .
+          cmake --build . -DBUILD_TESTING=ON -DBUILD_TESTING_INTEGRATION=ON
           ctest -R "allocator|example|value"
