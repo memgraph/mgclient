@@ -98,6 +98,7 @@ jobs:
           mkdir ~/memgraph
           curl -L https://download.memgraph.com/memgraph/v1.2.0/ubuntu-18.04/memgraph_1.2.0-community-1_amd64.deb --output ~/memgraph/memgraph-community.deb
           dpkg -i ~/memgraph/memgraph-community.deb
+          systemctl status memgraph
           /usr/lib/memgraph/memgraph --bolt-port 7687 \
                                      --bolt-cert-file="" \
                                      --bolt-key-file="" \
