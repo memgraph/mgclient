@@ -92,10 +92,12 @@ jobs:
       - uses: Vampire/setup-wsl@v1
         with:
             distribution: Ubuntu-18.04
-      - shell: wsl-bash {0}
+      - name: Download, install and run Memgraph under WSL
+        shell: wsl-bash {0}
         run: |
           mkdir ~/memgraph
           curl -L https://memgraph.com/download/memgraph/v1.2.0/ubuntu-18.04/memgraph-1.2.0-community-1_amd64.deb > ~/memgraph/memgraph-community.deb
+          sudo dpkg -i ~/memgraph/memgraph-community.deb
           /usr/lib/memgraph/memgraph --bolt-port 7687 \
                                      --bolt-cert-file="" \
                                      --bolt-key-file="" \
