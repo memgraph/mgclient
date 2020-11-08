@@ -68,9 +68,10 @@ jobs:
   # GitHub actions can't run Linux Docker container on Windows machine
   # https://github.com/actions/virtual-environments/issues/1143.
   #
-  # The only option to test this project on Windows is to run Memgraph on
-  # [WSL](https://docs.microsoft.com/en-us/windows/wsl/). Memgraph has to be
-  # started manually because systemd is not available on WSL.
+  # The only option to test this project on GitHub Actions under Windows is to
+  # run Memgraph under [WSL](https://docs.microsoft.com/en-us/windows/wsl/).
+  # Memgraph has to be started manually because systemd is not available on
+  # WSL (init process does not exist).
   build_and_test_windows:
     runs-on: windows-latest
     strategy:
@@ -102,7 +103,6 @@ jobs:
 
       - name: Build and test mgclient
         run: |
-          ls /usr/lib/memgraph
           mkdir build
           cd build
           cmake .. -G "MinGW Makefiles" -DBUILD_TESTING=ON -DBUILD_TESTING_INTEGRATION=ON
