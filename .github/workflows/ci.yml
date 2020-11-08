@@ -98,21 +98,11 @@ jobs:
           mkdir ~/memgraph
           curl -L https://download.memgraph.com/memgraph/v1.2.0/ubuntu-18.04/memgraph_1.2.0-community-1_amd64.deb --output ~/memgraph/memgraph-community.deb
           dpkg -i ~/memgraph/memgraph-community.deb
-          /usr/lib/memgraph/memgraph --help
-          /usr/lib/memgraph/memgraph --bolt-port 7687 \
-                                     --bolt-cert-file="" \
-                                     --bolt-key-file="" \
-                                     --data-directory="~/memgraph/data" \
-                                     --storage-properties-on-edges=true \
-                                     --storage-snapshot-interval-sec=0 \
-                                     --storage-wal-enabled=false \
-                                     --storage-recover-on-startup=false \
-                                     --storage-snapshot-on-exit=false \
-                                     --telemetry-enabled=false \
-                                     --log-file='' &
+          nohup /usr/lib/memgraph/memgraph --bolt-port 7687 --bolt-cert-file="" --bolt-key-file="" --data-directory="~/memgraph/data" --storage-properties-on-edges=true --storage-snapshot-interval-sec=0 --storage-wal-enabled=false --storage-recover-on-startup=false --storage-snapshot-on-exit=false --telemetry-enabled=false --log-file='' &
 
       - name: Build and test mgclient
         run: |
+          ls /usr/lib/memgraph
           mkdir build
           cd build
           cmake .. -G "MinGW Makefiles" -DBUILD_TESTING=ON -DBUILD_TESTING_INTEGRATION=ON
