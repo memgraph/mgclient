@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <iostream>
 #include <string>
 #include <thread>
-#include <iostream>
 
 #include <gtest/gtest.h>
 
@@ -47,9 +47,7 @@ using namespace std::string_literals;
 /// parallel prevent the kernel buffer from filling up which makes `send` block.
 class TestClient {
  public:
-  TestClient() {
-    mg_init();
-  }
+  TestClient() { mg_init(); }
 
   void Write(int sockfd, const std::string &data) {
     thread_ = std::thread([this, sockfd, data] {

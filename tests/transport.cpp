@@ -28,18 +28,19 @@
 #include <netinet/ip.h>
 #include <sys/socket.h>
 #include <sys/types.h>
-#endif // ON_POSIX
+#endif  // ON_POSIX
 
 #if ON_WINDOWS
-// NOTE: https://stackoverflow.com/questions/49504648/x509-name-macro-in-c-wont-compile
+// NOTE:
+// https://stackoverflow.com/questions/49504648/x509-name-macro-in-c-wont-compile
 #define WIN32_LEAN_AND_MEAN
 #include <openssl/x509.h>
-#endif // ON_WINDOWS
+#endif  // ON_WINDOWS
 
 extern "C" {
 #include "mgclient.h"
-#include "mgtransport.h"
 #include "mgsocket.h"
+#include "mgtransport.h"
 }
 
 #include "test-common.hpp"
@@ -237,10 +238,10 @@ TEST_F(SecureTransportTest, WithCertificate) {
   });
 
   mg_transport *transport;
-  ASSERT_EQ(mg_secure_transport_init(
-                sc, client_cert_path.string().c_str(),
-                client_key_path.string().c_str(),
-                (mg_secure_transport **)&transport, (mg_allocator *)&allocator),
+  ASSERT_EQ(mg_secure_transport_init(sc, client_cert_path.string().c_str(),
+                                     client_key_path.string().c_str(),
+                                     (mg_secure_transport **)&transport,
+                                     (mg_allocator *)&allocator),
             0);
   ASSERT_EQ(mg_transport_send((mg_transport *)transport, "hello", 5), 0);
 

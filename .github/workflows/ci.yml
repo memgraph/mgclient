@@ -9,26 +9,13 @@ jobs:
     - name: Set-up repository
       uses: actions/checkout@v2
 
-    - name: Install clang-format
+    - name: Install environment
       run: |
         sudo apt install -y clang-format-8
 
     - name: Run clang formatter
       run: |
-        ALL_FILES_TO_CHECK=$(find . -type f -regex ".*\.\(cpp\|hpp\|c\|h\)" -print | paste -sd " ")
-        for file in ${ALL_FILES_TO_CHECK}; do
-          clang-format-8 -i -verbose ${file}
-        done
-        changes="$(git diff)"
-        if [[ ! -z "${changes}" ]]; then
-          echo "Clang-format check failed!"
-          echo "You should fix the following formatting errors:"
-          echo "${changes}"
-          exit 1
-        else
-          echo "Clang-format check ok!"
-          exit 0
-        fi
+        ./tool/format.sh
 
   build_and_test_posix:
     strategy:
@@ -40,6 +27,10 @@ jobs:
     steps:
     - name: Set-up repository
       uses: actions/checkout@v1
+
+    - name: Install environment
+      run: |
+        sudo apt install -y gcc-8 g++-8 clang-8 clang++-8
 
     - name: Cache Memgraph Docker image
       id: cache-memgraph-docker
@@ -62,7 +53,7 @@ jobs:
     - name: Build with gcc, test and install mgclient
       run: |
         mkdir build-gcc && cd build-gcc
-        cmake -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++ -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=ON -DBUILD_TESTING_INTEGRATION=ON ..
+        cmake -DCMAKE_C_COMPILER=gcc-8 -DCMAKE_CXX_COMPILER=g++-8 -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=ON -DBUILD_TESTING_INTEGRATION=ON ..
         make
         ctest --output-on-failure
         sudo make install
@@ -70,7 +61,7 @@ jobs:
     - name: Build with clang, test and install mgclient
       run: |
         mkdir build-clang && cd build-clang
-        cmake -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=ON -DBUILD_TESTING_INTEGRATION=ON ..
+        cmake -DCMAKE_C_COMPILER=clang-8 -DCMAKE_CXX_COMPILER=clang++-8 -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=ON -DBUILD_TESTING_INTEGRATION=ON ..
         make
         ctest --output-on-failure
         sudo make install
@@ -97,5 +88,5 @@ jobs:
           mkdir build
           cd build
           cmake .. -G "MinGW Makefiles"
-          cmake --build .
+          cmake --build -DBUILD_TESTING=ON -DBUILD_TESTING_INTEGRATION=ON .
           ctest -R "allocator|example|value"

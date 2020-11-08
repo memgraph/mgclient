@@ -76,7 +76,7 @@ int mg_socket_close(int sock) { return closesocket(sock); }
 char *mg_socket_error() {
   // FormatMessage could be used but a caller would have
   // to take care of the allocated memory (LocalFree call).
-  switch (WSAGetLastError())  {
+  switch (WSAGetLastError()) {
     case WSA_INVALID_HANDLE:
       return "Specified event object handle is invalid.";
     case WSA_NOT_ENOUGH_MEMORY:

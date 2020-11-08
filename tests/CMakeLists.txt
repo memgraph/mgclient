@@ -20,7 +20,9 @@ ExternalProject_Add(gtest-proj
         PREFIX            gtest
         GIT_REPOSITORY    https://github.com/google/googletest.git
         GIT_TAG           release-1.8.1
-        CMAKE_ARGS        "-DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>"
+        CMAKE_ARGS        "-DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}"
+                          "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}"
+                          "-DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>"
                           "-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}"
         INSTALL_DIR       "${PROJECT_BINARY_DIR}/gtest")
 
