@@ -41,4 +41,7 @@ int mg_socket_pair(int d, int type, int protocol, int *sv);
 
 int mg_socket_close(int sock);
 
+/// Function used to get a native error message after
+/// some socket call fails. Has to be called immediately
+/// after the failed socket function.
 char *mg_socket_error();

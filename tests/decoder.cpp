@@ -14,6 +14,7 @@
 
 #include <string>
 #include <thread>
+#include <iostream>
 
 #include <gtest/gtest.h>
 
@@ -46,7 +47,9 @@ using namespace std::string_literals;
 /// parallel prevent the kernel buffer from filling up which makes `send` block.
 class TestClient {
  public:
-  TestClient() {}
+  TestClient() {
+    mg_init();
+  }
 
   void Write(int sockfd, const std::string &data) {
     thread_ = std::thread([this, sockfd, data] {
@@ -54,7 +57,9 @@ class TestClient {
       while (sent < data.size()) {
         ssize_t now = mg_socket_send(sockfd, data.data(), data.size() - sent);
         if (now < 0) {
+          auto socket_error = mg_socket_error();
           error = true;
+          std::cout << "ERROR: " << socket_error << std::endl;
           break;
         }
         sent += now;
@@ -125,7 +130,11 @@ TEST_F(MessageChunkingTest, Empty) {
   ASSERT_TRUE(session);
 
   client.Write(ss, "\x00\x00"s);
-  EXPECT_EQ(mg_session_receive_message(session), 0);
+  int recv_message_status = mg_session_receive_message(session);
+  if (recv_message_status != 0) {
+    std::cout << "ERROR: " << mg_session_error(session) << std::endl;
+  }
+  EXPECT_EQ(recv_message_status, 0);
   std::string message(session->in_buffer, session->in_end);
   EXPECT_EQ(message, "");
 

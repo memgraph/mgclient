@@ -15,7 +15,8 @@
 #include "mgclient.h"
 #include "mgsession.h"
 
-#include <bits/stdint-intn.h>
+// TODO(gitbuda): Doesn't exist on ON_WINDOWS.
+//#include <bits/stdint-intn.h>
 #include <string.h>
 
 #ifdef ON_POSIX
