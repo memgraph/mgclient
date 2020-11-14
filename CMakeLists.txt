@@ -20,6 +20,7 @@ project(mgclient VERSION 1.1.0)
 set(mgclient_SOVERSION 2)
 add_definitions(-DMGCLIENT_VERSION="${mgclient_VERSION}")
 
+# TODO(gitbuda): Refactor to ON_WINDOWS_MGCLIENT and ON_LINUX_MGCLIENT.
 if(${WIN32})
     message(STATUS "ON WINDOWS BUILD")
     add_definitions(-DON_WINDOWS=1)

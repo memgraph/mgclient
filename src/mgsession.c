@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "mgsession.h"
-
 #include <assert.h>
 #include <errno.h>
 #include <stdalign.h>
@@ -24,18 +22,9 @@
 #include <string.h>
 #include <unistd.h>
 
-#ifdef ON_POSIX
-#include <endian.h>
-#endif  // ON_POSIX
-
-#ifdef ON_WINDOWS
-// TODO(gitbuda): Add more https://gist.github.com/PkmX/63dd23f28ba885be53a5.
-#define htobe16(x) __builtin_bswap16(x)
-#define be16toh(x) __builtin_bswap16(x)
-#endif  // ON_WINDOWS
-
 #include "mgcommon.h"
 #include "mgconstants.h"
+#include "mgsession.h"
 
 int mg_session_status(const mg_session *session) {
   if (!session) {

@@ -18,17 +18,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#ifdef ON_POSIX
-#include <endian.h>
-#endif  // ON_POSIX
-
-#ifdef ON_WINDOWS
-// TODO(gitbuda): Add more https://gist.github.com/PkmX/63dd23f28ba885be53a5.
-#define htobe16(x) __builtin_bswap16(x)
-#define htobe32(x) __builtin_bswap32(x)
-#define htobe64(x) __builtin_bswap64(x)
-#endif  // ON_WINDOWS
-
 #include "mgcommon.h"
 #include "mgconstants.h"
 #include "mgvalue.h"

@@ -17,19 +17,9 @@
 
 #include <gtest/gtest.h>
 
-#ifdef ON_POSIX
-#include <sys/socket.h>
-#include <sys/types.h>
-#endif  // ON_POSIX
-
-#ifdef ON_WINDOWS
-// TODO(gitbuda): Add more https://gist.github.com/PkmX/63dd23f28ba885be53a5.
-#define be16toh(x) _byteswap_ushort(x)
-#endif  // ON_WINDOWS
-
-#include "mgclient.h"
-
 extern "C" {
+#include "mgclient.h"
+#include "mgcommon.h"
 #include "mgconstants.h"
 #include "mgsession.h"
 #include "mgsocket.h"

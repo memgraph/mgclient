@@ -13,13 +13,18 @@
 // limitations under the License.
 
 #ifdef ON_POSIX
+#include <arpa/inet.h>
+#include <netdb.h>
+#include <netinet/ip.h>
 #include <netinet/tcp.h>
 #include <sys/socket.h>
+#include <sys/types.h>
 #include <unistd.h>
 #endif  // ON_POSIX
 
 #ifdef ON_WINDOWS
 #include <Ws2tcpip.h>
+#include <windows.h>
 #include <winsock2.h>
 #endif  // ON_WINDOWS
 
@@ -27,21 +32,31 @@
 
 int mg_socket_init();
 
+/// Returns a descriptor referencing the new socket or MG_ERROR_SOCKET in the
+/// case of any failure.
 int mg_socket_create(int af, int type, int protocol);
+/// Returns MG_ERROR in case of an error or MG_SUCCESS if there is no error.
+/// In the error case, session will have the underlying error message set.
+int mg_socket_create_handle_error(int sock, mg_session *session);
 
+/// Returns connect status.
 int mg_socket_connect(int sock, const struct sockaddr *addr, socklen_t addrlen);
+int mg_socket_connect_handle_error(int *sock, int status, mg_session *session);
 
 int mg_socket_options(int sock, mg_session *session);
 
-int mg_socket_send(int sock, const void *buf, int len);
+ssize_t mg_socket_send(int sock, const void *buf, int len);
 
-int mg_socket_receive(int sock, void *buf, int len);
+ssize_t mg_socket_receive(int sock, void *buf, int len);
 
 int mg_socket_pair(int d, int type, int protocol, int *sv);
 
 int mg_socket_close(int sock);
 
-/// Function used to get a native error message after
-/// some socket call fails. Has to be called immediately
-/// after the failed socket function.
+/// Function used to get a native error message after some socket call fails.
+/// Has to be called immediately after the failed socket function.
 char *mg_socket_error();
+
+/// Should be called at the end of any process which previously called the
+/// \ref mg_socket_init function.
+void mg_socket_finalize();

@@ -12,63 +12,93 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "mgsocket.h"
+#include <limits.h>
 
 #include "mgclient-error.h"
+#include "mgsocket.h"
+
+// Please refer to https://docs.microsoft.com/en-us/windows/win32/api/winsock2/
+// for more details about Windows system calls.
 
 int mg_socket_init() {
-  // TODO(gitbuda): Handle errors, return MG_ERRORs.
   WSADATA data;
-  return WSAStartup(MAKEWORD(2, 2), &data);
+  int status = WSAStartup(MAKEWORD(2, 2), &data);
+  if (status != 0) {
+    fprintf(stderr, "WSAStartup failed: %s\n", mg_socket_error());
+    abort();
+  }
+  return MG_SUCCESS;
 }
 
 int mg_socket_create(int af, int type, int protocol) {
-  return socket(af, type, protocol);
+  SOCKET sock = socket(af, type, protocol);
+  if (sock == INVALID_SOCKET) {
+    return MG_ERROR_SOCKET;
+  }
+  if (sock > INT_MAX) {
+    fprintf(stderr,
+            "Implementation is wrong. Unsigned result of socket system call "
+            "can not be stored to signed data type. Please contact the"
+            "maintainer.\n");
+    abort();
+  }
+  return (int)sock;
+}
+
+int mg_socket_create_handle_error(int sock, mg_session *session) {
+  if (sock == MG_ERROR_SOCKET) {
+    mg_session_set_error(session, "couldn't open socket: %s",
+                         mg_socket_error());
+    return MG_ERROR_NETWORK_FAILURE;
+  }
+  return MG_SUCCESS;
 }
 
 int mg_socket_connect(int sock, const struct sockaddr *addr,
                       socklen_t addrlen) {
-  return connect(sock, addr, addrlen);
+  int status = connect(sock, addr, addrlen);
+  if (status != 0) {
+    return MG_ERROR_SOCKET;
+  }
+  return MG_SUCCESS;
 }
 
-int mg_socket_options(int sock, mg_session *session) {
-  return MG_ERROR_UNIMPLEMENTED;
+int mg_socket_connect_handle_error(int *sock, int status, mg_session *session) {
+  if (status != MG_SUCCESS) {
+    mg_session_set_error(session, "couldn't connect to host: %s",
+                         mg_socket_error());
+    if (mg_socket_close(*sock) != 0) {
+      abort();
+    }
+    *sock = MG_ERROR_SOCKET;
+    return MG_ERROR_NETWORK_FAILURE;
+  }
+  return MG_SUCCESS;
 }
 
-int mg_socket_send(int sock, const void *buf, int len) {
-  return send(sock, buf, len, 0);
+int mg_socket_options(int sock, mg_session *session) { return MG_SUCCESS; }
+
+ssize_t mg_socket_send(int sock, const void *buf, int len) {
+  int sent = send(sock, buf, len, 0);
+  if (sent == SOCKET_ERROR) {
+    return -1;
+  }
+  return sent;
 }
 
-int mg_socket_receive(int sock, void *buf, int len) {
-  return recv(sock, buf, len, 0);
+ssize_t mg_socket_receive(int sock, void *buf, int len) {
+  int received = recv(sock, buf, len, 0);
+  if (received == SOCKET_ERROR) {
+    return -1;
+  }
+  return received;
 }
 
-// Taken from
+// Implementation here
 // https://nlnetlabs.nl/svn/unbound/tags/release-1.0.1/compat/socketpair.c
-// TODO(gitbuda): Understand how to correctly implement socketpair on Windows.
+// does not work.
 int mg_socket_pair(int d, int type, int protocol, int *sv) {
-  static int count;
-  char buf[64];
-  HANDLE fd;
-  DWORD dwMode;
-  (void)d;
-  (void)type;
-  (void)protocol;
-  sprintf(buf, "\\\\.\\pipe\\levent-%d", count++);
-  /// Create a duplex pipe which will behave like a socket pair.
-  fd = CreateNamedPipe(buf, PIPE_ACCESS_DUPLEX, PIPE_TYPE_BYTE | PIPE_NOWAIT,
-                       PIPE_UNLIMITED_INSTANCES, 4096, 4096, 0, NULL);
-  if (fd == INVALID_HANDLE_VALUE) return (-1);
-  sv[0] = (int)fd;
-
-  fd = CreateFile(buf, GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING,
-                  FILE_ATTRIBUTE_NORMAL, NULL);
-  if (fd == INVALID_HANDLE_VALUE) return (-1);
-  dwMode = PIPE_NOWAIT;
-  SetNamedPipeHandleState(fd, &dwMode, NULL, NULL);
-  sv[1] = (int)fd;
-
-  return (0);
+  return MG_ERROR_UNIMPLEMENTED;
 }
 
 int mg_socket_close(int sock) { return closesocket(sock); }
@@ -272,3 +302,5 @@ char *mg_socket_error() {
   }
   return "Unknown WSA error.";
 }
+
+void mg_socket_finalize() { WSACleanup(); }

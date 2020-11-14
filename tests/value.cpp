@@ -16,10 +16,9 @@
 
 #include <gtest/gtest.h>
 
+extern "C" {
 #include "mgallocator.h"
 #include "mgclient.h"
-
-extern "C" {
 #include "mgcommon.h"
 #include "mgvalue.h"
 }

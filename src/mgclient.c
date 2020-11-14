@@ -21,24 +21,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#if ON_POSIX
-#include <arpa/inet.h>
-#include <netdb.h>
-#include <netinet/tcp.h>
-#include <sys/socket.h>
-#include <sys/types.h>
-#include <unistd.h>
-#endif  // ON_POSIX
-
-#if ON_WINDOWS
-#include <Ws2tcpip.h>
-#include <windows.h>
-#include <winsock2.h>
-// TODO(gitbuda): Add more https://gist.github.com/PkmX/63dd23f28ba885be53a5.
-#define htobe32(x) __builtin_bswap32(x)
-#define be32toh(x) __builtin_bswap32(x)
-#endif  // ON_WINDOWS
-
 #include "mgcommon.h"
 #include "mgconstants.h"
 #include "mgmessage.h"
@@ -455,61 +437,40 @@ static int init_tcp_connection(const mg_session_params *params, int *sockfd,
   } else {
     abort();
   }
-
   if (getaddrinfo_status != 0) {
     mg_session_set_error(session, "getaddrinfo failed: %s",
                          gai_strerror(getaddrinfo_status));
     return MG_ERROR_NETWORK_FAILURE;
   }
 
-#ifdef ON_POSIX
-  int tsockfd = -1;
-  int status = 0;
-#endif  // ON_POSIX
-
-#ifdef ON_WINDOWS
-  SOCKET tsockfd = INVALID_SOCKET;
-  int status = 0;
-#endif  // ON_WINDOWS
-
+  // https://stackoverflow.com/questions/10817252
+  int tsockfd = MG_ERROR_SOCKET;
+  int status = MG_SUCCESS;
   for (struct addrinfo *curr_addr = addr_list; curr_addr;
        curr_addr = curr_addr->ai_next) {
-    // TODO(gitbuda): Cross-platform error handling.
     tsockfd = mg_socket_create(curr_addr->ai_family, curr_addr->ai_socktype,
                                curr_addr->ai_protocol);
-    if (tsockfd == -1) {
-      status = MG_ERROR_NETWORK_FAILURE;
-      mg_session_set_error(session, "couldn't open socket: %s",
-                           strerror(errno));
+    status = mg_socket_create_handle_error(tsockfd, session);
+    if (status != MG_SUCCESS) {
       continue;
     }
-    // TODO(gitbuda): Cross-platform error handling.
-    if (mg_socket_connect(tsockfd, curr_addr->ai_addr, curr_addr->ai_addrlen) !=
-        0) {
-      status = MG_ERROR_NETWORK_FAILURE;
-      mg_session_set_error(session, "couldn't connect to host: %s",
-                           strerror(errno));
-      // TODO(gitbuda): Cross-platform error handling.
-      if (MG_RETRY_ON_EINTR(mg_socket_close(tsockfd)) != 0) {
-        abort();
-      }
-      tsockfd = -1;
-    } else {
+    status =
+        mg_socket_connect(tsockfd, curr_addr->ai_addr, curr_addr->ai_addrlen);
+    status = mg_socket_connect_handle_error(&tsockfd, status, session);
+    if (status == MG_SUCCESS) {
       memcpy(peer_addr, curr_addr->ai_addr, sizeof(struct sockaddr));
       break;
     }
   }
-
   freeaddrinfo(addr_list);
-
-  if (tsockfd == -1) {
-    assert(status != 0);
+  if (tsockfd == MG_ERROR_SOCKET) {
+    assert(status != MG_SUCCESS);
     return status;
   }
 
   int set_options_status = mg_socket_options(tsockfd, session);
-  if (set_options_status == MG_ERROR_NETWORK_FAILURE) {
-    return MG_ERROR_NETWORK_FAILURE;
+  if (set_options_status != MG_SUCCESS) {
+    return set_options_status;
   }
 
   *sockfd = tsockfd;
@@ -635,8 +596,7 @@ int mg_connect_ca(const mg_session_params *params, mg_session **session,
   return 0;
 
 cleanup:
-  // TODO(gitbuda): Cross-platform error handling.
-  if (sockfd >= 0 && MG_RETRY_ON_EINTR(mg_socket_close(sockfd)) != 0) {
+  if (sockfd >= 0 && mg_socket_close(sockfd) != 0) {
     abort();
   }
   *session = tsession;

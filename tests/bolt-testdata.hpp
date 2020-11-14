@@ -19,8 +19,10 @@
 
 #include <gtest/gtest.h>
 
+extern "C" {
 #include "mgallocator.h"
 #include "mgclient.h"
+}
 
 using namespace std::string_literals;
 

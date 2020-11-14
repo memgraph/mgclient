@@ -15,6 +15,10 @@
 #ifndef MGCLIENT_MGCOMMON_H
 #define MGCLIENT_MGCOMMON_H
 
+#ifdef ON_POSIX
+
+#include <endian.h>
+
 #define MG_RETRY_ON_EINTR(expression)          \
   ({                                           \
     long result;                               \
@@ -23,6 +27,29 @@
     } while (result == -1L && errno == EINTR); \
     result;                                    \
   })
+
+#endif  // ON_POSIX
+
+#ifdef ON_WINDOWS
+
+// Based on https://gist.github.com/PkmX/63dd23f28ba885be53a5
+
+#define htobe16(x) __builtin_bswap16(x)
+#define htole16(x) (x)
+#define be16toh(x) __builtin_bswap16(x)
+#define le16toh(x) (x)
+
+#define htobe32(x) __builtin_bswap32(x)
+#define htole32(x) (x)
+#define be32toh(x) __builtin_bswap32(x)
+#define le32toh(x) (x)
+
+#define htobe64(x) __builtin_bswap64(x)
+#define htole64(x) (x)
+#define be64toh(x) __builtin_bswap64(x)
+#define le64toh(x) (x)
+
+#endif  // ON_WINDOWS
 
 #define MG_RETURN_IF_FAILED(expression) \
   do {                                  \

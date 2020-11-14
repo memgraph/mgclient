@@ -15,20 +15,7 @@
 #include "mgclient.h"
 #include "mgsession.h"
 
-// TODO(gitbuda): Doesn't exist on ON_WINDOWS.
-//#include <bits/stdint-intn.h>
 #include <string.h>
-
-#ifdef ON_POSIX
-#include <endian.h>
-#endif  // ON_POSIX
-
-#ifdef ON_WINDOWS
-// TODO(gitbuda): Add more https://gist.github.com/PkmX/63dd23f28ba885be53a5.
-#define be16toh(x) _byteswap_ushort(x)
-#define be32toh(x) _byteswap_ulong(x)
-#define be64toh(x) __builtin_bswap64(x)
-#endif  // ON_WINDOWS
 
 #include "mgcommon.h"
 #include "mgconstants.h"

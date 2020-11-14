@@ -23,13 +23,6 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#if ON_POSIX
-#include <arpa/inet.h>
-#include <netinet/ip.h>
-#include <sys/socket.h>
-#include <sys/types.h>
-#endif  // ON_POSIX
-
 #if ON_WINDOWS
 // NOTE:
 // https://stackoverflow.com/questions/49504648/x509-name-macro-in-c-wont-compile
@@ -39,6 +32,7 @@
 
 extern "C" {
 #include "mgclient.h"
+#include "mgcommon.h"
 #include "mgsocket.h"
 #include "mgtransport.h"
 }

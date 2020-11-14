@@ -15,6 +15,11 @@
 #ifndef MGCLIENT_ERROR_H
 #define MGCLIENT_ERROR_H
 
+// TODO(gitbuda): Refactor to mgclient-status or mgclient-code.
+
+/// Success code.
+#define MG_SUCCESS (0)
+
 /// Failed to send data to server.
 #define MG_ERROR_SEND_FAILED (-1)
 
@@ -71,7 +76,10 @@
 /// negotiation.
 #define MG_ERROR_TRUST_CALLBACK (-18)
 
+// Unable to initialize the socket (both create and connect).
+#define MG_ERROR_SOCKET (-100)
+
 // Function unimplemented.
-#define MG_ERROR_UNIMPLEMENTED (-100)
+#define MG_ERROR_UNIMPLEMENTED (-1000)
 
 #endif
