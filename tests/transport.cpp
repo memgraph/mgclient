@@ -23,12 +23,12 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#if ON_WINDOWS
+#if MGCLIENT_ON_LINUX
 // NOTE:
 // https://stackoverflow.com/questions/49504648/x509-name-macro-in-c-wont-compile
 #define WIN32_LEAN_AND_MEAN
 #include <openssl/x509.h>
-#endif  // ON_WINDOWS
+#endif  // MGCLIENT_ON_WINDOWS
 
 extern "C" {
 #include "mgclient.h"

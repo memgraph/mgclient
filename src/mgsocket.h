@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifdef ON_POSIX
+#ifdef MGCLIENT_ON_LINUX
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <netinet/ip.h>
@@ -21,13 +21,13 @@
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <unistd.h>
-#endif  // ON_POSIX
+#endif  // MGCLIENT_ON_LINUX
 
-#ifdef ON_WINDOWS
+#ifdef MGCLIENT_ON_WINDOWS
 #include <Ws2tcpip.h>
 #include <windows.h>
 #include <winsock2.h>
-#endif  // ON_WINDOWS
+#endif  // MGCLIENT_ON_WINDOWS
 
 #include "mgclient.h"
 #include "mgsession.h"

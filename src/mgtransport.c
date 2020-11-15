@@ -18,9 +18,9 @@
 #include <errno.h>
 #include <stdlib.h>
 #include <string.h>
-#ifdef ON_POSIX
+#ifdef MGCLIENT_ON_LINUX
 #include <pthread.h>
-#endif  // ON_POSIX
+#endif  // MGCLIENT_ON_LINUX
 
 #include "mgallocator.h"
 #include "mgclient.h"

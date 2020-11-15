@@ -20,17 +20,23 @@ project(mgclient VERSION 1.1.0)
 set(mgclient_SOVERSION 2)
 add_definitions(-DMGCLIENT_VERSION="${mgclient_VERSION}")
 
-# TODO(gitbuda): Refactor to ON_WINDOWS_MGCLIENT and ON_LINUX_MGCLIENT.
-if(${WIN32})
+# Deal with the operating system.
+if(WIN32)
     message(STATUS "ON WINDOWS BUILD")
-    add_definitions(-DON_WINDOWS=1)
+    add_definitions(-DMGCLIENT_ON_WINDOWS=1)
     # CMAKE_FIND_LIBRARY_PREFIXES on Windows is "lib;".
     # "lib;" breaks gtest lib referencing.
     set(MGCLIENT_FIND_LIBRARY_PREFIXES "lib")
+elseif(UNIX AND NOT APPLE)
+    if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+        message(STATUS "ON LINUX BUILD")
+        add_definitions(-DMGCLIENT_ON_LINUX=1)
+        set(MGCLIENT_FIND_LIBRARY_PREFIXES "${CMAKE_FIND_LIBRARY_PREFIXES}")
+    else()
+        message(FATAL_ERROR "Unsupported operating system. Please create issue or contribute!")
+    endif()
 else()
-    message(STATUS "ON POSIX BUILD")
-    add_definitions(-DON_POSIX=1)
-    set(MGCLIENT_FIND_LIBRARY_PREFIXES "${CMAKE_FIND_LIBRARY_PREFIXES}")
+    message(FATAL_ERROR "Unsupported operating system. Please create issue or contribute!")
 endif()
 
 # Building tests is disabled by default to simplify the default build config.

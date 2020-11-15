@@ -15,7 +15,7 @@
 #ifndef MGCLIENT_MGCOMMON_H
 #define MGCLIENT_MGCOMMON_H
 
-#ifdef ON_POSIX
+#ifdef MGCLIENT_ON_LINUX
 
 #include <endian.h>
 
@@ -28,9 +28,9 @@
     result;                                    \
   })
 
-#endif  // ON_POSIX
+#endif  // MGCLIENT_ON_LINUX
 
-#ifdef ON_WINDOWS
+#ifdef MGCLIENT_ON_WINDOWS
 
 // Based on https://gist.github.com/PkmX/63dd23f28ba885be53a5
 
@@ -49,7 +49,7 @@
 #define be64toh(x) __builtin_bswap64(x)
 #define le64toh(x) (x)
 
-#endif  // ON_WINDOWS
+#endif  // MGCLIENT_ON_WINDOWS
 
 #define MG_RETURN_IF_FAILED(expression) \
   do {                                  \
