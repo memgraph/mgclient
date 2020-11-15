@@ -19,11 +19,8 @@
 #include <stdlib.h>
 #include <string.h>
 #ifdef ON_POSIX
-#include <poll.h>
 #include <pthread.h>
 #endif  // ON_POSIX
-#ifdef ON_WINDOWS
-#endif  // ON_WINDOWS
 
 #include "mgallocator.h"
 #include "mgclient.h"
@@ -269,13 +266,12 @@ int mg_secure_transport_send(mg_transport *transport, const char *buf,
           abort();
         }
         p.events = POLLIN;
-        // TODO(gitbuda): Port poll to ON_LINUX_MGCLIENT.
-        // if (MG_RETRY_ON_EINTR(poll(&p, 1, -1)) < 0) {
-        //  return -1;
-        //}
+        if (mg_socket_poll(&p, 1, -1) < 0) {
+         return -1;
+        }
         continue;
       } else {
-        ERR_print_errors_cb(print_ssl_error, "mg_secure_transport_recv");
+        ERR_print_errors_cb(print_ssl_error, "mg_secure_transport_send");
         return -1;
       }
     }
@@ -301,10 +297,9 @@ int mg_secure_transport_recv(mg_transport *transport, char *buf, size_t len) {
           abort();
         }
         p.events = POLLIN;
-        // TODO(gitbuda): Port poll to ON_LINUX_MGCLIENT.
-        // if (MG_RETRY_ON_EINTR(poll(&p, 1, -1)) < 0) {
-        //  return -1;
-        // }
+        if (mg_socket_poll(&p, 1, -1) < 0) {
+         return -1;
+        }
         continue;
       } else {
         ERR_print_errors_cb(print_ssl_error, "mg_secure_transport_recv");

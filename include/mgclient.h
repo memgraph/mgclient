@@ -135,10 +135,15 @@ extern "C" {
 /// \return Client version in the major.minor.patch format.
 MGCLIENT_EXPORT const char *mg_client_version();
 
-/// Initializes the client.
+/// Initializes the client (the whole process).
+/// Should be called at the beginning of each process using the client.
 ///
 /// \return Zero if initialization was successful.
 MGCLIENT_EXPORT int mg_init();
+
+/// Finalizes the client (the whole process).
+/// Should be called at the end of each process using the client.
+MGCLIENT_EXPORT void mg_finalize();
 
 /// An enum listing all the types as specified by Bolt protocol.
 enum mg_value_type {

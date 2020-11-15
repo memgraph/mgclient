@@ -102,6 +102,10 @@ ssize_t mg_socket_receive(int sock, void *buf, int len) {
   return MG_RETRY_ON_EINTR(recv(sock, buf, len, 0));
 }
 
+int mg_socket_poll(struct pollfd *fds, unsigned int nfds, int timeout) {
+  return MG_RETRY_ON_EINTR(poll(fds, nfds, timeout));
+}
+
 int mg_socket_pair(int d, int type, int protocol, int *sv) {
   return socketpair(d, type, protocol, sv);
 }

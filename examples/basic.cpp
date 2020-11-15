@@ -10,12 +10,13 @@ int main(int argc, char *argv[]) {
   }
 
   mg_init();
+
   std::cout << "mgclient version: " << mg::Client::Version() << std::endl;
   mg::Client::Params params;
   params.host = argv[1];
   params.port = static_cast<uint16_t>(atoi(argv[2]));
   params.use_ssl = false;
-  const auto client = mg::Client::Connect(params);
+  auto client = mg::Client::Connect(params);
 
   if (!client) {
     std::cerr << "Failed to connect!\n";
@@ -33,6 +34,10 @@ int main(int argc, char *argv[]) {
   }
 
   std::cout << "Fetched " << rows << " row(s)\n";
+
+  // Deallocate the client because mg_finalize has to be called globally.
+  client.reset(nullptr);
+  mg_finalize();
 
   return 0;
 }

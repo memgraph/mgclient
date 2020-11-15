@@ -32,6 +32,8 @@ const char *mg_client_version() { return MGCLIENT_VERSION; }
 
 int mg_init() { return mg_socket_init(); }
 
+void mg_finalize() { mg_socket_finalize(); }
+
 typedef struct mg_session_params {
   const char *address;
   const char *host;
@@ -418,22 +420,23 @@ static int mg_bolt_init(mg_session *session, const mg_session_params *params) {
 static int init_tcp_connection(const mg_session_params *params, int *sockfd,
                                struct sockaddr *peer_addr,
                                mg_session *session) {
-  struct addrinfo hint;
-  memset(&hint, 0, sizeof(hint));
-  hint.ai_family = AF_UNSPEC;
-  hint.ai_socktype = SOCK_STREAM;
-  struct addrinfo *addr_list;
+  struct addrinfo *addr_list = NULL;
+  struct addrinfo hints;
+  memset(&hints, 0, sizeof(hints));
+  hints.ai_family = AF_UNSPEC;
+  hints.ai_socktype = SOCK_STREAM;
+  hints.ai_protocol = IPPROTO_TCP;
 
   char portstr[6];
   sprintf(portstr, "%" PRIu16, params->port);
 
   int getaddrinfo_status;
   if (params->host) {
-    getaddrinfo_status = getaddrinfo(params->host, portstr, &hint, &addr_list);
+    getaddrinfo_status = getaddrinfo(params->host, portstr, &hints, &addr_list);
   } else if (params->address) {
-    hint.ai_flags = AI_NUMERICHOST;
+    hints.ai_flags = AI_NUMERICHOST;
     getaddrinfo_status =
-        getaddrinfo(params->address, portstr, &hint, &addr_list);
+        getaddrinfo(params->address, portstr, &hints, &addr_list);
   } else {
     abort();
   }
@@ -443,7 +446,6 @@ static int init_tcp_connection(const mg_session_params *params, int *sockfd,
     return MG_ERROR_NETWORK_FAILURE;
   }
 
-  // https://stackoverflow.com/questions/10817252
   int tsockfd = MG_ERROR_SOCKET;
   int status = MG_SUCCESS;
   for (struct addrinfo *curr_addr = addr_list; curr_addr;
@@ -479,6 +481,7 @@ static int init_tcp_connection(const mg_session_params *params, int *sockfd,
 
 static int get_hostname_and_ip(const struct sockaddr *peer_addr, char *hostname,
                                char *ip, mg_session *session) {
+  // Populate the ip.
   switch (peer_addr->sa_family) {
     case AF_INET:
       if (!inet_ntop(AF_INET, &((struct sockaddr_in *)peer_addr)->sin_addr, ip,
@@ -488,7 +491,6 @@ static int get_hostname_and_ip(const struct sockaddr *peer_addr, char *hostname,
         return MG_ERROR_NETWORK_FAILURE;
       }
       break;
-
     case AF_INET6:
       if (!inet_ntop(AF_INET6, &((struct sockaddr_in6 *)peer_addr)->sin6_addr,
                      ip, INET6_ADDRSTRLEN)) {
@@ -497,24 +499,29 @@ static int get_hostname_and_ip(const struct sockaddr *peer_addr, char *hostname,
         return MG_ERROR_NETWORK_FAILURE;
       }
       break;
-
     default:
       // Should not happen with addresses returned from getaddrinfo.
       abort();
   }
-
-  int status = getnameinfo(peer_addr, sizeof(struct sockaddr), hostname,
-                           NI_MAXHOST, NULL, 0, 0);
-  if (status != 0) {
-    mg_session_set_error(session, "failed to get server name: %s",
-                         gai_strerror(status));
-    return MG_ERROR_NETWORK_FAILURE;
+  // Populate the hostname.
+  // Useful read https://stackoverflow.com/questions/12274028.
+  int nameinfo_status = getnameinfo(peer_addr, sizeof(struct sockaddr),
+                                    hostname, NI_MAXHOST, NULL, 0, 0);
+  if (nameinfo_status != 0) {
+    // ON_WINDOWS getnameinfo fails if peer_addr was constructed from
+    // getaddrinfo when localhost is passed in (getaddrinfo returns an empty
+    // address). I haven't find simple and clean solution to make getnameinfo
+    // work. Since this function is used only to get the hostname for the
+    // trust callback, setting hostname to unknown and continuing the program
+    // seems sensible solution.
+    strcpy(hostname, "unknown");
   }
   return 0;
 }
 
 int mg_connect_ca(const mg_session_params *params, mg_session **session,
                   mg_allocator *allocator) {
+  // Useful read https://akkadia.org/drepper/userapi-ipv6.html.
   mg_session *tsession = mg_session_init(allocator);
   if (!tsession) {
     return MG_ERROR_OOM;

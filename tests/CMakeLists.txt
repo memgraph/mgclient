@@ -37,8 +37,7 @@ set(GTEST_DEBUG_LIBRARY_PATH ${GTEST_ROOT}/lib/${MGCLIENT_FIND_LIBRARY_PREFIXES}
 set(GTEST_LIBRARY gtest)
 add_library(${GTEST_LIBRARY} STATIC IMPORTED)
 # TODO(gitbuda): On Windows ${CMAKE_THREAD_LIBS_INIT} is undefined.
-#     "${...}" just prevents set_target_properties to fail.
-#     It's not a solution.
+#                "${...}" prevents set_target_properties to fail.
 set_target_properties(${GTEST_LIBRARY} PROPERTIES
         IMPORTED_LOCATION ${GTEST_LIBRARY_PATH}
         IMPORTED_LOCATION_DEBUG ${GTEST_DEBUG_LIBRARY_PATH}

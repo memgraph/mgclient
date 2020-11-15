@@ -110,7 +110,6 @@ int __wrap_mg_secure_transport_init(int sockfd, const char *cert,
 int SendData(int sockfd, const char *buf, size_t len) {
   size_t total_sent = 0;
   while (total_sent < len) {
-    // TODO(gitbuda): MSG_NOSIGNAL was sent to the send here. IMPORTANT!
     ssize_t sent_now =
         mg_socket_send(sockfd, buf + total_sent, len - total_sent);
     if (sent_now == -1) {

@@ -57,5 +57,7 @@ int main(int argc, char *argv[]) {
   }
 
   mg_session_destroy(session);
+  mg_finalize();
+
   return 0;
 }

@@ -32,8 +32,7 @@ TEST(ValueTest, BasicTypes) {
   Value value_bool1(true);
   Value value_bool2(false);
   Value value_int1(-13);
-  // TODO(gitbuda): Left shift count >= width of type [-Wshift-count-overflow].
-  // Value value_int2(1L << 60);
+  Value value_int2((int64_t)(1L << 60));
   Value value_double(3.14159);
   Value value_string1("test");
   Value value_string2(std::string("test"));
@@ -43,8 +42,7 @@ TEST(ValueTest, BasicTypes) {
   ASSERT_EQ(value_bool1.type(), Value::Type::Bool);
   ASSERT_EQ(value_bool2.type(), Value::Type::Bool);
   ASSERT_EQ(value_int1.type(), Value::Type::Int);
-  // TODO(gitbuda): Left shift count >= width of type [-Wshift-count-overflow].
-  // ASSERT_EQ(value_int2.type(), Value::Type::Int);
+  ASSERT_EQ(value_int2.type(), Value::Type::Int);
   ASSERT_EQ(value_double.type(), Value::Type::Double);
   ASSERT_EQ(value_string1.type(), Value::Type::String);
   ASSERT_EQ(value_string2.type(), Value::Type::String);
@@ -52,8 +50,7 @@ TEST(ValueTest, BasicTypes) {
   ASSERT_EQ(value_bool1.ValueBool(), true);
   ASSERT_EQ(value_bool2.ValueBool(), false);
   ASSERT_EQ(value_int1.ValueInt(), -13);
-  // TODO(gitbuda): Left shift count >= width of type [-Wshift-count-overflow].
-  // ASSERT_EQ(value_int2.ValueInt(), 1L << 60);
+  ASSERT_EQ(value_int2.ValueInt(), 1L << 60);
   ASSERT_EQ(value_double.ValueDouble(), 3.14159);
   ASSERT_EQ(value_string1.ValueString(), "test");
   ASSERT_EQ(value_string2.ValueString(), "test");
@@ -65,10 +62,9 @@ TEST(ValueTest, BasicTypes) {
   ASSERT_EQ(value_string1.AsConstValue(), value_string2.AsConstValue());
   ASSERT_EQ(value_string1.AsConstValue(), value_string2);
   ASSERT_EQ(value_string1, value_string2.AsConstValue());
-  // TODO(gitbuda): Left shift count >= width of type [-Wshift-count-overflow].
-  // ASSERT_NE(value_int1.AsConstValue(), value_int2.AsConstValue());
-  // ASSERT_NE(value_int1.AsConstValue(), value_int2);
-  // ASSERT_NE(value_int1, value_int2.AsConstValue());
+  ASSERT_NE(value_int1.AsConstValue(), value_int2.AsConstValue());
+  ASSERT_NE(value_int1.AsConstValue(), value_int2);
+  ASSERT_NE(value_int1, value_int2.AsConstValue());
 }
 
 TEST(ValueTest, CopyValue) {

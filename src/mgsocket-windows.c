@@ -32,6 +32,7 @@ int mg_socket_init() {
 
 int mg_socket_create(int af, int type, int protocol) {
   SOCKET sock = socket(af, type, protocol);
+  // Useful info here https://stackoverflow.com/questions/10817252.
   if (sock == INVALID_SOCKET) {
     return MG_ERROR_SOCKET;
   }
@@ -76,7 +77,11 @@ int mg_socket_connect_handle_error(int *sock, int status, mg_session *session) {
   return MG_SUCCESS;
 }
 
-int mg_socket_options(int sock, mg_session *session) { return MG_SUCCESS; }
+int mg_socket_options(int sock, mg_session *session) {
+  (void)sock;
+  (void)session;
+  return MG_SUCCESS;
+}
 
 ssize_t mg_socket_send(int sock, const void *buf, int len) {
   int sent = send(sock, buf, len, 0);
@@ -94,14 +99,32 @@ ssize_t mg_socket_receive(int sock, void *buf, int len) {
   return received;
 }
 
+int mg_socket_poll(struct pollfd *fds, unsigned int nfds, int timeout) {
+  return WSAPoll(fds, nfds, timeout);
+}
+
 // Implementation here
 // https://nlnetlabs.nl/svn/unbound/tags/release-1.0.1/compat/socketpair.c
 // does not work.
 int mg_socket_pair(int d, int type, int protocol, int *sv) {
+  (void)d;
+  (void)type;
+  (void)protocol;
+  (void)sv;
   return MG_ERROR_UNIMPLEMENTED;
 }
 
-int mg_socket_close(int sock) { return closesocket(sock); }
+int mg_socket_close(int sock) {
+  int shutdown_status = shutdown(sock, SD_BOTH);
+  if (shutdown_status != 0) {
+    fprintf(stderr, "Fail to shutdown a socket: %s\n", mg_socket_error());
+  }
+  int closesocket_status = closesocket(sock);
+  if (closesocket_status != 0) {
+    fprintf(stderr, "Fail to close a socket: %s\n", mg_socket_error());
+  }
+  return MG_SUCCESS;
+}
 
 char *mg_socket_error() {
   // FormatMessage could be used but a caller would have
@@ -303,4 +326,8 @@ char *mg_socket_error() {
   return "Unknown WSA error.";
 }
 
-void mg_socket_finalize() { WSACleanup(); }
+void mg_socket_finalize() {
+  if (WSACleanup() != 0) {
+    fprintf(stderr, "WSACleanup failed: %s\n", mg_socket_error());
+  }
+}

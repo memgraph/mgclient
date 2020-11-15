@@ -30,6 +30,8 @@ T GetEnvOrDefault(const std::string &value_name, const T &default_value) {
 class MemgraphConnection : public ::testing::Test {
  protected:
   virtual void SetUp() override {
+    mg_init();
+
     client = mg::Client::Connect(
         {GetEnvOrDefault<std::string>("MEMGRAPH_HOST", "127.0.0.1"),
          GetEnvOrDefault<uint16_t>("MEMGRAPH_PORT", 7687), "", "",
@@ -48,6 +50,11 @@ class MemgraphConnection : public ::testing::Test {
 
     ASSERT_TRUE(client->Execute(delete_all_query));
     ASSERT_FALSE(client->FetchOne());
+
+    // Deallocate the client because mg_finalize has to be called globally.
+    client.reset(nullptr);
+
+    mg_finalize();
   }
 
   std::unique_ptr<mg::Client> client;

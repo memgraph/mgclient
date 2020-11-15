@@ -192,7 +192,6 @@ mg_value *GetElement(int idx) {
       return mg_value_make_map(map);
     }
   }
-  // TODO(gitbuda): Control reaches end of non-void function (warning).
 }
 
 std::string GetElementEncoding(int idx) {
@@ -211,7 +210,6 @@ std::string GetElementEncoding(int idx) {
     case 5:
       return "\xA2\x81x\x01\x81y\x02";
   }
-  // TODO(gitbuda): Control reaches end of non-void function (warning).
 }
 
 std::vector<ValueTestParam> StringTestCases() {
@@ -263,7 +261,7 @@ std::vector<ValueTestParam> NodeTestCases() {
   std::vector<ValueTestParam> inputs;
 
   {
-    mg_string *labels[] = {};
+    mg_string *labels[0] = {};
     mg_map *props = mg_map_make_empty(0);
     mg_node *node = mg_node_make(12345, 0, labels, props);
     inputs.push_back(

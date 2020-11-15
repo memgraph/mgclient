@@ -64,6 +64,7 @@ std::string GetStringValue(const mg_value *value) {
 class MemgraphConnection : public ::testing::Test {
  protected:
   virtual void SetUp() override {
+    mg_init();
     params = mg_session_params_make();
     std::string memgraph_host =
         GetEnvOrDefault<std::string>("MEMGRAPH_HOST", "127.0.0.1");
@@ -84,6 +85,7 @@ class MemgraphConnection : public ::testing::Test {
     if (session) {
       mg_session_destroy(session);
     }
+    mg_finalize();
   }
 
   mg_session_params *params;
@@ -164,4 +166,6 @@ TEST_F(MemgraphConnection, InsertAndRetriveFromMemegraph) {
   ASSERT_EQ(rows, 1);
   ASSERT_EQ(status, 0);
   ASSERT_EQ(mg_session_commit_transaction(session, &result), 0);
+
+  std::cout << "END END" << std::endl;
 }

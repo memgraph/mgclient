@@ -49,6 +49,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(C_STANDARD_REQUIRED ON)
 set(CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+add_compile_options(-Wall -Wextra -pedantic)
 
 # Set default build type to 'Release'
 if(NOT CMAKE_BUILD_TYPE)
