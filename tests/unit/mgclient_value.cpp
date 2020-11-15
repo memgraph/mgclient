@@ -21,7 +21,7 @@ extern "C" {
 #include "mgclient.h"
 }
 
-#include "mgvalue.hpp"
+#include "mgclient-value.hpp"
 
 using namespace std;
 

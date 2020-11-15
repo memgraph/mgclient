@@ -29,6 +29,7 @@
 #include <winsock2.h>
 #endif  // ON_WINDOWS
 
+#include "mgclient.h"
 #include "mgsession.h"
 
 /// Initializes underlying resources. Has to be called at the beginning of a

@@ -14,7 +14,6 @@
 
 #include <string.h>
 
-#include "mgclient-error.h"
 #include "mgcommon.h"
 #include "mgsocket.h"
 

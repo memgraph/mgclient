@@ -14,7 +14,6 @@
 
 #include <limits.h>
 
-#include "mgclient-error.h"
 #include "mgsocket.h"
 
 // Please refer to https://docs.microsoft.com/en-us/windows/win32/api/winsock2/
@@ -117,11 +116,11 @@ int mg_socket_pair(int d, int type, int protocol, int *sv) {
 int mg_socket_close(int sock) {
   int shutdown_status = shutdown(sock, SD_BOTH);
   if (shutdown_status != 0) {
-    fprintf(stderr, "Fail to shutdown a socket: %s\n", mg_socket_error());
+    fprintf(stderr, "Fail to shutdown socket: %s\n", mg_socket_error());
   }
   int closesocket_status = closesocket(sock);
   if (closesocket_status != 0) {
-    fprintf(stderr, "Fail to close a socket: %s\n", mg_socket_error());
+    fprintf(stderr, "Fail to close socket: %s\n", mg_socket_error());
   }
   return MG_SUCCESS;
 }

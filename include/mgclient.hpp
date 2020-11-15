@@ -19,7 +19,7 @@
 
 #include "mgclient.h"
 
-#include "mgvalue.hpp"
+#include "mgclient-value.hpp"
 
 namespace mg {
 

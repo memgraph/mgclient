@@ -10,3 +10,6 @@ tool/generated/
 
 # .vscode project files.
 .vscode/
+
+# Doxygen output files.
+html/
