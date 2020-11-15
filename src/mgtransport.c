@@ -267,7 +267,7 @@ int mg_secure_transport_send(mg_transport *transport, const char *buf,
         }
         p.events = POLLIN;
         if (mg_socket_poll(&p, 1, -1) < 0) {
-         return -1;
+          return -1;
         }
         continue;
       } else {
@@ -298,7 +298,7 @@ int mg_secure_transport_recv(mg_transport *transport, char *buf, size_t len) {
         }
         p.events = POLLIN;
         if (mg_socket_poll(&p, 1, -1) < 0) {
-         return -1;
+          return -1;
         }
         continue;
       } else {
