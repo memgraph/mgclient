@@ -23,6 +23,7 @@ add_definitions(-DMGCLIENT_VERSION="${mgclient_VERSION}")
 # Deal with the operating system.
 if(WIN32)
     message(STATUS "ON WINDOWS BUILD")
+    set(MGCLIENT_ON_WINDOWS TRUE)
     add_definitions(-DMGCLIENT_ON_WINDOWS=1)
     # CMAKE_FIND_LIBRARY_PREFIXES on Windows is "lib;".
     # "lib;" breaks gtest lib referencing.
@@ -30,6 +31,7 @@ if(WIN32)
 elseif(UNIX AND NOT APPLE)
     if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
         message(STATUS "ON LINUX BUILD")
+        set(MGCLIENT_ON_LINUX TRUE)
         add_definitions(-DMGCLIENT_ON_LINUX=1)
         set(MGCLIENT_FIND_LIBRARY_PREFIXES "${CMAKE_FIND_LIBRARY_PREFIXES}")
     else()
@@ -55,7 +57,6 @@ set(CMAKE_CXX_STANDARD 17)
 set(C_STANDARD_REQUIRED ON)
 set(CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-add_compile_options(-Wall -Wextra -pedantic)
 
 # Set default build type to 'Release'
 if(NOT CMAKE_BUILD_TYPE)

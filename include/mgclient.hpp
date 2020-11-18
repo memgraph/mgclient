@@ -46,6 +46,16 @@ class Client {
   /// \return client version in the major.minor.patch format.
   static const char *Version();
 
+  /// Initializes the client (the whole process).
+  /// Should be called at the beginning of each process using the client.
+  ///
+  /// \return Zero if initialization was successful.
+  static int Init();
+
+  /// Finalizes the client (the whole process).
+  /// Should be called at the end of each process using the client.
+  static void Finalize();
+
   /// \brief Executes the given Cypher `statement`.
   /// \return true when the statement is successfully executed, false otherwise.
   /// \note
@@ -127,6 +137,10 @@ inline Client::Client(mg_session *session) : session_(session) {}
 inline Client::~Client() { mg_session_destroy(session_); }
 
 inline const char *Client::Version() { return mg_client_version(); }
+
+inline int Client::Init() { return mg_init(); }
+
+inline void Client::Finalize() { mg_finalize(); }
 
 inline bool Client::Execute(const std::string &statement) {
   int status = mg_session_run(session_, statement.c_str(), nullptr, nullptr,

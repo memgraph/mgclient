@@ -23,7 +23,7 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#if MGCLIENT_ON_LINUX
+#if MGCLIENT_ON_WINDOWS
 // NOTE:
 // https://stackoverflow.com/questions/49504648/x509-name-macro-in-c-wont-compile
 #define WIN32_LEAN_AND_MEAN

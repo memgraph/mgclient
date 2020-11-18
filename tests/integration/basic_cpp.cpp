@@ -30,7 +30,7 @@ T GetEnvOrDefault(const std::string &value_name, const T &default_value) {
 class MemgraphConnection : public ::testing::Test {
  protected:
   virtual void SetUp() override {
-    mg_init();
+    mg::Client::Init();
 
     client = mg::Client::Connect(
         {GetEnvOrDefault<std::string>("MEMGRAPH_HOST", "127.0.0.1"),
@@ -54,7 +54,7 @@ class MemgraphConnection : public ::testing::Test {
     // Deallocate the client because mg_finalize has to be called globally.
     client.reset(nullptr);
 
-    mg_finalize();
+    mg::Client::Finalize();
   }
 
   std::unique_ptr<mg::Client> client;
@@ -120,4 +120,32 @@ TEST_F(MemgraphConnection, InsertAndRetrieveFromMemgraph) {
   }
   ASSERT_EQ(result_counter, 1);
   ASSERT_TRUE(client->CommitTransaction());
+
+  {
+    ASSERT_TRUE(client->Execute(
+        "CREATE (n:ValuesTest {int: 1, string:'Name', float: 2.3, bool: True, "
+        "list: [1, 2], map: {key: 'value'}}) RETURN n;"));
+    auto maybe_result = client->FetchOne();
+    ASSERT_TRUE(maybe_result);
+    const auto &row = *maybe_result;
+    EXPECT_EQ(row.size(), 1);
+    const auto node = row[0];
+    ASSERT_EQ(node.type(), mg::Value::Type::Node);
+    const auto node_props = node.ValueNode().properties();
+    ASSERT_EQ(node_props["int"].ValueInt(), 1);
+    ASSERT_EQ(node_props["string"].ValueString(), "Name");
+    ASSERT_GT(node_props["float"].ValueDouble(), 2.299999);
+    ASSERT_LT(node_props["float"].ValueDouble(), 2.300001);
+    ASSERT_EQ(node_props["bool"].ValueBool(), true);
+    ASSERT_EQ(node_props["list"].type(), mg::Value::Type::List);
+    const auto list_value = node_props["list"].ValueList();
+    ASSERT_EQ(list_value.size(), 2);
+    ASSERT_EQ(list_value[0].ValueInt(), 1);
+    ASSERT_EQ(list_value[1].ValueInt(), 2);
+    ASSERT_EQ(node_props["map"].type(), mg::Value::Type::Map);
+    const auto map_value = node_props["map"].ValueMap();
+    ASSERT_EQ(map_value.size(), 1);
+    ASSERT_EQ(map_value["key"].ValueString(), "value");
+    ASSERT_FALSE(client->FetchOne());
+  }
 }

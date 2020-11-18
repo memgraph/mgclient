@@ -3085,7 +3085,7 @@ inline const ConstList ConstValue::ValueList() const {
 }
 
 inline const ConstMap ConstValue::ValueMap() const {
-  if (type() != Value::Type::List) {
+  if (type() != Value::Type::Map) {
     std::abort();
   }
   return ConstMap(mg_value_map(const_ptr_));

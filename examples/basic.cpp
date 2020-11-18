@@ -9,7 +9,7 @@ int main(int argc, char *argv[]) {
     exit(1);
   }
 
-  mg_init();
+  mg::Client::Init();
 
   std::cout << "mgclient version: " << mg::Client::Version() << std::endl;
   mg::Client::Params params;
@@ -37,7 +37,8 @@ int main(int argc, char *argv[]) {
 
   // Deallocate the client because mg_finalize has to be called globally.
   client.reset(nullptr);
-  mg_finalize();
+
+  mg::Client::Finalize();
 
   return 0;
 }

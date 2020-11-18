@@ -25,10 +25,11 @@ set(mgclient_src_files
         mgsession-encoder.c
         mgtransport.c
         mgvalue.c)
-if(${WIN32})
-    list(APPEND mgclient_src_files mgsocket-windows.c)
-else()
-    list(APPEND mgclient_src_files mgsocket-posix.c)
+if(MGCLIENT_ON_WINDOWS)
+    list(APPEND mgclient_src_files windows/mgsocket.c)
+endif()
+if(MGCLIENT_ON_LINUX)
+    list(APPEND mgclient_src_files linux/mgsocket.c)
 endif()
 
 find_package(OpenSSL REQUIRED)
@@ -40,6 +41,8 @@ set_target_properties(mgclient-static PROPERTIES
         OUTPUT_NAME mgclient)
 target_compile_definitions(mgclient-static PUBLIC MGCLIENT_STATIC_DEFINE)
 target_include_directories(mgclient-static
+        PRIVATE
+        "${CMAKE_SOURCE_DIR}/src"
         PUBLIC
         "${CMAKE_SOURCE_DIR}/include"
         "${CMAKE_CURRENT_BINARY_DIR}"
@@ -55,6 +58,8 @@ set_target_properties(mgclient-shared PROPERTIES
         SOVERSION ${mgclient_SOVERSION}
         C_VISIBILITY_PRESET hidden)
 target_include_directories(mgclient-shared
+        PRIVATE
+        "${CMAKE_SOURCE_DIR}/src"
         PUBLIC
         "${CMAKE_SOURCE_DIR}/include"
         "${CMAKE_CURRENT_BINARY_DIR}"
