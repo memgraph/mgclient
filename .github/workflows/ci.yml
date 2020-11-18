@@ -100,6 +100,7 @@ jobs:
           curl -L https://download.memgraph.com/memgraph/v${{matrix.mgversion}}/ubuntu-18.04/memgraph_${{matrix.mgversion}}-community-1_amd64.deb --output ~/memgraph/memgraph-community.deb
           dpkg -i ~/memgraph/memgraph-community.deb
           nohup /usr/lib/memgraph/memgraph --bolt-port 7687 --bolt-cert-file="" --bolt-key-file="" --data-directory="~/memgraph/data" --storage-properties-on-edges=true --storage-snapshot-interval-sec=0 --storage-wal-enabled=false --storage-recover-on-startup=false --storage-snapshot-on-exit=false --telemetry-enabled=false --log-file='' &
+          sleep 1 # Sometime for some reason memgraph doesn't start.
 
       - name: Build and test mgclient
         run: |
