@@ -61,7 +61,7 @@ ctest
 
 # Building and installing on Windows
 
-To build `mgclient` on Windows MINGW environment could be used.
+To build `mgclient` on Windows, MINGW environment should be used.
    - Install MSYS2 from https://www.msys2.org/.
    - Install MinGW toolchain with the following command:
      ```
@@ -80,9 +80,9 @@ cmake --build . --target install
 # Using the library
 
 The library provides header files located under the include folder. All library
-functionality is documented in that file in Doxygen format. You can also build
-HTML version of the documentation by running `doxygen` command from project
-root directory.
+functionality is documented in these files in Doxygen format. You can also
+build HTML version of the documentation by running `doxygen` command from
+project root directory.
 
 # Examples
 
