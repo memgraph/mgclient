@@ -134,8 +134,7 @@ TEST_F(MemgraphConnection, InsertAndRetrieveFromMemgraph) {
     const auto node_props = node.ValueNode().properties();
     ASSERT_EQ(node_props["int"].ValueInt(), 1);
     ASSERT_EQ(node_props["string"].ValueString(), "Name");
-    ASSERT_GT(node_props["float"].ValueDouble(), 2.299999);
-    ASSERT_LT(node_props["float"].ValueDouble(), 2.300001);
+    ASSERT_LT(std::abs(node_props["float"].ValueDouble() - 2.3), 0.000001);
     ASSERT_EQ(node_props["bool"].ValueBool(), true);
     ASSERT_EQ(node_props["list"].type(), mg::Value::Type::List);
     const auto list_value = node_props["list"].ValueList();

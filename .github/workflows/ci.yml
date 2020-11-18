@@ -4,7 +4,7 @@ on: [push]
 
 jobs:
   clang_check:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
     steps:
     - name: Set-up repository
       uses: actions/checkout@v2
@@ -17,7 +17,7 @@ jobs:
       run: |
         ./tool/format.sh
 
-  build_and_test_posix:
+  build_and_test_linux:
     strategy:
      matrix:
         platform: [ubuntu-18.04]

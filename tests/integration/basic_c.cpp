@@ -200,8 +200,8 @@ TEST_F(MemgraphConnection, InsertAndRetriveFromMemegraph) {
     const mg_map *properties = mg_node_properties(node);
     EXPECT_EQ(GetIntegerValue(mg_map_at(properties, "int")), 1);
     EXPECT_EQ(GetStringValue(mg_map_at(properties, "string")), "Name");
-    EXPECT_GT(GetFloatValue(mg_map_at(properties, "float")), 2.299999);
-    EXPECT_LT(GetFloatValue(mg_map_at(properties, "float")), 2.300001);
+    EXPECT_LT(std::abs(GetFloatValue(mg_map_at(properties, "float")) - 2.3),
+              0.000001);
     EXPECT_EQ(GetBoolValue(mg_map_at(properties, "bool")), true);
     const mg_list *list_value = GetListValue(mg_map_at(properties, "list"));
     ASSERT_EQ(mg_list_size(list_value), 2);
