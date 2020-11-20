@@ -1,4 +1,4 @@
-# build directory
+# Build directory.
 build/
 
 # coverage generated report directory
@@ -7,3 +7,9 @@ tool/generated/
 # vim temporary files
 *.swp
 *.swo
+
+# .vscode project files.
+.vscode/
+
+# Doxygen output files.
+html/

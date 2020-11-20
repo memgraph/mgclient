@@ -15,10 +15,7 @@
 #include "mgclient.h"
 #include "mgsession.h"
 
-#include <bits/stdint-intn.h>
 #include <string.h>
-
-#include <endian.h>
 
 #include "mgcommon.h"
 #include "mgconstants.h"

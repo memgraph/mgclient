@@ -9,6 +9,7 @@ int main(int argc, char *argv[]) {
     exit(1);
   }
 
+  mg_init();
   printf("mgclient version: %s\n", mg_client_version());
 
   mg_session_params *params = mg_session_params_make();
@@ -56,5 +57,7 @@ int main(int argc, char *argv[]) {
   }
 
   mg_session_destroy(session);
+  mg_finalize();
+
   return 0;
 }

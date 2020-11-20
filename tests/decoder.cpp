@@ -12,18 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <iostream>
 #include <string>
 #include <thread>
 
 #include <gtest/gtest.h>
-#include <sys/socket.h>
-#include <sys/types.h>
-
-#include "mgclient.h"
 
 extern "C" {
+#include "mgclient.h"
 #include "mgcommon.h"
 #include "mgsession.h"
+#include "mgsocket.h"
 }
 
 #include "bolt-testdata.hpp"
@@ -35,15 +34,17 @@ using namespace std::string_literals;
 /// parallel prevent the kernel buffer from filling up which makes `send` block.
 class TestClient {
  public:
-  TestClient() {}
+  TestClient() { mg_init(); }
 
   void Write(int sockfd, const std::string &data) {
     thread_ = std::thread([this, sockfd, data] {
       size_t sent = 0;
       while (sent < data.size()) {
-        ssize_t now = send(sockfd, data.data(), data.size() - sent, 0);
+        ssize_t now = mg_socket_send(sockfd, data.data(), data.size() - sent);
         if (now < 0) {
+          auto socket_error = mg_socket_error();
           error = true;
+          std::cout << "ERROR: " << socket_error << std::endl;
           break;
         }
         sent += now;
@@ -84,7 +85,7 @@ class DecoderTest : public ::testing::Test {
  protected:
   virtual void SetUp() override {
     int tmp[2];
-    socketpair(AF_UNIX, SOCK_STREAM, 0, tmp);
+    ASSERT_EQ(mg_socket_pair(AF_UNIX, SOCK_STREAM, 0, tmp), 0);
     sc = tmp[0];
     ss = tmp[1];
   }
@@ -114,7 +115,11 @@ TEST_F(MessageChunkingTest, Empty) {
   ASSERT_TRUE(session);
 
   client.Write(ss, "\x00\x00"s);
-  EXPECT_EQ(mg_session_receive_message(session), 0);
+  int recv_message_status = mg_session_receive_message(session);
+  if (recv_message_status != 0) {
+    std::cout << "ERROR: " << mg_session_error(session) << std::endl;
+  }
+  EXPECT_EQ(recv_message_status, 0);
   std::string message(session->in_buffer, session->in_end);
   EXPECT_EQ(message, "");
 

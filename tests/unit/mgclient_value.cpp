@@ -17,8 +17,11 @@
 
 #include <gtest/gtest.h>
 
+extern "C" {
 #include "mgclient.h"
-#include "mgvalue.hpp"
+}
+
+#include "mgclient-value.hpp"
 
 using namespace std;
 
@@ -29,7 +32,7 @@ TEST(ValueTest, BasicTypes) {
   Value value_bool1(true);
   Value value_bool2(false);
   Value value_int1(-13);
-  Value value_int2(1L << 60);
+  Value value_int2(static_cast<int64_t>((1L << 60)));
   Value value_double(3.14159);
   Value value_string1("test");
   Value value_string2(std::string("test"));

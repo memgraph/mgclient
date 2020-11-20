@@ -134,6 +134,16 @@ extern "C" {
 /// \return Client version in the major.minor.patch format.
 MGCLIENT_EXPORT const char *mg_client_version();
 
+/// Initializes the client (the whole process).
+/// Should be called at the beginning of each process using the client.
+///
+/// \return Zero if initialization was successful.
+MGCLIENT_EXPORT int mg_init();
+
+/// Finalizes the client (the whole process).
+/// Should be called at the end of each process using the client.
+MGCLIENT_EXPORT void mg_finalize();
+
 /// An enum listing all the types as specified by Bolt protocol.
 enum mg_value_type {
   MG_VALUE_TYPE_NULL,
@@ -1029,6 +1039,9 @@ MGCLIENT_EXPORT void mg_point_3d_destroy(mg_point_3d *point_3d);
 /// Results can be pulled using \ref mg_session_fetch.
 #define MG_SESSION_FETCHING 3
 
+/// Success code.
+#define MG_SUCCESS (0)
+
 /// Failed to send data to server.
 #define MG_ERROR_SEND_FAILED (-1)
 
@@ -1084,6 +1097,12 @@ MGCLIENT_EXPORT void mg_point_3d_destroy(mg_point_3d *point_3d);
 /// User provided trust callback returned a non-zeron value after SSL connection
 /// negotiation.
 #define MG_ERROR_TRUST_CALLBACK (-18)
+
+// Unable to initialize the socket (both create and connect).
+#define MG_ERROR_SOCKET (-100)
+
+// Function unimplemented.
+#define MG_ERROR_UNIMPLEMENTED (-1000)
 
 /// Determines whether a secure SSL TCP/IP connection will be negotiated with
 /// the server.
@@ -1163,6 +1182,8 @@ typedef struct mg_session mg_session;
 ///     fingerprint and user provided data. If the function returns a non-zero
 ///     value, SSL connection will be immediately terminated. This can be used
 ///     to implement TOFU (trust on first use) mechanism.
+///     It might happen that hostname can not be determined, in that case the
+///     trust callback will be called with hostname="undefined".
 ///
 ///  - trust_data
 ///

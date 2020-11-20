@@ -15,26 +15,24 @@
 #include "mgclient.h"
 
 #include <assert.h>
+#include <errno.h>
 #include <inttypes.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include <arpa/inet.h>
-#include <errno.h>
-#include <netdb.h>
-#include <netinet/tcp.h>
-#include <sys/socket.h>
-#include <sys/types.h>
-#include <unistd.h>
-
 #include "mgcommon.h"
 #include "mgconstants.h"
 #include "mgmessage.h"
 #include "mgsession.h"
+#include "mgsocket.h"
 #include "mgvalue.h"
 
 const char *mg_client_version() { return MGCLIENT_VERSION; }
+
+int mg_init() { return mg_socket_init(); }
+
+void mg_finalize() { mg_socket_finalize(); }
 
 typedef struct mg_session_params {
   const char *address;
@@ -422,97 +420,59 @@ static int mg_bolt_init(mg_session *session, const mg_session_params *params) {
 static int init_tcp_connection(const mg_session_params *params, int *sockfd,
                                struct sockaddr *peer_addr,
                                mg_session *session) {
-  struct addrinfo hint;
-  memset(&hint, 0, sizeof(hint));
-  hint.ai_family = AF_UNSPEC;
-  hint.ai_socktype = SOCK_STREAM;
-  struct addrinfo *addr_list;
+  struct addrinfo *addr_list = NULL;
+  struct addrinfo hints;
+  memset(&hints, 0, sizeof(hints));
+  hints.ai_family = AF_UNSPEC;
+  hints.ai_socktype = SOCK_STREAM;
+  hints.ai_protocol = IPPROTO_TCP;
 
   char portstr[6];
   sprintf(portstr, "%" PRIu16, params->port);
 
   int getaddrinfo_status;
   if (params->host) {
-    getaddrinfo_status = getaddrinfo(params->host, portstr, &hint, &addr_list);
+    getaddrinfo_status = getaddrinfo(params->host, portstr, &hints, &addr_list);
   } else if (params->address) {
-    hint.ai_flags = AI_NUMERICHOST;
+    hints.ai_flags = AI_NUMERICHOST;
     getaddrinfo_status =
-        getaddrinfo(params->address, portstr, &hint, &addr_list);
+        getaddrinfo(params->address, portstr, &hints, &addr_list);
   } else {
     abort();
   }
-
   if (getaddrinfo_status != 0) {
     mg_session_set_error(session, "getaddrinfo failed: %s",
                          gai_strerror(getaddrinfo_status));
     return MG_ERROR_NETWORK_FAILURE;
   }
 
-  int tsockfd = -1;
-  int status = 0;
-
+  int tsockfd = MG_ERROR_SOCKET;
+  int status = MG_SUCCESS;
   for (struct addrinfo *curr_addr = addr_list; curr_addr;
        curr_addr = curr_addr->ai_next) {
-    tsockfd = socket(curr_addr->ai_family, curr_addr->ai_socktype,
-                     curr_addr->ai_protocol);
-    if (tsockfd == -1) {
-      status = MG_ERROR_NETWORK_FAILURE;
-      mg_session_set_error(session, "couldn't open socket: %s",
-                           strerror(errno));
+    tsockfd = mg_socket_create(curr_addr->ai_family, curr_addr->ai_socktype,
+                               curr_addr->ai_protocol);
+    status = mg_socket_create_handle_error(tsockfd, session);
+    if (status != MG_SUCCESS) {
       continue;
     }
-    if (MG_RETRY_ON_EINTR(
-            connect(tsockfd, curr_addr->ai_addr, curr_addr->ai_addrlen)) != 0) {
-      status = MG_ERROR_NETWORK_FAILURE;
-      mg_session_set_error(session, "couldn't connect to host: %s",
-                           strerror(errno));
-
-      if (MG_RETRY_ON_EINTR(close(tsockfd)) != 0) {
-        abort();
-      }
-      tsockfd = -1;
-    } else {
+    status =
+        mg_socket_connect(tsockfd, curr_addr->ai_addr, curr_addr->ai_addrlen);
+    status = mg_socket_connect_handle_error(&tsockfd, status, session);
+    if (status == MG_SUCCESS) {
       memcpy(peer_addr, curr_addr->ai_addr, sizeof(struct sockaddr));
       break;
     }
   }
-
   freeaddrinfo(addr_list);
-
-  if (tsockfd == -1) {
-    assert(status != 0);
+  if (tsockfd == MG_ERROR_SOCKET) {
+    assert(status != MG_SUCCESS);
     return status;
   }
 
-  struct {
-    int level;
-    int optname;
-    int optval;
-  } socket_options[] = {// disable Nagle algorithm for performance reasons
-                        {SOL_TCP, TCP_NODELAY, 1},
-                        // turn keep-alive on
-                        {SOL_SOCKET, SO_KEEPALIVE, 1},
-                        // wait 20s before sending keep-alive packets
-                        {SOL_TCP, TCP_KEEPIDLE, 20},
-                        // 4 keep-alive packets must fail to close
-                        {SOL_TCP, TCP_KEEPCNT, 4},
-                        // send keep-alive packets every 15s
-                        {SOL_TCP, TCP_KEEPINTVL, 15}};
-  const size_t OPTCNT = sizeof(socket_options) / sizeof(socket_options[0]);
-
-  for (size_t i = 0; i < OPTCNT; ++i) {
-    int optval = socket_options[i].optval;
-    socklen_t optlen = sizeof(optval);
-
-    if (setsockopt(tsockfd, socket_options[i].level, socket_options[i].optname,
-                   (void *)&optval, optlen) != 0) {
-      mg_session_set_error(session, "couldn't set socket option: %s",
-                           strerror(errno));
-      if (MG_RETRY_ON_EINTR(close(tsockfd)) != 0) {
-        abort();
-      }
-      return MG_ERROR_NETWORK_FAILURE;
-    }
+  int set_options_status = mg_socket_options(tsockfd, session);
+  if (set_options_status != MG_SUCCESS) {
+    return set_options_status;
   }
 
   *sockfd = tsockfd;
@@ -521,6 +481,7 @@ static int init_tcp_connection(const mg_session_params *params, int *sockfd,
 
 static int get_hostname_and_ip(const struct sockaddr *peer_addr, char *hostname,
                                char *ip, mg_session *session) {
+  // Populate the ip.
   switch (peer_addr->sa_family) {
     case AF_INET:
       if (!inet_ntop(AF_INET, &((struct sockaddr_in *)peer_addr)->sin_addr, ip,
@@ -530,7 +491,6 @@ static int get_hostname_and_ip(const struct sockaddr *peer_addr, char *hostname,
         return MG_ERROR_NETWORK_FAILURE;
       }
       break;
-
     case AF_INET6:
       if (!inet_ntop(AF_INET6, &((struct sockaddr_in6 *)peer_addr)->sin6_addr,
                      ip, INET6_ADDRSTRLEN)) {
@@ -539,24 +499,30 @@ static int get_hostname_and_ip(const struct sockaddr *peer_addr, char *hostname,
         return MG_ERROR_NETWORK_FAILURE;
       }
       break;
-
     default:
       // Should not happen with addresses returned from getaddrinfo.
       abort();
   }
-
-  int status = getnameinfo(peer_addr, sizeof(struct sockaddr), hostname,
-                           NI_MAXHOST, NULL, 0, 0);
-  if (status != 0) {
-    mg_session_set_error(session, "failed to get server name: %s",
-                         gai_strerror(status));
-    return MG_ERROR_NETWORK_FAILURE;
+  // Populate the hostname.
+  // Useful read https://stackoverflow.com/questions/12274028.
+  int nameinfo_status = getnameinfo(peer_addr, sizeof(struct sockaddr),
+                                    hostname, NI_MAXHOST, NULL, 0, 0);
+  if (nameinfo_status != 0) {
+    // ON_WINDOWS getnameinfo fails if peer_addr was constructed from
+    // getaddrinfo when localhost is passed in (getaddrinfo returns an empty
+    // address). I haven't find simple and clean solution to make getnameinfo
+    // work. Since this function is used only to get the hostname for the
+    // trust callback, setting hostname to unknown and continuing the program
+    // seems sensible solution.
+    DB_LOG("getnameinfo call failed. hostname set to unknown\n");
+    strcpy(hostname, "unknown");
   }
   return 0;
 }
 
 int mg_connect_ca(const mg_session_params *params, mg_session **session,
                   mg_allocator *allocator) {
+  // Useful read https://akkadia.org/drepper/userapi-ipv6.html.
   mg_session *tsession = mg_session_init(allocator);
   if (!tsession) {
     return MG_ERROR_OOM;
@@ -572,13 +538,6 @@ int mg_connect_ca(const mg_session_params *params, mg_session **session,
 
   struct sockaddr peer_addr;
   status = init_tcp_connection(params, &sockfd, &peer_addr, tsession);
-  if (status != 0) {
-    goto cleanup;
-  }
-
-  char ip[INET6_ADDRSTRLEN];
-  char hostname[NI_MAXHOST];
-  status = get_hostname_and_ip(&peer_addr, hostname, ip, tsession);
   if (status != 0) {
     goto cleanup;
   }
@@ -603,6 +562,12 @@ int mg_connect_ca(const mg_session_params *params, mg_session **session,
       }
       tsession->transport = (mg_transport *)ttransport;
       if (params->trust_callback) {
+        char ip[INET6_ADDRSTRLEN];
+        char hostname[NI_MAXHOST];
+        status = get_hostname_and_ip(&peer_addr, hostname, ip, tsession);
+        if (status != 0) {
+          goto cleanup;
+        }
         int trust_result = params->trust_callback(
             hostname, ip, ttransport->peer_pubkey_type,
             ttransport->peer_pubkey_fp, params->trust_data);
@@ -638,7 +603,7 @@ int mg_connect_ca(const mg_session_params *params, mg_session **session,
   return 0;
 
 cleanup:
-  if (sockfd >= 0 && MG_RETRY_ON_EINTR(close(sockfd)) != 0) {
+  if (sockfd >= 0 && mg_socket_close(sockfd) != 0) {
     abort();
   }
   *session = tsession;
@@ -1101,6 +1066,7 @@ const mg_list *mg_result_row(const mg_result *result) {
   }
   return result->message->record_v->fields;
 }
+
 const mg_map *mg_result_summary(const mg_result *result) {
   if (result->message->type != MG_MESSAGE_TYPE_SUCCESS) {
     return NULL;

@@ -41,6 +41,11 @@ int GetIntegerValue(const mg_value *value) {
   return mg_value_integer(value);
 }
 
+double GetFloatValue(const mg_value *value) {
+  CheckMgValueType(value, MG_VALUE_TYPE_FLOAT);
+  return mg_value_float(value);
+}
+
 const mg_node *GetNodeValue(const mg_value *value) {
   CheckMgValueType(value, MG_VALUE_TYPE_NODE);
   return mg_value_node(value);
@@ -61,9 +66,20 @@ std::string GetStringValue(const mg_value *value) {
   return GetStringValue(s);
 }
 
+const mg_list *GetListValue(const mg_value *value) {
+  CheckMgValueType(value, MG_VALUE_TYPE_LIST);
+  return mg_value_list(value);
+}
+
+const mg_map *GetMapValue(const mg_value *value) {
+  CheckMgValueType(value, MG_VALUE_TYPE_MAP);
+  return mg_value_map(value);
+}
+
 class MemgraphConnection : public ::testing::Test {
  protected:
   virtual void SetUp() override {
+    mg_init();
     params = mg_session_params_make();
     std::string memgraph_host =
         GetEnvOrDefault<std::string>("MEMGRAPH_HOST", "127.0.0.1");
@@ -84,6 +100,7 @@ class MemgraphConnection : public ::testing::Test {
     if (session) {
       mg_session_destroy(session);
     }
+    mg_finalize();
   }
 
   mg_session_params *params;
@@ -164,4 +181,38 @@ TEST_F(MemgraphConnection, InsertAndRetriveFromMemegraph) {
   ASSERT_EQ(rows, 1);
   ASSERT_EQ(status, 0);
   ASSERT_EQ(mg_session_commit_transaction(session, &result), 0);
+
+  // The following test is more suitable to be under unit tests. Since it is
+  // impossible to execute all unit tests on all platforms (they are not ported
+  // yet), the test is located under integration tests.
+  {
+    ASSERT_EQ(mg_session_run(session,
+                             "CREATE (n:ValuesTest {int: 1, string:'Name', "
+                             "float: 2.3, bool: True, "
+                             "list: [1, 2], map: {key: 'value'}}) RETURN n;",
+                             NULL, NULL, NULL, NULL),
+              0);
+    ASSERT_EQ(mg_session_pull(session, NULL), 0);
+    mg_result *result;
+    ASSERT_EQ(mg_session_fetch(session, &result), 1);
+    const mg_list *mg_columns = mg_result_columns(result);
+    const mg_list *mg_row = mg_result_row(result);
+    ASSERT_EQ(mg_list_size(mg_columns), 1);
+    ASSERT_EQ(mg_list_size(mg_row), 1);
+    const mg_node *node = GetNodeValue(mg_list_at(mg_row, 0));
+    const mg_map *properties = mg_node_properties(node);
+    EXPECT_EQ(GetIntegerValue(mg_map_at(properties, "int")), 1);
+    EXPECT_EQ(GetStringValue(mg_map_at(properties, "string")), "Name");
+    EXPECT_LT(std::abs(GetFloatValue(mg_map_at(properties, "float")) - 2.3),
+              0.000001);
+    EXPECT_EQ(GetBoolValue(mg_map_at(properties, "bool")), true);
+    const mg_list *list_value = GetListValue(mg_map_at(properties, "list"));
+    ASSERT_EQ(mg_list_size(list_value), 2);
+    ASSERT_EQ(GetIntegerValue(mg_list_at(list_value, 0)), 1);
+    ASSERT_EQ(GetIntegerValue(mg_list_at(list_value, 1)), 2);
+    const mg_map *map_value = GetMapValue(mg_map_at(properties, "map"));
+    ASSERT_EQ(mg_map_size(map_value), 1);
+    ASSERT_EQ(GetStringValue(mg_map_at(map_value, "key")), "value");
+    ASSERT_EQ(mg_session_fetch(session, &result), 0);
+  }
 }

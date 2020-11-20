@@ -16,14 +16,13 @@
 #include <thread>
 
 #include <gtest/gtest.h>
-#include <sys/socket.h>
-#include <sys/types.h>
-
-#include "mgclient.h"
 
 extern "C" {
+#include "mgclient.h"
+#include "mgcommon.h"
 #include "mgconstants.h"
 #include "mgsession.h"
+#include "mgsocket.h"
 }
 
 #include "bolt-testdata.hpp"
@@ -43,7 +42,7 @@ class TestServer {
     thread_ = std::thread([this, sockfd] {
       char buffer[8192];
       while (true) {
-        ssize_t now = recv(sockfd, buffer, 8192, 0);
+        ssize_t now = mg_socket_receive(sockfd, buffer, 8192);
         if (now < 0) {
           error = true;
           break;
@@ -81,7 +80,7 @@ class EncoderTest : public ::testing::Test {
     session.out_end = session.out_begin;
     {
       int tmp[2];
-      socketpair(AF_UNIX, SOCK_STREAM, 0, tmp);
+      ASSERT_EQ(mg_socket_pair(AF_UNIX, SOCK_STREAM, 0, tmp), 0);
       sc = tmp[0];
       ss = tmp[1];
     }

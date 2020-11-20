@@ -20,7 +20,9 @@ ExternalProject_Add(gtest-proj
         PREFIX            gtest
         GIT_REPOSITORY    https://github.com/google/googletest.git
         GIT_TAG           release-1.8.1
-        CMAKE_ARGS        "-DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>"
+        CMAKE_ARGS        "-DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}"
+                          "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}"
+                          "-DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>"
                           "-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}"
         INSTALL_DIR       "${PROJECT_BINARY_DIR}/gtest")
 
@@ -30,24 +32,26 @@ set(GTEST_ROOT ${install_dir})
 set(GTEST_INCLUDE_DIRS ${GTEST_ROOT}/include
         CACHE INTERNAL "Path to gtest include directory")
 
-set(GTEST_LIBRARY_PATH ${GTEST_ROOT}/lib/${CMAKE_FIND_LIBRARY_PREFIXES}gtest.a)
-set(GTEST_DEBUG_LIBRARY_PATH ${GTEST_ROOT}/lib/${CMAKE_FIND_LIBRARY_PREFIXES}gtestd.a)
+set(GTEST_LIBRARY_PATH ${GTEST_ROOT}/lib/${MGCLIENT_FIND_LIBRARY_PREFIXES}gtest.a)
+set(GTEST_DEBUG_LIBRARY_PATH ${GTEST_ROOT}/lib/${MGCLIENT_FIND_LIBRARY_PREFIXES}gtestd.a)
 set(GTEST_LIBRARY gtest)
 add_library(${GTEST_LIBRARY} STATIC IMPORTED)
+# TODO(gitbuda): On Windows ${CMAKE_THREAD_LIBS_INIT} is undefined.
+#                "${...}" prevents set_target_properties to fail.
 set_target_properties(${GTEST_LIBRARY} PROPERTIES
         IMPORTED_LOCATION ${GTEST_LIBRARY_PATH}
         IMPORTED_LOCATION_DEBUG ${GTEST_DEBUG_LIBRARY_PATH}
-        INTERFACE_LINK_LIBRARIES ${CMAKE_THREAD_LIBS_INIT})
+        INTERFACE_LINK_LIBRARIES "${CMAKE_THREAD_LIBS_INIT}")
 add_dependencies(${GTEST_LIBRARY} gtest-proj)
 
-set(GTEST_MAIN_LIBRARY_PATH ${GTEST_ROOT}/lib/${CMAKE_FIND_LIBRARY_PREFIXES}gtest_main.a)
-set(GTEST_MAIN_DEBUG_LIBRARY_PATH ${GTEST_ROOT}/lib/${CMAKE_FIND_LIBRARY_PREFIXES}gtest_maind.a)
+set(GTEST_MAIN_LIBRARY_PATH ${GTEST_ROOT}/lib/${MGCLIENT_FIND_LIBRARY_PREFIXES}gtest_main.a)
+set(GTEST_MAIN_DEBUG_LIBRARY_PATH ${GTEST_ROOT}/lib/${MGCLIENT_FIND_LIBRARY_PREFIXES}gtest_maind.a)
 set(GTEST_MAIN_LIBRARY gtest-main)
 add_library(${GTEST_MAIN_LIBRARY} STATIC IMPORTED)
 set_target_properties(${GTEST_MAIN_LIBRARY} PROPERTIES
         IMPORTED_LOCATION ${GTEST_MAIN_LIBRARY_PATH}
         IMPORTED_LOCATION_DEBUG ${GTEST_MAIN_DEBUG_LIBRARY_PATH}
-        INTERFACE_LINK_LIBRARIES ${CMAKE_THREAD_LIBS_INIT})
+        INTERFACE_LINK_LIBRARIES "${CMAKE_THREAD_LIBS_INIT}")
 add_dependencies(${GTEST_MAIN_LIBRARY} gtest-proj)
 
 macro(add_gtest target_name target_path)

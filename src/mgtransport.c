@@ -14,20 +14,18 @@
 
 #include "mgtransport.h"
 
+#include <assert.h>
+#include <errno.h>
+#include <stdlib.h>
+#include <string.h>
+#ifdef MGCLIENT_ON_LINUX
+#include <pthread.h>
+#endif  // MGCLIENT_ON_LINUX
+
 #include "mgallocator.h"
 #include "mgclient.h"
 #include "mgcommon.h"
-
-#include <assert.h>
-#include <stdlib.h>
-#include <string.h>
-
-#include <errno.h>
-#include <poll.h>
-#include <pthread.h>
-#include <sys/socket.h>
-#include <sys/types.h>
-#include <unistd.h>
+#include "mgsocket.h"
 
 int mg_init_ssl = 1;
 
@@ -65,8 +63,8 @@ int mg_raw_transport_send(struct mg_transport *transport, const char *buf,
   size_t total_sent = 0;
   while (total_sent < len) {
     // TODO(mtomic): maybe enable using MSG_MORE here
-    ssize_t sent_now = MG_RETRY_ON_EINTR(
-        send(sockfd, buf + total_sent, len - total_sent, MSG_NOSIGNAL));
+    ssize_t sent_now =
+        mg_socket_send(sockfd, buf + total_sent, len - total_sent);
     if (sent_now == -1) {
       perror("mg_raw_transport_send");
       return -1;
@@ -81,8 +79,8 @@ int mg_raw_transport_recv(struct mg_transport *transport, char *buf,
   int sockfd = ((mg_raw_transport *)transport)->sockfd;
   size_t total_received = 0;
   while (total_received < len) {
-    ssize_t received_now = MG_RETRY_ON_EINTR(
-        recv(sockfd, buf + total_received, len - total_received, 0));
+    ssize_t received_now =
+        mg_socket_receive(sockfd, buf + total_received, len - total_received);
     if (received_now == 0) {
       // Server closed the connection.
       fprintf(stderr, "mg_raw_transport_recv: connection closed by server\n");
@@ -99,7 +97,7 @@ int mg_raw_transport_recv(struct mg_transport *transport, char *buf,
 
 void mg_raw_transport_destroy(struct mg_transport *transport) {
   mg_raw_transport *self = (mg_raw_transport *)transport;
-  if (MG_RETRY_ON_EINTR(close(self->sockfd)) != 0) {
+  if (mg_socket_close(self->sockfd) != 0) {
     abort();
   }
   mg_allocator_free(self->allocator, transport);
@@ -268,12 +266,12 @@ int mg_secure_transport_send(mg_transport *transport, const char *buf,
           abort();
         }
         p.events = POLLIN;
-        if (MG_RETRY_ON_EINTR(poll(&p, 1, -1)) < 0) {
+        if (mg_socket_poll(&p, 1, -1) < 0) {
           return -1;
         }
         continue;
       } else {
-        ERR_print_errors_cb(print_ssl_error, "mg_secure_transport_recv");
+        ERR_print_errors_cb(print_ssl_error, "mg_secure_transport_send");
         return -1;
       }
     }
@@ -299,7 +297,7 @@ int mg_secure_transport_recv(mg_transport *transport, char *buf, size_t len) {
           abort();
         }
         p.events = POLLIN;
-        if (MG_RETRY_ON_EINTR(poll(&p, 1, -1)) < 0) {
+        if (mg_socket_poll(&p, 1, -1) < 0) {
           return -1;
         }
         continue;

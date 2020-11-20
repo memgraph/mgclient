@@ -15,6 +15,10 @@
 #ifndef MGCLIENT_MGCOMMON_H
 #define MGCLIENT_MGCOMMON_H
 
+#ifdef MGCLIENT_ON_LINUX
+
+#include <endian.h>
+
 #define MG_RETRY_ON_EINTR(expression)          \
   ({                                           \
     long result;                               \
@@ -24,12 +28,45 @@
     result;                                    \
   })
 
+#endif  // MGCLIENT_ON_LINUX
+
+#ifdef MGCLIENT_ON_WINDOWS
+
+// Based on https://gist.github.com/PkmX/63dd23f28ba885be53a5
+
+#define htobe16(x) __builtin_bswap16(x)
+#define htole16(x) (x)
+#define be16toh(x) __builtin_bswap16(x)
+#define le16toh(x) (x)
+
+#define htobe32(x) __builtin_bswap32(x)
+#define htole32(x) (x)
+#define be32toh(x) __builtin_bswap32(x)
+#define le32toh(x) (x)
+
+#define htobe64(x) __builtin_bswap64(x)
+#define htole64(x) (x)
+#define be64toh(x) __builtin_bswap64(x)
+#define le64toh(x) (x)
+
+#endif  // MGCLIENT_ON_WINDOWS
+
 #define MG_RETURN_IF_FAILED(expression) \
   do {                                  \
     int status = (expression);          \
     if (status != 0) {                  \
       return status;                    \
     }                                   \
+  } while (0)
+
+#ifdef NDEBUG
+#define DB_ACTIVE 0
+#else
+#define DB_ACTIVE 1
+#endif  // NDEBUG
+#define DB_LOG(x)                      \
+  do {                                 \
+    if (DB_ACTIVE) fprintf(stderr, x); \
   } while (0)
 
 #endif

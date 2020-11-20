@@ -25,6 +25,12 @@ set(mgclient_src_files
         mgsession-encoder.c
         mgtransport.c
         mgvalue.c)
+if(MGCLIENT_ON_WINDOWS)
+    list(APPEND mgclient_src_files windows/mgsocket.c)
+endif()
+if(MGCLIENT_ON_LINUX)
+    list(APPEND mgclient_src_files linux/mgsocket.c)
+endif()
 
 find_package(OpenSSL REQUIRED)
 
@@ -35,12 +41,16 @@ set_target_properties(mgclient-static PROPERTIES
         OUTPUT_NAME mgclient)
 target_compile_definitions(mgclient-static PUBLIC MGCLIENT_STATIC_DEFINE)
 target_include_directories(mgclient-static
+        PRIVATE
+        "${CMAKE_SOURCE_DIR}/src"
         PUBLIC
         "${CMAKE_SOURCE_DIR}/include"
         "${CMAKE_CURRENT_BINARY_DIR}"
         "${OPENSSL_INCLUDE_DIR}")
 target_link_libraries(mgclient-static PRIVATE ${OPENSSL_LIBRARIES} project_options)
-
+if(MGCLIENT_ON_WINDOWS)
+    target_link_libraries(mgclient-static PUBLIC ws2_32)
+endif()
 
 add_library(mgclient-shared SHARED ${mgclient_src_files})
 set_target_properties(mgclient-shared PROPERTIES
@@ -48,11 +58,16 @@ set_target_properties(mgclient-shared PROPERTIES
         SOVERSION ${mgclient_SOVERSION}
         C_VISIBILITY_PRESET hidden)
 target_include_directories(mgclient-shared
+        PRIVATE
+        "${CMAKE_SOURCE_DIR}/src"
         PUBLIC
         "${CMAKE_SOURCE_DIR}/include"
         "${CMAKE_CURRENT_BINARY_DIR}"
         "${OPENSSL_INCLUDE_DIR}")
 target_link_libraries(mgclient-shared PRIVATE ${OPENSSL_LIBRARIES})
+if(MGCLIENT_ON_WINDOWS)
+    target_link_libraries(mgclient-shared PUBLIC ws2_32)
+endif()
 
 generate_export_header(mgclient-shared
         BASE_NAME "mgclient"
@@ -65,9 +80,7 @@ install(TARGETS mgclient-static mgclient-shared
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
 install(DIRECTORY
         "${CMAKE_SOURCE_DIR}/include/"
-        DESTINATION
-        ${CMAKE_INSTALL_INCLUDEDIR})
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 install(FILES
         "${CMAKE_CURRENT_BINARY_DIR}/mgclient-export.h"
-        DESTINATION
-        ${CMAKE_INSTALL_INCLUDEDIR})
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})

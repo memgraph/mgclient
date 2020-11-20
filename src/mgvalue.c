@@ -12,14 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "mgvalue.h"
-
 #include <stdlib.h>
 #include <string.h>
 
 #include "mgallocator.h"
 #include "mgclient.h"
 #include "mgconstants.h"
+#include "mgvalue.h"
 
 mg_string *mg_string_alloc(uint32_t size, mg_allocator *allocator) {
   char *block = mg_allocator_malloc(allocator, sizeof(mg_string) + size);

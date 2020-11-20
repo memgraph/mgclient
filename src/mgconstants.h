@@ -28,6 +28,7 @@
 
 static const char MG_HANDSHAKE_MAGIC[] = "\x60\x60\xB0\x17";
 
+// TODO(gitbuda): Align this with the mgclient library version.
 static const char MG_USER_AGENT_DEFAULT[] = "MemgraphBolt/0.1";
 
 /// Markers

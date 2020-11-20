@@ -12,22 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "mgsession.h"
-
 #include <assert.h>
+#include <errno.h>
 #include <stdalign.h>
 #include <stdarg.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-#include <endian.h>
-#include <errno.h>
 #include <unistd.h>
 
 #include "mgcommon.h"
 #include "mgconstants.h"
+#include "mgsession.h"
 
 int mg_session_status(const mg_session *session) {
   if (!session) {

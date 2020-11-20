@@ -19,8 +19,10 @@
 
 #include <gtest/gtest.h>
 
+extern "C" {
 #include "mgallocator.h"
 #include "mgclient.h"
+}
 
 using namespace std::string_literals;
 
@@ -101,12 +103,13 @@ std::vector<ValueTestParam> FloatTestCases() {
 
 /// Encoding of a container is just encoding of its size concatenated to
 /// encodings of its elements. There are 4 size classes: TINY (<= 15), SIZE_8 (<
-/// 2^8), SIZE_16 (< 2^16), SIZE_32 (< 2^32). In array SIZE we have a range of
+/// 2^8), SIZE_16 (< 2^16), SIZE_32 (< 2^32). In array SIZES we have a range of
 /// sizes to test if container sizes are encoded correctly according to size
 /// class. There is a utility function `GetEncodedSize` to provide encoded
 /// container size for each test case, which is then used in
 /// `ContainerTestCases` functions.
-size_t SIZE[] = {0, 1, 10, 15, 16, 130, 255, 256, 10000, 65535, 65536, 130000};
+/// Note: on Windows, SIZE is already defined in windef.h.
+size_t SIZES[] = {0, 1, 10, 15, 16, 130, 255, 256, 10000, 65535, 65536, 130000};
 
 enum class SizeClass { TINY, SIZE_8, SIZE_16, SIZE_32 };
 
@@ -129,7 +132,7 @@ std::string ENCODED_SIZE[] = {"not applicable",
                               "\x00\x01\x00\x00"s,
                               "\x00\x01\xFB\xD0"s};
 
-int NUM_INPUTS = sizeof(SIZE) / sizeof(size_t);
+int NUM_INPUTS = sizeof(SIZES) / sizeof(size_t);
 
 enum class ContainerType { STRING, LIST, MAP };
 
@@ -152,7 +155,7 @@ std::string GetEncodedSize(int idx, ContainerType type) {
   }
   switch (SIZE_CLASS[idx]) {
     case SizeClass::TINY:
-      return std::string(1, char(marker_tiny + SIZE[idx]));
+      return std::string(1, char(marker_tiny + SIZES[idx]));
     case SizeClass::SIZE_8:
       return std::string(1, marker_8) + ENCODED_SIZE[idx];
     case SizeClass::SIZE_16:
@@ -214,7 +217,7 @@ std::vector<ValueTestParam> StringTestCases() {
   for (int i = 0; i < NUM_INPUTS; ++i) {
     std::string data;
     /// String 'abcdefhijklmnopqrstuvwxyzabcdefhijklmnopq...'
-    for (int j = 0; j < SIZE[i]; ++j) data.push_back((char)(j % 26 + 'a'));
+    for (int j = 0; j < SIZES[i]; ++j) data.push_back((char)(j % 26 + 'a'));
     std::string encoded_size = GetEncodedSize(i, ContainerType::STRING);
     test_cases.push_back(
         {mg_value_make_string(data.c_str()), encoded_size + data});
@@ -226,8 +229,8 @@ std::vector<ValueTestParam> ListTestCases() {
   std::vector<ValueTestParam> inputs;
   for (int i = 0; i < NUM_INPUTS; ++i) {
     std::string encoded = GetEncodedSize(i, ContainerType::LIST);
-    mg_list *list = mg_list_make_empty(SIZE[i]);
-    for (int j = 0; j < SIZE[i]; ++j) {
+    mg_list *list = mg_list_make_empty(SIZES[i]);
+    for (int j = 0; j < SIZES[i]; ++j) {
       encoded += GetElementEncoding(j);
       mg_list_append(list, GetElement(j));
     }
@@ -240,8 +243,8 @@ std::vector<ValueTestParam> MapTestCases() {
   std::vector<ValueTestParam> inputs;
   for (int i = 0; i < NUM_INPUTS; ++i) {
     std::string encoded = GetEncodedSize(i, ContainerType::MAP);
-    mg_map *map = mg_map_make_empty(SIZE[i]);
-    for (int j = 0; j < SIZE[i]; ++j) {
+    mg_map *map = mg_map_make_empty(SIZES[i]);
+    for (int j = 0; j < SIZES[i]; ++j) {
       std::string key = "k" + std::to_string(j);
       encoded.push_back('\x80' + key.size());
       encoded += key;
@@ -258,7 +261,7 @@ std::vector<ValueTestParam> NodeTestCases() {
   std::vector<ValueTestParam> inputs;
 
   {
-    mg_string *labels[] = {};
+    mg_string *labels[0] = {};
     mg_map *props = mg_map_make_empty(0);
     mg_node *node = mg_node_make(12345, 0, labels, props);
     inputs.push_back(

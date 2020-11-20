@@ -5,13 +5,12 @@
 mgclient is a C library interface for [Memgraph](https://www.memgraph.com)
 database.
 
-# Building and installing
+# Building and installing on Linux
 
 To build and install mgclient from source you will need:
    - CMake version >= 3.8
    - OpenSSL version >= 1.0.2
-   - C compiler supporting C11
-   - C++ compiler supporting C++17
+   - gcc >= 8 or clang >= 8
 
 To install minimum compile dependencies on Debian / Ubuntu:
 
@@ -53,14 +52,37 @@ make install
 This will install to system default installation directory. If you want to
 change this location, use `-DCMAKE_INSTALL_PREFIX` option when running CMake.
 
-If you want to run tests, just type `ctest` in your build directory.
+If you want to build and run tests, in the build directory run:
+
+```
+cmake -DBUILD_TESTING=ON -DBUILD_TESTING_INTEGRATION=ON ..
+ctest
+```
+
+# Building and installing on Windows
+
+To build `mgclient` on Windows, MINGW environment should be used.
+   - Install MSYS2 from https://www.msys2.org/.
+   - Install MinGW toolchain with the following command:
+     ```
+     pacman -S --needed git base-devel mingw-w64-i686-toolchain mingw-w64-x86_64-toolchain mingw-w64-i686-cmake mingw-w64-x86_64-cmake mingw-w64-i686-openssl mingw-w64-x86_64-openssl
+     ```
+
+Once the environment is ready, please run:
+
+```
+mkdir build
+cd build
+cmake .. -G "MinGW Makefiles"
+cmake --build . --target install
+```
 
 # Using the library
 
-The library provides a single header file `mgclient.h`. All library
-functionality is documented in that file in Doxygen format. You can also build
-HTML version of the documentation by running `doxygen` command from project
-root directory.
+The library provides header files located under the include folder. All library
+functionality is documented in these files in Doxygen format. You can also
+build HTML version of the documentation by running `doxygen` command from
+project root directory.
 
 # Examples
 

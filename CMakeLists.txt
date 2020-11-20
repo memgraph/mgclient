@@ -20,6 +20,27 @@ project(mgclient VERSION 1.1.0)
 set(mgclient_SOVERSION 2)
 add_definitions(-DMGCLIENT_VERSION="${mgclient_VERSION}")
 
+# Deal with the operating system.
+if(WIN32)
+    message(STATUS "ON WINDOWS BUILD")
+    set(MGCLIENT_ON_WINDOWS TRUE)
+    add_definitions(-DMGCLIENT_ON_WINDOWS)
+    # CMAKE_FIND_LIBRARY_PREFIXES on Windows is "lib;".
+    # "lib;" breaks gtest lib referencing.
+    set(MGCLIENT_FIND_LIBRARY_PREFIXES "lib")
+elseif(UNIX AND NOT APPLE)
+    if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+        message(STATUS "ON LINUX BUILD")
+        set(MGCLIENT_ON_LINUX TRUE)
+        add_definitions(-DMGCLIENT_ON_LINUX)
+        set(MGCLIENT_FIND_LIBRARY_PREFIXES "${CMAKE_FIND_LIBRARY_PREFIXES}")
+    else()
+        message(FATAL_ERROR "Unsupported operating system. Please create issue or contribute!")
+    endif()
+else()
+    message(FATAL_ERROR "Unsupported operating system. Please create issue or contribute!")
+endif()
+
 # Building tests is disabled by default to simplify the default build config.
 option(BUILD_TESTING "" OFF)
 message(STATUS "BUILD_TESTING: ${BUILD_TESTING}")
@@ -31,6 +52,7 @@ message(STATUS "BUILD_TESTING_INTEGRATION: ${BUILD_TESTING_INTEGRATION}")
 include(CTest)
 
 set(CMAKE_C_STANDARD 11)
+# C++17 is fine here because it is required only for the testing purposes.
 set(CMAKE_CXX_STANDARD 17)
 set(C_STANDARD_REQUIRED ON)
 set(CXX_STANDARD_REQUIRED ON)
