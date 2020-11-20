@@ -83,5 +83,4 @@ install(DIRECTORY
         DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 install(FILES
         "${CMAKE_CURRENT_BINARY_DIR}/mgclient-export.h"
-        "${PROJECT_SOURCE_DIR}/include/mgclient.h"
         DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})

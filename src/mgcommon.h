@@ -59,4 +59,12 @@
     }                                   \
   } while (0)
 
+#ifdef NDEBUG
+#define DB_ACTIVE 0
+#else
+#define DB_ACTIVE 1
+#endif  // NDEBUG
+#define DB_LOG(x) \
+  do { if (DB_ACTIVE) fprintf(stderr, x); } while (0)
+
 #endif

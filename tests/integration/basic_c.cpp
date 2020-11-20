@@ -182,6 +182,9 @@ TEST_F(MemgraphConnection, InsertAndRetriveFromMemegraph) {
   ASSERT_EQ(status, 0);
   ASSERT_EQ(mg_session_commit_transaction(session, &result), 0);
 
+  // The following test is more suitable to be under unit tests. Since it is
+  // impossible to execute all unit tests on all platforms (they are not ported
+  // yet), the test is located under integration tests.
   {
     ASSERT_EQ(mg_session_run(session,
                              "CREATE (n:ValuesTest {int: 1, string:'Name', "

@@ -514,6 +514,7 @@ static int get_hostname_and_ip(const struct sockaddr *peer_addr, char *hostname,
     // work. Since this function is used only to get the hostname for the
     // trust callback, setting hostname to unknown and continuing the program
     // seems sensible solution.
+    DB_LOG("getnameinfo call failed. hostname set to unknown\n");
     strcpy(hostname, "unknown");
   }
   return 0;
@@ -541,13 +542,6 @@ int mg_connect_ca(const mg_session_params *params, mg_session **session,
     goto cleanup;
   }
 
-  char ip[INET6_ADDRSTRLEN];
-  char hostname[NI_MAXHOST];
-  status = get_hostname_and_ip(&peer_addr, hostname, ip, tsession);
-  if (status != 0) {
-    goto cleanup;
-  }
-
   switch (params->sslmode) {
     case MG_SSLMODE_DISABLE:
       status = mg_raw_transport_init(
@@ -568,6 +562,12 @@ int mg_connect_ca(const mg_session_params *params, mg_session **session,
       }
       tsession->transport = (mg_transport *)ttransport;
       if (params->trust_callback) {
+        char ip[INET6_ADDRSTRLEN];
+        char hostname[NI_MAXHOST];
+        status = get_hostname_and_ip(&peer_addr, hostname, ip, tsession);
+        if (status != 0) {
+          goto cleanup;
+        }
         int trust_result = params->trust_callback(
             hostname, ip, ttransport->peer_pubkey_type,
             ttransport->peer_pubkey_fp, params->trust_data);

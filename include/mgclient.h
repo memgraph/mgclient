@@ -1182,6 +1182,8 @@ typedef struct mg_session mg_session;
 ///     fingerprint and user provided data. If the function returns a non-zero
 ///     value, SSL connection will be immediately terminated. This can be used
 ///     to implement TOFU (trust on first use) mechanism.
+///     It might happen that hostname can not be determined, in that case the
+///     trust callback will be called with hostname="undefined".
 ///
 ///  - trust_data
 ///

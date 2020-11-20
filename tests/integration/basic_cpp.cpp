@@ -121,6 +121,9 @@ TEST_F(MemgraphConnection, InsertAndRetrieveFromMemgraph) {
   ASSERT_EQ(result_counter, 1);
   ASSERT_TRUE(client->CommitTransaction());
 
+  // The following test is more suitable to be under unit tests. Since it is
+  // impossible to execute all unit tests on all platforms (they are not ported
+  // yet), the test is located under integration tests.
   {
     ASSERT_TRUE(client->Execute(
         "CREATE (n:ValuesTest {int: 1, string:'Name', float: 2.3, bool: True, "
