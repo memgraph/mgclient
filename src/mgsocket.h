@@ -16,15 +16,29 @@
 #define MGCLIENT_MGSOCKET_H
 
 #ifdef MGCLIENT_ON_APPLE
-#include "apple/mgsocket.h"
+#include <arpa/inet.h>
+#include <netdb.h>
+#include <poll.h>
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <unistd.h>
 #endif  // MGCLIENT_ON_APPLE
 
 #ifdef MGCLIENT_ON_LINUX
-#include "linux/mgsocket.h"
+#include <arpa/inet.h>
+#include <netdb.h>
+#include <netinet/ip.h>
+#include <netinet/tcp.h>
+#include <poll.h>
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <unistd.h>
 #endif  // MGCLIENT_ON_LINUX
 
 #ifdef MGCLIENT_ON_WINDOWS
-#include "windows/mgsocket.h"
+#include <Ws2tcpip.h>
+#include <windows.h>
+#include <winsock2.h>
 #endif  // MGCLIENT_ON_WINDOWS
 
 #include "mgclient.h"
