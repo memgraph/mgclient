@@ -22,19 +22,18 @@ jobs:
     runs-on: ${{ matrix.platform }}
     env:
       MG_VERSION: "1.2.0"
-    # NOTE: CI can't execute end2end tests because Docker isn't available on
-    # macos.
     steps:
       - name: Set-up repository
         uses: actions/checkout@v2
-
+      # NOTE: CI can't execute end2end tests because there is no way to run
+      #       Memgraph on CI MacOS machines.
       - name: Build and test mgclient
         run: |
           mkdir build
           cd build
           cmake -DOPENSSL_ROOT_DIR=/usr/local/Cellar/openssl@1.1/1.1.1h -DCMAKE_INSTALL_PREFIX=/usr/local -DBUILD_TESTING=ON -DBUILD_TESTING_INTEGRATION=ON ..
           make
-          ctest -R "value|encoder|decoder|transport|allocator"
+          ctest -E "example|integration"
           sudo make install
 
   build_and_test_linux:
