@@ -12,6 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#ifdef MGCLIENT_ON_APPLE
+#include <arpa/inet.h>
+#include <netdb.h>
+#include <poll.h>
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <unistd.h>
+#endif  // MGCLIENT_ON_APPLE
+
 #ifdef MGCLIENT_ON_LINUX
 #include <arpa/inet.h>
 #include <netdb.h>

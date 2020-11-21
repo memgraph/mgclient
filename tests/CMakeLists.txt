@@ -78,6 +78,9 @@ target_link_libraries(client -Wl,--wrap=mg_secure_transport_init)
 
 add_gtest(transport transport.cpp)
 target_link_libraries(transport stdc++fs)
+if(MGCLIENT_ON_APPLE)
+    target_link_libraries(transport c++)
+endif()
 
 add_gtest(allocator allocator.cpp)
 
