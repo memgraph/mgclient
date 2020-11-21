@@ -73,13 +73,16 @@ add_gtest(encoder encoder.cpp)
 add_gtest(decoder decoder.cpp)
 
 add_gtest(client client.cpp)
-# We're mocking the mg_secure_transport_init function in the test.
-target_link_libraries(client -Wl,--wrap=mg_secure_transport_init)
+if(NOT MGCLIENT_ON_APPLE)
+    # We're mocking the mg_secure_transport_init function in the test.
+    target_link_libraries(client -Wl,--wrap=mg_secure_transport_init)
+endif()
 
 add_gtest(transport transport.cpp)
-target_link_libraries(transport stdc++fs)
 if(MGCLIENT_ON_APPLE)
     target_link_libraries(transport c++)
+else()
+    target_link_libraries(transport stdc++fs)
 endif()
 
 add_gtest(allocator allocator.cpp)
