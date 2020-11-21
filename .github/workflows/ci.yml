@@ -30,12 +30,13 @@ jobs:
       - name: Install environment
         run: |
           clang -v
+          ls /usr/local/Cellar/openssl@1.1
 
       - name: Build and test mgclient
         run: |
           mkdir build
           cd build
-          cmake ..
+          cmake -DOPENSSL_ROOT_DIR=/usr/local/Cellar/openssl@1.1/1.1.1h ..
           make
           sudo make install
 
