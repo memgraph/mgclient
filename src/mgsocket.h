@@ -12,30 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#ifndef MGCLIENT_MGSOCKET_H
+#define MGCLIENT_MGSOCKET_H
+
 #ifdef MGCLIENT_ON_APPLE
-#include <arpa/inet.h>
-#include <netdb.h>
-#include <poll.h>
-#include <sys/socket.h>
-#include <sys/types.h>
-#include <unistd.h>
+#include "apple/mgsocket.h"
 #endif  // MGCLIENT_ON_APPLE
 
 #ifdef MGCLIENT_ON_LINUX
-#include <arpa/inet.h>
-#include <netdb.h>
-#include <netinet/ip.h>
-#include <netinet/tcp.h>
-#include <poll.h>
-#include <sys/socket.h>
-#include <sys/types.h>
-#include <unistd.h>
+#include "linux/mgsocket.h"
 #endif  // MGCLIENT_ON_LINUX
 
 #ifdef MGCLIENT_ON_WINDOWS
-#include <Ws2tcpip.h>
-#include <windows.h>
-#include <winsock2.h>
+#include "windows/mgsocket.h"
 #endif  // MGCLIENT_ON_WINDOWS
 
 #include "mgclient.h"
@@ -104,3 +93,5 @@ char *mg_socket_error();
 /// Should be called at the end of any process which previously called the
 /// \ref mg_socket_init function.
 void mg_socket_finalize();
+
+#endif

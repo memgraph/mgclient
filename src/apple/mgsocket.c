@@ -17,6 +17,15 @@
 #include "mgcommon.h"
 #include "mgsocket.h"
 
+#define MG_RETRY_ON_EINTR(expression)          \
+  ({                                           \
+    long result;                               \
+    do {                                       \
+      result = (long)(expression);             \
+    } while (result == -1L && errno == EINTR); \
+    result;                                    \
+  })
+
 int mg_socket_init() { return MG_SUCCESS; }
 
 int mg_socket_create(int af, int type, int protocol) {
@@ -26,6 +35,7 @@ int mg_socket_create(int af, int type, int protocol) {
   }
   return sockfd;
 }
+
 int mg_socket_create_handle_error(int sock, mg_session *session) {
   if (sock == MG_ERROR_SOCKET) {
     mg_session_set_error(session, "couldn't open socket: %s",

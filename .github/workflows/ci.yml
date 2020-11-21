@@ -27,10 +27,6 @@ jobs:
     steps:
       - name: Set-up repository
         uses: actions/checkout@v2
-      - name: Install environment
-        run: |
-          clang -v
-          ls /usr/local/Cellar/openssl@1.1
 
       - name: Build and test mgclient
         run: |
@@ -48,42 +44,42 @@ jobs:
     env:
       MG_VERSION: "1.2.0"
     steps:
-    - name: Set-up repository
-      uses: actions/checkout@v1
-    - name: Install environment
-      run: |
-        sudo apt install -y gcc-8 g++-8 clang-8 clang++-8
+      - name: Set-up repository
+        uses: actions/checkout@v1
+      - name: Install environment
+        run: |
+          sudo apt install -y gcc-8 g++-8 clang-8 clang++-8
 
-    - name: Cache Memgraph Docker image
-      id: cache-memgraph-docker
-      uses: actions/cache@v1
-      with:
-        path: ~/memgraph
-        key: cache-memgraph-v${{ env.MG_VERSION }}-docker-image
-    - name: Download Memgraph Docker image
-      if: steps.cache-memgraph-docker.outputs.cache-hit != 'true'
-      run: |
-        mkdir ~/memgraph
-        curl -L https://memgraph.com/download/memgraph/v${MG_VERSION}/docker/memgraph-${MG_VERSION}-community-docker.tar.gz > ~/memgraph/memgraph-docker.tar.gz
-    - name: Load and run Memgraph Docker image
-      run: |
-        docker load -i ~/memgraph/memgraph-docker.tar.gz
-        docker run -d -p 7687:7687 memgraph
+      - name: Cache Memgraph Docker image
+        id: cache-memgraph-docker
+        uses: actions/cache@v1
+        with:
+          path: ~/memgraph
+          key: cache-memgraph-v${{ env.MG_VERSION }}-docker-image
+      - name: Download Memgraph Docker image
+        if: steps.cache-memgraph-docker.outputs.cache-hit != 'true'
+        run: |
+          mkdir ~/memgraph
+          curl -L https://memgraph.com/download/memgraph/v${MG_VERSION}/docker/memgraph-${MG_VERSION}-community-docker.tar.gz > ~/memgraph/memgraph-docker.tar.gz
+      - name: Load and run Memgraph Docker image
+        run: |
+          docker load -i ~/memgraph/memgraph-docker.tar.gz
+          docker run -d -p 7687:7687 memgraph
 
-    - name: Build with gcc, test and install mgclient
-      run: |
-        mkdir build-gcc && cd build-gcc
-        cmake -DCMAKE_C_COMPILER=gcc-8 -DCMAKE_CXX_COMPILER=g++-8 -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=ON -DBUILD_TESTING_INTEGRATION=ON ..
-        make
-        ctest --output-on-failure
-        sudo make install
-    - name: Build with clang, test and install mgclient
-      run: |
-        mkdir build-clang && cd build-clang
-        cmake -DCMAKE_C_COMPILER=clang-8 -DCMAKE_CXX_COMPILER=clang++-8 -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=ON -DBUILD_TESTING_INTEGRATION=ON ..
-        make
-        ctest --output-on-failure
-        sudo make install
+      - name: Build with gcc, test and install mgclient
+        run: |
+          mkdir build-gcc && cd build-gcc
+          cmake -DCMAKE_C_COMPILER=gcc-8 -DCMAKE_CXX_COMPILER=g++-8 -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=ON -DBUILD_TESTING_INTEGRATION=ON ..
+          make
+          ctest --output-on-failure
+          sudo make install
+      - name: Build with clang, test and install mgclient
+        run: |
+          mkdir build-clang && cd build-clang
+          cmake -DCMAKE_C_COMPILER=clang-8 -DCMAKE_CXX_COMPILER=clang++-8 -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=ON -DBUILD_TESTING_INTEGRATION=ON ..
+          make
+          ctest --output-on-failure
+          sudo make install
 
   # This project needs MinGW environment ON_WINDOWS to compile. CMake, make,
   # gcc are all required.

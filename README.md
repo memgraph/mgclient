@@ -5,7 +5,49 @@
 mgclient is a C library interface for [Memgraph](https://www.memgraph.com)
 database.
 
-# Building and installing on Linux
+## Building and installing on Apple
+
+To build and install mgclient from source you will need:
+   - CMake version >= 3.8
+   - OpenSSL version >= 1.0.2
+   - Apple LLVM/clang >= 8.0.0
+
+Once everything is in place, create a build directory inside the source
+directory and configure the build by running CMake from it:
+
+```
+mkdir build
+cd build
+cmake ..
+```
+
+If `cmake` can't locate OpenSSL, please set `OPENSSL_ROOT_DIR` to a valid path.
+An examples follows:
+
+```
+cmake -DOPENSSL_ROOT_DIR=/usr/local/Cellar/openssl@1.1/1.1.1h ..
+```
+
+After running CMake, you should see a Makefile in the build directory. Then you
+can build the project by running:
+
+```
+make
+```
+
+This will build two `mgclient` library flavours: a static library (named
+`libmgclient.a`) and a shared library (named `libmgclient.dylib`).
+
+To install the libraries and corresponding header files run:
+
+```
+make install
+```
+
+This will install to system default installation directory. If you want to
+change this location, use `-DCMAKE_INSTALL_PREFIX` option when running CMake.
+
+## Building and installing on Linux
 
 To build and install mgclient from source you will need:
    - CMake version >= 3.8
@@ -59,7 +101,7 @@ cmake -DBUILD_TESTING=ON -DBUILD_TESTING_INTEGRATION=ON ..
 ctest
 ```
 
-# Building and installing on Windows
+## Building and installing on Windows
 
 To build `mgclient` on Windows, MINGW environment should be used.
    - Install MSYS2 from https://www.msys2.org/.
@@ -77,14 +119,14 @@ cmake .. -G "MinGW Makefiles"
 cmake --build . --target install
 ```
 
-# Using the library
+## Using the library
 
 The library provides header files located under the include folder. All library
 functionality is documented in these files in Doxygen format. You can also
 build HTML version of the documentation by running `doxygen` command from
 project root directory.
 
-# Examples
+## Examples
 
 All the examples of the usage of the mgclient are contained in the
 [examples](examples) folder, including the C++ wrapper.

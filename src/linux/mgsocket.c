@@ -17,6 +17,15 @@
 #include "mgcommon.h"
 #include "mgsocket.h"
 
+#define MG_RETRY_ON_EINTR(expression)          \
+  ({                                           \
+    long result;                               \
+    do {                                       \
+      result = (long)(expression);             \
+    } while (result == -1L && errno == EINTR); \
+    result;                                    \
+  })
+
 // Please refer to https://man7.org/linux/man-pages/man2 for more details about
 // Linux system calls.
 
