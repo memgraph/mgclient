@@ -25,11 +25,14 @@ set(mgclient_src_files
         mgsession-encoder.c
         mgtransport.c
         mgvalue.c)
-if(MGCLIENT_ON_WINDOWS)
-    list(APPEND mgclient_src_files windows/mgsocket.c)
-endif()
-if(MGCLIENT_ON_LINUX)
+if(MGCLIENT_ON_APPLE)
+    list(APPEND mgclient_src_files apple/mgsocket.c)
+elseif(MGCLIENT_ON_LINUX)
     list(APPEND mgclient_src_files linux/mgsocket.c)
+elseif(MGCLIENT_ON_WINDOWS)
+    list(APPEND mgclient_src_files windows/mgsocket.c)
+else()
+    message(FATAL_ERROR "Operating system undefined.")
 endif()
 
 find_package(OpenSSL REQUIRED)

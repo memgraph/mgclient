@@ -26,9 +26,6 @@
     result;                                    \
   })
 
-// Please refer to https://man7.org/linux/man-pages/man2 for more details about
-// Linux system calls.
-
 int mg_socket_init() { return MG_SUCCESS; }
 
 int mg_socket_create(int af, int type, int protocol) {
@@ -38,6 +35,7 @@ int mg_socket_create(int af, int type, int protocol) {
   }
   return sockfd;
 }
+
 int mg_socket_create_handle_error(int sock, mg_session *session) {
   if (sock == MG_ERROR_SOCKET) {
     mg_session_set_error(session, "couldn't open socket: %s",
@@ -55,6 +53,7 @@ int mg_socket_connect(int sock, const struct sockaddr *addr,
   }
   return MG_SUCCESS;
 }
+
 int mg_socket_connect_handle_error(int *sock, int status, mg_session *session) {
   if (status != MG_SUCCESS) {
     mg_session_set_error(session, "couldn't connect to host: %s",
@@ -68,42 +67,10 @@ int mg_socket_connect_handle_error(int *sock, int status, mg_session *session) {
   return MG_SUCCESS;
 }
 
-int mg_socket_options(int sock, mg_session *session) {
-  struct {
-    int level;
-    int optname;
-    int optval;
-  } socket_options[] = {// disable Nagle algorithm for performance reasons
-                        {SOL_TCP, TCP_NODELAY, 1},
-                        // turn keep-alive on
-                        {SOL_SOCKET, SO_KEEPALIVE, 1},
-                        // wait 20s before sending keep-alive packets
-                        {SOL_TCP, TCP_KEEPIDLE, 20},
-                        // 4 keep-alive packets must fail to close
-                        {SOL_TCP, TCP_KEEPCNT, 4},
-                        // send keep-alive packets every 15s
-                        {SOL_TCP, TCP_KEEPINTVL, 15}};
-  const size_t OPTCNT = sizeof(socket_options) / sizeof(socket_options[0]);
-
-  for (size_t i = 0; i < OPTCNT; ++i) {
-    int optval = socket_options[i].optval;
-    socklen_t optlen = sizeof(optval);
-
-    if (setsockopt(sock, socket_options[i].level, socket_options[i].optname,
-                   (void *)&optval, optlen) != 0) {
-      mg_session_set_error(session, "couldn't set socket option: %s",
-                           mg_socket_error());
-      if (mg_socket_close(sock) != 0) {
-        abort();
-      }
-      return MG_ERROR_NETWORK_FAILURE;
-    }
-  }
-  return MG_SUCCESS;
-}
+int mg_socket_options(int sock, mg_session *session) { return MG_SUCCESS; }
 
 ssize_t mg_socket_send(int sock, const void *buf, int len) {
-  return MG_RETRY_ON_EINTR(send(sock, buf, len, MSG_NOSIGNAL));
+  return MG_RETRY_ON_EINTR(send(sock, buf, len, 0));
 }
 
 ssize_t mg_socket_receive(int sock, void *buf, int len) {
