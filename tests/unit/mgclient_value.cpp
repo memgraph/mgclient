@@ -118,7 +118,7 @@ TEST(ValueTest, ListIterate) {
   list.Append(Value(true));
 
   std::vector<ConstValue> values;
-  for (const auto &value : list) {
+  for (const auto value : list) {
     values.push_back(value);
   }
 
@@ -128,7 +128,7 @@ TEST(ValueTest, ListIterate) {
   ASSERT_EQ(values[2], Value(true));
 
   values.clear();
-  for (const auto &value : list.AsConstList()) {
+  for (const auto value : list.AsConstList()) {
     values.push_back(value);
   }
 
@@ -230,7 +230,7 @@ TEST(ValueTest, MapIterate) {
   map.Insert("key 3", Value(3.0));
 
   std::vector<std::pair<std::string, ConstValue>> values;
-  for (const auto &[key, value] : map) {
+  for (const auto [key, value] : map) {
     values.emplace_back(key, value);
   }
 
@@ -243,7 +243,7 @@ TEST(ValueTest, MapIterate) {
   ASSERT_EQ(values[2].second, Value(3.0));
 
   values.clear();
-  for (const auto &[key, value] : map.AsConstMap()) {
+  for (const auto [key, value] : map.AsConstMap()) {
     values.emplace_back(key, value);
   }
 
