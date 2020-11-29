@@ -1,5 +1,5 @@
 function(set_project_c_warnings library_name)
-  option(C_WARNINGS_AS_ERRORS "Treat C compiler warnings as errors" TRUE)
+  option(C_WARNINGS_AS_ERRORS "Treat C compiler warnings as errors" OFF)
 
   set(CLANG_C_WARNINGS
       -Wall
@@ -27,7 +27,7 @@ function(set_project_c_warnings library_name)
 endfunction()
 
 function(set_project_cpp_warnings library_name)
-  option(CPP_WARNINGS_AS_ERRORS "Treat CPP compiler warnings as errors" TRUE)
+  option(CPP_WARNINGS_AS_ERRORS "Treat CPP compiler warnings as errors" OFF)
 
   set(CLANG_CPP_WARNINGS
       -Wall
@@ -48,6 +48,8 @@ function(set_project_cpp_warnings library_name)
   endif()
 
   if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+    set(CPP_PROJECT_WARNINGS ${CLANG_CPP_WARNINGS})
+  elseif(CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang")
     set(CPP_PROJECT_WARNINGS ${CLANG_CPP_WARNINGS})
   else()
     set(CPP_PROJECT_WARNINGS ${GCC_CPP_WARNINGS})
