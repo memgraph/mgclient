@@ -18,7 +18,7 @@
 #include "mgsocket.h"
 
 #define MG_RETRY_ON_EINTR(expression)          \
-  ({                                           \
+  __extension__({                              \
     long result;                               \
     do {                                       \
       result = (long)(expression);             \

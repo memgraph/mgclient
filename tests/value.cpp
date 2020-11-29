@@ -124,7 +124,7 @@ TEST(Value, String) {
 
 TEST(Value, List) {
   auto check_list = [](const mg_list *list) {
-    ASSERT_EQ(mg_list_size(list), 3);
+    ASSERT_EQ(mg_list_size(list), 3u);
     EXPECT_TRUE(Equal(mg_list_at(list, 0), Null{}));
     EXPECT_TRUE(Equal(mg_list_at(list, 1), true));
     EXPECT_TRUE(Equal(mg_list_at(list, 2), "abcde"s));
@@ -134,21 +134,21 @@ TEST(Value, List) {
 
   mg_list *list = mg_list_make_empty(3);
 
-  EXPECT_EQ(mg_list_size(list), 0);
+  EXPECT_EQ(mg_list_size(list), 0u);
 
   EXPECT_EQ(mg_list_append(list, mg_value_make_null()), 0);
-  EXPECT_EQ(mg_list_size(list), 1);
+  EXPECT_EQ(mg_list_size(list), 1u);
 
   EXPECT_EQ(mg_list_append(list, mg_value_make_bool(1)), 0);
-  EXPECT_EQ(mg_list_size(list), 2);
+  EXPECT_EQ(mg_list_size(list), 2u);
 
   EXPECT_EQ(mg_list_append(list, mg_value_make_string("abcde")), 0);
-  EXPECT_EQ(mg_list_size(list), 3);
+  EXPECT_EQ(mg_list_size(list), 3u);
 
   {
     mg_value *value = mg_value_make_float(3.14);
     EXPECT_NE(mg_list_append(list, value), 0);
-    EXPECT_EQ(mg_list_size(list), 3);
+    EXPECT_EQ(mg_list_size(list), 3u);
     mg_value_destroy(value);
   }
 
@@ -168,7 +168,7 @@ TEST(Value, List) {
 
 TEST(Value, Map) {
   auto check_map = [](const mg_map *map) {
-    ASSERT_EQ(mg_map_size(map), 4);
+    ASSERT_EQ(mg_map_size(map), 4u);
 
     EXPECT_TRUE(Equal(mg_map_at(map, "x"), (int64_t)3));
     EXPECT_TRUE(Equal(mg_map_at(map, "y"), false));
@@ -198,29 +198,29 @@ TEST(Value, Map) {
   };
 
   mg_map *map = mg_map_make_empty(4);
-  EXPECT_EQ(mg_map_size(map), 0);
+  EXPECT_EQ(mg_map_size(map), 0u);
 
   // Test `insert` and `insert2` with failures for duplicate key.
   {
     EXPECT_EQ(mg_map_insert(map, "x", mg_value_make_integer(3)), 0);
-    EXPECT_EQ(mg_map_size(map), 1);
+    EXPECT_EQ(mg_map_size(map), 1u);
   }
   {
     mg_value *value = mg_value_make_integer(5);
     EXPECT_NE(mg_map_insert(map, "x", value), 0);
-    EXPECT_EQ(mg_map_size(map), 1);
+    EXPECT_EQ(mg_map_size(map), 1u);
     mg_value_destroy(value);
   }
   {
     EXPECT_EQ(mg_map_insert2(map, mg_string_make("y"), mg_value_make_bool(0)),
               0);
-    EXPECT_EQ(mg_map_size(map), 2);
+    EXPECT_EQ(mg_map_size(map), 2u);
   }
   {
     mg_string *key = mg_string_make("y");
     mg_value *value = mg_value_make_float(3.14);
     EXPECT_NE(mg_map_insert2(map, key, value), 0);
-    EXPECT_EQ(mg_map_size(map), 2);
+    EXPECT_EQ(mg_map_size(map), 2u);
     mg_string_destroy(key);
     mg_value_destroy(value);
   }
@@ -229,41 +229,41 @@ TEST(Value, Map) {
   {
     EXPECT_EQ(mg_map_insert_unsafe(map, "key", mg_value_make_string("value")),
               0);
-    EXPECT_EQ(mg_map_size(map), 3);
+    EXPECT_EQ(mg_map_size(map), 3u);
   }
   {
     EXPECT_EQ(mg_map_insert_unsafe2(map, mg_string_make("key2"),
                                     mg_value_make_string("value2")),
               0);
-    EXPECT_EQ(mg_map_size(map), 4);
+    EXPECT_EQ(mg_map_size(map), 4u);
   }
 
   // All insertions should fail now because the map is full.
   {
     mg_value *value = mg_value_make_null();
     EXPECT_NE(mg_map_insert(map, "k1", value), 0);
-    EXPECT_EQ(mg_map_size(map), 4);
+    EXPECT_EQ(mg_map_size(map), 4u);
     mg_value_destroy(value);
   }
   {
     mg_string *key = mg_string_make("k2");
     mg_value *value = mg_value_make_null();
     EXPECT_NE(mg_map_insert2(map, key, value), 0);
-    EXPECT_EQ(mg_map_size(map), 4);
+    EXPECT_EQ(mg_map_size(map), 4u);
     mg_string_destroy(key);
     mg_value_destroy(value);
   }
   {
     mg_value *value = mg_value_make_null();
     EXPECT_NE(mg_map_insert_unsafe(map, "k3", value), 0);
-    EXPECT_EQ(mg_map_size(map), 4);
+    EXPECT_EQ(mg_map_size(map), 4u);
     mg_value_destroy(value);
   }
   {
     mg_string *key = mg_string_make("k4");
     mg_value *value = mg_value_make_null();
     EXPECT_NE(mg_map_insert_unsafe2(map, key, value), 0);
-    EXPECT_EQ(mg_map_size(map), 4);
+    EXPECT_EQ(mg_map_size(map), 4u);
     mg_string_destroy(key);
     mg_value_destroy(value);
   }
@@ -286,14 +286,14 @@ TEST(Value, Map) {
 TEST(Value, Node) {
   auto check_node = [](const mg_node *node) {
     EXPECT_EQ(mg_node_id(node), 1234);
-    EXPECT_EQ(mg_node_label_count(node), 2);
+    EXPECT_EQ(mg_node_label_count(node), 2u);
     EXPECT_TRUE(Equal(mg_node_label_at(node, 0), "Label1"s));
     EXPECT_TRUE(Equal(mg_node_label_at(node, 1), "Label2"s));
     EXPECT_EQ(mg_node_label_at(node, 2), nullptr);
     EXPECT_EQ(mg_node_label_at(node, 328192), nullptr);
 
     const mg_map *props = mg_node_properties(node);
-    EXPECT_EQ(mg_map_size(props), 2);
+    EXPECT_EQ(mg_map_size(props), 2u);
     EXPECT_TRUE(Equal(mg_map_key_at(props, 0), "x"s));
     EXPECT_TRUE(Equal(mg_map_key_at(props, 1), "y"s));
     EXPECT_TRUE(Equal(mg_map_value_at(props, 0), (int64_t)1));
@@ -329,7 +329,7 @@ TEST(Value, Relationship) {
     EXPECT_TRUE(Equal(mg_relationship_type(rel), "EDGE"s));
 
     const mg_map *props = mg_relationship_properties(rel);
-    EXPECT_EQ(mg_map_size(props), 2);
+    EXPECT_EQ(mg_map_size(props), 2u);
     EXPECT_TRUE(Equal(mg_map_key_at(props, 0), "x"s));
     EXPECT_TRUE(Equal(mg_map_key_at(props, 1), "y"s));
     EXPECT_TRUE(Equal(mg_map_value_at(props, 0), (int64_t)1));
@@ -363,7 +363,7 @@ TEST(Value, UnboundRelationship) {
     EXPECT_TRUE(Equal(mg_unbound_relationship_type(rel), "EDGE"s));
 
     const mg_map *props = mg_unbound_relationship_properties(rel);
-    EXPECT_EQ(mg_map_size(props), 2);
+    EXPECT_EQ(mg_map_size(props), 2u);
     EXPECT_TRUE(Equal(mg_map_key_at(props, 0), "x"s));
     EXPECT_TRUE(Equal(mg_map_key_at(props, 1), "y"s));
     EXPECT_TRUE(Equal(mg_map_value_at(props, 0), (int64_t)1));
@@ -394,8 +394,8 @@ TEST(Value, UnboundRelationship) {
 TEST(Value, Path) {
   const int64_t indices[] = {1, 1, -2, 2, 3, 0, 1, 1, -4, 3, 5, 3};
 
-  auto check_path = [indices](const mg_path *path) {
-    EXPECT_EQ(mg_path_length(path), 6);
+  auto check_path = [](const mg_path *path) {
+    EXPECT_EQ(mg_path_length(path), 6u);
     EXPECT_EQ(mg_node_id(mg_path_node_at(path, 0)), 1);
     EXPECT_EQ(mg_node_id(mg_path_node_at(path, 1)), 2);
     EXPECT_EQ(mg_node_id(mg_path_node_at(path, 2)), 3);

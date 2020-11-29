@@ -192,6 +192,8 @@ mg_value *GetElement(int idx) {
       return mg_value_make_map(map);
     }
   }
+  fprintf(stderr, "Invalid switch case in GetElement.\n");
+  abort();
 }
 
 std::string GetElementEncoding(int idx) {
@@ -210,6 +212,8 @@ std::string GetElementEncoding(int idx) {
     case 5:
       return "\xA2\x81x\x01\x81y\x02";
   }
+  fprintf(stderr, "Invalid switch case in GetElementEncoding.\n");
+  abort();
 }
 
 std::vector<ValueTestParam> StringTestCases() {
@@ -217,7 +221,7 @@ std::vector<ValueTestParam> StringTestCases() {
   for (int i = 0; i < NUM_INPUTS; ++i) {
     std::string data;
     /// String 'abcdefhijklmnopqrstuvwxyzabcdefhijklmnopq...'
-    for (int j = 0; j < SIZES[i]; ++j) data.push_back((char)(j % 26 + 'a'));
+    for (size_t j = 0; j < SIZES[i]; ++j) data.push_back((char)(j % 26 + 'a'));
     std::string encoded_size = GetEncodedSize(i, ContainerType::STRING);
     test_cases.push_back(
         {mg_value_make_string(data.c_str()), encoded_size + data});
@@ -230,7 +234,7 @@ std::vector<ValueTestParam> ListTestCases() {
   for (int i = 0; i < NUM_INPUTS; ++i) {
     std::string encoded = GetEncodedSize(i, ContainerType::LIST);
     mg_list *list = mg_list_make_empty(SIZES[i]);
-    for (int j = 0; j < SIZES[i]; ++j) {
+    for (size_t j = 0; j < SIZES[i]; ++j) {
       encoded += GetElementEncoding(j);
       mg_list_append(list, GetElement(j));
     }
@@ -244,7 +248,7 @@ std::vector<ValueTestParam> MapTestCases() {
   for (int i = 0; i < NUM_INPUTS; ++i) {
     std::string encoded = GetEncodedSize(i, ContainerType::MAP);
     mg_map *map = mg_map_make_empty(SIZES[i]);
-    for (int j = 0; j < SIZES[i]; ++j) {
+    for (size_t j = 0; j < SIZES[i]; ++j) {
       std::string key = "k" + std::to_string(j);
       encoded.push_back('\x80' + key.size());
       encoded += key;

@@ -78,7 +78,7 @@ TEST_F(MemgraphConnection, InsertAndRetrieveFromMemgraph) {
   int result_counter = 0;
   while ((maybe_result = client->FetchOne())) {
     const auto &result = *maybe_result;
-    ASSERT_EQ(result.size(), 3);
+    ASSERT_EQ(result.size(), 3u);
 
     ASSERT_EQ(result[0].type(), mg::Value::Type::Node);
     const auto node_n = result[0].ValueNode();
@@ -89,31 +89,31 @@ TEST_F(MemgraphConnection, InsertAndRetrieveFromMemgraph) {
 
     // Assert labels
     const auto n_labels = node_n.labels();
-    ASSERT_EQ(n_labels.size(), 1);
+    ASSERT_EQ(n_labels.size(), 1u);
     EXPECT_EQ(n_labels[0], "TestLabel");
     const auto m_labels = node_m.labels();
-    ASSERT_EQ(m_labels.size(), 1);
+    ASSERT_EQ(m_labels.size(), 1u);
     EXPECT_EQ(m_labels[0], "TestLabel");
     const auto r_type = relationship_r.type();
     EXPECT_EQ(r_type, "TestRel");
 
     // Assert properties of Node n
     const auto n_properties = node_n.properties();
-    ASSERT_EQ(n_properties.size(), 3);
+    ASSERT_EQ(n_properties.size(), 3u);
     EXPECT_EQ(n_properties["id"].ValueInt(), 1);
     EXPECT_EQ(n_properties["name"].ValueString(), "test1");
     EXPECT_EQ(n_properties["is_deleted"].ValueBool(), true);
 
     // Assert properties of Node m
     const auto m_properties = node_m.properties();
-    ASSERT_EQ(m_properties.size(), 3);
+    ASSERT_EQ(m_properties.size(), 3u);
     EXPECT_EQ(m_properties["id"].ValueInt(), 12);
     EXPECT_EQ(m_properties["name"].ValueString(), "test2");
     EXPECT_EQ(m_properties["is_deleted"].ValueBool(), false);
 
     // Assert properties of Relationship r
     const auto r_properties = relationship_r.properties();
-    ASSERT_EQ(r_properties.size(), 1);
+    ASSERT_EQ(r_properties.size(), 1u);
     EXPECT_EQ(r_properties["attr"].ValueString(), "attr1");
 
     ++result_counter;
@@ -131,7 +131,7 @@ TEST_F(MemgraphConnection, InsertAndRetrieveFromMemgraph) {
     auto maybe_result = client->FetchOne();
     ASSERT_TRUE(maybe_result);
     const auto &row = *maybe_result;
-    EXPECT_EQ(row.size(), 1);
+    EXPECT_EQ(row.size(), 1u);
     const auto node = row[0];
     ASSERT_EQ(node.type(), mg::Value::Type::Node);
     const auto node_props = node.ValueNode().properties();
@@ -141,12 +141,12 @@ TEST_F(MemgraphConnection, InsertAndRetrieveFromMemgraph) {
     ASSERT_EQ(node_props["bool"].ValueBool(), true);
     ASSERT_EQ(node_props["list"].type(), mg::Value::Type::List);
     const auto list_value = node_props["list"].ValueList();
-    ASSERT_EQ(list_value.size(), 2);
+    ASSERT_EQ(list_value.size(), 2u);
     ASSERT_EQ(list_value[0].ValueInt(), 1);
     ASSERT_EQ(list_value[1].ValueInt(), 2);
     ASSERT_EQ(node_props["map"].type(), mg::Value::Type::Map);
     const auto map_value = node_props["map"].ValueMap();
-    ASSERT_EQ(map_value.size(), 1);
+    ASSERT_EQ(map_value.size(), 1u);
     ASSERT_EQ(map_value["key"].ValueString(), "value");
     ASSERT_FALSE(client->FetchOne());
   }

@@ -149,7 +149,7 @@ inline bool Client::Execute(const std::string &statement) {
     return false;
   }
 
-  int stauts = mg_session_pull(session_, nullptr);
+  status = mg_session_pull(session_, nullptr);
   if (status < 0) {
     return false;
   }
@@ -165,7 +165,7 @@ inline bool Client::Execute(const std::string &statement,
     return false;
   }
 
-  int stauts = mg_session_pull(session_, nullptr);
+  status = mg_session_pull(session_, nullptr);
   if (status < 0) {
     return false;
   }

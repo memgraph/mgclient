@@ -21,19 +21,16 @@
 #include <string.h>
 
 void *mg_system_realloc(struct mg_allocator *self, void *buf, size_t size) {
-  // Unused parameter.
   (void)self;
   return realloc(buf, size);
 }
 
 void *mg_system_malloc(struct mg_allocator *self, size_t size) {
-  // Unused parameter.
   (void)self;
   return malloc(size);
 }
 
 void mg_system_free(struct mg_allocator *self, void *buf) {
-  // Unused parameter;
   (void)self;
   free(buf);
 }
@@ -48,7 +45,7 @@ void *mg_allocator_realloc(struct mg_allocator *allocator, void *buf,
 }
 
 void mg_allocator_free(struct mg_allocator *allocator, void *buf) {
-  return allocator->free(allocator, buf);
+  allocator->free(allocator, buf);
 }
 
 struct mg_allocator mg_system_allocator = {mg_system_malloc, mg_system_realloc,
@@ -124,11 +121,16 @@ void *mg_linear_allocator_malloc(struct mg_allocator *allocator, size_t size) {
 
 void *mg_linear_allocator_realloc(struct mg_allocator *allocator, void *buf,
                                   size_t size) {
+  (void)allocator;
+  (void)buf;
+  (void)size;
   fprintf(stderr, "mg_linear_allocator doesn't support realloc\n");
   return NULL;
 }
 
 void mg_linear_allocator_free(struct mg_allocator *allocator, void *buf) {
+  (void)allocator;
+  (void)buf;
   return;
 }
 

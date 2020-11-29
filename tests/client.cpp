@@ -310,7 +310,7 @@ TEST_F(ConnectTest, InitFail) {
           std::string(msg_init->client_name->data, msg_init->client_name->size),
           "MemgraphBolt/0.1");
       {
-        ASSERT_EQ(mg_map_size(msg_init->auth_token), 1);
+        ASSERT_EQ(mg_map_size(msg_init->auth_token), 1u);
 
         const mg_value *scheme_val = mg_map_at(msg_init->auth_token, "scheme");
         ASSERT_TRUE(scheme_val);
@@ -380,7 +380,7 @@ TEST_F(ConnectTest, InitFail_v4) {
 
       mg_message_hello *msg_hello = message->hello_v;
       {
-        ASSERT_EQ(mg_map_size(msg_hello->extra), 2);
+        ASSERT_EQ(mg_map_size(msg_hello->extra), 2u);
 
         const mg_value *user_agent_val =
             mg_map_at(msg_hello->extra, "user_agent");
@@ -461,7 +461,7 @@ TEST_F(ConnectTest, Success) {
           std::string(msg_init->client_name->data, msg_init->client_name->size),
           "MemgraphBolt/0.1");
       {
-        ASSERT_EQ(mg_map_size(msg_init->auth_token), 3);
+        ASSERT_EQ(mg_map_size(msg_init->auth_token), 3u);
 
         const mg_value *scheme_val = mg_map_at(msg_init->auth_token, "scheme");
         ASSERT_TRUE(scheme_val);
@@ -536,7 +536,7 @@ TEST_F(ConnectTest, Success_v4) {
 
       mg_message_hello *msg_hello = message->hello_v;
       {
-        ASSERT_EQ(mg_map_size(msg_hello->extra), 4);
+        ASSERT_EQ(mg_map_size(msg_hello->extra), 4u);
 
         const mg_value *user_agent_val =
             mg_map_at(msg_hello->extra, "user_agent");
@@ -622,7 +622,7 @@ TEST_F(ConnectTest, SuccessWithSSL) {
           std::string(msg_init->client_name->data, msg_init->client_name->size),
           "MemgraphBolt/0.1");
       {
-        ASSERT_EQ(mg_map_size(msg_init->auth_token), 3);
+        ASSERT_EQ(mg_map_size(msg_init->auth_token), 3u);
 
         const mg_value *scheme_val = mg_map_at(msg_init->auth_token, "scheme");
         ASSERT_TRUE(scheme_val);
@@ -771,10 +771,10 @@ void RunTest::ProtocolViolation(int version) {
       EXPECT_EQ(std::string(msg_run->statement->data, msg_run->statement->size),
                 "MATCH (n) RETURN n");
 
-      ASSERT_EQ(mg_map_size(msg_run->parameters), 0);
+      ASSERT_EQ(mg_map_size(msg_run->parameters), 0u);
       if (version == 4) {
         ASSERT_TRUE(msg_run->extra);
-        ASSERT_EQ(mg_map_size(msg_run->extra), 0);
+        ASSERT_EQ(mg_map_size(msg_run->extra), 0u);
       }
       mg_message_destroy_ca(message, session->decoder_allocator);
     }
@@ -819,10 +819,10 @@ void RunTest::InvalidStatement(int version) {
       mg_message_run *msg_run = message->run_v;
       EXPECT_EQ(std::string(msg_run->statement->data, msg_run->statement->size),
                 "MATCH (n) RETURN m");
-      ASSERT_EQ(mg_map_size(msg_run->parameters), 0);
+      ASSERT_EQ(mg_map_size(msg_run->parameters), 0u);
       if (version == 4) {
         ASSERT_TRUE(msg_run->extra);
-        ASSERT_EQ(mg_map_size(msg_run->extra), 0);
+        ASSERT_EQ(mg_map_size(msg_run->extra), 0u);
       }
       mg_message_destroy_ca(message, session->decoder_allocator);
     }
@@ -892,10 +892,10 @@ void RunTest::OkNoResults(int version) {
       mg_message_run *msg_run = message->run_v;
       EXPECT_EQ(std::string(msg_run->statement->data, msg_run->statement->size),
                 "MATCH (n) RETURN n");
-      ASSERT_EQ(mg_map_size(msg_run->parameters), 0);
+      ASSERT_EQ(mg_map_size(msg_run->parameters), 0u);
       if (version == 4) {
         ASSERT_TRUE(msg_run->extra);
-        ASSERT_EQ(mg_map_size(msg_run->extra), 0);
+        ASSERT_EQ(mg_map_size(msg_run->extra), 0u);
       }
       mg_message_destroy_ca(message, session->decoder_allocator);
     }
@@ -922,7 +922,7 @@ void RunTest::OkNoResults(int version) {
       if (version == 4) {
         mg_message_pull *pull_message = message->pull_v;
         ASSERT_TRUE(pull_message->extra);
-        ASSERT_EQ(mg_map_size(pull_message->extra), 0);
+        ASSERT_EQ(mg_map_size(pull_message->extra), 0u);
       }
       mg_message_destroy_ca(message, session->decoder_allocator);
     }
@@ -982,10 +982,10 @@ void RunTest::MultipleQueries(int version) {
         EXPECT_EQ(
             std::string(msg_run->statement->data, msg_run->statement->size),
             "RETURN " + std::to_string(i) + " AS n");
-        ASSERT_EQ(mg_map_size(msg_run->parameters), 0);
+        ASSERT_EQ(mg_map_size(msg_run->parameters), 0u);
         if (version == 4) {
           ASSERT_TRUE(msg_run->extra);
-          ASSERT_EQ(mg_map_size(msg_run->extra), 0);
+          ASSERT_EQ(mg_map_size(msg_run->extra), 0u);
         }
         mg_message_destroy_ca(message, session->decoder_allocator);
       }
@@ -1012,7 +1012,7 @@ void RunTest::MultipleQueries(int version) {
         if (version == 4) {
           mg_message_pull *pull_message = message->pull_v;
           ASSERT_TRUE(pull_message->extra);
-          ASSERT_EQ(mg_map_size(pull_message->extra), 0);
+          ASSERT_EQ(mg_map_size(pull_message->extra), 0u);
         }
         mg_message_destroy_ca(message, session->decoder_allocator);
       }
@@ -1059,7 +1059,7 @@ void RunTest::MultipleQueries(int version) {
     ASSERT_TRUE(CheckColumns(result, std::vector<std::string>{"n"}));
 
     const mg_list *row = mg_result_row(result);
-    EXPECT_EQ(mg_list_size(row), 1);
+    EXPECT_EQ(mg_list_size(row), 1u);
     EXPECT_EQ(mg_value_get_type(mg_list_at(row, 0)), MG_VALUE_TYPE_INTEGER);
     EXPECT_EQ(mg_value_integer(mg_list_at(row, 0)), i);
 
@@ -1097,10 +1097,10 @@ void RunTest::OkWithResults(int version) {
       mg_message_run *msg_run = message->run_v;
       EXPECT_EQ(std::string(msg_run->statement->data, msg_run->statement->size),
                 "UNWIND [1, 2, 3] AS n RETURN n, n + 5 AS m");
-      ASSERT_EQ(mg_map_size(msg_run->parameters), 0);
+      ASSERT_EQ(mg_map_size(msg_run->parameters), 0u);
       if (version == 4) {
         ASSERT_TRUE(msg_run->extra);
-        ASSERT_EQ(mg_map_size(msg_run->extra), 0);
+        ASSERT_EQ(mg_map_size(msg_run->extra), 0u);
       }
       mg_message_destroy_ca(message, session->decoder_allocator);
     }
@@ -1128,7 +1128,7 @@ void RunTest::OkWithResults(int version) {
       if (version == 4) {
         mg_message_pull *pull_message = message->pull_v;
         ASSERT_TRUE(pull_message->extra);
-        ASSERT_EQ(mg_map_size(pull_message->extra), 0);
+        ASSERT_EQ(mg_map_size(pull_message->extra), 0u);
       }
       mg_message_destroy_ca(message, session->decoder_allocator);
     }
@@ -1177,7 +1177,7 @@ void RunTest::OkWithResults(int version) {
     ASSERT_TRUE(CheckColumns(result, std::vector<std::string>{"n", "m"}));
 
     const mg_list *row = mg_result_row(result);
-    EXPECT_EQ(mg_list_size(row), 2);
+    EXPECT_EQ(mg_list_size(row), 2u);
     EXPECT_EQ(mg_value_get_type(mg_list_at(row, 0)), MG_VALUE_TYPE_INTEGER);
     EXPECT_EQ(mg_value_integer(mg_list_at(row, 0)), i);
 
@@ -1218,10 +1218,10 @@ void RunTest::QueryRuntimeError(int version) {
       mg_message_run *msg_run = message->run_v;
       EXPECT_EQ(std::string(msg_run->statement->data, msg_run->statement->size),
                 "MATCH (n) RETURN size(n.prop)");
-      ASSERT_EQ(mg_map_size(msg_run->parameters), 0);
+      ASSERT_EQ(mg_map_size(msg_run->parameters), 0u);
       if (version == 4) {
         ASSERT_TRUE(msg_run->extra);
-        ASSERT_EQ(mg_map_size(msg_run->extra), 0);
+        ASSERT_EQ(mg_map_size(msg_run->extra), 0u);
       }
       mg_message_destroy_ca(message, session->decoder_allocator);
     }
@@ -1248,7 +1248,7 @@ void RunTest::QueryRuntimeError(int version) {
       if (version == 4) {
         mg_message_pull *pull_message = message->pull_v;
         ASSERT_TRUE(pull_message->extra);
-        ASSERT_EQ(mg_map_size(pull_message->extra), 0);
+        ASSERT_EQ(mg_map_size(pull_message->extra), 0u);
       }
       mg_message_destroy_ca(message, session->decoder_allocator);
     }
@@ -1330,10 +1330,10 @@ void RunTest::QueryDatabaseError(int version) {
       mg_message_run *msg_run = message->run_v;
       EXPECT_EQ(std::string(msg_run->statement->data, msg_run->statement->size),
                 "MATCH (n) RETURN size(n.prop)");
-      ASSERT_EQ(mg_map_size(msg_run->parameters), 0);
+      ASSERT_EQ(mg_map_size(msg_run->parameters), 0u);
       if (version == 4) {
         ASSERT_TRUE(msg_run->extra);
-        ASSERT_EQ(mg_map_size(msg_run->extra), 0);
+        ASSERT_EQ(mg_map_size(msg_run->extra), 0u);
       }
       mg_message_destroy_ca(message, session->decoder_allocator);
     }
@@ -1359,7 +1359,7 @@ void RunTest::QueryDatabaseError(int version) {
       if (version == 4) {
         mg_message_pull *pull_message = message->pull_v;
         ASSERT_TRUE(pull_message->extra);
-        ASSERT_EQ(mg_map_size(pull_message->extra), 0);
+        ASSERT_EQ(mg_map_size(pull_message->extra), 0u);
       }
       mg_message_destroy_ca(message, session->decoder_allocator);
     }
@@ -1415,14 +1415,14 @@ void RunTest::RunWithParams(int version) {
       EXPECT_EQ(std::string(msg_run->statement->data, msg_run->statement->size),
                 "WITH $param AS x RETURN x");
       {
-        ASSERT_EQ(mg_map_size(msg_run->parameters), 1);
+        ASSERT_EQ(mg_map_size(msg_run->parameters), 1u);
         const mg_value *param = mg_map_at(msg_run->parameters, "param");
         ASSERT_TRUE(param);
         ASSERT_EQ(mg_value_get_type(param), MG_VALUE_TYPE_INTEGER);
         ASSERT_EQ(mg_value_integer(param), 42);
         if (version == 4) {
           ASSERT_TRUE(msg_run->extra);
-          ASSERT_EQ(mg_map_size(msg_run->extra), 0);
+          ASSERT_EQ(mg_map_size(msg_run->extra), 0u);
         }
       }
       mg_message_destroy_ca(message, session->decoder_allocator);
@@ -1450,7 +1450,7 @@ void RunTest::RunWithParams(int version) {
       if (version == 4) {
         mg_message_pull *pull_message = message->pull_v;
         ASSERT_TRUE(pull_message->extra);
-        ASSERT_EQ(mg_map_size(pull_message->extra), 0);
+        ASSERT_EQ(mg_map_size(pull_message->extra), 0u);
       }
       mg_message_destroy_ca(message, session->decoder_allocator);
     }
@@ -1490,7 +1490,7 @@ void RunTest::RunWithParams(int version) {
     ASSERT_EQ(mg_session_fetch(session, &result), 1);
     ASSERT_TRUE(CheckColumns(result, std::vector<std::string>{"x"}));
     const mg_list *row = mg_result_row(result);
-    ASSERT_EQ(mg_list_size(row), 1);
+    ASSERT_EQ(mg_list_size(row), 1u);
     ASSERT_EQ(mg_value_get_type(mg_list_at(row, 0)), MG_VALUE_TYPE_INTEGER);
     ASSERT_EQ(mg_value_integer(mg_list_at(row, 0)), 42);
   }
@@ -1543,8 +1543,8 @@ TEST_F(RunTest, MultipleResultPull) {
       mg_message_run *msg_run = message->run_v;
       EXPECT_EQ(std::string(msg_run->statement->data, msg_run->statement->size),
                 "UNWIND [1, 2, 3] AS n RETURN n, n + 5 AS m");
-      ASSERT_EQ(mg_map_size(msg_run->parameters), 0);
-      ASSERT_EQ(mg_map_size(msg_run->extra), 0);
+      ASSERT_EQ(mg_map_size(msg_run->parameters), 0u);
+      ASSERT_EQ(mg_map_size(msg_run->extra), 0u);
       mg_message_destroy_ca(message, session->decoder_allocator);
     }
 
@@ -1569,7 +1569,7 @@ TEST_F(RunTest, MultipleResultPull) {
       ASSERT_EQ(mg_session_read_bolt_message(session, &message), 0);
       ASSERT_EQ(message->type, MG_MESSAGE_TYPE_PULL);
       mg_message_pull *msg_pull = message->pull_v;
-      ASSERT_EQ(mg_map_size(msg_pull->extra), 1);
+      ASSERT_EQ(mg_map_size(msg_pull->extra), 1u);
       const mg_value *n_val = mg_map_at(msg_pull->extra, "n");
       ASSERT_TRUE(n_val);
       ASSERT_EQ(n_val->type, MG_VALUE_TYPE_INTEGER);
@@ -1603,7 +1603,7 @@ TEST_F(RunTest, MultipleResultPull) {
       ASSERT_EQ(mg_session_read_bolt_message(session, &message), 0);
       ASSERT_EQ(message->type, MG_MESSAGE_TYPE_PULL);
       mg_message_pull *msg_pull = message->pull_v;
-      ASSERT_EQ(mg_map_size(msg_pull->extra), 1);
+      ASSERT_EQ(mg_map_size(msg_pull->extra), 1u);
       const mg_value *n_val = mg_map_at(msg_pull->extra, "n");
       ASSERT_TRUE(n_val);
       ASSERT_EQ(n_val->type, MG_VALUE_TYPE_INTEGER);
@@ -1653,7 +1653,7 @@ TEST_F(RunTest, MultipleResultPull) {
     ASSERT_TRUE(CheckColumns(result, std::vector<std::string>{"n", "m"}));
 
     const mg_list *row = mg_result_row(result);
-    EXPECT_EQ(mg_list_size(row), 2);
+    EXPECT_EQ(mg_list_size(row), 2u);
     EXPECT_EQ(mg_value_get_type(mg_list_at(row, 0)), MG_VALUE_TYPE_INTEGER);
     EXPECT_EQ(mg_value_integer(mg_list_at(row, 0)), i);
 
@@ -1730,9 +1730,9 @@ TEST_F(RunTest, TransactionBasic) {
       mg_message_run *msg_run = message->run_v;
       EXPECT_EQ(std::string(msg_run->statement->data, msg_run->statement->size),
                 "MATCH (n) RETURN n");
-      ASSERT_EQ(mg_map_size(msg_run->parameters), 0);
+      ASSERT_EQ(mg_map_size(msg_run->parameters), 0u);
       ASSERT_TRUE(msg_run->extra);
-      ASSERT_EQ(mg_map_size(msg_run->extra), 0);
+      ASSERT_EQ(mg_map_size(msg_run->extra), 0u);
       mg_message_destroy_ca(message, session->decoder_allocator);
     }
 
@@ -1755,7 +1755,7 @@ TEST_F(RunTest, TransactionBasic) {
       ASSERT_EQ(message->type, MG_MESSAGE_TYPE_PULL);
       mg_message_pull *pull_message = message->pull_v;
       ASSERT_TRUE(pull_message->extra);
-      ASSERT_EQ(mg_map_size(pull_message->extra), 0);
+      ASSERT_EQ(mg_map_size(pull_message->extra), 0u);
       mg_message_destroy_ca(message, session->decoder_allocator);
     }
 
@@ -1832,8 +1832,8 @@ TEST_F(RunTest, TransactionWithMultipleRuns) {
           EXPECT_EQ(std::string_view(msg_run->statement->data,
                                      msg_run->statement->size),
                     expected_statement);
-          ASSERT_EQ(mg_map_size(msg_run->parameters), 0);
-          ASSERT_EQ(mg_map_size(msg_run->extra), 0);
+          ASSERT_EQ(mg_map_size(msg_run->parameters), 0u);
+          ASSERT_EQ(mg_map_size(msg_run->extra), 0u);
           mg_message_destroy_ca(message, session->decoder_allocator);
         };
 
@@ -1857,7 +1857,7 @@ TEST_F(RunTest, TransactionWithMultipleRuns) {
       ASSERT_EQ(message->type, MG_MESSAGE_TYPE_PULL);
       mg_message_pull *msg_pull = message->pull_v;
 
-      const int extra_size = expected_qid ? 2 : 1;
+      const uint32_t extra_size = expected_qid ? 2u : 1u;
       ASSERT_EQ(mg_map_size(msg_pull->extra), extra_size);
       const mg_value *n_val = mg_map_at(msg_pull->extra, "n");
       ASSERT_TRUE(n_val);
@@ -2024,7 +2024,7 @@ TEST_F(RunTest, TransactionWithMultipleRuns) {
 
     const int n = 2 * run_idx + 1 + result_idx;
     const mg_list *row = mg_result_row(result);
-    EXPECT_EQ(mg_list_size(row), 2);
+    EXPECT_EQ(mg_list_size(row), 2u);
     EXPECT_EQ(mg_value_get_type(mg_list_at(row, 0)), MG_VALUE_TYPE_INTEGER);
     EXPECT_EQ(mg_value_integer(mg_list_at(row, 0)), n);
 

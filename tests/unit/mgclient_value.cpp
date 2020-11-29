@@ -97,18 +97,18 @@ TEST(ValueTest, ListConstruction) {
   list.Append(Value(3.14));
   list.Append(Value(std::move(inner_list)));
 
-  ASSERT_EQ(list.size(), 3);
+  ASSERT_EQ(list.size(), 3u);
   ASSERT_EQ(list[0], Value("hey"));
   ASSERT_EQ(list[1], Value(3.14));
   ASSERT_EQ(list[2].type(), Value::Type::List);
-  ASSERT_EQ(list[2].ValueList().size(), 2);
+  ASSERT_EQ(list[2].ValueList().size(), 2u);
 
   ConstList const_list = list.AsConstList();
-  ASSERT_EQ(const_list.size(), 3);
+  ASSERT_EQ(const_list.size(), 3u);
   ASSERT_EQ(const_list[0], Value("hey"));
   ASSERT_EQ(const_list[1], Value(3.14));
   ASSERT_EQ(const_list[2].type(), Value::Type::List);
-  ASSERT_EQ(const_list[2].ValueList().size(), 2);
+  ASSERT_EQ(const_list[2].ValueList().size(), 2u);
 }
 
 TEST(ValueTest, ListIterate) {
@@ -122,7 +122,7 @@ TEST(ValueTest, ListIterate) {
     values.push_back(value);
   }
 
-  ASSERT_EQ(values.size(), 3);
+  ASSERT_EQ(values.size(), 3u);
   ASSERT_EQ(values[0], Value("hey"));
   ASSERT_EQ(values[1], Value(3.14));
   ASSERT_EQ(values[2], Value(true));
@@ -132,7 +132,7 @@ TEST(ValueTest, ListIterate) {
     values.push_back(value);
   }
 
-  ASSERT_EQ(values.size(), 3);
+  ASSERT_EQ(values.size(), 3u);
   ASSERT_EQ(values[0], Value("hey"));
   ASSERT_EQ(values[1], Value(3.14));
   ASSERT_EQ(values[2], Value(true));
@@ -211,13 +211,13 @@ TEST(ValueTest, MapConstruction) {
   map.Insert("key 2", Value(3.14));
   map.Insert("key 3", Value(false));
 
-  ASSERT_EQ(map.size(), 3);
+  ASSERT_EQ(map.size(), 3u);
   ASSERT_EQ(map["key 1"], Value(1));
   ASSERT_EQ(map["key 2"], Value(3.14));
   ASSERT_EQ(map["key 3"], Value(false));
 
   ConstMap const_map = map.AsConstMap();
-  ASSERT_EQ(const_map.size(), 3);
+  ASSERT_EQ(const_map.size(), 3u);
   ASSERT_EQ(const_map["key 1"], Value(1));
   ASSERT_EQ(const_map["key 2"], Value(3.14));
   ASSERT_EQ(const_map["key 3"], Value(false));
@@ -234,7 +234,7 @@ TEST(ValueTest, MapIterate) {
     values.emplace_back(key, value);
   }
 
-  ASSERT_EQ(values.size(), 3);
+  ASSERT_EQ(values.size(), 3u);
   ASSERT_EQ(values[0].first, "key 1");
   ASSERT_EQ(values[0].second, Value(1));
   ASSERT_EQ(values[1].first, "key 2");
@@ -247,7 +247,7 @@ TEST(ValueTest, MapIterate) {
     values.emplace_back(key, value);
   }
 
-  ASSERT_EQ(values.size(), 3);
+  ASSERT_EQ(values.size(), 3u);
   ASSERT_EQ(values[0].first, "key 1");
   ASSERT_EQ(values[0].second, Value(1));
   ASSERT_EQ(values[1].first, "key 2");

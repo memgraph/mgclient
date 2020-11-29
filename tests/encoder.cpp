@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <gtest/gtest.h>
+
 #include <string>
 #include <thread>
-
-#include <gtest/gtest.h>
 
 extern "C" {
 #include "mgclient.h"
@@ -100,13 +100,13 @@ class EncoderTest : public ::testing::Test {
 };
 
 void AssertReadRaw(std::stringstream &sstr, const std::string &expected) {
-  char tmp[expected.size()];
-  size_t read = sstr.readsome(tmp, expected.size());
+  std::vector<char> tmp(expected.size());
+  size_t read = sstr.readsome(tmp.data(), expected.size());
   if (read != expected.size()) {
     FAIL() << "Expected at least " << expected.size()
            << " bytes in stream, got only " << read;
   }
-  std::string got(tmp, expected.size());
+  std::string got(tmp.data(), expected.size());
   ASSERT_EQ(got, expected);
 }
 
@@ -273,19 +273,22 @@ TEST_P(ValueTest, Encoding) {
   ASSERT_MEMORY_OK();
 }
 
-INSTANTIATE_TEST_CASE_P(Null, ValueTest, ::testing::ValuesIn(NullTestCases()));
+INSTANTIATE_TEST_CASE_P(Null, ValueTest,
+                        ::testing::ValuesIn(NullTestCases()), );
 
-INSTANTIATE_TEST_CASE_P(Bool, ValueTest, ::testing::ValuesIn(BoolTestCases()));
+INSTANTIATE_TEST_CASE_P(Bool, ValueTest,
+                        ::testing::ValuesIn(BoolTestCases()), );
 
 INSTANTIATE_TEST_CASE_P(Integer, ValueTest,
-                        ::testing::ValuesIn(IntegerTestCases()));
+                        ::testing::ValuesIn(IntegerTestCases()), );
 
 INSTANTIATE_TEST_CASE_P(Float, ValueTest,
-                        ::testing::ValuesIn(FloatTestCases()));
+                        ::testing::ValuesIn(FloatTestCases()), );
 
 INSTANTIATE_TEST_CASE_P(String, ValueTest,
-                        ::testing::ValuesIn(StringTestCases()));
+                        ::testing::ValuesIn(StringTestCases()), );
 
-INSTANTIATE_TEST_CASE_P(List, ValueTest, ::testing::ValuesIn(ListTestCases()));
+INSTANTIATE_TEST_CASE_P(List, ValueTest,
+                        ::testing::ValuesIn(ListTestCases()), );
 
-INSTANTIATE_TEST_CASE_P(Map, ValueTest, ::testing::ValuesIn(MapTestCases()));
+INSTANTIATE_TEST_CASE_P(Map, ValueTest, ::testing::ValuesIn(MapTestCases()), );
