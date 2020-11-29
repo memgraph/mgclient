@@ -19,6 +19,8 @@ function(set_project_c_warnings library_name)
 
   if(CMAKE_C_COMPILER_ID STREQUAL "Clang")
     set(C_PROJECT_WARNINGS ${CLANG_C_WARNINGS})
+  elseif(CMAKE_C_COMPILER_ID STREQUAL "AppleClang")
+    set(C_PROJECT_WARNINGS ${CLANG_C_WARNINGS})
   else()
     set(C_PROJECT_WARNINGS ${GCC_C_WARNINGS})
   endif()
