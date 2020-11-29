@@ -67,7 +67,11 @@ int mg_socket_connect_handle_error(int *sock, int status, mg_session *session) {
   return MG_SUCCESS;
 }
 
-int mg_socket_options(int sock, mg_session *session) { return MG_SUCCESS; }
+int mg_socket_options(int sock, mg_session *session) {
+  (void)sock;
+  (void)session;
+  return MG_SUCCESS;
+}
 
 ssize_t mg_socket_send(int sock, const void *buf, int len) {
   return MG_RETRY_ON_EINTR(send(sock, buf, len, 0));

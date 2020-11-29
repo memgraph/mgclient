@@ -62,10 +62,13 @@ set(CMAKE_CXX_STANDARD 17)
 set(C_STANDARD_REQUIRED ON)
 set(CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-add_compile_options(
-    -Wall -Wextra -pedantic
-    -Wno-zero-length-array -Wno-nested-anon-types
-    -Werror)
+
+# Link these "libraries" to set compiler warnings on targets.
+include(cmake/CompilerWarnings.cmake)
+add_library(project_c_warnings INTERFACE)
+set_project_c_warnings(project_c_warnings)
+add_library(project_cpp_warnings INTERFACE)
+set_project_cpp_warnings(project_cpp_warnings)
 
 # Set default build type to 'Release'
 if(NOT CMAKE_BUILD_TYPE)

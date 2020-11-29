@@ -163,6 +163,7 @@ std::string GetEncodedSize(int idx, ContainerType type) {
     case SizeClass::SIZE_32:
       return std::string(1, marker_32) + ENCODED_SIZE[idx];
   }
+  std::abort();
 }
 
 /// `GetElement` and `GetElementEncoding` for a little variety in container
@@ -192,8 +193,7 @@ mg_value *GetElement(int idx) {
       return mg_value_make_map(map);
     }
   }
-  fprintf(stderr, "Invalid switch case in GetElement.\n");
-  abort();
+  std::abort();
 }
 
 std::string GetElementEncoding(int idx) {
@@ -212,8 +212,7 @@ std::string GetElementEncoding(int idx) {
     case 5:
       return "\xA2\x81x\x01\x81y\x02";
   }
-  fprintf(stderr, "Invalid switch case in GetElementEncoding.\n");
-  abort();
+  std::abort();
 }
 
 std::vector<ValueTestParam> StringTestCases() {
@@ -265,9 +264,9 @@ std::vector<ValueTestParam> NodeTestCases() {
   std::vector<ValueTestParam> inputs;
 
   {
-    mg_string *labels[0] = {};
+    std::vector<mg_string *> labels(0);
     mg_map *props = mg_map_make_empty(0);
-    mg_node *node = mg_node_make(12345, 0, labels, props);
+    mg_node *node = mg_node_make(12345, 0, labels.data(), props);
     inputs.push_back(
         {mg_value_make_node(node), "\xB3\x4E\xC9\x30\x39\x90\xA0"});
   }
