@@ -27,26 +27,26 @@ TEST(LinearAllocatorTest, Basic) {
   mg_linear_allocator *allocator = mg_linear_allocator_init(
       (mg_allocator *)&underlying_allocator, 4096, 2048);
 
-  ASSERT_EQ(underlying_allocator.allocated.size(), 2);
+  ASSERT_EQ(underlying_allocator.allocated.size(), 2u);
 
   for (int i = 0; i < 4; ++i) {
     mg_allocator_malloc((mg_allocator *)allocator, 1024);
   }
-  ASSERT_EQ(underlying_allocator.allocated.size(), 2);
+  ASSERT_EQ(underlying_allocator.allocated.size(), 2u);
 
   mg_allocator_malloc((mg_allocator *)allocator, 1024);
-  ASSERT_EQ(underlying_allocator.allocated.size(), 3);
+  ASSERT_EQ(underlying_allocator.allocated.size(), 3u);
 
   mg_linear_allocator_reset(allocator);
-  ASSERT_EQ(underlying_allocator.allocated.size(), 2);
+  ASSERT_EQ(underlying_allocator.allocated.size(), 2u);
 
   for (int i = 0; i < 4; ++i) {
     mg_allocator_malloc((mg_allocator *)allocator, 1024);
   }
-  ASSERT_EQ(underlying_allocator.allocated.size(), 2);
+  ASSERT_EQ(underlying_allocator.allocated.size(), 2u);
 
   mg_linear_allocator_destroy(allocator);
-  ASSERT_EQ(underlying_allocator.allocated.size(), 0);
+  ASSERT_EQ(underlying_allocator.allocated.size(), 0u);
 }
 
 TEST(LinearAllocatorTest, SeparateAllocations) {
@@ -54,30 +54,30 @@ TEST(LinearAllocatorTest, SeparateAllocations) {
   mg_linear_allocator *allocator = mg_linear_allocator_init(
       (mg_allocator *)&underlying_allocator, 4096, 2048);
 
-  ASSERT_EQ(underlying_allocator.allocated.size(), 2);
+  ASSERT_EQ(underlying_allocator.allocated.size(), 2u);
 
   for (int i = 0; i < 3; ++i) {
     mg_allocator_malloc((mg_allocator *)allocator, 1024);
   }
-  ASSERT_EQ(underlying_allocator.allocated.size(), 2);
+  ASSERT_EQ(underlying_allocator.allocated.size(), 2u);
 
   mg_allocator_malloc((mg_allocator *)allocator, 2048);
-  ASSERT_EQ(underlying_allocator.allocated.size(), 3);
+  ASSERT_EQ(underlying_allocator.allocated.size(), 3u);
 
   mg_allocator_malloc((mg_allocator *)allocator, 1024);
-  ASSERT_EQ(underlying_allocator.allocated.size(), 3);
+  ASSERT_EQ(underlying_allocator.allocated.size(), 3u);
 
   mg_allocator_malloc((mg_allocator *)allocator, 1024);
-  ASSERT_EQ(underlying_allocator.allocated.size(), 4);
+  ASSERT_EQ(underlying_allocator.allocated.size(), 4u);
 
   mg_linear_allocator_reset(allocator);
-  ASSERT_EQ(underlying_allocator.allocated.size(), 2);
+  ASSERT_EQ(underlying_allocator.allocated.size(), 2u);
 
   for (int i = 0; i < 4; ++i) {
     mg_allocator_malloc((mg_allocator *)allocator, 1024);
   }
-  ASSERT_EQ(underlying_allocator.allocated.size(), 2);
+  ASSERT_EQ(underlying_allocator.allocated.size(), 2u);
 
   mg_linear_allocator_destroy(allocator);
-  ASSERT_EQ(underlying_allocator.allocated.size(), 0);
+  ASSERT_EQ(underlying_allocator.allocated.size(), 0u);
 }

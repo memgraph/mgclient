@@ -14,14 +14,14 @@
 
 // TODO(mtomic): Maybe add test for raw transport.
 
+#include <gmock/gmock.h>
+#include <gtest/gtest.h>
+
 #include <filesystem>
 #include <fstream>
 #include <functional>
 #include <random>
 #include <thread>
-
-#include <gmock/gmock.h>
-#include <gtest/gtest.h>
 
 #if MGCLIENT_ON_WINDOWS
 // NOTE:
@@ -88,7 +88,7 @@ class SecureTransportTest : public ::testing::Test {
 
     // Server certificate is self signed.
     X509_set_issuer_name(server_cert, X509_get_subject_name(server_cert));
-    X509_sign(server_cert, server_key, EVP_sha1());
+    X509_sign(server_cert, server_key, EVP_sha512());
 
     // Build client key and certificate.
     X509 *client_cert;
@@ -101,11 +101,11 @@ class SecureTransportTest : public ::testing::Test {
 
     // CA certificate is self signed.
     X509_set_issuer_name(ca_cert, X509_get_subject_name(ca_cert));
-    X509_sign(ca_cert, ca_key, EVP_sha1());
+    X509_sign(ca_cert, ca_key, EVP_sha512());
 
     // Sign the client certificate with CA key.
     X509_set_issuer_name(client_cert, X509_get_subject_name(ca_cert));
-    X509_sign(client_cert, ca_key, EVP_sha1());
+    X509_sign(client_cert, ca_key, EVP_sha512());
 
     // Write client key and certificates to temporary file.
     client_cert_path = std::filesystem::temp_directory_path() / "client.crt";

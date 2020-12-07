@@ -139,41 +139,41 @@ TEST_F(MemgraphConnection, InsertAndRetriveFromMemegraph) {
     const mg_list *mg_columns = mg_result_columns(result);
     const mg_list *mg_row = mg_result_row(result);
 
-    ASSERT_EQ(mg_list_size(mg_columns), 3);
+    ASSERT_EQ(mg_list_size(mg_columns), 3u);
     EXPECT_EQ(GetStringValue(mg_list_at(mg_columns, 0)), "n");
     EXPECT_EQ(GetStringValue(mg_list_at(mg_columns, 1)), "r");
     EXPECT_EQ(GetStringValue(mg_list_at(mg_columns, 2)), "m");
 
-    ASSERT_EQ(mg_list_size(mg_row), 3);
+    ASSERT_EQ(mg_list_size(mg_row), 3u);
     const mg_node *node_n = GetNodeValue(mg_list_at(mg_row, 0));
     const mg_node *node_m = GetNodeValue(mg_list_at(mg_row, 2));
     const mg_relationship *relationship_r =
         GetRelationshipValue(mg_list_at(mg_row, 1));
 
     // Assert Labels
-    ASSERT_EQ(mg_node_label_count(node_n), 1);
+    ASSERT_EQ(mg_node_label_count(node_n), 1u);
     EXPECT_EQ(GetStringValue(mg_node_label_at(node_n, 0)), "TestLabel");
     EXPECT_EQ(GetStringValue(mg_relationship_type(relationship_r)), "TestRel");
-    ASSERT_EQ(mg_node_label_count(node_m), 1);
+    ASSERT_EQ(mg_node_label_count(node_m), 1u);
     EXPECT_EQ(GetStringValue(mg_node_label_at(node_m, 0)), "TestLabel");
 
     // Assert properties of Node n
     const mg_map *properties_n = mg_node_properties(node_n);
-    ASSERT_EQ(mg_map_size(properties_n), 3);
+    ASSERT_EQ(mg_map_size(properties_n), 3u);
     EXPECT_EQ(GetIntegerValue(mg_map_at(properties_n, "id")), 1);
     EXPECT_EQ(GetStringValue(mg_map_at(properties_n, "name")), "test1");
     EXPECT_EQ(GetBoolValue(mg_map_at(properties_n, "is_deleted")), 1);
 
     // Assert properties of Node m
     const mg_map *properties_m = mg_node_properties(node_m);
-    ASSERT_EQ(mg_map_size(properties_m), 3);
+    ASSERT_EQ(mg_map_size(properties_m), 3u);
     EXPECT_EQ(GetIntegerValue(mg_map_at(properties_m, "id")), 12);
     EXPECT_EQ(GetStringValue(mg_map_at(properties_m, "name")), "test2");
     EXPECT_EQ(GetBoolValue(mg_map_at(properties_m, "is_deleted")), 0);
 
     // Assert properties of Relationship r
     const mg_map *properties_r = mg_relationship_properties(relationship_r);
-    ASSERT_EQ(mg_map_size(properties_r), 1);
+    ASSERT_EQ(mg_map_size(properties_r), 1u);
     EXPECT_EQ(GetStringValue(mg_map_at(properties_r, "attr")), "attr1");
 
     rows++;
@@ -197,8 +197,8 @@ TEST_F(MemgraphConnection, InsertAndRetriveFromMemegraph) {
     ASSERT_EQ(mg_session_fetch(session, &result), 1);
     const mg_list *mg_columns = mg_result_columns(result);
     const mg_list *mg_row = mg_result_row(result);
-    ASSERT_EQ(mg_list_size(mg_columns), 1);
-    ASSERT_EQ(mg_list_size(mg_row), 1);
+    ASSERT_EQ(mg_list_size(mg_columns), 1u);
+    ASSERT_EQ(mg_list_size(mg_row), 1u);
     const mg_node *node = GetNodeValue(mg_list_at(mg_row, 0));
     const mg_map *properties = mg_node_properties(node);
     EXPECT_EQ(GetIntegerValue(mg_map_at(properties, "int")), 1);
@@ -207,11 +207,11 @@ TEST_F(MemgraphConnection, InsertAndRetriveFromMemegraph) {
               0.000001);
     EXPECT_EQ(GetBoolValue(mg_map_at(properties, "bool")), true);
     const mg_list *list_value = GetListValue(mg_map_at(properties, "list"));
-    ASSERT_EQ(mg_list_size(list_value), 2);
+    ASSERT_EQ(mg_list_size(list_value), 2u);
     ASSERT_EQ(GetIntegerValue(mg_list_at(list_value, 0)), 1);
     ASSERT_EQ(GetIntegerValue(mg_list_at(list_value, 1)), 2);
     const mg_map *map_value = GetMapValue(mg_map_at(properties, "map"));
-    ASSERT_EQ(mg_map_size(map_value), 1);
+    ASSERT_EQ(mg_map_size(map_value), 1u);
     ASSERT_EQ(GetStringValue(mg_map_at(map_value, "key")), "value");
     ASSERT_EQ(mg_session_fetch(session, &result), 0);
   }

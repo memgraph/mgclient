@@ -32,7 +32,7 @@ TEST(ValueTest, BasicTypes) {
   Value value_bool1(true);
   Value value_bool2(false);
   Value value_int1(-13);
-  Value value_int2(static_cast<int64_t>((1L << 60)));
+  Value value_int2(static_cast<int64_t>((1LL << 60)));
   Value value_double(3.14159);
   Value value_string1("test");
   Value value_string2(std::string("test"));
@@ -50,7 +50,7 @@ TEST(ValueTest, BasicTypes) {
   ASSERT_EQ(value_bool1.ValueBool(), true);
   ASSERT_EQ(value_bool2.ValueBool(), false);
   ASSERT_EQ(value_int1.ValueInt(), -13);
-  ASSERT_EQ(value_int2.ValueInt(), 1L << 60);
+  ASSERT_EQ(value_int2.ValueInt(), 1LL << 60);
   ASSERT_EQ(value_double.ValueDouble(), 3.14159);
   ASSERT_EQ(value_string1.ValueString(), "test");
   ASSERT_EQ(value_string2.ValueString(), "test");
@@ -97,18 +97,18 @@ TEST(ValueTest, ListConstruction) {
   list.Append(Value(3.14));
   list.Append(Value(std::move(inner_list)));
 
-  ASSERT_EQ(list.size(), 3);
+  ASSERT_EQ(list.size(), 3u);
   ASSERT_EQ(list[0], Value("hey"));
   ASSERT_EQ(list[1], Value(3.14));
   ASSERT_EQ(list[2].type(), Value::Type::List);
-  ASSERT_EQ(list[2].ValueList().size(), 2);
+  ASSERT_EQ(list[2].ValueList().size(), 2u);
 
   ConstList const_list = list.AsConstList();
-  ASSERT_EQ(const_list.size(), 3);
+  ASSERT_EQ(const_list.size(), 3u);
   ASSERT_EQ(const_list[0], Value("hey"));
   ASSERT_EQ(const_list[1], Value(3.14));
   ASSERT_EQ(const_list[2].type(), Value::Type::List);
-  ASSERT_EQ(const_list[2].ValueList().size(), 2);
+  ASSERT_EQ(const_list[2].ValueList().size(), 2u);
 }
 
 TEST(ValueTest, ListIterate) {
@@ -118,21 +118,21 @@ TEST(ValueTest, ListIterate) {
   list.Append(Value(true));
 
   std::vector<ConstValue> values;
-  for (const auto &value : list) {
+  for (const auto value : list) {
     values.push_back(value);
   }
 
-  ASSERT_EQ(values.size(), 3);
+  ASSERT_EQ(values.size(), 3u);
   ASSERT_EQ(values[0], Value("hey"));
   ASSERT_EQ(values[1], Value(3.14));
   ASSERT_EQ(values[2], Value(true));
 
   values.clear();
-  for (const auto &value : list.AsConstList()) {
+  for (const auto value : list.AsConstList()) {
     values.push_back(value);
   }
 
-  ASSERT_EQ(values.size(), 3);
+  ASSERT_EQ(values.size(), 3u);
   ASSERT_EQ(values[0], Value("hey"));
   ASSERT_EQ(values[1], Value(3.14));
   ASSERT_EQ(values[2], Value(true));
@@ -211,13 +211,13 @@ TEST(ValueTest, MapConstruction) {
   map.Insert("key 2", Value(3.14));
   map.Insert("key 3", Value(false));
 
-  ASSERT_EQ(map.size(), 3);
+  ASSERT_EQ(map.size(), 3u);
   ASSERT_EQ(map["key 1"], Value(1));
   ASSERT_EQ(map["key 2"], Value(3.14));
   ASSERT_EQ(map["key 3"], Value(false));
 
   ConstMap const_map = map.AsConstMap();
-  ASSERT_EQ(const_map.size(), 3);
+  ASSERT_EQ(const_map.size(), 3u);
   ASSERT_EQ(const_map["key 1"], Value(1));
   ASSERT_EQ(const_map["key 2"], Value(3.14));
   ASSERT_EQ(const_map["key 3"], Value(false));
@@ -230,11 +230,11 @@ TEST(ValueTest, MapIterate) {
   map.Insert("key 3", Value(3.0));
 
   std::vector<std::pair<std::string, ConstValue>> values;
-  for (const auto &[key, value] : map) {
+  for (const auto [key, value] : map) {
     values.emplace_back(key, value);
   }
 
-  ASSERT_EQ(values.size(), 3);
+  ASSERT_EQ(values.size(), 3u);
   ASSERT_EQ(values[0].first, "key 1");
   ASSERT_EQ(values[0].second, Value(1));
   ASSERT_EQ(values[1].first, "key 2");
@@ -243,11 +243,11 @@ TEST(ValueTest, MapIterate) {
   ASSERT_EQ(values[2].second, Value(3.0));
 
   values.clear();
-  for (const auto &[key, value] : map.AsConstMap()) {
+  for (const auto [key, value] : map.AsConstMap()) {
     values.emplace_back(key, value);
   }
 
-  ASSERT_EQ(values.size(), 3);
+  ASSERT_EQ(values.size(), 3u);
   ASSERT_EQ(values[0].first, "key 1");
   ASSERT_EQ(values[0].second, Value(1));
   ASSERT_EQ(values[1].first, "key 2");

@@ -63,6 +63,13 @@ set(C_STANDARD_REQUIRED ON)
 set(CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+# Link these "libraries" to set compiler warnings on targets.
+include(cmake/CompilerWarnings.cmake)
+add_library(project_c_warnings INTERFACE)
+set_project_c_warnings(project_c_warnings)
+add_library(project_cpp_warnings INTERFACE)
+set_project_cpp_warnings(project_cpp_warnings)
+
 # Set default build type to 'Release'
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "Release")

@@ -50,7 +50,9 @@ target_include_directories(mgclient-static
         "${CMAKE_SOURCE_DIR}/include"
         "${CMAKE_CURRENT_BINARY_DIR}"
         "${OPENSSL_INCLUDE_DIR}")
-target_link_libraries(mgclient-static PRIVATE ${OPENSSL_LIBRARIES} project_options)
+target_link_libraries(mgclient-static
+        PRIVATE
+        ${OPENSSL_LIBRARIES} project_options project_c_warnings)
 if(MGCLIENT_ON_WINDOWS)
     target_link_libraries(mgclient-static PUBLIC ws2_32)
 endif()

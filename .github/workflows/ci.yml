@@ -31,7 +31,7 @@ jobs:
         run: |
           mkdir build
           cd build
-          cmake -DOPENSSL_ROOT_DIR=/usr/local/Cellar/openssl@1.1/1.1.1h -DCMAKE_INSTALL_PREFIX=/usr/local -DBUILD_TESTING=ON -DBUILD_TESTING_INTEGRATION=ON ..
+          cmake -DOPENSSL_ROOT_DIR=/usr/local/Cellar/openssl@1.1/1.1.1h -DCMAKE_INSTALL_PREFIX=/usr/local -DBUILD_TESTING=ON -DBUILD_TESTING_INTEGRATION=ON -DC_WARNINGS_AS_ERRORS=ON -DCPP_WARNINGS_AS_ERRORS=ON ..
           make
           ctest -E "example|integration"
           sudo make install
@@ -69,14 +69,14 @@ jobs:
       - name: Build with gcc, test and install mgclient
         run: |
           mkdir build-gcc && cd build-gcc
-          cmake -DCMAKE_C_COMPILER=gcc-8 -DCMAKE_CXX_COMPILER=g++-8 -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=ON -DBUILD_TESTING_INTEGRATION=ON ..
+          cmake -DCMAKE_C_COMPILER=gcc-8 -DCMAKE_CXX_COMPILER=g++-8 -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=ON -DBUILD_TESTING_INTEGRATION=ON -DC_WARNINGS_AS_ERRORS=ON -DCPP_WARNINGS_AS_ERRORS=ON ..
           make
           ctest --output-on-failure
           sudo make install
       - name: Build with clang, test and install mgclient
         run: |
           mkdir build-clang && cd build-clang
-          cmake -DCMAKE_C_COMPILER=clang-8 -DCMAKE_CXX_COMPILER=clang++-8 -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=ON -DBUILD_TESTING_INTEGRATION=ON ..
+          cmake -DCMAKE_C_COMPILER=clang-8 -DCMAKE_CXX_COMPILER=clang++-8 -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=ON -DBUILD_TESTING_INTEGRATION=ON -DC_WARNINGS_AS_ERRORS=ON -DCPP_WARNINGS_AS_ERRORS=ON ..
           make
           ctest --output-on-failure
           sudo make install
@@ -125,6 +125,6 @@ jobs:
         run: |
           mkdir build
           cd build
-          cmake .. -G "MinGW Makefiles" -DBUILD_TESTING=ON -DBUILD_TESTING_INTEGRATION=ON
+          cmake .. -G "MinGW Makefiles" -DBUILD_TESTING=ON -DBUILD_TESTING_INTEGRATION=ON -DC_WARNINGS_AS_ERRORS=ON -DCPP_WARNINGS_AS_ERRORS=ON
           cmake --build .
           ctest --verbose -R "allocator|value|example_basic|integration_basic"

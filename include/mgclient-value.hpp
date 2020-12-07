@@ -1675,6 +1675,7 @@ inline Value::Type ConvertType(mg_value_type type) {
     case MG_VALUE_TYPE_UNKNOWN:
       throw std::runtime_error("Unknown value type!");
   }
+  std::abort();
 }
 
 inline bool AreValuesEqual(const mg_value *value1, const mg_value *value2);
@@ -1942,6 +1943,7 @@ inline bool AreValuesEqual(const mg_value *value1, const mg_value *value2) {
     case MG_VALUE_TYPE_UNKNOWN:
       throw std::runtime_error("Comparing values of unknown types!");
   }
+  std::abort();
 }
 }  // namespace detail
 
