@@ -60,7 +60,7 @@ mg_session_params *mg_session_params_make() {
   params->port = 0;
   params->username = NULL;
   params->password = NULL;
-  params->user_agent = MG_USER_AGENT_DEFAULT;
+  params->user_agent = MG_USER_AGENT;
   params->sslmode = MG_SSLMODE_DISABLE;
   params->sslcert = NULL;
   params->sslkey = NULL;

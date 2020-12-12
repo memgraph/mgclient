@@ -1233,7 +1233,7 @@ MGCLIENT_EXPORT const char *mg_session_params_get_username(
     const mg_session_params *);
 MGCLIENT_EXPORT const char *mg_session_params_get_password(
     const mg_session_params *);
-MGCLIENT_EXPORT const char *mg_session_params_get_client_name(
+MGCLIENT_EXPORT const char *mg_session_params_get_user_agent(
     const mg_session_params *);
 MGCLIENT_EXPORT enum mg_sslmode mg_session_params_get_sslmode(
     const mg_session_params *);

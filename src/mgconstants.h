@@ -27,9 +27,7 @@
 #define MG_TINY_SIZE_MAX 15
 
 static const char MG_HANDSHAKE_MAGIC[] = "\x60\x60\xB0\x17";
-
-// TODO(gitbuda): Align this with the mgclient library version.
-static const char MG_USER_AGENT_DEFAULT[] = "MemgraphBolt/0.1";
+static const char MG_USER_AGENT[] = "mgclient/" MGCLIENT_VERSION;
 
 /// Markers
 #define MG_MARKER_NULL 0xC0

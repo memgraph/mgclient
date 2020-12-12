@@ -33,7 +33,7 @@ class Client {
     std::string username;
     std::string password;
     bool use_ssl;
-    std::string user_agent;
+    std::string user_agent = "mgclient++/" MGCLIENT_VERSION;
   };
 
   Client(const Client &) = delete;
