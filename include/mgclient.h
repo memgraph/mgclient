@@ -1287,18 +1287,19 @@ typedef struct mg_result mg_result;
 /// next query.
 ///
 /// \param session               A \ref mg_session to be used for query
-/// execution. \param query                 Query string. \param params A \ref
-/// mg_map containing query parameters. NULL can be
-///                              supplied instead of an empty parameter map.
+///                              execution.
+/// \param query                 Query string.
+/// \param params                A \ref mg_map containing query parameters. NULL
+///                              can be supplied instead of an empty parameter
+///                              map.
 /// \param columns               Names of the columns output by the query
-/// execution will be
-///                              stored in here. This is the same as the value
+///                              execution will be stored in here. This is the
+///                              same as the value
 ///                              obtained by \ref mg_result_columns on a pulled
 ///                              \ref mg_result. NULL can be supplied if we're
 ///                              not interested in the columns names.
-///
 /// \param extra_run_information A \ref mg_map containing extra information for
-/// running the statement.
+///                              running the statement.
 ///                              It can contain the following information:
 ///                               - bookmarks - list of strings containing some
 ///                               kind of bookmark identification
@@ -1316,9 +1317,9 @@ typedef struct mg_result mg_result;
 ///                               takes place. If no `db` is sent or empty
 ///                               string it implies that it is the default
 ///                               database.
-/// \param qid                   QID for the statement will be stored in here if
-/// an Explicit transaction was started. \return Returns 0 if query was
-/// submitted for execution successfuly.
+/// \param qid                    QID for the statement will be stored in here
+///                               if an Explicit transaction was started.
+/// \return Returns 0 if query was submitted for execution successfuly.
 ///         Otherwise, a non-zero error code is returned.
 MGCLIENT_EXPORT int mg_session_run(mg_session *session, const char *query,
                                    const mg_map *params,
@@ -1385,7 +1386,7 @@ MGCLIENT_EXPORT int mg_session_rollback_transaction(mg_session *session,
 /// \return On success, 0 or 1 is returned. Exit code 1 means that a new result
 ///         row was obtained and stored in \p result and its contents may be
 ///         accessed using \ref mg_result_row. Exit code 0 means that there are
-///         now more result rows and that the query execution summary was stored
+///         no more result rows and that the query execution summary was stored
 ///         in \p result. Its contents may be accessed using \ref
 ///         mg_result_summary. On failure, a non-zero exit code is returned.
 MGCLIENT_EXPORT int mg_session_fetch(mg_session *session, mg_result **result);
@@ -1393,15 +1394,16 @@ MGCLIENT_EXPORT int mg_session_fetch(mg_session *session, mg_result **result);
 /// Tries to pull results of a statement.
 ///
 /// \param session          A \ref mg_session from which the results should be
-/// pulled. \param pull_information A \ref mg_map that contains extra
-/// information for pulling the results.
+///                         pulled.
+/// \param pull_information A \ref mg_map that contains extra information for
+///                         pulling the results.
 ///                         It can contain the following information:
-///                         - n - how many records to fetch. `n=-1` will fetch
-///                         all records.
-///                         - qid - query identification, specifies the result
-///                         from which statement the results should be pulled .
-///                         `qid=-1` denotes the last executed statement. This
-///                         is only for Explicit transactions.
+///                          - n - how many records to fetch. `n=-1` will fetch
+///                          all records.
+///                          - qid - query identification, specifies the result
+///                          from which statement the results should be pulled.
+///                          `qid=-1` denotes the last executed statement. This
+///                          is only for Explicit transactions.
 /// \return Returns 0 if the result was pulled successfuly.
 ///         Otherwise, a non-zero error code is returned.
 MGCLIENT_EXPORT int mg_session_pull(mg_session *session,
