@@ -17,9 +17,8 @@
 #include <memory>
 #include <optional>
 
-#include "mgclient.h"
-
 #include "mgclient-value.hpp"
+#include "mgclient.h"
 
 namespace mg {
 
@@ -28,11 +27,11 @@ namespace mg {
 class Client {
  public:
   struct Params {
-    std::string host;
-    uint16_t port;
-    std::string username;
-    std::string password;
-    bool use_ssl;
+    std::string host = "127.0.0.1";
+    uint16_t port = 7687;
+    std::string username = "";
+    std::string password = "";
+    bool use_ssl = false;
     std::string user_agent = "mgclient++/" MGCLIENT_VERSION;
   };
 
@@ -61,7 +60,8 @@ class Client {
   /// \note
   /// After executing the statement, the method is blocked until all incoming
   /// data (execution results) are handled, i.e. until `FetchOne` method returns
-  /// `std::nullopt`.
+  /// `std::nullopt`. Even if the result set is empty, the fetching has to be
+  /// done/finished to be able to execute another statement.
   bool Execute(const std::string &statement);
 
   /// \brief Executes the given Cypher `statement`, supplied with additional
@@ -78,6 +78,9 @@ class Client {
   /// \return next result from the input stream.
   /// If there is nothing to fetch, `std::nullopt` is returned.
   std::optional<std::vector<Value>> FetchOne();
+
+  /// \brief Fetches all results and discards them.
+  void DiscardAll();
 
   /// \brief Start a transaction.
   /// \return true when the transaction was successfully started, false
@@ -187,6 +190,11 @@ inline std::optional<std::vector<Value>> Client::FetchOne() {
     values.emplace_back(Value(mg_list_at(list, i)));
   }
   return values;
+}
+
+inline void Client::DiscardAll() {
+  while (FetchOne())
+    ;
 }
 
 inline bool Client::BeginTransaction() {
