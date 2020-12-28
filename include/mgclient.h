@@ -1036,7 +1036,7 @@ MGCLIENT_EXPORT void mg_point_3d_destroy(mg_point_3d *point_3d);
 #define MG_SESSION_BAD 2
 
 /// Marks a \ref mg_session which is currently fetching result of a query.
-/// Results can be pulled using \ref mg_session_fetch.
+/// Results can be fetched using \ref mg_session_fetch.
 #define MG_SESSION_FETCHING 3
 
 /// Success code.

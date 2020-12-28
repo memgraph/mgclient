@@ -767,15 +767,15 @@ fatal_failure:
 
 int mg_session_pull(mg_session *session, const mg_map *pull_information) {
   if (session->status == MG_SESSION_BAD) {
-    mg_session_set_error(session, "bad session");
+    mg_session_set_error(session, "called pull while bad session");
     return MG_ERROR_BAD_CALL;
   }
   if (session->status == MG_SESSION_READY) {
-    mg_session_set_error(session, "not executing a query");
+    mg_session_set_error(session, "called pull while not executing a query");
     return MG_ERROR_BAD_CALL;
   }
   if (session->status == MG_SESSION_FETCHING) {
-    mg_session_set_error(session, "fetching results from a query");
+    mg_session_set_error(session, "called pull while still fetching data");
     return MG_ERROR_BAD_CALL;
   }
 
@@ -805,15 +805,15 @@ fatal_failure:
 
 int mg_session_fetch(mg_session *session, mg_result **result) {
   if (session->status == MG_SESSION_BAD) {
-    mg_session_set_error(session, "bad session");
+    mg_session_set_error(session, "called fetch while bad session");
     return MG_ERROR_BAD_CALL;
   }
   if (session->status == MG_SESSION_READY) {
-    mg_session_set_error(session, "not executing a query");
+    mg_session_set_error(session, "called fetch while not executing a query");
     return MG_ERROR_BAD_CALL;
   }
   if (session->status == MG_SESSION_EXECUTING) {
-    mg_session_set_error(session, "results not pulled");
+    mg_session_set_error(session, "called fetch without pulling results");
     return MG_ERROR_BAD_CALL;
   }
   assert(session->status == MG_SESSION_FETCHING);
