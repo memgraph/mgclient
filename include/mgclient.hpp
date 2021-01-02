@@ -82,6 +82,9 @@ class Client {
   /// \brief Fetches all results and discards them.
   void DiscardAll();
 
+  /// \brief Fetches all results.
+  std::optional<std::vector<std::vector<Value>>> FetchAll();
+
   /// \brief Start a transaction.
   /// \return true when the transaction was successfully started, false
   /// otherwise.
@@ -195,6 +198,14 @@ inline std::optional<std::vector<Value>> Client::FetchOne() {
 inline void Client::DiscardAll() {
   while (FetchOne())
     ;
+}
+
+inline std::optional<std::vector<std::vector<Value>>> Client::FetchAll() {
+  std::vector<std::vector<Value>> data;
+  while (auto maybe_result = FetchOne()) {
+    data.emplace_back(std::move(*maybe_result));
+  }
+  return data;
 }
 
 inline bool Client::BeginTransaction() {

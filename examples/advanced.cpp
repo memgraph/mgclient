@@ -49,8 +49,17 @@ int main(int argc, char *argv[]) {
       std::cerr << "Failed to read data." << std::endl;
       return 1;
     }
-    while (const auto maybeResult = client->FetchOne()) {
-      const auto result = *maybeResult;
+    if (const auto maybe_data = client->FetchAll()) {
+      const auto data = *maybe_data;
+      std::cout << "Number of results: " << data.size() << std::endl;
+    }
+
+    if (!client->Execute("MATCH (n) RETURN n;")) {
+      std::cerr << "Failed to read data." << std::endl;
+      return 1;
+    }
+    while (const auto maybe_result = client->FetchOne()) {
+      const auto result = *maybe_result;
       if (result.size() < 1) {
         continue;
       }
