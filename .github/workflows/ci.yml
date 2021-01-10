@@ -31,7 +31,7 @@ jobs:
         run: |
           mkdir build
           cd build
-          ls /usr/local/Cellar
+          ls /usr/local/Cellar/openssl@1.1
           cmake -DOPENSSL_ROOT_DIR=/usr/local/Cellar/openssl@1.1/1.1.1h -DCMAKE_INSTALL_PREFIX=/usr/local -DBUILD_TESTING=ON -DBUILD_TESTING_INTEGRATION=ON -DC_WARNINGS_AS_ERRORS=ON -DCPP_WARNINGS_AS_ERRORS=ON ..
           make
           ctest -E "example|integration"
