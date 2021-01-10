@@ -151,3 +151,18 @@ TEST_F(MemgraphConnection, InsertAndRetrieveFromMemgraph) {
     ASSERT_FALSE(client->FetchOne());
   }
 }
+
+TEST_F(MemgraphConnection, DiscardAllAndFetchAll) {
+  ASSERT_NE(client, nullptr);
+  ASSERT_TRUE(client->Execute("UNWIND range(1, 10) AS x CREATE ();"));
+  client->DiscardAll();
+  ASSERT_TRUE(client->Execute("MATCH (n) RETURN n;"));
+  auto maybe_nodes = client->FetchAll();
+  ASSERT_TRUE(maybe_nodes);
+  const auto &nodes = *maybe_nodes;
+  ASSERT_EQ(nodes.size(), 10u);
+  for (const auto &row : nodes) {
+    const auto &value = row[0];
+    ASSERT_EQ(value.type(), mg::Value::Type::Node);
+  }
+}

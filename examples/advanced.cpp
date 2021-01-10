@@ -74,22 +74,28 @@ int main(int argc, char *argv[]) {
             });
         const auto props = node.properties();
         std::string props_str =
-            std::accumulate(props.begin(), props.end(), std::string("{"),
-                            [](const std::string &acc, const auto &key_value) {
-                              const auto &key = key_value.first;
-                              const auto &value = key_value.second;
-                              std::string value_str;
-                              if (value.type() == mg::Value::Type::Int)
-                                value_str = std::to_string(value.ValueInt());
-                              if (value.type() == mg::Value::Type::String)
-                                value_str = value.ValueString();
-                              if (value.type() == mg::Value::Type::Bool)
-                                value_str = std::to_string(value.ValueBool());
-                              if (value.type() == mg::Value::Type::Double)
-                                value_str = std::to_string(value.ValueDouble());
-                              return acc + " " + std::string(key) + ": " +
-                                     value_str;
-                            }) +
+            std::accumulate(
+                props.begin(), props.end(), std::string("{"),
+                [](const std::string &acc, const auto &key_value) {
+                  const auto &key = key_value.first;
+                  const auto &value = key_value.second;
+                  std::string value_str;
+                  if (value.type() == mg::Value::Type::Int) {
+                    value_str = std::to_string(value.ValueInt());
+                  } else if (value.type() == mg::Value::Type::String) {
+                    value_str = value.ValueString();
+                  } else if (value.type() == mg::Value::Type::Bool) {
+                    value_str = std::to_string(value.ValueBool());
+                  } else if (value.type() == mg::Value::Type::Double) {
+                    value_str = std::to_string(value.ValueDouble());
+                  } else {
+                    std::cerr
+                        << "Uncovered converstion from data type to a string"
+                        << std::endl;
+                    std::exit(1);
+                  }
+                  return acc + " " + std::string(key) + ": " + value_str;
+                }) +
             " }";
         std::cout << labels_str << " " << props_str << std::endl;
       }
