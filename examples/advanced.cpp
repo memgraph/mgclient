@@ -77,8 +77,7 @@ int main(int argc, char *argv[]) {
             std::accumulate(
                 props.begin(), props.end(), std::string("{"),
                 [](const std::string &acc, const auto &key_value) {
-                  const auto &key = key_value.first;
-                  const auto &value = key_value.second;
+                  const auto &[key, value] = key_value;
                   std::string value_str;
                   if (value.type() == mg::Value::Type::Int) {
                     value_str = std::to_string(value.ValueInt());
