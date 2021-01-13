@@ -1061,6 +1061,9 @@ const mg_list *mg_result_columns(const mg_result *result) {
 }
 
 const mg_list *mg_result_row(const mg_result *result) {
+  if (!result->message) {
+    return NULL;
+  }
   if (result->message->type != MG_MESSAGE_TYPE_RECORD) {
     return NULL;
   }
@@ -1068,6 +1071,9 @@ const mg_list *mg_result_row(const mg_result *result) {
 }
 
 const mg_map *mg_result_summary(const mg_result *result) {
+  if (!result->message) {
+    return NULL;
+  }
   if (result->message->type != MG_MESSAGE_TYPE_SUCCESS) {
     return NULL;
   }

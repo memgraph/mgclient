@@ -739,8 +739,7 @@ MGCLIENT_EXPORT uint32_t mg_map_size(const mg_map *map);
 /// Retrieves the key at position \p pos in map \p map.
 ///
 /// \return A pointer to required key. If \p pos is outside of map bounds, \c
-/// NULL
-///         is returned.
+///         NULL is returned.
 MGCLIENT_EXPORT const mg_string *mg_map_key_at(const mg_map *, uint32_t pos);
 
 /// Retrieves the value at position \p pos in map \p map.
