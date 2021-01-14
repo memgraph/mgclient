@@ -739,8 +739,7 @@ MGCLIENT_EXPORT uint32_t mg_map_size(const mg_map *map);
 /// Retrieves the key at position \p pos in map \p map.
 ///
 /// \return A pointer to required key. If \p pos is outside of map bounds, \c
-/// NULL
-///         is returned.
+///         NULL is returned.
 MGCLIENT_EXPORT const mg_string *mg_map_key_at(const mg_map *, uint32_t pos);
 
 /// Retrieves the value at position \p pos in map \p map.
@@ -1036,7 +1035,7 @@ MGCLIENT_EXPORT void mg_point_3d_destroy(mg_point_3d *point_3d);
 #define MG_SESSION_BAD 2
 
 /// Marks a \ref mg_session which is currently fetching result of a query.
-/// Results can be pulled using \ref mg_session_fetch.
+/// Results can be fetched using \ref mg_session_fetch.
 #define MG_SESSION_FETCHING 3
 
 /// Success code.
@@ -1233,7 +1232,7 @@ MGCLIENT_EXPORT const char *mg_session_params_get_username(
     const mg_session_params *);
 MGCLIENT_EXPORT const char *mg_session_params_get_password(
     const mg_session_params *);
-MGCLIENT_EXPORT const char *mg_session_params_get_client_name(
+MGCLIENT_EXPORT const char *mg_session_params_get_user_agent(
     const mg_session_params *);
 MGCLIENT_EXPORT enum mg_sslmode mg_session_params_get_sslmode(
     const mg_session_params *);
@@ -1287,18 +1286,19 @@ typedef struct mg_result mg_result;
 /// next query.
 ///
 /// \param session               A \ref mg_session to be used for query
-/// execution. \param query                 Query string. \param params A \ref
-/// mg_map containing query parameters. NULL can be
-///                              supplied instead of an empty parameter map.
+///                              execution.
+/// \param query                 Query string.
+/// \param params                A \ref mg_map containing query parameters. NULL
+///                              can be supplied instead of an empty parameter
+///                              map.
 /// \param columns               Names of the columns output by the query
-/// execution will be
-///                              stored in here. This is the same as the value
+///                              execution will be stored in here. This is the
+///                              same as the value
 ///                              obtained by \ref mg_result_columns on a pulled
 ///                              \ref mg_result. NULL can be supplied if we're
 ///                              not interested in the columns names.
-///
 /// \param extra_run_information A \ref mg_map containing extra information for
-/// running the statement.
+///                              running the statement.
 ///                              It can contain the following information:
 ///                               - bookmarks - list of strings containing some
 ///                               kind of bookmark identification
@@ -1316,9 +1316,9 @@ typedef struct mg_result mg_result;
 ///                               takes place. If no `db` is sent or empty
 ///                               string it implies that it is the default
 ///                               database.
-/// \param qid                   QID for the statement will be stored in here if
-/// an Explicit transaction was started. \return Returns 0 if query was
-/// submitted for execution successfuly.
+/// \param qid                    QID for the statement will be stored in here
+///                               if an Explicit transaction was started.
+/// \return Returns 0 if query was submitted for execution successfuly.
 ///         Otherwise, a non-zero error code is returned.
 MGCLIENT_EXPORT int mg_session_run(mg_session *session, const char *query,
                                    const mg_map *params,
@@ -1385,7 +1385,7 @@ MGCLIENT_EXPORT int mg_session_rollback_transaction(mg_session *session,
 /// \return On success, 0 or 1 is returned. Exit code 1 means that a new result
 ///         row was obtained and stored in \p result and its contents may be
 ///         accessed using \ref mg_result_row. Exit code 0 means that there are
-///         now more result rows and that the query execution summary was stored
+///         no more result rows and that the query execution summary was stored
 ///         in \p result. Its contents may be accessed using \ref
 ///         mg_result_summary. On failure, a non-zero exit code is returned.
 MGCLIENT_EXPORT int mg_session_fetch(mg_session *session, mg_result **result);
@@ -1393,15 +1393,16 @@ MGCLIENT_EXPORT int mg_session_fetch(mg_session *session, mg_result **result);
 /// Tries to pull results of a statement.
 ///
 /// \param session          A \ref mg_session from which the results should be
-/// pulled. \param pull_information A \ref mg_map that contains extra
-/// information for pulling the results.
+///                         pulled.
+/// \param pull_information A \ref mg_map that contains extra information for
+///                         pulling the results.
 ///                         It can contain the following information:
-///                         - n - how many records to fetch. `n=-1` will fetch
-///                         all records.
-///                         - qid - query identification, specifies the result
-///                         from which statement the results should be pulled .
-///                         `qid=-1` denotes the last executed statement. This
-///                         is only for Explicit transactions.
+///                          - n - how many records to fetch. `n=-1` will fetch
+///                          all records.
+///                          - qid - query identification, specifies the result
+///                          from which statement the results should be pulled.
+///                          `qid=-1` denotes the last executed statement. This
+///                          is only for Explicit transactions.
 /// \return Returns 0 if the result was pulled successfuly.
 ///         Otherwise, a non-zero error code is returned.
 MGCLIENT_EXPORT int mg_session_pull(mg_session *session,

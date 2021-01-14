@@ -308,7 +308,7 @@ TEST_F(ConnectTest, InitFail) {
       mg_message_init *msg_init = message->init_v;
       EXPECT_EQ(
           std::string(msg_init->client_name->data, msg_init->client_name->size),
-          "MemgraphBolt/0.1");
+          MG_USER_AGENT);
       {
         ASSERT_EQ(mg_map_size(msg_init->auth_token), 1u);
 
@@ -388,7 +388,7 @@ TEST_F(ConnectTest, InitFail_v4) {
         ASSERT_EQ(mg_value_get_type(user_agent_val), MG_VALUE_TYPE_STRING);
         const mg_string *user_agent = mg_value_string(user_agent_val);
         ASSERT_EQ(std::string(user_agent->data, user_agent->size),
-                  "MemgraphBolt/0.1");
+                  MG_USER_AGENT);
 
         const mg_value *scheme_val = mg_map_at(msg_hello->extra, "scheme");
         ASSERT_TRUE(scheme_val);
@@ -459,7 +459,7 @@ TEST_F(ConnectTest, Success) {
       mg_message_init *msg_init = message->init_v;
       EXPECT_EQ(
           std::string(msg_init->client_name->data, msg_init->client_name->size),
-          "MemgraphBolt/0.1");
+          MG_USER_AGENT);
       {
         ASSERT_EQ(mg_map_size(msg_init->auth_token), 3u);
 
@@ -544,7 +544,7 @@ TEST_F(ConnectTest, Success_v4) {
         ASSERT_EQ(mg_value_get_type(user_agent_val), MG_VALUE_TYPE_STRING);
         const mg_string *user_agent = mg_value_string(user_agent_val);
         ASSERT_EQ(std::string(user_agent->data, user_agent->size),
-                  "MemgraphBolt/0.1");
+                  MG_USER_AGENT);
 
         const mg_value *scheme_val = mg_map_at(msg_hello->extra, "scheme");
         ASSERT_TRUE(scheme_val);
@@ -620,7 +620,7 @@ TEST_F(ConnectTest, SuccessWithSSL) {
       mg_message_init *msg_init = message->init_v;
       EXPECT_EQ(
           std::string(msg_init->client_name->data, msg_init->client_name->size),
-          "MemgraphBolt/0.1");
+          MG_USER_AGENT);
       {
         ASSERT_EQ(mg_map_size(msg_init->auth_token), 3u);
 

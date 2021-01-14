@@ -14,7 +14,7 @@
 
 cmake_minimum_required(VERSION 3.8)
 
-project(mgclient VERSION 1.1.0)
+project(mgclient VERSION 1.2.0)
 # Minor version increase can also mean ABI incompatibility with previous
 # versions. IMPORTANT: Take care of the SO version manually.
 set(mgclient_SOVERSION 2)
