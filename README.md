@@ -23,7 +23,7 @@ cmake ..
 
 NOTE: Dealing with OpenSSL might be a bit tricky. If OpenSSL is not available
 on the system, please use, e.g., [brew](https://brew.sh/) package manager to
-install openssl with the following command:
+install OpenSSL with the following command:
 
 ```
 brew install openssl
