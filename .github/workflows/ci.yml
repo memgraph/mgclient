@@ -21,7 +21,7 @@ jobs:
         platform: [macos-10.15]
     runs-on: ${{ matrix.platform }}
     env:
-      MG_VERSION: "1.2.0"
+      MG_VERSION: "1.4.0"
     steps:
       - name: Set-up repository
         uses: actions/checkout@v2
@@ -31,7 +31,7 @@ jobs:
         run: |
           mkdir build
           cd build
-          cmake -DOPENSSL_ROOT_DIR=/usr/local/Cellar/openssl@1.1/1.1.1i -DCMAKE_INSTALL_PREFIX=/usr/local -DBUILD_TESTING=ON -DBUILD_TESTING_INTEGRATION=ON -DC_WARNINGS_AS_ERRORS=ON -DCPP_WARNINGS_AS_ERRORS=ON ..
+          cmake -DOPENSSL_ROOT_DIR="$(ls -td -- /usr/local/Cellar/openssl@1.1/* | head -n 1)" -DCMAKE_INSTALL_PREFIX=/usr/local -DBUILD_TESTING=ON -DBUILD_TESTING_INTEGRATION=ON -DC_WARNINGS_AS_ERRORS=ON -DCPP_WARNINGS_AS_ERRORS=ON ..
           make
           ctest -E "example|integration"
           sudo make install
@@ -42,7 +42,7 @@ jobs:
         platform: [ubuntu-18.04]
     runs-on: ${{ matrix.platform }}
     env:
-      MG_VERSION: "1.2.0"
+      MG_VERSION: "1.4.0"
     steps:
       - name: Set-up repository
         uses: actions/checkout@v1
@@ -64,7 +64,7 @@ jobs:
       - name: Load and run Memgraph Docker image
         run: |
           docker load -i ~/memgraph/memgraph-docker.tar.gz
-          docker run -d -p 7687:7687 memgraph
+          docker run -d -p 7687:7687 memgraph --telemetry-enabled=false
 
       - name: Build with gcc, test and install mgclient
         run: |
@@ -96,7 +96,7 @@ jobs:
     strategy:
       matrix:
         include: [
-          { msystem: MINGW64, arch: x86_64, mgversion: "1.2.0" }
+          { msystem: MINGW64, arch: x86_64, mgversion: "1.4.0" }
         ]
     defaults:
       run:
