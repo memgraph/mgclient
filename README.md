@@ -26,7 +26,7 @@ on the system, please use, e.g., [brew](https://brew.sh/) package manager to
 install OpenSSL with the following command:
 
 ```
-brew install openssl
+brew install openssl@1.1
 ```
 
 If `cmake` can't locate OpenSSL, please set `OPENSSL_ROOT_DIR` to a valid path.
