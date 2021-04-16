@@ -21,11 +21,19 @@ cd build
 cmake ..
 ```
 
+NOTE: Dealing with OpenSSL might be a bit tricky. If OpenSSL is not available
+on the system, please use, e.g., [brew](https://brew.sh/) package manager to
+install OpenSSL with the following command:
+
+```
+brew install openssl@1.1
+```
+
 If `cmake` can't locate OpenSSL, please set `OPENSSL_ROOT_DIR` to a valid path.
 An examples follows:
 
 ```
-cmake -DOPENSSL_ROOT_DIR=/usr/local/Cellar/openssl@1.1/1.1.1h ..
+cmake -DOPENSSL_ROOT_DIR="$(ls -rd -- /usr/local/Cellar/openssl@1.1/* | head -n 1)" ..
 ```
 
 After running CMake, you should see a Makefile in the build directory. Then you
