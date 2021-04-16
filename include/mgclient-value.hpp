@@ -15,6 +15,7 @@
 #pragma once
 
 #include <cstring>
+#include <stdexcept>
 #include <initializer_list>
 #include <set>
 #include <string>
