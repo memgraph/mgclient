@@ -17,6 +17,7 @@
 #include <cstring>
 #include <initializer_list>
 #include <set>
+#include <stdexcept>
 #include <string>
 #include <string_view>
 #include <utility>
