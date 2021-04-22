@@ -39,6 +39,15 @@ find_package(OpenSSL REQUIRED)
 
 include(GenerateExportHeader)
 
+if(MGCLIENT_ON_WINDOWS)
+    set(LIBS_ON_WINDOWS ws2_32)
+    if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+        set(LINK_OPTIONS_ON_WINDOWS "-Wl,--default-image-base-low")
+    else()
+        set(LINK_OPTIONS_ON_WINDOWS)
+    endif()
+endif()
+
 add_library(mgclient-static STATIC ${mgclient_src_files})
 set_target_properties(mgclient-static PROPERTIES
         OUTPUT_NAME mgclient)
@@ -54,8 +63,8 @@ target_link_libraries(mgclient-static
         PRIVATE
         ${OPENSSL_LIBRARIES} project_options project_c_warnings)
 if(MGCLIENT_ON_WINDOWS)
-    target_link_libraries(mgclient-static PUBLIC ws2_32)
-    target_link_options(mgclient-static PUBLIC -Wl,--default-image-base-low)
+    target_link_libraries(mgclient-static PUBLIC ${LIBS_ON_WINDOWS})
+    target_link_options(mgclient-static PUBLIC ${LINK_OPTIONS_ON_WINDOWS})
 endif()
 
 add_library(mgclient-shared SHARED ${mgclient_src_files})
@@ -72,8 +81,8 @@ target_include_directories(mgclient-shared
         "${OPENSSL_INCLUDE_DIR}")
 target_link_libraries(mgclient-shared PRIVATE ${OPENSSL_LIBRARIES})
 if(MGCLIENT_ON_WINDOWS)
-    target_link_libraries(mgclient-shared PUBLIC ws2_32)
-    target_link_options(mgclient-shared PUBLIC -Wl,--default-image-base-low)
+    target_link_libraries(mgclient-shared PUBLIC ${LIBS_ON_WINDOWS})
+    target_link_options(mgclient-shared PUBLIC ${LINK_OPTIONS_ON_WINDOWS})
 endif()
 
 generate_export_header(mgclient-shared
