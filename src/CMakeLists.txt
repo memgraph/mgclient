@@ -55,7 +55,6 @@ target_link_libraries(mgclient-static
         ${OPENSSL_LIBRARIES} project_options project_c_warnings)
 if(MGCLIENT_ON_WINDOWS)
     target_link_libraries(mgclient-static PUBLIC ws2_32)
-    target_link_options(mgclient-static PUBLIC -Wl,--default-image-base-low)
 endif()
 
 add_library(mgclient-shared SHARED ${mgclient_src_files})
@@ -73,7 +72,6 @@ target_include_directories(mgclient-shared
 target_link_libraries(mgclient-shared PRIVATE ${OPENSSL_LIBRARIES})
 if(MGCLIENT_ON_WINDOWS)
     target_link_libraries(mgclient-shared PUBLIC ws2_32)
-    target_link_options(mgclient-shared PUBLIC -Wl,--default-image-base-low)
 endif()
 
 generate_export_header(mgclient-shared
