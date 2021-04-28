@@ -76,7 +76,7 @@ add_gtest(client client.cpp)
 # We're mocking the mg_secure_transport_init function in the test.
 if(MGCLIENT_ON_APPLE)
     target_link_libraries(client -Wl,-alias,___wrap_mg_secure_transport_init,_mg_secure_transport_init)
-else()
+elseif(MGCLIENT_ON_LINUX)
     target_link_libraries(client -Wl,--wrap=mg_secure_transport_init)
 endif()
 
