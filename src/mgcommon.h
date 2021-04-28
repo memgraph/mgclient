@@ -45,10 +45,10 @@
     if (DB_ACTIVE) fprintf(stderr, x); \
   } while (0)
 
-#ifdef MGCLIENT_ON_WINDOWS
-#define MG_ATTRIBUTE_WEAK
-#else
+#ifdef MGCLIENT_ON_APPLE
 #define MG_ATTRIBUTE_WEAK __attribute__((weak))
+#else
+#define MG_ATTRIBUTE_WEAK
 #endif
 
 #endif
