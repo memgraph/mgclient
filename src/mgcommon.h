@@ -46,9 +46,9 @@
   } while (0)
 
 #ifdef MGCLIENT_ON_WINDOWS
-  #define MG_ATTRIBUTE_WEAK 
+#define MG_ATTRIBUTE_WEAK
 #else
-  #define MG_ATTRIBUTE_WEAK __attribute__((weak))
+#define MG_ATTRIBUTE_WEAK __attribute__((weak))
 #endif
 
 #endif

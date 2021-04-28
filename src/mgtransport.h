@@ -15,11 +15,10 @@
 #ifndef MGCLIENT_MGTRANSPORT_H
 #define MGCLIENT_MGTRANSPORT_H
 
-#include <stddef.h>
-
 #include <openssl/bio.h>
 #include <openssl/err.h>
 #include <openssl/ssl.h>
+#include <stddef.h>
 
 #include "mgallocator.h"
 #include "mgcommon.h"
@@ -67,9 +66,11 @@ void mg_raw_transport_destroy(struct mg_transport *);
 // This function is mocked in tests during linking by using --wrap. ON_APPLE
 // there is no --wrap. An alternative is to use -alias but if a symbol is
 // strong linking fails.
-MG_ATTRIBUTE_WEAK int mg_secure_transport_init(
-    int sockfd, const char *cert_file, const char *key_file,
-    mg_secure_transport **transport, mg_allocator *allocator);
+MG_ATTRIBUTE_WEAK int mg_secure_transport_init(int sockfd,
+                                               const char *cert_file,
+                                               const char *key_file,
+                                               mg_secure_transport **transport,
+                                               mg_allocator *allocator);
 
 int mg_secure_transport_send(mg_transport *, const char *buf, size_t len);
 
