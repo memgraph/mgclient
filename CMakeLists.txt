@@ -54,6 +54,15 @@ message(STATUS "BUILD_TESTING: ${BUILD_TESTING}")
 option(BUILD_TESTING_INTEGRATION "" OFF)
 message(STATUS "BUILD_TESTING_INTEGRATION: ${BUILD_TESTING_INTEGRATION}")
 
+# build header only cpp bindings
+option(BUILD_CPP_BINDINGS "" OFF)
+if (BUILD_TESTING OR BUILD_TESTING_INTEGRATION)
+  set(BUILD_CPP_BINDINGS ON)
+  message(STATUS "Testing triggering cpp binding dependancy.")
+endif()
+
+message(STATUS "BUILD_CPP_BINDINGS: ${BUILD_CPP_BINDINGS}")
+
 include(CTest)
 
 set(CMAKE_C_STANDARD 11)
@@ -83,8 +92,12 @@ if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
     set(CMAKE_INSTALL_PREFIX "/usr")
 endif()
 
-add_subdirectory(src)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src)
+
+if(BUILD_CPP_BINDINGS)
+  add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/mgclient_cpp)
+endif()
 
 if(BUILD_TESTING)
-    add_subdirectory(tests)
+    add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/tests)
 endif()

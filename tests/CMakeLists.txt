@@ -56,8 +56,8 @@ add_dependencies(${GTEST_MAIN_LIBRARY} gtest-proj)
 
 macro(add_gtest target_name target_path)
   add_executable(${target_name} ${target_path})
-  target_include_directories(${target_name} PRIVATE ${GTEST_INCLUDE_DIRS} "${CMAKE_SOURCE_DIR}/src")
-  target_link_libraries(${target_name} mgclient-static gtest gtest-main project_cpp_warnings)
+  target_include_directories(${target_name} PRIVATE ${GTEST_INCLUDE_DIRS} "${PROJECT_SOURCE_DIR}/src")
+  target_link_libraries(${target_name} mgclient-static mgclient_cpp gtest gtest-main project_cpp_warnings)
 
   if (ENABLE_COVERAGE)
     add_test(${target_name} env LLVM_PROFILE_FILE=${target_name}.profraw ./${target_name})
@@ -97,16 +97,16 @@ endif()
 add_gtest(unit_mgclient_value unit/mgclient_value.cpp)
 
 # Build examples and add them to tests
-set(EXAMPLE_DIR ${CMAKE_SOURCE_DIR}/examples)
+set(EXAMPLE_DIR ${PROJECT_SOURCE_DIR}/examples)
 
 add_executable(example_basic_c ${EXAMPLE_DIR}/basic.c)
 target_link_libraries(example_basic_c mgclient-static project_c_warnings)
 add_test(example_basic_c example_basic_c 127.0.0.1 7687 "RETURN 1")
 
 add_executable(example_basic_cpp ${EXAMPLE_DIR}/basic.cpp)
-target_link_libraries(example_basic_cpp mgclient-static project_cpp_warnings)
+target_link_libraries(example_basic_cpp mgclient-static mgclient_cpp project_cpp_warnings)
 add_test(example_basic_cpp example_basic_cpp 127.0.0.1 7687 "RETURN 1")
 
 add_executable(example_advanced_cpp ${EXAMPLE_DIR}/advanced.cpp)
-target_link_libraries(example_advanced_cpp mgclient-static project_cpp_warnings)
+target_link_libraries(example_advanced_cpp mgclient-static mgclient_cpp project_cpp_warnings)
 add_test(example_advanced_cpp example_advanced_cpp 127.0.0.1 7687)

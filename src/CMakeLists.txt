@@ -45,9 +45,9 @@ set_target_properties(mgclient-static PROPERTIES
 target_compile_definitions(mgclient-static PUBLIC MGCLIENT_STATIC_DEFINE)
 target_include_directories(mgclient-static
         PRIVATE
-        "${CMAKE_SOURCE_DIR}/src"
+        "${PROJECT_SOURCE_DIR}/src"
         PUBLIC
-        "${CMAKE_SOURCE_DIR}/include"
+        "${PROJECT_SOURCE_DIR}/include"
         "${CMAKE_CURRENT_BINARY_DIR}"
         "${OPENSSL_INCLUDE_DIR}")
 target_link_libraries(mgclient-static
@@ -64,9 +64,9 @@ set_target_properties(mgclient-shared PROPERTIES
         C_VISIBILITY_PRESET hidden)
 target_include_directories(mgclient-shared
         PRIVATE
-        "${CMAKE_SOURCE_DIR}/src"
+        "${PROJECT_SOURCE_DIR}/src"
         PUBLIC
-        "${CMAKE_SOURCE_DIR}/include"
+        "${PROJECT_SOURCE_DIR}/include"
         "${CMAKE_CURRENT_BINARY_DIR}"
         "${OPENSSL_INCLUDE_DIR}")
 target_link_libraries(mgclient-shared PRIVATE ${OPENSSL_LIBRARIES})
@@ -85,7 +85,7 @@ install(TARGETS mgclient-static mgclient-shared
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
         RUNTIME DESTINATION ${CMAKE_INSTALL_LIBDIR})
 install(DIRECTORY
-        "${CMAKE_SOURCE_DIR}/include/"
+        "${PROJECT_SOURCE_DIR}/include/"
         DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 install(FILES
         "${CMAKE_CURRENT_BINARY_DIR}/mgclient-export.h"
