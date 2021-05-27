@@ -35,7 +35,6 @@ static const char MG_USER_AGENT[] = "mgclient/" MGCLIENT_VERSION;
 
 /// Markers
 #define MG_MARKER_NULL 0xC0
-
 #define MG_MARKER_BOOL_FALSE 0xC2
 #define MG_MARKER_BOOL_TRUE 0xC3
 
@@ -103,7 +102,6 @@ static const uint8_t MG_MARKERS_MAP[] = {MG_MARKER_TINY_MAP, MG_MARKER_MAP_8,
 #define MG_SIGNATURE_MESSAGE_BEGIN 0x11
 #define MG_SIGNATURE_MESSAGE_COMMIT 0x12
 #define MG_SIGNATURE_MESSAGE_ROLLBACK 0x13
-
 
 #ifdef __cplusplus
 }
