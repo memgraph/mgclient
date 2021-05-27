@@ -12,18 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <optional>
 #include <random>
 #include <thread>
 
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-extern "C" {
 #include "mgclient.h"
 #include "mgcommon.h"
 #include "mgsession.h"
 #include "mgsocket.h"
-}
 
 #include "test-common.hpp"
 

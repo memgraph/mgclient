@@ -15,6 +15,10 @@
 #ifndef MGCLIENT_MGSOCKET_H
 #define MGCLIENT_MGSOCKET_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #ifdef MGCLIENT_ON_APPLE
 #include <arpa/inet.h>
 #include <netdb.h>
@@ -108,4 +112,8 @@ char *mg_socket_error();
 /// \ref mg_socket_init function.
 void mg_socket_finalize();
 
+#ifdef __cplusplus
+}
 #endif
+
+#endif /* MGCLIENT_MGSOCKET_H */

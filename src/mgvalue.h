@@ -15,6 +15,10 @@
 #ifndef MGCLIENT_MGVALUE_H
 #define MGCLIENT_MGVALUE_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "mgallocator.h"
 #include "mgclient.h"
 
@@ -289,4 +293,8 @@ int mg_value_equal(const mg_value *lhs, const mg_value *rhs);
 
 extern mg_map mg_empty_map;
 
+#ifdef __cplusplus
+}
 #endif
+
+#endif /* MGCLIENT_MGVALUE_H */

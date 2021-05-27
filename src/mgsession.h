@@ -15,6 +15,10 @@
 #ifndef MGCLIENT_MGSESSION_H
 #define MGCLIENT_MGSESSION_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stddef.h>
 
 #include "mgconstants.h"
@@ -177,4 +181,8 @@ int mg_session_send_commit_messsage(mg_session *session);
 
 int mg_session_send_rollback_messsage(mg_session *session);
 
+#ifdef __cplusplus
+}
 #endif
+
+#endif /* MGCLIENT_MGSESSION_H */

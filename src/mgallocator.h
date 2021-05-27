@@ -15,6 +15,10 @@
 #ifndef MGCLIENT_MGALLOCATOR_H
 #define MGCLIENT_MGALLOCATOR_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stddef.h>
 
 typedef struct mg_allocator {
@@ -76,4 +80,8 @@ void mg_linear_allocator_destroy(mg_linear_allocator *allocator);
 
 extern struct mg_allocator mg_system_allocator;
 
+#ifdef __cplusplus
+}
 #endif
+
+#endif /* MGCLIENT_MGALLOCATOR_H */

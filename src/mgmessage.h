@@ -15,6 +15,10 @@
 #ifndef MGCLIENT_MGMESSAGE_H
 #define MGCLIENT_MGMESSAGE_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "mgvalue.h"
 
 // Some of these message types are never sent/received by client, but we still
@@ -85,4 +89,8 @@ typedef struct mg_message {
 
 void mg_message_destroy_ca(mg_message *message, mg_allocator *allocator);
 
+#ifdef __cplusplus
+}
 #endif
+
+#endif /* MGCLIENT_MGMESSAGE_H */

@@ -17,10 +17,7 @@
 
 #include <gtest/gtest.h>
 
-extern "C" {
 #include "mgclient.h"
-}
-
 #include "mgclient-value.hpp"
 
 using namespace std;

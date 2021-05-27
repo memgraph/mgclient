@@ -18,12 +18,10 @@
 #include <string>
 #include <thread>
 
-extern "C" {
 #include "mgclient.h"
 #include "mgcommon.h"
 #include "mgsession.h"
 #include "mgsocket.h"
-}
 
 #include "bolt-testdata.hpp"
 #include "test-common.hpp"
