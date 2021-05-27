@@ -15,6 +15,10 @@
 #ifndef MGCLIENT_MGCOMMON_H
 #define MGCLIENT_MGCOMMON_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #ifdef MGCLIENT_ON_APPLE
 #include "apple/mgcommon.h"
 #endif  // MGCLIENT_ON_APPLE
@@ -51,4 +55,8 @@
 #define MG_ATTRIBUTE_WEAK
 #endif
 
+#ifdef __cplusplus
+}
 #endif
+
+#endif /* MGCLIENT_MGCOMMON_H */

@@ -14,9 +14,7 @@
 
 #include <gtest/gtest.h>
 
-extern "C" {
 #include "mgallocator.h"
-}
 
 #include "test-common.hpp"
 

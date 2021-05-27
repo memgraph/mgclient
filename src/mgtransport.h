@@ -15,6 +15,10 @@
 #ifndef MGCLIENT_MGTRANSPORT_H
 #define MGCLIENT_MGTRANSPORT_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <openssl/bio.h>
 #include <openssl/err.h>
 #include <openssl/ssl.h>
@@ -78,4 +82,8 @@ int mg_secure_transport_recv(mg_transport *, char *buf, size_t len);
 
 void mg_secure_transport_destroy(mg_transport *);
 
+#ifdef __cplusplus
+}
 #endif
+
+#endif /* MGCLIENT_MGTRANSPORT_H */

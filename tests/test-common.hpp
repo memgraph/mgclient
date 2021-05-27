@@ -14,6 +14,11 @@
 
 #pragma once
 
+#include <cassert>
+#include <set>
+
+#include "mgallocator.h"
+
 #define ASSERT_READ_RAW(sstr, data)  \
   do {                               \
     SCOPED_TRACE("ASSERT_READ_RAW"); \
