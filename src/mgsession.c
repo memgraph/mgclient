@@ -83,6 +83,8 @@ mg_session *mg_session_init(mg_allocator *allocator) {
   session->explicit_transaction = 0;
   session->query_number = 0;
 
+  session->error_buffer[0] = 0;
+
   return session;
 
 cleanup:
