@@ -1837,7 +1837,7 @@ inline bool AreDateTimeZoneIdsEqual(
     const mg_date_time_zone_id *date_time_zone_id1,
     const mg_date_time_zone_id *date_time_zone_id2) {
   return mg_date_time_zone_id_seconds(date_time_zone_id1) ==
-             mg_date_time_zone_id_nanoseconds(date_time_zone_id2) &&
+             mg_date_time_zone_id_seconds(date_time_zone_id2) &&
          mg_date_time_zone_id_nanoseconds(date_time_zone_id1) ==
              mg_date_time_zone_id_nanoseconds(date_time_zone_id2) &&
          mg_date_time_zone_id_tz_id(date_time_zone_id1) ==
@@ -1847,7 +1847,7 @@ inline bool AreDateTimeZoneIdsEqual(
 inline bool AreLocalDateTimesEqual(const mg_local_date_time *local_date_time1,
                                    const mg_local_date_time *local_date_time2) {
   return mg_local_date_time_seconds(local_date_time1) ==
-             mg_local_date_time_nanoseconds(local_date_time2) &&
+             mg_local_date_time_seconds(local_date_time2) &&
          mg_local_date_time_nanoseconds(local_date_time1) ==
              mg_local_date_time_nanoseconds(local_date_time2);
 }
