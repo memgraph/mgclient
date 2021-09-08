@@ -12,13 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include "mgvalue.h"
+
 #include <stdlib.h>
 #include <string.h>
 
 #include "mgallocator.h"
 #include "mgclient.h"
 #include "mgconstants.h"
-#include "mgvalue.h"
 
 mg_string *mg_string_alloc(uint32_t size, mg_allocator *allocator) {
   char *block = mg_allocator_malloc(allocator, sizeof(mg_string) + size);
@@ -1637,6 +1638,48 @@ mg_path *mg_path_make(uint32_t node_count, mg_node **nodes,
   path->sequence_length = sequence_length;
   memcpy(path->sequence, sequence, sequence_length * sizeof(int64_t));
   return path;
+}
+
+mg_date *mg_date_make(int64_t days) {
+  mg_date *date = mg_date_alloc(&mg_system_allocator);
+  if (!date) {
+    return NULL;
+  }
+  date->days = days;
+  return date;
+}
+
+mg_local_time *mg_local_time_make(int64_t nanoseconds) {
+  mg_local_time *lt = mg_local_time_alloc(&mg_system_allocator);
+  if (!lt) {
+    return NULL;
+  }
+  lt->nanoseconds = nanoseconds;
+  return lt;
+}
+
+mg_local_date_time *mg_local_date_time_make(int64_t seconds,
+                                            int64_t nanoseconds) {
+  mg_local_date_time *ldt = mg_local_date_time_alloc(&mg_system_allocator);
+  if (!ldt) {
+    return NULL;
+  }
+  ldt->seconds = seconds;
+  ldt->nanoseconds = nanoseconds;
+  return ldt;
+}
+
+mg_duration *mg_duration_make(int64_t months, int64_t days, int64_t seconds,
+                              int64_t nanoseconds) {
+  mg_duration *dur = mg_duration_alloc(&mg_system_allocator);
+  if (!dur) {
+    return NULL;
+  }
+  dur->months = months;
+  dur->days = days;
+  dur->seconds = seconds;
+  dur->nanoseconds = nanoseconds;
+  return dur;
 }
 
 int mg_string_equal(const mg_string *lhs, const mg_string *rhs) {
