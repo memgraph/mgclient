@@ -289,4 +289,16 @@ INSTANTIATE_TEST_CASE_P(String, ValueTest,
 INSTANTIATE_TEST_CASE_P(List, ValueTest,
                         ::testing::ValuesIn(ListTestCases()), );
 
+INSTANTIATE_TEST_CASE_P(Date, ValueTest,
+                        ::testing::ValuesIn(DateTestCases()), );
+
+INSTANTIATE_TEST_CASE_P(LocalTime, ValueTest,
+                        ::testing::ValuesIn(LocalTimeTestCases()), );
+
+INSTANTIATE_TEST_CASE_P(LocalDateTime, ValueTest,
+                        ::testing::ValuesIn(LocalDateTimeTestCases()), );
+
+INSTANTIATE_TEST_CASE_P(Duration, ValueTest,
+                        ::testing::ValuesIn((DurationTestCases())), );
+
 INSTANTIATE_TEST_CASE_P(Map, ValueTest, ::testing::ValuesIn(MapTestCases()), );

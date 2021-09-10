@@ -160,7 +160,7 @@ int mg_session_write_local_date_time(mg_session *session,
 int mg_session_write_duration(mg_session *session, const mg_duration *dur) {
   MG_RETURN_IF_FAILED(
       mg_session_write_uint8(session, (uint8_t)(MG_MARKER_TINY_STRUCT4)));
-  MG_RETURN_IF_FAILED(mg_session_write_uint8(session, MG_SIGNATURE_DATE));
+  MG_RETURN_IF_FAILED(mg_session_write_uint8(session, MG_SIGNATURE_DURATION));
   MG_RETURN_IF_FAILED(mg_session_write_uint8(session, dur->months));
   MG_RETURN_IF_FAILED(mg_session_write_uint8(session, dur->days));
   MG_RETURN_IF_FAILED(mg_session_write_uint8(session, dur->seconds));
