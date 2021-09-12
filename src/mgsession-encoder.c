@@ -134,7 +134,7 @@ int mg_session_write_date(mg_session *session, const mg_date *date) {
   MG_RETURN_IF_FAILED(
       mg_session_write_uint8(session, (uint8_t)(MG_MARKER_TINY_STRUCT1)));
   MG_RETURN_IF_FAILED(mg_session_write_uint8(session, MG_SIGNATURE_DATE));
-  MG_RETURN_IF_FAILED(mg_session_write_uint8(session, date->days));
+  MG_RETURN_IF_FAILED(mg_session_write_integer(session, date->days));
   return 0;
 }
 
@@ -142,7 +142,7 @@ int mg_session_write_local_time(mg_session *session, const mg_local_time *lt) {
   MG_RETURN_IF_FAILED(
       mg_session_write_uint8(session, (uint8_t)(MG_MARKER_TINY_STRUCT1)));
   MG_RETURN_IF_FAILED(mg_session_write_uint8(session, MG_SIGNATURE_LOCAL_TIME));
-  MG_RETURN_IF_FAILED(mg_session_write_uint8(session, lt->nanoseconds));
+  MG_RETURN_IF_FAILED(mg_session_write_integer(session, lt->nanoseconds));
   return 0;
 }
 
@@ -152,8 +152,8 @@ int mg_session_write_local_date_time(mg_session *session,
       mg_session_write_uint8(session, (uint8_t)(MG_MARKER_TINY_STRUCT2)));
   MG_RETURN_IF_FAILED(
       mg_session_write_uint8(session, MG_SIGNATURE_LOCAL_DATE_TIME));
-  MG_RETURN_IF_FAILED(mg_session_write_uint8(session, ldt->seconds));
-  MG_RETURN_IF_FAILED(mg_session_write_uint8(session, ldt->nanoseconds));
+  MG_RETURN_IF_FAILED(mg_session_write_integer(session, ldt->seconds));
+  MG_RETURN_IF_FAILED(mg_session_write_integer(session, ldt->nanoseconds));
   return 0;
 }
 
@@ -161,10 +161,10 @@ int mg_session_write_duration(mg_session *session, const mg_duration *dur) {
   MG_RETURN_IF_FAILED(
       mg_session_write_uint8(session, (uint8_t)(MG_MARKER_TINY_STRUCT4)));
   MG_RETURN_IF_FAILED(mg_session_write_uint8(session, MG_SIGNATURE_DURATION));
-  MG_RETURN_IF_FAILED(mg_session_write_uint8(session, dur->months));
-  MG_RETURN_IF_FAILED(mg_session_write_uint8(session, dur->days));
-  MG_RETURN_IF_FAILED(mg_session_write_uint8(session, dur->seconds));
-  MG_RETURN_IF_FAILED(mg_session_write_uint8(session, dur->nanoseconds));
+  MG_RETURN_IF_FAILED(mg_session_write_integer(session, dur->months));
+  MG_RETURN_IF_FAILED(mg_session_write_integer(session, dur->days));
+  MG_RETURN_IF_FAILED(mg_session_write_integer(session, dur->seconds));
+  MG_RETURN_IF_FAILED(mg_session_write_integer(session, dur->nanoseconds));
   return 0;
 }
 
