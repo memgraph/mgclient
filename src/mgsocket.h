@@ -43,6 +43,9 @@ extern "C" {
 #include <Ws2tcpip.h>
 #include <windows.h>
 #include <winsock2.h>
+#ifdef _MSC_VER
+typedef long ssize_t;
+#endif
 #endif  // MGCLIENT_ON_WINDOWS
 
 #include "mgclient.h"

@@ -20,6 +20,10 @@
 #include <stdlib.h>
 #include <string.h>
 
+#ifdef _MSC_VER
+typedef double max_align_t;
+#endif
+
 void *mg_system_realloc(struct mg_allocator *self, void *buf, size_t size) {
   (void)self;
   return realloc(buf, size);
