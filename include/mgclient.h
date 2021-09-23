@@ -960,11 +960,12 @@ MGCLIENT_EXPORT void mg_date_time_zone_id_destroy(
 MGCLIENT_EXPORT mg_local_date_time *mg_local_date_time_make(
     int64_t seconds, int64_t nanoseconds);
 //
-/// Returns seconds since Unix epoch.
+/// Returns seconds since Unix epoch. This includes the hours, minutes, seconds
+/// fields of the local_time.
 MGCLIENT_EXPORT int64_t
 mg_local_date_time_seconds(const mg_local_date_time *local_date_time);
 
-/// Returns nanoseconds since midnight.
+/// Returns subseconds of the local_time field as nanoseconds.
 MGCLIENT_EXPORT int64_t
 mg_local_date_time_nanoseconds(const mg_local_date_time *local_date_time);
 
