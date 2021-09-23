@@ -12,14 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "mgclient.h"
-#include "mgsession.h"
-
 #include <string.h>
 
+#include "mgclient.h"
 #include "mgcommon.h"
 #include "mgconstants.h"
 #include "mgmessage.h"
+#include "mgsession.h"
 #include "mgvalue.h"
 
 int mg_session_read_uint8(mg_session *session, uint8_t *val) {

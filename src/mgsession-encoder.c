@@ -12,14 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "mgsession.h"
-
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include "mgcommon.h"
 #include "mgconstants.h"
+#include "mgsession.h"
 #include "mgvalue.h"
 
 int mg_session_write_uint8(mg_session *session, uint8_t val) {
@@ -131,6 +130,44 @@ int mg_session_write_map(mg_session *session, const mg_map *map) {
   return 0;
 }
 
+int mg_session_write_date(mg_session *session, const mg_date *date) {
+  MG_RETURN_IF_FAILED(
+      mg_session_write_uint8(session, (uint8_t)(MG_MARKER_TINY_STRUCT1)));
+  MG_RETURN_IF_FAILED(mg_session_write_uint8(session, MG_SIGNATURE_DATE));
+  MG_RETURN_IF_FAILED(mg_session_write_integer(session, date->days));
+  return 0;
+}
+
+int mg_session_write_local_time(mg_session *session, const mg_local_time *lt) {
+  MG_RETURN_IF_FAILED(
+      mg_session_write_uint8(session, (uint8_t)(MG_MARKER_TINY_STRUCT1)));
+  MG_RETURN_IF_FAILED(mg_session_write_uint8(session, MG_SIGNATURE_LOCAL_TIME));
+  MG_RETURN_IF_FAILED(mg_session_write_integer(session, lt->nanoseconds));
+  return 0;
+}
+
+int mg_session_write_local_date_time(mg_session *session,
+                                     const mg_local_date_time *ldt) {
+  MG_RETURN_IF_FAILED(
+      mg_session_write_uint8(session, (uint8_t)(MG_MARKER_TINY_STRUCT2)));
+  MG_RETURN_IF_FAILED(
+      mg_session_write_uint8(session, MG_SIGNATURE_LOCAL_DATE_TIME));
+  MG_RETURN_IF_FAILED(mg_session_write_integer(session, ldt->seconds));
+  MG_RETURN_IF_FAILED(mg_session_write_integer(session, ldt->nanoseconds));
+  return 0;
+}
+
+int mg_session_write_duration(mg_session *session, const mg_duration *dur) {
+  MG_RETURN_IF_FAILED(
+      mg_session_write_uint8(session, (uint8_t)(MG_MARKER_TINY_STRUCT4)));
+  MG_RETURN_IF_FAILED(mg_session_write_uint8(session, MG_SIGNATURE_DURATION));
+  MG_RETURN_IF_FAILED(mg_session_write_integer(session, dur->months));
+  MG_RETURN_IF_FAILED(mg_session_write_integer(session, dur->days));
+  MG_RETURN_IF_FAILED(mg_session_write_integer(session, dur->seconds));
+  MG_RETURN_IF_FAILED(mg_session_write_integer(session, dur->nanoseconds));
+  return 0;
+}
+
 int mg_session_write_value(mg_session *session, const mg_value *value) {
   switch (value->type) {
     case MG_VALUE_TYPE_NULL:
@@ -163,14 +200,12 @@ int mg_session_write_value(mg_session *session, const mg_value *value) {
       mg_session_set_error(session, "tried to send value of type 'path'");
       return MG_ERROR_INVALID_VALUE;
     case MG_VALUE_TYPE_DATE:
-      mg_session_set_error(session, "tried to send value of type 'date'");
-      return MG_ERROR_INVALID_VALUE;
+      return mg_session_write_date(session, value->date_v);
     case MG_VALUE_TYPE_TIME:
       mg_session_set_error(session, "tried to send value of type 'time'");
       return MG_ERROR_INVALID_VALUE;
     case MG_VALUE_TYPE_LOCAL_TIME:
-      mg_session_set_error(session, "tried to send value of type 'local_time'");
-      return MG_ERROR_INVALID_VALUE;
+      return mg_session_write_local_time(session, value->local_time_v);
     case MG_VALUE_TYPE_DATE_TIME:
       mg_session_set_error(session, "tried to send value of type 'date_time'");
       return MG_ERROR_INVALID_VALUE;
@@ -179,12 +214,10 @@ int mg_session_write_value(mg_session *session, const mg_value *value) {
                            "tried to send value of type 'date_time_zone_id'");
       return MG_ERROR_INVALID_VALUE;
     case MG_VALUE_TYPE_LOCAL_DATE_TIME:
-      mg_session_set_error(session,
-                           "tried to send value of type 'local_date_time'");
-      return MG_ERROR_INVALID_VALUE;
+      return mg_session_write_local_date_time(session,
+                                              value->local_date_time_v);
     case MG_VALUE_TYPE_DURATION:
-      mg_session_set_error(session, "tried to send value of type 'duration'");
-      return MG_ERROR_INVALID_VALUE;
+      return mg_session_write_duration(session, value->duration_v);
     case MG_VALUE_TYPE_POINT_2D:
       mg_session_set_error(session, "tried to send value of type 'point_2d'");
       return MG_ERROR_INVALID_VALUE;

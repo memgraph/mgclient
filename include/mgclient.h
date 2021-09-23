@@ -869,6 +869,10 @@ MGCLIENT_EXPORT mg_path *mg_path_copy(const mg_path *path);
 /// Destroys the given path.
 MGCLIENT_EXPORT void mg_path_destroy(mg_path *path);
 
+/// Creates mg_date from days.
+/// \return a pointer to mg_date or NULL if an error occurred.
+MGCLIENT_EXPORT mg_date *mg_date_make(int64_t days);
+
 /// Returns days since the Unix epoch.
 MGCLIENT_EXPORT int64_t mg_date_days(const mg_date *date);
 
@@ -897,6 +901,10 @@ MGCLIENT_EXPORT void mg_time_destroy(mg_time *time);
 /// Returns nanoseconds since midnight.
 MGCLIENT_EXPORT int64_t
 mg_local_time_nanoseconds(const mg_local_time *local_time);
+
+/// Creates mg_local_time from nanoseconds.
+/// \return a pointer to mg_local_time or NULL if an error occurred.
+MGCLIENT_EXPORT mg_local_time *mg_local_time_make(int64_t nanoseconds);
 
 /// Creates a copy of the given local time.
 ///
@@ -947,11 +955,17 @@ MGCLIENT_EXPORT mg_date_time_zone_id *mg_date_time_zone_id_copy(
 MGCLIENT_EXPORT void mg_date_time_zone_id_destroy(
     mg_date_time_zone_id *date_time_zone_id);
 
-/// Returns seconds since Unix epoch.
+/// Creates mg_local_date_time from seconds and nanoseconds.
+/// \return a pointer to mg_local_date_time or NULL if an error occurred.
+MGCLIENT_EXPORT mg_local_date_time *mg_local_date_time_make(
+    int64_t seconds, int64_t nanoseconds);
+//
+/// Returns seconds since Unix epoch. This includes the hours, minutes, seconds
+/// fields of the local_time.
 MGCLIENT_EXPORT int64_t
 mg_local_date_time_seconds(const mg_local_date_time *local_date_time);
 
-/// Returns nanoseconds since midnight.
+/// Returns subseconds of the local_time field as nanoseconds.
 MGCLIENT_EXPORT int64_t
 mg_local_date_time_nanoseconds(const mg_local_date_time *local_date_time);
 
@@ -964,6 +978,12 @@ MGCLIENT_EXPORT mg_local_date_time *mg_local_date_time_copy(
 /// Destroy the given local date and time.
 MGCLIENT_EXPORT void mg_local_date_time_destroy(
     mg_local_date_time *local_date_time);
+
+/// Creates mg_duration from months, days, seconds and nanoseconds.
+/// \return a pointer to mg_duration or NULL if an error occurred.
+MGCLIENT_EXPORT mg_duration *mg_duration_make(int64_t months, int64_t days,
+                                              int64_t seconds,
+                                              int64_t nanoseconds);
 
 /// Returns the months part of the temporal amount.
 MGCLIENT_EXPORT int64_t mg_duration_months(const mg_duration *duration);
