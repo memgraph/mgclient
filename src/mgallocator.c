@@ -17,7 +17,7 @@
 #include <assert.h>
 // Somehow stdalign.h is not there (VS Build Tools 2019, Windows 11)
 // https://docs.microsoft.com/en-us/cpp/cpp/alignment-cpp-declarations?view=msvc-170
-#ifndef _WIN32
+#if !defined(_WIN32) && !defined(_MSC_VER)
 #include <stdalign.h>
 #endif
 #include <stdio.h>
