@@ -15,12 +15,17 @@
 #include "mgallocator.h"
 
 #include <assert.h>
+// Somehow stdalign.h is not there (VS Build Tools 2019, Windows 11)
+// https://docs.microsoft.com/en-us/cpp/cpp/alignment-cpp-declarations?view=msvc-170
+#ifndef _WIN32
 #include <stdalign.h>
+#endif
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 #ifdef _MSC_VER
+#define alignof __alignof
 typedef double max_align_t;
 #endif
 

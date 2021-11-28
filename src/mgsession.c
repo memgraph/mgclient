@@ -14,14 +14,16 @@
 
 #include <assert.h>
 #include <errno.h>
-#include <stdalign.h>
 #include <stdarg.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#ifndef _MSC_VER
+#ifndef _MSC_VER || _WIN32
 #include <unistd.h>
+#endif
+#ifndef _WIN32
+#include <stdalign.h>
 #endif
 
 #include "mgcommon.h"
