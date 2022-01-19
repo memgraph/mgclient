@@ -28,9 +28,13 @@
 #include "mgsocket.h"
 #include "mgvalue.h"
 
+#ifdef __EMSCRIPTEN__
+#include "mgwasm.h"
+#endif
+
 const char *mg_client_version() { return MGCLIENT_VERSION; }
 
-int mg_init() { return mg_socket_init(); }
+int EMSCRIPTEN_KEEPALIVE mg_init() { return mg_socket_init(); }
 
 void mg_finalize() { mg_socket_finalize(); }
 
@@ -204,6 +208,10 @@ static int mg_bolt_handshake(mg_session *session) {
   const uint32_t VERSION_NONE = htobe32(0);
   const uint32_t VERSION_1 = htobe32(1);
   const uint32_t VERSION_4_1 = htobe32(0x0104);
+#ifdef __EMSCRIPTEN__
+  int socket = ((mg_raw_transport *)session->transport)->sockfd;
+  yield_until_async_write(socket, 10);
+#endif
   if (mg_transport_send(session->transport, MG_HANDSHAKE_MAGIC,
                         strlen(MG_HANDSHAKE_MAGIC)) != 0 ||
       mg_transport_send(session->transport, (char *)&VERSION_4_1, 4) != 0 ||
@@ -213,12 +221,15 @@ static int mg_bolt_handshake(mg_session *session) {
     mg_session_set_error(session, "failed to send handshake data");
     return MG_ERROR_SEND_FAILED;
   }
+
   uint32_t server_version;
+#ifdef __EMSCRIPTEN__
+  yield_until_async_read(socket, 10);
+#endif
   if (mg_transport_recv(session->transport, (char *)&server_version, 4) != 0) {
     mg_session_set_error(session, "failed to receive handshake response");
     return MG_ERROR_RECV_FAILED;
   }
-
   if (server_version == VERSION_1) {
     session->version = 1;
   } else if (server_version == VERSION_4_1) {
@@ -441,8 +452,15 @@ static int init_tcp_connection(const mg_session_params *params, int *sockfd,
     abort();
   }
   if (getaddrinfo_status != 0) {
+#ifdef __EMSCRIPTEN__
+    mg_session_set_error(session, "getaddrinfo failed: %s",
+                         "Replace with error");
+    // Not supported by emscripten:
+    // gai_strerror(getaddrinfo_status));
+#else
     mg_session_set_error(session, "getaddrinfo failed: %s",
                          gai_strerror(getaddrinfo_status));
+#endif
     return MG_ERROR_NETWORK_FAILURE;
   }
 
@@ -470,10 +488,12 @@ static int init_tcp_connection(const mg_session_params *params, int *sockfd,
     return status;
   }
 
+#ifndef __EMSCRIPTEN__
   int set_options_status = mg_socket_options(tsockfd, session);
   if (set_options_status != MG_SUCCESS) {
     return set_options_status;
   }
+#endif
 
   *sockfd = tsockfd;
   return 0;
@@ -541,7 +561,6 @@ int mg_connect_ca(const mg_session_params *params, mg_session **session,
   if (status != 0) {
     goto cleanup;
   }
-
   switch (params->sslmode) {
     case MG_SSLMODE_DISABLE:
       status = mg_raw_transport_init(
@@ -587,12 +606,10 @@ int mg_connect_ca(const mg_session_params *params, mg_session **session,
 
   // mg_transport object took ownership of the socket.
   sockfd = -1;
-
   status = mg_bolt_handshake(tsession);
   if (status != 0) {
     goto cleanup;
   }
-
   status = mg_bolt_init(tsession, params);
   if (status != 0) {
     goto cleanup;
@@ -688,6 +705,10 @@ int mg_session_run(mg_session *session, const char *query, const mg_map *params,
     goto fatal_failure;
   }
 
+#ifdef __EMSCRIPTEN_
+  int socket = ((mg_raw_transport *)session->transport)->sockfd;
+  yield_until_async_read(socket, 10);
+#endif
   status = mg_session_receive_message(session);
   if (status != 0) {
     goto fatal_failure;

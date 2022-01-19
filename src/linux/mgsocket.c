@@ -17,13 +17,18 @@
 #include "mgcommon.h"
 #include "mgsocket.h"
 
-#define MG_RETRY_ON_EINTR(expression)          \
-  __extension__({                              \
-    long result;                               \
-    do {                                       \
-      result = (long)(expression);             \
-    } while (result == -1L && errno == EINTR); \
-    result;                                    \
+#ifdef __EMSCRIPTEN__
+#include "emscripten.h"
+#include "mgwasm.h"
+#endif
+
+#define MG_RETRY_ON_EINTR(expression)            \
+  __extension__({                                \
+    long result;                                 \
+    do {                                         \
+      result = (long)(expression);               \
+    } while (result == -1L && (errno == EINTR)); \
+    result;                                      \
   })
 
 // Please refer to https://man7.org/linux/man-pages/man2 for more details about
@@ -50,11 +55,18 @@ int mg_socket_create_handle_error(int sock, mg_session *session) {
 int mg_socket_connect(int sock, const struct sockaddr *addr,
                       socklen_t addrlen) {
   long status = MG_RETRY_ON_EINTR(connect(sock, addr, addrlen));
-  if (status == -1L) {
+  if (status == -1L && errno != EINPROGRESS) {
     return MG_ERROR_SOCKET;
   }
+#ifdef __EMSCRIPTEN__
+  if (yield_until_async_write(sock, 10) == -1) {
+    return MG_ERROR_SOCKET;
+  }
+#endif
+
   return MG_SUCCESS;
 }
+
 int mg_socket_connect_handle_error(int *sock, int status, mg_session *session) {
   if (status != MG_SUCCESS) {
     mg_session_set_error(session, "couldn't connect to host: %s",

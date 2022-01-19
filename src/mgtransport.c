@@ -19,7 +19,9 @@
 #include <stdlib.h>
 #include <string.h>
 #ifdef MGCLIENT_ON_LINUX
+#ifndef _EMSCRIPTEN_
 #include <pthread.h>
+#endif
 #endif  // MGCLIENT_ON_LINUX
 
 #include "mgallocator.h"
@@ -119,6 +121,7 @@ static char *hex_encode(unsigned char *data, unsigned int len,
 }
 
 static void mg_openssl_init() {
+#ifndef _EMSCRIPTEN_
 #if OPENSSL_VERSION_NUMBER < 0x10100000L
   static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
   static int mg_ssl_initialized = 0;
@@ -131,6 +134,7 @@ static void mg_openssl_init() {
     mg_ssl_initialized = 1;
   }
   pthread_mutex_unlock(&mutex);
+#endif
 #endif
 }
 

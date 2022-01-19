@@ -126,6 +126,20 @@ cd build
 cmake .. -G "MinGW Makefiles"
 cmake --build . --target install
 ```
+## Building WASM (linux only)
+Compiling `mgclient` requires the Emscripten sdk found in https://github.com/emscripten-core/emsdk and OpenSSL WASM.
+  - Clone the emsdk repo above and do `./emsdk install latest && ./emsdk activate latest && source ./emsdk_env.sh`
+  - Clone openssl repo found in https://github.com/openssl/openssl and compile it to WASM with `emconfigure ./Configure -no-asm -no-tests && make -j8`
+  - Create a build directory under, i.e., `mgclient/build` and then do (replace `PATH_TO` to the right path):
+    ```
+    emcmake cmake .. -DCMAKE_BUILD_TYPE=Release -DOPENSSL_ROOT_DIR=PATH_TO/openssl/apps/ -DOPENSSL_INCLUDE_DIR=PATH_TO/openssl/include/ -DOPENSSL_SSL_LIBRARY=PATH_TO/openssl/libssl.a -DOPENSSL_CRYPTO_LIBRARY=PATH_TO/openssl/libcrypto.a
+
+    emmake make
+
+    emcc src/libmgclient.a -o mgclient.js -s ASYNCIFY=1 -s MODULARIZE -s EXPORT_NAME="load_mgclient" --shared-memory --no-entry -s USE_PTHREADS=1 -s SOCKET_DEBUG=1 -s WEBSOCKET_SUBPROTOCOL="binary" -s EXPORTED_FUNCTIONS='_mg_init, _mg_finalize, _mg_session_params_make, _mg_session_params_destroy, _mg_session_params_set_host, _mg_session_params_set_port, _mg_session_params_set_sslmode, _mg_session_error, _mg_session_run, _mg_session_fetch, _mg_session_pull, _mg_connect' -s EXPORTED_RUNTIME_METHODS="ccall,cwrap,getValue,setValue" -L/home/rim/Desktop/openssl/ -lssl -lcrypto
+
+    ```
+Now there should be an `mgclient.js` and an `mgclient.wasm` found in `mgclient/build/`
 
 ## Using the library
 

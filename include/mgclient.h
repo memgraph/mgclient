@@ -17,6 +17,12 @@
 
 #include "mgclient-export.h"
 
+#ifdef __EMSCRIPTEN__
+#include "emscripten.h"
+#else
+#define EMSCRIPTEN_KEEPALIVE
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -132,17 +138,17 @@ extern "C" {
 /// Client software version.
 ///
 /// \return Client version in the major.minor.patch format.
-MGCLIENT_EXPORT const char *mg_client_version();
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE const char *mg_client_version();
 
 /// Initializes the client (the whole process).
 /// Should be called at the beginning of each process using the client.
 ///
 /// \return Zero if initialization was successful.
-MGCLIENT_EXPORT int mg_init();
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE int mg_init();
 
 /// Finalizes the client (the whole process).
 /// Should be called at the end of each process using the client.
-MGCLIENT_EXPORT void mg_finalize();
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE void mg_finalize();
 
 /// An enum listing all the types as specified by Bolt protocol.
 enum mg_value_type {
@@ -292,24 +298,25 @@ typedef struct mg_point_3d mg_point_3d;
 /// Constructs a nil \ref mg_value.
 ///
 /// \return Pointer to the newly constructed value or NULL if error occurred.
-MGCLIENT_EXPORT mg_value *mg_value_make_null();
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE mg_value *mg_value_make_null();
 
 /// Constructs a boolean \ref mg_value.
 ///
 /// \param val If the parameter is zero, constructed value will be false.
 ///            Otherwise, it will be true.
 /// \return Pointer to the newly constructed value or NULL if error occurred.
-MGCLIENT_EXPORT mg_value *mg_value_make_bool(int val);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE mg_value *mg_value_make_bool(int val);
 
 /// Constructs an integer \ref mg_value with the given underlying value.
 ///
 /// \return Pointer to the newly constructed value or NULL if error occurred.
-MGCLIENT_EXPORT mg_value *mg_value_make_integer(int64_t val);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE mg_value *mg_value_make_integer(
+    int64_t val);
 
 /// Constructs a float \ref mg_value with the given underlying value.
 ///
 /// \return Pointer to the newly constructed value or NULL if error occurred.
-MGCLIENT_EXPORT mg_value *mg_value_make_float(double val);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE mg_value *mg_value_make_float(double val);
 
 /// Constructs a string \ref mg_value given a null-terminated string.
 ///
@@ -319,225 +326,253 @@ MGCLIENT_EXPORT mg_value *mg_value_make_float(double val);
 /// \param str A null-terminated UTF-8 string.
 ///
 /// \return Pointer to the newly constructed value or NULL if error occurred.
-MGCLIENT_EXPORT mg_value *mg_value_make_string(const char *str);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE mg_value *mg_value_make_string(
+    const char *str);
 
 /// Construct a string \ref mg_value given the underlying \ref mg_string.
 ///
 /// \return Pointer to the newly constructed value or NULL if error occurred.
-MGCLIENT_EXPORT mg_value *mg_value_make_string2(mg_string *str);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE mg_value *mg_value_make_string2(
+    mg_string *str);
 
 /// Constructs a list \ref mg_value given the underlying \ref mg_list.
 ///
 /// \return Pointer to the newly constructed value or NULL if error occurred.
-MGCLIENT_EXPORT mg_value *mg_value_make_list(mg_list *list);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE mg_value *mg_value_make_list(
+    mg_list *list);
 
 /// Constructs a map \ref mg_value given the underlying \ref mg_map.
 ///
 /// \return Pointer to the newly constructed value or NULL if error occurred.
-MGCLIENT_EXPORT mg_value *mg_value_make_map(mg_map *map);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE mg_value *mg_value_make_map(mg_map *map);
 
 /// Constructs a node \ref mg_value given the underlying \ref mg_node.
 ///
 /// \return Pointer to the newly constructed value or NULL if error occurred.
-MGCLIENT_EXPORT mg_value *mg_value_make_node(mg_node *node);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE mg_value *mg_value_make_node(
+    mg_node *node);
 
 /// Constructs a relationship \ref mg_value given the underlying
 /// \ref mg_relationship.
 ///
 /// \return Pointer to the newly constructed value or NULL if error occurred.
-MGCLIENT_EXPORT mg_value *mg_value_make_relationship(mg_relationship *rel);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE mg_value *mg_value_make_relationship(
+    mg_relationship *rel);
 
 /// Constructs an unbound relationship \ref mg_value given the underlying
 /// \ref mg_unbound_relationship.
 ///
 /// \return Pointer to the newly constructed value or NULL if error occurred.
-MGCLIENT_EXPORT mg_value *mg_value_make_unbound_relationship(
-    mg_unbound_relationship *rel);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE mg_value *
+mg_value_make_unbound_relationship(mg_unbound_relationship *rel);
 
 /// Constructs a path \ref mg_value given the underlying \ref mg_path.
 ///
 /// \return Pointer to the newly constructed value or NULL if error occurred.
-MGCLIENT_EXPORT mg_value *mg_value_make_path(mg_path *path);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE mg_value *mg_value_make_path(
+    mg_path *path);
 
 /// Constructs a date \ref mg_value given the underlying \ref mg_date.
 ///
 /// \return Pointer to the newly constructed value or NULL if error occurred.
-MGCLIENT_EXPORT mg_value *mg_value_make_date(mg_date *date);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE mg_value *mg_value_make_date(
+    mg_date *date);
 
 /// Constructs a time \ref mg_value given the underlying \ref mg_time.
 ///
 /// \return Pointer to the newly constructed value or NULL if error occurred.
-MGCLIENT_EXPORT mg_value *mg_value_make_time(mg_time *time);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE mg_value *mg_value_make_time(
+    mg_time *time);
 
 /// Constructs a local time \ref mg_value given the underlying \ref
 /// mg_local_time.
 ///
 /// \return Pointer to the newly constructed value or NULL if error occurred.
-MGCLIENT_EXPORT mg_value *mg_value_make_local_time(mg_local_time *local_time);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE mg_value *mg_value_make_local_time(
+    mg_local_time *local_time);
 
 /// Constructs a date and time \ref mg_value given the underlying \ref
 /// mg_date_time.
 ///
 /// \return Pointer to the newly constructed value or NULL if error occurred.
-MGCLIENT_EXPORT mg_value *mg_value_make_date_time(mg_date_time *date_time);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE mg_value *mg_value_make_date_time(
+    mg_date_time *date_time);
 
 /// Constructs a date and time \ref mg_value given the underlying \ref
 /// mg_date_time_zone_id.
 ///
 /// \return Pointer to the newly constructed value or NULL if error occurred.
-MGCLIENT_EXPORT mg_value *mg_value_make_date_time_zone_id(
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE mg_value *mg_value_make_date_time_zone_id(
     mg_date_time_zone_id *date_time_zone_id);
 
 /// Constructs a local date and time \ref mg_value given the underlying \ref
 /// mg_local_date_time.
 ///
 /// \return Pointer to the newly constructed value or NULL if error occurred.
-MGCLIENT_EXPORT mg_value *mg_value_make_local_date_time(
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE mg_value *mg_value_make_local_date_time(
     mg_local_date_time *local_date_time);
 
 /// Constructs a duration \ref mg_value given the underlying \ref mg_duration.
 ///
 /// \return Pointer to the newly constructed value or NULL if error occurred.
-MGCLIENT_EXPORT mg_value *mg_value_make_duration(mg_duration *duration);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE mg_value *mg_value_make_duration(
+    mg_duration *duration);
 
 /// Constructs a 2D point \ref mg_value given the underlying \ref mg_point_2d.
 ///
 /// \return Pointer to the newly constructed value or NULL if error occurred.
-MGCLIENT_EXPORT mg_value *mg_value_make_point_2d(mg_point_2d *point_2d);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE mg_value *mg_value_make_point_2d(
+    mg_point_2d *point_2d);
 
 /// Constructs a 3D point \ref mg_value given the underlying \ref mg_point_3d.
 ///
 /// \return Pointer to the newly constructed value or NULL if error occurred.
-MGCLIENT_EXPORT mg_value *mg_value_make_point_3d(mg_point_3d *point_3d);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE mg_value *mg_value_make_point_3d(
+    mg_point_3d *point_3d);
 
 /// Returns the type of the given \ref mg_value.
-MGCLIENT_EXPORT enum mg_value_type mg_value_get_type(const mg_value *val);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE enum mg_value_type mg_value_get_type(
+    const mg_value *val);
 
 /// Returns non-zero value if value contains true, zero otherwise.
 ///
 /// Type check should be made first. Accessing the wrong value results in
 /// undefined behavior.
-MGCLIENT_EXPORT int mg_value_bool(const mg_value *val);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE int mg_value_bool(const mg_value *val);
 
 /// Returns the underlying integer value.
 ///
 /// Type check should be made first. Accessing the wrong value results in
 /// undefined behavior.
-MGCLIENT_EXPORT int64_t mg_value_integer(const mg_value *val);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE int64_t
+mg_value_integer(const mg_value *val);
 
 /// Returns the underlying float value.
 ///
 /// Type check should be made first. Accessing the wrong value results in
 /// undefined behavior.
-MGCLIENT_EXPORT double mg_value_float(const mg_value *val);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE double mg_value_float(const mg_value *val);
 
 /// Returns the underlying \ref mg_string value.
 ///
 /// Type check should be made first. Accessing the wrong value results in
 /// undefined behavior.
-MGCLIENT_EXPORT const mg_string *mg_value_string(const mg_value *val);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE const mg_string *mg_value_string(
+    const mg_value *val);
 
 /// Returns the underlying \ref mg_list value.
 ///
 /// Type check should be made first. Accessing the wrong value results in
 /// undefined behavior.
-MGCLIENT_EXPORT const mg_list *mg_value_list(const mg_value *val);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE const mg_list *mg_value_list(
+    const mg_value *val);
 
 /// Returns the underlying \ref mg_map value.
 ///
 /// Type check should be made first. Accessing the wrong value results in
 /// undefined behavior.
-MGCLIENT_EXPORT const mg_map *mg_value_map(const mg_value *val);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE const mg_map *mg_value_map(
+    const mg_value *val);
 
 /// Returns the underlying \ref mg_node value.
 ///
 /// Type check should be made first. Accessing the wrong value results in
 /// undefined behavior.
-MGCLIENT_EXPORT const mg_node *mg_value_node(const mg_value *val);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE const mg_node *mg_value_node(
+    const mg_value *val);
 
 /// Returns the underlying \ref mg_relationship value.
 ///
 /// Type check should be made first. Accessing the wrong value results in
 /// undefined behavior.
-MGCLIENT_EXPORT const mg_relationship *mg_value_relationship(
-    const mg_value *val);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE const mg_relationship *
+mg_value_relationship(const mg_value *val);
 
 /// Returns the underlying \ref mg_unbound_relationship value.
 ///
 /// Type check should be made first. Accessing the wrong value results in
 /// undefined behavior.
-MGCLIENT_EXPORT const mg_unbound_relationship *mg_value_unbound_relationship(
-    const mg_value *val);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE const mg_unbound_relationship *
+mg_value_unbound_relationship(const mg_value *val);
 
 /// Returns the underlying \ref mg_path value.
 ///
 /// Type check should be made first. Accessing the wrong value results in
 /// undefined behavior.
-MGCLIENT_EXPORT const mg_path *mg_value_path(const mg_value *val);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE const mg_path *mg_value_path(
+    const mg_value *val);
 
 /// Returns the underlying \ref mg_date value.
 ///
 /// Type check should be made first. Accessing the wrong value results in
 /// undefined behavior.
-MGCLIENT_EXPORT const mg_date *mg_value_date(const mg_value *val);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE const mg_date *mg_value_date(
+    const mg_value *val);
 
 /// Returns the underlying \ref mg_time value.
 ///
 /// Type check should be made first. Accessing the wrong value results in
 /// undefined behavior.
-MGCLIENT_EXPORT const mg_time *mg_value_time(const mg_value *val);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE const mg_time *mg_value_time(
+    const mg_value *val);
 
 /// Returns the underlying \ref mg_local_time value.
 ///
 /// Type check should be made first. Accessing the wrong value results in
 /// undefined behavior.
-MGCLIENT_EXPORT const mg_local_time *mg_value_local_time(const mg_value *val);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE const mg_local_time *mg_value_local_time(
+    const mg_value *val);
 
 /// Returns the underlying \ref mg_date_time value.
 ///
 /// Type check should be made first. Accessing the wrong value results in
 /// undefined behavior.
-MGCLIENT_EXPORT const mg_date_time *mg_value_date_time(const mg_value *val);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE const mg_date_time *mg_value_date_time(
+    const mg_value *val);
 
 /// Returns the underlying \ref mg_date_time_zone_id value.
 ///
 /// Type check should be made first. Accessing the wrong value results in
 /// undefined behavior.
-MGCLIENT_EXPORT const mg_date_time_zone_id *mg_value_date_time_zone_id(
-    const mg_value *val);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE const mg_date_time_zone_id *
+mg_value_date_time_zone_id(const mg_value *val);
 
 /// Returns the underlying \ref mg_local_date_time value.
 ///
 /// Type check should be made first. Accessing the wrong value results in
 /// undefined behavior.
-MGCLIENT_EXPORT const mg_local_date_time *mg_value_local_date_time(
-    const mg_value *val);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE const mg_local_date_time *
+mg_value_local_date_time(const mg_value *val);
 
 /// Returns the underlying \ref mg_duration value.
 ///
 /// Type check should be made first. Accessing the wrong value results in
 /// undefined behavior.
-MGCLIENT_EXPORT const mg_duration *mg_value_duration(const mg_value *val);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE const mg_duration *mg_value_duration(
+    const mg_value *val);
 
 /// Returns the underlying \ref mg_point_2d value.
 ///
 /// Type check should be made first. Accessing the wrong value results in
 /// undefined behavior.
-MGCLIENT_EXPORT const mg_point_2d *mg_value_point_2d(const mg_value *val);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE const mg_point_2d *mg_value_point_2d(
+    const mg_value *val);
 
 /// Returns the underlying \ref mg_point_3d value.
 ///
 /// Type check should be made first. Accessing the wrong value results in
 /// undefined behavior.
-MGCLIENT_EXPORT const mg_point_3d *mg_value_point_3d(const mg_value *val);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE const mg_point_3d *mg_value_point_3d(
+    const mg_value *val);
 
 /// Creates a copy of the given value.
 ///
 /// \return Pointer to the copy or NULL if error occurred.
-MGCLIENT_EXPORT mg_value *mg_value_copy(const mg_value *val);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE mg_value *mg_value_copy(
+    const mg_value *val);
 
 /// Destroys the given value.
-MGCLIENT_EXPORT void mg_value_destroy(mg_value *val);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE void mg_value_destroy(mg_value *val);
 
 /// Constructs a string given a null-terminated string.
 ///
@@ -548,7 +583,7 @@ MGCLIENT_EXPORT void mg_value_destroy(mg_value *val);
 ///
 /// \return A pointer to the newly constructed `mg_string` object or \c NULL
 ///         if an error occurred.
-MGCLIENT_EXPORT mg_string *mg_string_make(const char *str);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE mg_string *mg_string_make(const char *str);
 
 /// Constructs a string given its length (in bytes) and contents.
 ///
@@ -559,21 +594,25 @@ MGCLIENT_EXPORT mg_string *mg_string_make(const char *str);
 ///
 /// \return A pointer to the newly constructed `mg_string` object or \c NULL
 ///         if an error occurred.
-MGCLIENT_EXPORT mg_string *mg_string_make2(uint32_t len, const char *data);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE mg_string *mg_string_make2(
+    uint32_t len, const char *data);
 
 /// Returns a pointer to the beginning of data buffer of string \p str.
-MGCLIENT_EXPORT const char *mg_string_data(const mg_string *str);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE const char *mg_string_data(
+    const mg_string *str);
 
 /// Returns the length (in bytes) of string \p str.
-MGCLIENT_EXPORT uint32_t mg_string_size(const mg_string *str);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE uint32_t
+mg_string_size(const mg_string *str);
 
 /// Creates a copy of the given string.
 ///
 /// \return A pointer to the copy or NULL if an error occurred.
-MGCLIENT_EXPORT mg_string *mg_string_copy(const mg_string *str);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE mg_string *mg_string_copy(
+    const mg_string *str);
 
 /// Destroys the given string.
-MGCLIENT_EXPORT void mg_string_destroy(mg_string *str);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE void mg_string_destroy(mg_string *str);
 
 /// Constructs a list that can hold at most \p capacity elements.
 ///
@@ -584,7 +623,8 @@ MGCLIENT_EXPORT void mg_string_destroy(mg_string *str);
 ///
 /// \return A pointer to the newly constructed empty list or NULL if an error
 ///         occurred.
-MGCLIENT_EXPORT mg_list *mg_list_make_empty(uint32_t capacity);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE mg_list *mg_list_make_empty(
+    uint32_t capacity);
 
 /// Appends an element at the end of the list \p list.
 ///
@@ -596,24 +636,26 @@ MGCLIENT_EXPORT mg_list *mg_list_make_empty(uint32_t capacity);
 ///
 /// \return The function returns non-zero value if insertion failed, zero
 ///         otherwise.
-MGCLIENT_EXPORT int mg_list_append(mg_list *list, mg_value *value);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE int mg_list_append(mg_list *list,
+                                                        mg_value *value);
 
 /// Returns the number of elements in list \p list.
-MGCLIENT_EXPORT uint32_t mg_list_size(const mg_list *list);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE uint32_t mg_list_size(const mg_list *list);
 
 /// Retrieves the element at position \p pos in list \p list.
 ///
 /// \return A pointer to required list element. If \p pos is outside of list
 ///         bounds, \c NULL is returned.
-MGCLIENT_EXPORT const mg_value *mg_list_at(const mg_list *list, uint32_t pos);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE const mg_value *mg_list_at(
+    const mg_list *list, uint32_t pos);
 
 /// Creates a copy of the given list.
 ///
 /// \return A pointer to the copy or NULL if an error occurred.
-MGCLIENT_EXPORT mg_list *mg_list_copy(const mg_list *list);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE mg_list *mg_list_copy(const mg_list *list);
 
 /// Destroys the given list.
-MGCLIENT_EXPORT void mg_list_destroy(mg_list *list);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE void mg_list_destroy(mg_list *list);
 
 /// Constructs an empty map that can hold at most \p capacity key-value pairs.
 ///
@@ -625,7 +667,8 @@ MGCLIENT_EXPORT void mg_list_destroy(mg_list *list);
 ///
 /// \return A pointer to the newly constructed empty map or NULL if an error
 ///         occurred.
-MGCLIENT_EXPORT mg_map *mg_map_make_empty(uint32_t capacity);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE mg_map *mg_map_make_empty(
+    uint32_t capacity);
 
 /// Inserts the given key-value pair into the map.
 ///
@@ -646,8 +689,9 @@ MGCLIENT_EXPORT mg_map *mg_map_make_empty(uint32_t capacity);
 ///
 /// \return The function returns non-zero value if insertion failed, zero
 ///         otherwise.
-MGCLIENT_EXPORT int mg_map_insert(mg_map *map, const char *key_str,
-                                  mg_value *value);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE int mg_map_insert(mg_map *map,
+                                                       const char *key_str,
+                                                       mg_value *value);
 
 /// Inserts the given key-value pair into the map.
 ///
@@ -667,8 +711,9 @@ MGCLIENT_EXPORT int mg_map_insert(mg_map *map, const char *key_str,
 ///
 /// \return The function returns non-zero value if insertion failed, zero
 ///         otherwise.
-MGCLIENT_EXPORT int mg_map_insert2(mg_map *map, mg_string *key,
-                                   mg_value *value);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE int mg_map_insert2(mg_map *map,
+                                                        mg_string *key,
+                                                        mg_value *value);
 
 /// Inserts the given key-value pair into the map.
 ///
@@ -688,8 +733,8 @@ MGCLIENT_EXPORT int mg_map_insert2(mg_map *map, mg_string *key,
 ///
 /// \return The function returns non-zero value if insertion failed, zero
 ///         otherwise.
-MGCLIENT_EXPORT int mg_map_insert_unsafe(mg_map *map, const char *key_str,
-                                         mg_value *value);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE int mg_map_insert_unsafe(
+    mg_map *map, const char *key_str, mg_value *value);
 
 /// Inserts the given key-value pair into the map.
 ///
@@ -707,8 +752,9 @@ MGCLIENT_EXPORT int mg_map_insert_unsafe(mg_map *map, const char *key_str,
 ///
 /// \return The function returns non-zero value if insertion failed, zero
 ///         otherwise.
-MGCLIENT_EXPORT int mg_map_insert_unsafe2(mg_map *map, mg_string *key,
-                                          mg_value *value);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE int mg_map_insert_unsafe2(mg_map *map,
+                                                               mg_string *key,
+                                                               mg_value *value);
 
 /// Looks up a map value with the given key.
 ///
@@ -718,8 +764,8 @@ MGCLIENT_EXPORT int mg_map_insert_unsafe2(mg_map *map, mg_string *key,
 ///
 /// \return If the key is found in the map, the pointer to the corresponding
 ///         \ref mg_value is returned. Otherwise, \c NULL is returned.
-MGCLIENT_EXPORT const mg_value *mg_map_at(const mg_map *map,
-                                          const char *key_str);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE const mg_value *mg_map_at(
+    const mg_map *map, const char *key_str);
 
 /// Looks up a map value with the given key.
 ///
@@ -730,106 +776,115 @@ MGCLIENT_EXPORT const mg_value *mg_map_at(const mg_map *map,
 ///
 /// \return If the key is found in the map, the pointer to the corresponding
 ///         \ref mg_value is returned. Otherwise, \c NULL is returned.
-MGCLIENT_EXPORT const mg_value *mg_map_at2(const mg_map *map, uint32_t key_size,
-                                           const char *key_data);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE const mg_value *mg_map_at2(
+    const mg_map *map, uint32_t key_size, const char *key_data);
 
 /// Returns the number of key-value pairs in map \p map.
-MGCLIENT_EXPORT uint32_t mg_map_size(const mg_map *map);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE uint32_t mg_map_size(const mg_map *map);
 
 /// Retrieves the key at position \p pos in map \p map.
 ///
 /// \return A pointer to required key. If \p pos is outside of map bounds, \c
 ///         NULL is returned.
-MGCLIENT_EXPORT const mg_string *mg_map_key_at(const mg_map *, uint32_t pos);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE const mg_string *mg_map_key_at(
+    const mg_map *, uint32_t pos);
 
 /// Retrieves the value at position \p pos in map \p map.
 ///
 /// \return A pointer to required value. If \p pos is outside of map bounds,
 ///         \c NULL is returned.
-MGCLIENT_EXPORT const mg_value *mg_map_value_at(const mg_map *, uint32_t pos);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE const mg_value *mg_map_value_at(
+    const mg_map *, uint32_t pos);
 
 /// Creates a copy of the given map.
 ///
 /// \return A pointer to the copy or NULL if an error occurred.
-MGCLIENT_EXPORT mg_map *mg_map_copy(const mg_map *map);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE mg_map *mg_map_copy(const mg_map *map);
 
 /// Destroys the given map.
-MGCLIENT_EXPORT void mg_map_destroy(mg_map *map);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE void mg_map_destroy(mg_map *map);
 
 /// Returns the ID of node \p node.
-MGCLIENT_EXPORT int64_t mg_node_id(const mg_node *node);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE int64_t mg_node_id(const mg_node *node);
 
 /// Returns the number of labels of node \p node.
-MGCLIENT_EXPORT uint32_t mg_node_label_count(const mg_node *node);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE uint32_t
+mg_node_label_count(const mg_node *node);
 
 /// Returns the label at position \p pos in node \p node's label list.
 ///
 /// \return A pointer to the required label. If \p pos is outside of label list
 ///         bounds, \c NULL is returned.
-MGCLIENT_EXPORT const mg_string *mg_node_label_at(const mg_node *node,
-                                                  uint32_t pos);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE const mg_string *mg_node_label_at(
+    const mg_node *node, uint32_t pos);
 
 /// Returns property map of node \p node.
-MGCLIENT_EXPORT const mg_map *mg_node_properties(const mg_node *node);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE const mg_map *mg_node_properties(
+    const mg_node *node);
 
 /// Creates a copy of the given node.
 ///
 /// \return A pointer to the copy or NULL if an error occurred.
-MGCLIENT_EXPORT mg_node *mg_node_copy(const mg_node *node);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE mg_node *mg_node_copy(const mg_node *node);
 
 /// Destroys the given node.
-MGCLIENT_EXPORT void mg_node_destroy(mg_node *node);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE void mg_node_destroy(mg_node *node);
 
 /// Returns the ID of the relationship \p rel.
-MGCLIENT_EXPORT int64_t mg_relationship_id(const mg_relationship *rel);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE int64_t
+mg_relationship_id(const mg_relationship *rel);
 
 /// Returns the ID of the start node of relationship \p rel.
-MGCLIENT_EXPORT int64_t mg_relationship_start_id(const mg_relationship *rel);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE int64_t
+mg_relationship_start_id(const mg_relationship *rel);
 
 /// Returns the ID of the end node of relationship \p rel.
-MGCLIENT_EXPORT int64_t mg_relationship_end_id(const mg_relationship *rel);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE int64_t
+mg_relationship_end_id(const mg_relationship *rel);
 
 /// Returns the type of the relationship \p rel.
-MGCLIENT_EXPORT const mg_string *mg_relationship_type(
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE const mg_string *mg_relationship_type(
     const mg_relationship *rel);
 
 /// Returns the property map of the relationship \p rel.
-MGCLIENT_EXPORT const mg_map *mg_relationship_properties(
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE const mg_map *mg_relationship_properties(
     const mg_relationship *rel);
 
 /// Creates a copy of the given relationship.
 ///
 /// \return A pointer to the copy or NULL if an error occurred.
-MGCLIENT_EXPORT mg_relationship *mg_relationship_copy(
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE mg_relationship *mg_relationship_copy(
     const mg_relationship *rel);
 
 /// Destroys the given relationship.
-MGCLIENT_EXPORT void mg_relationship_destroy(mg_relationship *rel);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE void mg_relationship_destroy(
+    mg_relationship *rel);
 
 /// Returns the ID of the unbound relationship \p rel.
-MGCLIENT_EXPORT int64_t
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE int64_t
 mg_unbound_relationship_id(const mg_unbound_relationship *rel);
 
 /// Returns the type of the unbound relationship \p rel.
-MGCLIENT_EXPORT const mg_string *mg_unbound_relationship_type(
-    const mg_unbound_relationship *rel);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE const mg_string *
+mg_unbound_relationship_type(const mg_unbound_relationship *rel);
 
 /// Returns the property map of the unbound relationship \p rel.
-MGCLIENT_EXPORT const mg_map *mg_unbound_relationship_properties(
-    const mg_unbound_relationship *rel);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE const mg_map *
+mg_unbound_relationship_properties(const mg_unbound_relationship *rel);
 
 /// Creates a copy of the given unbound relationship.
 ///
 /// \return A pointer to the copy or NULL if an error occurred.
-MGCLIENT_EXPORT mg_unbound_relationship *mg_unbound_relationship_copy(
-    const mg_unbound_relationship *rel);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE mg_unbound_relationship *
+mg_unbound_relationship_copy(const mg_unbound_relationship *rel);
 
 /// Destroys the given unbound relationship.
-MGCLIENT_EXPORT void mg_unbound_relationship_destroy(
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE void mg_unbound_relationship_destroy(
     mg_unbound_relationship *rel);
 
 /// Returns the length (the number of edges) of path \p path.
-MGCLIENT_EXPORT uint32_t mg_path_length(const mg_path *path);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE uint32_t
+mg_path_length(const mg_path *path);
 
 /// Returns the node at position \p pos in the traversal of path \p path.
 ///
@@ -837,8 +892,8 @@ MGCLIENT_EXPORT uint32_t mg_path_length(const mg_path *path);
 ///
 /// \return A pointer to the required node. If \p pos is out of path bounds, \c
 ///         NULL is returned.
-MGCLIENT_EXPORT const mg_node *mg_path_node_at(const mg_path *path,
-                                               uint32_t pos);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE const mg_node *mg_path_node_at(
+    const mg_path *path, uint32_t pos);
 
 /// Returns the relationship at position \p pos in traversal of path \p path.
 ///
@@ -846,8 +901,8 @@ MGCLIENT_EXPORT const mg_node *mg_path_node_at(const mg_path *path,
 ///
 /// \return A pointer to the required relationship. If \p pos is outside of
 ///         path bounds, \c NULL is returned.
-MGCLIENT_EXPORT const mg_unbound_relationship *mg_path_relationship_at(
-    const mg_path *path, uint32_t pos);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE const mg_unbound_relationship *
+mg_path_relationship_at(const mg_path *path, uint32_t pos);
 
 /// Checks if the relationship at position \p pos in traversal of path \p path
 /// is reversed.
@@ -858,189 +913,197 @@ MGCLIENT_EXPORT const mg_unbound_relationship *mg_path_relationship_at(
 ///         underlying relationship in the data graph, and 1 if it is traversed
 ///         in the opposite direction. If \p pos is outside of path bounds, -1
 ///         is returned.
-MGCLIENT_EXPORT int mg_path_relationship_reversed_at(const mg_path *path,
-                                                     uint32_t pos);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE int mg_path_relationship_reversed_at(
+    const mg_path *path, uint32_t pos);
 
 /// Creates a copy of the given path.
 ///
 /// \return A pointer to the copy or NULL if an error occurred.
-MGCLIENT_EXPORT mg_path *mg_path_copy(const mg_path *path);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE mg_path *mg_path_copy(const mg_path *path);
 
 /// Destroys the given path.
-MGCLIENT_EXPORT void mg_path_destroy(mg_path *path);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE void mg_path_destroy(mg_path *path);
 
 /// Creates mg_date from days.
 /// \return a pointer to mg_date or NULL if an error occurred.
-MGCLIENT_EXPORT mg_date *mg_date_make(int64_t days);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE mg_date *mg_date_make(int64_t days);
 
 /// Returns days since the Unix epoch.
-MGCLIENT_EXPORT int64_t mg_date_days(const mg_date *date);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE int64_t mg_date_days(const mg_date *date);
 
 /// Creates a copy of the given date.
 ///
 /// \return A pointer to the copy or NULL if an error occured.
-MGCLIENT_EXPORT mg_date *mg_date_copy(const mg_date *date);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE mg_date *mg_date_copy(const mg_date *date);
 
 /// Destroys the given date.
-MGCLIENT_EXPORT void mg_date_destroy(mg_date *date);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE void mg_date_destroy(mg_date *date);
 
 /// Returns nanoseconds since midnight.
-MGCLIENT_EXPORT int64_t mg_time_nanoseconds(const mg_time *time);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE int64_t
+mg_time_nanoseconds(const mg_time *time);
 
 /// Returns time zone offset in seconds from UTC.
-MGCLIENT_EXPORT int64_t mg_time_tz_offset_seconds(const mg_time *time);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE int64_t
+mg_time_tz_offset_seconds(const mg_time *time);
 
 /// Creates a copy of the given time.
 ///
 /// \return A pointer to the copy or NULL if an error occured.
-MGCLIENT_EXPORT mg_time *mg_time_copy(const mg_time *time);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE mg_time *mg_time_copy(const mg_time *time);
 
 /// Destroys the given time.
-MGCLIENT_EXPORT void mg_time_destroy(mg_time *time);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE void mg_time_destroy(mg_time *time);
 
 /// Returns nanoseconds since midnight.
-MGCLIENT_EXPORT int64_t
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE int64_t
 mg_local_time_nanoseconds(const mg_local_time *local_time);
 
 /// Creates mg_local_time from nanoseconds.
 /// \return a pointer to mg_local_time or NULL if an error occurred.
-MGCLIENT_EXPORT mg_local_time *mg_local_time_make(int64_t nanoseconds);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE mg_local_time *mg_local_time_make(
+    int64_t nanoseconds);
 
 /// Creates a copy of the given local time.
 ///
 /// \return A pointer to the copy or NULL if an error occured.
-MGCLIENT_EXPORT mg_local_time *mg_local_time_copy(
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE mg_local_time *mg_local_time_copy(
     const mg_local_time *local_time);
 
 /// Destroys the given local time.
-MGCLIENT_EXPORT void mg_local_time_destroy(mg_local_time *local_time);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE void mg_local_time_destroy(
+    mg_local_time *local_time);
 
 /// Returns seconds since Unix epoch.
-MGCLIENT_EXPORT int64_t mg_date_time_seconds(const mg_date_time *date_time);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE int64_t
+mg_date_time_seconds(const mg_date_time *date_time);
 
 /// Returns nanoseconds since midnight.
-MGCLIENT_EXPORT int64_t mg_date_time_nanoseconds(const mg_date_time *date_time);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE int64_t
+mg_date_time_nanoseconds(const mg_date_time *date_time);
 
 /// Returns time zone offset in minutes from UTC.
-MGCLIENT_EXPORT int64_t
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE int64_t
 mg_date_time_tz_offset_minutes(const mg_date_time *date_time);
 
 /// Creates a copy of the given date and time.
 ///
 /// \return A pointer to the copy or NULL if an error occured.
-MGCLIENT_EXPORT mg_date_time *mg_date_time_copy(const mg_date_time *date_time);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE mg_date_time *mg_date_time_copy(
+    const mg_date_time *date_time);
 
 /// Destroys the given date and time.
-MGCLIENT_EXPORT void mg_date_time_destroy(mg_date_time *date_time);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE void mg_date_time_destroy(
+    mg_date_time *date_time);
 
 /// Returns seconds since Unix epoch.
-MGCLIENT_EXPORT int64_t
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE int64_t
 mg_date_time_zone_id_seconds(const mg_date_time_zone_id *date_time_zone_id);
 
 /// Returns nanoseconds since midnight.
-MGCLIENT_EXPORT int64_t
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE int64_t
 mg_date_time_zone_id_nanoseconds(const mg_date_time_zone_id *date_time_zone_id);
 
 /// Returns time zone represented by the identifier.
-MGCLIENT_EXPORT int64_t
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE int64_t
 mg_date_time_zone_id_tz_id(const mg_date_time_zone_id *date_time_zone_id);
 
 /// Creates a copy of the given date and time.
 ///
 /// \return A pointer to the copy or NULL if an error occured.
-MGCLIENT_EXPORT mg_date_time_zone_id *mg_date_time_zone_id_copy(
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE mg_date_time_zone_id *mg_date_time_zone_id_copy(
     const mg_date_time_zone_id *date_time_zone_id);
 
 /// Destroys the given date and time.
-MGCLIENT_EXPORT void mg_date_time_zone_id_destroy(
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE void mg_date_time_zone_id_destroy(
     mg_date_time_zone_id *date_time_zone_id);
 
 /// Creates mg_local_date_time from seconds and nanoseconds.
 /// \return a pointer to mg_local_date_time or NULL if an error occurred.
-MGCLIENT_EXPORT mg_local_date_time *mg_local_date_time_make(
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE mg_local_date_time *mg_local_date_time_make(
     int64_t seconds, int64_t nanoseconds);
 //
 /// Returns seconds since Unix epoch. This includes the hours, minutes, seconds
 /// fields of the local_time.
-MGCLIENT_EXPORT int64_t
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE int64_t
 mg_local_date_time_seconds(const mg_local_date_time *local_date_time);
 
 /// Returns subseconds of the local_time field as nanoseconds.
-MGCLIENT_EXPORT int64_t
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE int64_t
 mg_local_date_time_nanoseconds(const mg_local_date_time *local_date_time);
 
 /// Creates a copy of the given local date and time.
 ///
 /// \return A pointer to the copy or NULL if an error occured.
-MGCLIENT_EXPORT mg_local_date_time *mg_local_date_time_copy(
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE mg_local_date_time *mg_local_date_time_copy(
     const mg_local_date_time *local_date_time);
 
 /// Destroy the given local date and time.
-MGCLIENT_EXPORT void mg_local_date_time_destroy(
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE void mg_local_date_time_destroy(
     mg_local_date_time *local_date_time);
 
 /// Creates mg_duration from months, days, seconds and nanoseconds.
 /// \return a pointer to mg_duration or NULL if an error occurred.
-MGCLIENT_EXPORT mg_duration *mg_duration_make(int64_t months, int64_t days,
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE mg_duration *mg_duration_make(int64_t months, int64_t days,
                                               int64_t seconds,
                                               int64_t nanoseconds);
 
 /// Returns the months part of the temporal amount.
-MGCLIENT_EXPORT int64_t mg_duration_months(const mg_duration *duration);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE int64_t mg_duration_months(const mg_duration *duration);
 
 /// Returns the days part of the temporal amount.
-MGCLIENT_EXPORT int64_t mg_duration_days(const mg_duration *duration);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE int64_t mg_duration_days(const mg_duration *duration);
 
 /// Returns the seconds part of the temporal amount.
-MGCLIENT_EXPORT int64_t mg_duration_seconds(const mg_duration *duration);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE int64_t mg_duration_seconds(const mg_duration *duration);
 
 /// Returns the nanoseconds part of the temporal amount.
-MGCLIENT_EXPORT int64_t mg_duration_nanoseconds(const mg_duration *duration);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE int64_t mg_duration_nanoseconds(const mg_duration *duration);
 
 /// Creates a copy of the given duration.
 ///
 /// \return A pointer to the copy or NULL if an error occured.
-MGCLIENT_EXPORT mg_duration *mg_duration_copy(const mg_duration *duration);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE mg_duration *mg_duration_copy(const mg_duration *duration);
 
 /// Destroy the given duration.
-MGCLIENT_EXPORT void mg_duration_destroy(mg_duration *duration);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE void mg_duration_destroy(mg_duration *duration);
 
 /// Returns SRID of the 2D point.
-MGCLIENT_EXPORT int64_t mg_point_2d_srid(const mg_point_2d *point_2d);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE int64_t mg_point_2d_srid(const mg_point_2d *point_2d);
 
 /// Returns the x coordinate of the 2D point.
-MGCLIENT_EXPORT double mg_point_2d_x(const mg_point_2d *point_2d);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE double mg_point_2d_x(const mg_point_2d *point_2d);
 
 /// Returns the y coordinate of the 2D point.
-MGCLIENT_EXPORT double mg_point_2d_y(const mg_point_2d *point_2d);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE double mg_point_2d_y(const mg_point_2d *point_2d);
 
 /// Creates a copy of the given 2D point.
 ///
 /// \return A pointer to the copy or NULL if an error occured.
-MGCLIENT_EXPORT mg_point_2d *mg_point_2d_copy(const mg_point_2d *point_2d);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE mg_point_2d *mg_point_2d_copy(const mg_point_2d *point_2d);
 
 /// Destroys the given 2D point.
-MGCLIENT_EXPORT void mg_point_2d_destroy(mg_point_2d *point_2d);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE void mg_point_2d_destroy(mg_point_2d *point_2d);
 
 /// Returns SRID of the 3D point.
-MGCLIENT_EXPORT int64_t mg_point_3d_srid(const mg_point_3d *point_3d);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE int64_t mg_point_3d_srid(const mg_point_3d *point_3d);
 
 /// Returns the x coordinate of the 3D point.
-MGCLIENT_EXPORT double mg_point_3d_x(const mg_point_3d *point_3d);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE double mg_point_3d_x(const mg_point_3d *point_3d);
 
 /// Returns the y coordinate of the 3D point.
-MGCLIENT_EXPORT double mg_point_3d_y(const mg_point_3d *point_3d);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE double mg_point_3d_y(const mg_point_3d *point_3d);
 
 /// Returns the z coordinate of the 3D point.
-MGCLIENT_EXPORT double mg_point_3d_z(const mg_point_3d *point_3d);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE double mg_point_3d_z(const mg_point_3d *point_3d);
 
 /// Creates a copy of the given 3D point.
 ///
 /// \return A pointer to the copy or NULL if an error occured.
-MGCLIENT_EXPORT mg_point_3d *mg_point_3d_copy(const mg_point_3d *point_3d);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE mg_point_3d *mg_point_3d_copy(const mg_point_3d *point_3d);
 
 /// Destroys the given 3D point.
-MGCLIENT_EXPORT void mg_point_3d_destroy(mg_point_3d *point_3d);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE void mg_point_3d_destroy(mg_point_3d *point_3d);
 
 /// Marks a \ref mg_session ready to execute a new query using \ref
 /// mg_session_run.
@@ -1214,55 +1277,57 @@ typedef int (*mg_trust_callback_type)(const char *, const char *, const char *,
                                       const char *, void *);
 
 /// Creates a new `mg_session_params` object.
-MGCLIENT_EXPORT mg_session_params *mg_session_params_make();
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE mg_session_params *
+mg_session_params_make();
 
 /// Destroys a `mg_session_params` object.
-MGCLIENT_EXPORT void mg_session_params_destroy(mg_session_params *);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE void mg_session_params_destroy(
+    mg_session_params *);
 
 /// Getters and setters for `mg_session_params` values.
-MGCLIENT_EXPORT void mg_session_params_set_address(mg_session_params *,
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE void mg_session_params_set_address(mg_session_params *,
                                                    const char *address);
-MGCLIENT_EXPORT void mg_session_params_set_host(mg_session_params *,
-                                                const char *host);
-MGCLIENT_EXPORT void mg_session_params_set_port(mg_session_params *,
-                                                uint16_t port);
-MGCLIENT_EXPORT void mg_session_params_set_username(mg_session_params *,
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE void mg_session_params_set_host(
+    mg_session_params *, const char *host);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE void mg_session_params_set_port(
+    mg_session_params *, uint16_t port);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE void mg_session_params_set_username(mg_session_params *,
                                                     const char *username);
-MGCLIENT_EXPORT void mg_session_params_set_password(mg_session_params *,
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE void mg_session_params_set_password(mg_session_params *,
                                                     const char *password);
-MGCLIENT_EXPORT void mg_session_params_set_user_agent(mg_session_params *,
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE void mg_session_params_set_user_agent(mg_session_params *,
                                                       const char *user_agent);
-MGCLIENT_EXPORT void mg_session_params_set_sslmode(mg_session_params *,
-                                                   enum mg_sslmode sslmode);
-MGCLIENT_EXPORT void mg_session_params_set_sslcert(mg_session_params *,
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE void mg_session_params_set_sslmode(
+    mg_session_params *, enum mg_sslmode sslmode);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE void mg_session_params_set_sslcert(mg_session_params *,
                                                    const char *sslcert);
-MGCLIENT_EXPORT void mg_session_params_set_sslkey(mg_session_params *,
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE void mg_session_params_set_sslkey(mg_session_params *,
                                                   const char *sslkey);
-MGCLIENT_EXPORT void mg_session_params_set_trust_callback(
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE void mg_session_params_set_trust_callback(
     mg_session_params *, mg_trust_callback_type trust_callback);
-MGCLIENT_EXPORT void mg_session_params_set_trust_data(mg_session_params *,
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE void mg_session_params_set_trust_data(mg_session_params *,
                                                       void *trust_data);
 
-MGCLIENT_EXPORT const char *mg_session_params_get_address(
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE const char *mg_session_params_get_address(
     const mg_session_params *);
-MGCLIENT_EXPORT const char *mg_session_params_get_host(
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE const char *mg_session_params_get_host(
     const mg_session_params *);
-MGCLIENT_EXPORT uint16_t mg_session_params_get_port(const mg_session_params *);
-MGCLIENT_EXPORT const char *mg_session_params_get_username(
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE uint16_t mg_session_params_get_port(const mg_session_params *);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE const char *mg_session_params_get_username(
     const mg_session_params *);
-MGCLIENT_EXPORT const char *mg_session_params_get_password(
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE const char *mg_session_params_get_password(
     const mg_session_params *);
-MGCLIENT_EXPORT const char *mg_session_params_get_user_agent(
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE const char *mg_session_params_get_user_agent(
     const mg_session_params *);
-MGCLIENT_EXPORT enum mg_sslmode mg_session_params_get_sslmode(
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE enum mg_sslmode mg_session_params_get_sslmode(
     const mg_session_params *);
-MGCLIENT_EXPORT const char *mg_session_params_get_sslcert(
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE const char *mg_session_params_get_sslcert(
     const mg_session_params *);
-MGCLIENT_EXPORT const char *mg_session_params_get_sslkey(
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE const char *mg_session_params_get_sslkey(
     const mg_session_params *);
-MGCLIENT_EXPORT mg_trust_callback_type
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE mg_trust_callback_type
 mg_session_params_get_trust_callback(const mg_session_params *params);
-MGCLIENT_EXPORT void *mg_session_params_get_trust_data(
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE void *mg_session_params_get_trust_data(
     const mg_session_params *);
 
 /// Makes a new connection to the database server.
@@ -1279,20 +1344,22 @@ MGCLIENT_EXPORT void *mg_session_params_get_trust_data(
 /// \return Returns 0 if connected successfuly, otherwise returns a non-zero
 ///         error code. A more detailed error message can be obtained by using
 ///         \ref mg_session_error on \p session, unless it is set to NULL.
-MGCLIENT_EXPORT int mg_connect(const mg_session_params *params,
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE int mg_connect(const mg_session_params *params,
                                mg_session **session);
 
 /// Returns the status of \ref mg_session.
 ///
 /// \return One of \ref MG_SESSION_READY, \ref MG_SESSION_EXECUTING,
 /// \ref MG_SESSION_BAD.
-MGCLIENT_EXPORT int mg_session_status(const mg_session *session);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE int mg_session_status(
+    const mg_session *session);
 
 /// Obtains the error message stored in \ref mg_session (if any).
-MGCLIENT_EXPORT const char *mg_session_error(mg_session *session);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE const char *mg_session_error(
+    mg_session *session);
 
 /// Destroys a \ref mg_session and releases all of its resources.
-MGCLIENT_EXPORT void mg_session_destroy(mg_session *session);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE void mg_session_destroy(mg_session *session);
 
 /// An object encapsulating a single result row or query execution summary. Its
 /// lifetime is limited by lifetime of parent \ref mg_session. Also, invoking
@@ -1340,10 +1407,9 @@ typedef struct mg_result mg_result;
 ///                               if an Explicit transaction was started.
 /// \return Returns 0 if query was submitted for execution successfuly.
 ///         Otherwise, a non-zero error code is returned.
-MGCLIENT_EXPORT int mg_session_run(mg_session *session, const char *query,
-                                   const mg_map *params,
-                                   const mg_map *extra_run_information,
-                                   const mg_list **columns, int64_t *qid);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE int mg_session_run(
+    mg_session *session, const char *query, const mg_map *params,
+    const mg_map *extra_run_information, const mg_list **columns, int64_t *qid);
 
 /// Starts an Explicit transaction on the server.
 ///
@@ -1372,7 +1438,7 @@ MGCLIENT_EXPORT int mg_session_run(mg_session *session, const char *query,
 ///                               database.
 /// \return Returns 0 if the transaction was started successfuly.
 ///         Otherwise, a non-zero error code is returned.
-MGCLIENT_EXPORT int mg_session_begin_transaction(
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE int mg_session_begin_transaction(
     mg_session *session, const mg_map *extra_run_information);
 
 /// Commits current Explicit transaction.
@@ -1383,7 +1449,7 @@ MGCLIENT_EXPORT int mg_session_begin_transaction(
 ///                if it was successful.
 /// \return Returns 0 if the  transaction was ended successfuly.
 ///         Otherwise, a non-zero error code is returned.
-MGCLIENT_EXPORT int mg_session_commit_transaction(mg_session *session,
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE int mg_session_commit_transaction(mg_session *session,
                                                   mg_result **result);
 
 /// Rollbacks current Explicit transaction.
@@ -1394,7 +1460,7 @@ MGCLIENT_EXPORT int mg_session_commit_transaction(mg_session *session,
 ///                if it was successful.
 /// \return Returns 0 if the transaction was ended successfuly.
 ///         Otherwise, a non-zero error code is returned.
-MGCLIENT_EXPORT int mg_session_rollback_transaction(mg_session *session,
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE int mg_session_rollback_transaction(mg_session *session,
                                                     mg_result **result);
 
 /// Tries to fetch the next query result from \ref mg_session.
@@ -1408,7 +1474,8 @@ MGCLIENT_EXPORT int mg_session_rollback_transaction(mg_session *session,
 ///         no more result rows and that the query execution summary was stored
 ///         in \p result. Its contents may be accessed using \ref
 ///         mg_result_summary. On failure, a non-zero exit code is returned.
-MGCLIENT_EXPORT int mg_session_fetch(mg_session *session, mg_result **result);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE int mg_session_fetch(mg_session *session,
+                                                          mg_result **result);
 
 /// Tries to pull results of a statement.
 ///
@@ -1425,17 +1492,17 @@ MGCLIENT_EXPORT int mg_session_fetch(mg_session *session, mg_result **result);
 ///                          is only for Explicit transactions.
 /// \return Returns 0 if the result was pulled successfuly.
 ///         Otherwise, a non-zero error code is returned.
-MGCLIENT_EXPORT int mg_session_pull(mg_session *session,
-                                    const mg_map *pull_information);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE int mg_session_pull(
+    mg_session *session, const mg_map *pull_information);
 
 /// Returns names of columns output by the current query execution.
-MGCLIENT_EXPORT const mg_list *mg_result_columns(const mg_result *result);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE const mg_list *mg_result_columns(const mg_result *result);
 
 /// Returns column values of current result row.
-MGCLIENT_EXPORT const mg_list *mg_result_row(const mg_result *result);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE const mg_list *mg_result_row(const mg_result *result);
 
 /// Returns query execution summary.
-MGCLIENT_EXPORT const mg_map *mg_result_summary(const mg_result *result);
+MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE const mg_map *mg_result_summary(const mg_result *result);
 
 #ifdef __cplusplus
 }
