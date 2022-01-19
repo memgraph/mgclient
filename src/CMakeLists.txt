@@ -60,10 +60,10 @@ if(MGCLIENT_ON_WINDOWS)
 endif()
 
 if(NOT EMSCRIPTEN)
+    add_library(mgclient-shared STATIC ${mgclient_src_files})
     generate_export_header(mgclient-shared
             BASE_NAME "mgclient"
             EXPORT_FILE_NAME "mgclient-export.h")
-    add_library(mgclient-shared STATIC ${mgclient_src_files})
     set_target_properties(mgclient-shared PROPERTIES
             OUTPUT_NAME mgclient
             SOVERSION ${mgclient_SOVERSION}
