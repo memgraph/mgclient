@@ -16,11 +16,39 @@
 
 #include <memory>
 #include <optional>
+#include <string_view>
 
 #include "mgclient-value.hpp"
 #include "mgclient.h"
 
 namespace mg {
+class MgException : public std::exception {
+ public:
+  explicit MgException(const std::string_view message) : msg_(message) {}
+
+  const char *what() const noexcept override { return msg_.c_str(); }
+
+ protected:
+  std::string msg_;
+};
+
+class ClientException : public MgException {
+ public:
+  explicit ClientException(const std::string_view message)
+      : MgException(message) {}
+};
+
+class TransientException : public MgException {
+ public:
+  explicit TransientException(const std::string_view message)
+      : MgException(message) {}
+};
+
+class DatabaseException : public MgException {
+ public:
+  explicit DatabaseException(const std::string_view message)
+      : MgException(message) {}
+};
 
 /// An interface for a Memgraph client that can execute queries and fetch
 /// results.
@@ -181,6 +209,18 @@ inline bool Client::Execute(const std::string &statement,
 inline std::optional<std::vector<Value>> Client::FetchOne() {
   mg_result *result;
   int status = mg_session_fetch(session_, &result);
+  if (status == MG_ERROR_CLIENT_ERROR) {
+    throw ClientException(mg_session_error(session_));
+  }
+
+  if (status == MG_ERROR_TRANSIENT_ERROR) {
+    throw TransientException(mg_session_error(session_));
+  }
+
+  if (status == MG_ERROR_DATABASE_ERROR) {
+    throw DatabaseException(mg_session_error(session_));
+  }
+
   if (status != 1) {
     return std::nullopt;
   }
