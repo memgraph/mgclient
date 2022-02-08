@@ -166,3 +166,9 @@ TEST_F(MemgraphConnection, DiscardAllAndFetchAll) {
     ASSERT_EQ(value.type(), mg::Value::Type::Node);
   }
 }
+
+TEST_F(MemgraphConnection, ThrowClientException) {
+  ASSERT_NE(client, nullptr);
+  ASSERT_TRUE(client->Execute("CREATE(n {name: assert(false)})"));
+  ASSERT_THROW(client->DiscardAll(), mg::ClientException);
+}
