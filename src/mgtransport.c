@@ -105,6 +105,7 @@ void mg_raw_transport_destroy(struct mg_transport *transport) {
   mg_allocator_free(self->allocator, transport);
 }
 
+#ifndef __EMSCRIPTEN__
 static int print_ssl_error(const char *str, size_t len, void *u) {
   (void)len;
   fprintf(stderr, "%s: %s", (char *)u, str);
@@ -121,7 +122,6 @@ static char *hex_encode(unsigned char *data, unsigned int len,
 }
 
 static void mg_openssl_init() {
-#ifndef _EMSCRIPTEN_
 #if OPENSSL_VERSION_NUMBER < 0x10100000L
   static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
   static int mg_ssl_initialized = 0;
@@ -134,7 +134,6 @@ static void mg_openssl_init() {
     mg_ssl_initialized = 1;
   }
   pthread_mutex_unlock(&mutex);
-#endif
 #endif
 }
 
@@ -323,3 +322,11 @@ void mg_secure_transport_destroy(mg_transport *transport) {
   mg_allocator_free(self->allocator, self->peer_pubkey_fp);
   mg_allocator_free(self->allocator, self);
 }
+#else
+int mg_secure_transport_init(int sockfd, const char *cert_file,
+                             const char *key_file,
+                             mg_secure_transport **transport,
+                             mg_allocator *allocator) {
+  return -1;
+}
+#endif

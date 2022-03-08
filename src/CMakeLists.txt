@@ -24,8 +24,7 @@ set(mgclient_src_files
         mgsession-decoder.c
         mgsession-encoder.c
         mgtransport.c
-        mgvalue.c
-        mgwasm.c)
+        mgvalue.c)
 if(MGCLIENT_ON_APPLE)
     list(APPEND mgclient_src_files apple/mgsocket.c)
 elseif(MGCLIENT_ON_LINUX)
@@ -36,34 +35,56 @@ else()
     message(FATAL_ERROR "Operating system undefined.")
 endif()
 
-find_package(OpenSSL REQUIRED)
-
-include(GenerateExportHeader)
-
-add_library(mgclient-static STATIC ${mgclient_src_files})
-set_target_properties(mgclient-static PROPERTIES
-        OUTPUT_NAME mgclient)
-target_compile_definitions(mgclient-static PUBLIC MGCLIENT_STATIC_DEFINE)
-target_include_directories(mgclient-static
-        PRIVATE
-        "${PROJECT_SOURCE_DIR}/src"
-        PUBLIC
-        "${PROJECT_SOURCE_DIR}/include"
-        "${CMAKE_CURRENT_BINARY_DIR}"
-        "${OPENSSL_INCLUDE_DIR}")
-target_link_libraries(mgclient-static
-        PRIVATE
-        ${OPENSSL_LIBRARIES} project_options project_c_warnings)
-
-if(MGCLIENT_ON_WINDOWS)
-    target_link_libraries(mgclient-static PUBLIC ws2_32)
+if(NOT EMSCRIPTEN)
+  find_package(OpenSSL REQUIRED)
 endif()
 
-if(NOT EMSCRIPTEN)
+if(EMSCRIPTEN)
+    list(APPEND mgclient_src_files mgwasm.c)
+    add_executable(mgclient ${mgclient_src_files})
+    set_target_properties(mgclient PROPERTIES LINK_FLAGS "-o mgclient.js -s ASYNCIFY=1 -s MODULARIZE -s EXPORT_NAME=\"load_mgclient\" --shared-memory --no-entry -s USE_PTHREADS=1 -s WEBSOCKET_SUBPROTOCOL=\"binary\" -s EXPORTED_FUNCTIONS='_mg_init, _mg_finalize, _mg_session_params_make, _mg_session_params_destroy, _mg_session_params_set_host, _mg_session_params_set_port, _mg_session_params_set_sslmode, _mg_session_error, _mg_session_run, _mg_session_fetch, _mg_session_pull, _mg_connect, _mg_client_version, _mg_result_row' -s EXPORTED_RUNTIME_METHODS=\"ccall, cwrap, getValue, setValue, UTF8ToString\"")
+
+    target_compile_definitions(mgclient PUBLIC MGCLIENT_STATIC_DEFINE)
+    target_include_directories(mgclient
+            PRIVATE
+            "${PROJECT_SOURCE_DIR}/src"
+            PUBLIC
+            "${PROJECT_SOURCE_DIR}/include"
+            "${CMAKE_CURRENT_BINARY_DIR}")
+
+else()
+    include(GenerateExportHeader)
+
+    add_library(mgclient-static STATIC ${mgclient_src_files})
+
+    generate_export_header(mgclient-static
+            BASE_NAME "mgclient"
+            EXPORT_FILE_NAME "mgclient-export.h")
+
+    set_target_properties(mgclient-static PROPERTIES
+            OUTPUT_NAME mgclient)
+    target_compile_definitions(mgclient-static PUBLIC MGCLIENT_STATIC_DEFINE)
+    target_include_directories(mgclient-static
+            PRIVATE
+            "${PROJECT_SOURCE_DIR}/src"
+            PUBLIC
+            "${PROJECT_SOURCE_DIR}/include"
+            "${CMAKE_CURRENT_BINARY_DIR}"
+            "${OPENSSL_INCLUDE_DIR}")
+    target_link_libraries(mgclient-static
+            PRIVATE
+            ${OPENSSL_LIBRARIES} project_options project_c_warnings)
+
+    if(MGCLIENT_ON_WINDOWS)
+        target_link_libraries(mgclient-static PUBLIC ws2_32)
+    endif()
+
     add_library(mgclient-shared STATIC ${mgclient_src_files})
+
     generate_export_header(mgclient-shared
             BASE_NAME "mgclient"
             EXPORT_FILE_NAME "mgclient-export.h")
+
     set_target_properties(mgclient-shared PROPERTIES
             OUTPUT_NAME mgclient
             SOVERSION ${mgclient_SOVERSION}
@@ -76,19 +97,17 @@ if(NOT EMSCRIPTEN)
             "${CMAKE_CURRENT_BINARY_DIR}"
             "${OPENSSL_INCLUDE_DIR}")
     target_link_libraries(mgclient-shared PRIVATE ${OPENSSL_LIBRARIES})
-endif()
 
-if(MGCLIENT_ON_WINDOWS)
-    target_link_libraries(mgclient-shared PUBLIC ws2_32)
-endif()
+    if(MGCLIENT_ON_WINDOWS)
+        target_link_libraries(mgclient-shared PUBLIC ws2_32)
+    endif()
 
-generate_export_header(mgclient-static
-        BASE_NAME "mgclient"
-        EXPORT_FILE_NAME "mgclient-export.h")
+    generate_export_header(mgclient-shared
+            BASE_NAME "mgclient"
+            EXPORT_FILE_NAME "mgclient-export.h")
 
-include(GNUInstallDirs)
+    include(GNUInstallDirs)
 
-if(NOT EMSCRIPTEN)
     install(TARGETS mgclient-static mgclient-shared
             ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
             LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}

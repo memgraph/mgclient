@@ -12,12 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include "mgsocket.h"
+
 #include <string.h>
 
 #include "mgcommon.h"
-#include "mgsocket.h"
 
 #ifdef __EMSCRIPTEN__
+#include <stdlib.h>
+
 #include "emscripten.h"
 #include "mgwasm.h"
 #endif

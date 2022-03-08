@@ -19,9 +19,22 @@
 extern "C" {
 #endif
 
+#ifndef __EMSCRIPTEN__
+
 #include <openssl/bio.h>
 #include <openssl/err.h>
 #include <openssl/ssl.h>
+
+#else
+// This is a small hack to allow the current code to compile without openSSL
+// support. This is guranteed to work because the API is defined natively by the
+// implementation language that consumes the mgclient wasm module.
+#define SSL int
+#define BIO int
+#include <stdio.h>
+
+#endif
+
 #include <stddef.h>
 
 #include "mgallocator.h"

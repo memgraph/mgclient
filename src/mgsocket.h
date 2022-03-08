@@ -30,6 +30,7 @@ extern "C" {
 
 #ifdef MGCLIENT_ON_LINUX
 #include <arpa/inet.h>
+#include <errno.h>
 #include <netdb.h>
 #include <netinet/ip.h>
 #include <netinet/tcp.h>

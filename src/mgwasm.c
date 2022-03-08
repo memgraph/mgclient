@@ -36,6 +36,7 @@ int write_loop(int sock) {
 
 int yield_until_async_read(int sock, int ms) {
   while (1) {
+    emscripten_sleep(ms);
     int res = read_loop(sock);
     if (res == 1) {
       return 1;
@@ -43,12 +44,12 @@ int yield_until_async_read(int sock, int ms) {
     if (res == -1) {
       return -1;
     }
-    emscripten_sleep(ms);
   }
 }
 
 int yield_until_async_write(int sock, int ms) {
   while (1) {
+    emscripten_sleep(ms);
     int res = write_loop(sock);
     if (res == 1) {
       return 1;
@@ -56,7 +57,6 @@ int yield_until_async_write(int sock, int ms) {
     if (res == -1) {
       return -1;
     }
-    emscripten_sleep(ms);
   }
 }
 

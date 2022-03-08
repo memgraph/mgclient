@@ -15,7 +15,11 @@
 #ifndef MGCLIENT_MGCLIENT_H
 #define MGCLIENT_MGCLIENT_H
 
+#ifdef EMSCRIPTEN
+#define MGCLIENT_EXPORT
+#else
 #include "mgclient-export.h"
+#endif
 
 #ifdef __EMSCRIPTEN__
 #include "emscripten.h"
