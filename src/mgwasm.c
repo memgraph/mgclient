@@ -6,7 +6,7 @@
 #include <stdio.h>
 #include <sys/select.h>
 
-int read_loop(int sock) {
+int read_loop(const int sock) {
   fd_set fdr;
   FD_ZERO(&fdr);
   FD_SET(sock, &fdr);
@@ -20,7 +20,7 @@ int read_loop(int sock) {
   return 1;
 }
 
-int write_loop(int sock) {
+int write_loop(const int sock) {
   fd_set fdw;
   FD_ZERO(&fdw);
   FD_SET(sock, &fdw);
@@ -34,7 +34,7 @@ int write_loop(int sock) {
   return 1;
 }
 
-int yield_until_async_read(int sock, int ms) {
+int yield_until_async_read(const int sock, const int ms) {
   while (1) {
     emscripten_sleep(ms);
     int res = read_loop(sock);
@@ -47,7 +47,7 @@ int yield_until_async_read(int sock, int ms) {
   }
 }
 
-int yield_until_async_write(int sock, int ms) {
+int yield_until_async_write(const int sock, const int ms) {
   while (1) {
     emscripten_sleep(ms);
     int res = write_loop(sock);

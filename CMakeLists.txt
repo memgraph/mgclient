@@ -14,16 +14,18 @@
 
 cmake_minimum_required(VERSION 3.8)
 
-project(mgclient VERSION 1.3.0)
+if(WASM) 
+    message(STATUS "WASM")
+    set(CMAKE_TOOLCHAIN_FILE "${CMAKE_SOURCE_DIR}/build/emsdk/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake")
+    message(STATUS ${CMAKE_TOOLCHAIN_FILE})
+endif()
+
+project(mgclient VERSION 1.2.0)
 # Minor version increase can also mean ABI incompatibility with previous
 # versions. IMPORTANT: Take care of the SO version manually.
 set(mgclient_SOVERSION 2)
 set(WASM OFF CACHE BOOL "Compile mgclient for wasm")
 add_definitions(-DMGCLIENT_VERSION="${mgclient_VERSION}")
-
-if(WASM) 
-    set(CMAKE_TOOLCHAIN_FILE "./emsdk/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake")
-endif()
 
 # Deal with the operating system.
 if((NOT UNIX) AND EMSCRIPTEN)

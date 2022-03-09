@@ -138,12 +138,13 @@ jobs:
       MG_VERSION: "1.4.0"
     steps:
       - name: Set-up repository
-        uses: actions/checkout@v1
+        uses: actions/checkout@v2
       - name: Install environment
         run: |
           sudo apt install -y clang-8 clang++-8
-      - name: Build with gcc, test and install mgclient
+
+      - name: Build with clang
         run: |
-          mkdir build && ./wasm/install_deps.sh && ./wasm/activate.sh && cd build
-          cmake -DCMAKE_C_COMPILER=clang-8 -DCMAKE_CXX_COMPILER=clang++-8 -DCMAKE_BUILD_TYPE=Release -DC_WARNINGS_AS_ERRORS=ON ..
+          mkdir build && ./wasm/install_deps.sh && source ./wasm/activate.sh && cd build
+          cmake .. -DCMAKE_BUILD_TYPE=Release -DC_WARNINGS_AS_ERRORS=ON -DWASM=ON
           make
