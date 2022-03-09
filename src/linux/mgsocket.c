@@ -55,14 +55,25 @@ int mg_socket_create_handle_error(int sock, mg_session *session) {
   return MG_SUCCESS;
 }
 
+static int mg_socket_test_status_is_error(long status) {
+#ifdef __EMSCRIPTEN__
+  if (status == -1L && errno != EINPROGRESS) {
+#else
+  if (status == -1L) {
+#endif
+    return 1;
+  }
+  return 0;
+}
+
 int mg_socket_connect(int sock, const struct sockaddr *addr,
                       socklen_t addrlen) {
   long status = MG_RETRY_ON_EINTR(connect(sock, addr, addrlen));
-  if (status == -1L && errno != EINPROGRESS) {
+  if (mg_socket_test_status_is_error(status)) {
     return MG_ERROR_SOCKET;
   }
 #ifdef __EMSCRIPTEN__
-  if (yield_until_async_write(sock, 10) == -1) {
+  if (yield_until_async_write(sock, 10)) {
     return MG_ERROR_SOCKET;
   }
 #endif

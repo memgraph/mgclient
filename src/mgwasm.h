@@ -1,5 +1,5 @@
-#ifndef MGCLIENT_MGWASM_UTIL_H
-#define MGCLIENT_MGWASM_UTIL_H
+#ifndef MGCLIENT_MGWASM_H
+#define MGCLIENT_MGWASM_H
 
 #ifdef __EMSCRIPTEN__
 
@@ -13,4 +13,4 @@ int yield_until_async_write(int sock, int ms);
 
 #endif
 
-#endif
+#endif /* MGCLIENT_MGWASM_H */

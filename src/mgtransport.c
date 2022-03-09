@@ -19,7 +19,7 @@
 #include <stdlib.h>
 #include <string.h>
 #ifdef MGCLIENT_ON_LINUX
-#ifndef _EMSCRIPTEN_
+#ifndef __EMSCRIPTEN__
 #include <pthread.h>
 #endif
 #endif  // MGCLIENT_ON_LINUX
@@ -321,12 +321,5 @@ void mg_secure_transport_destroy(mg_transport *transport) {
   self->ssl = NULL;
   mg_allocator_free(self->allocator, self->peer_pubkey_fp);
   mg_allocator_free(self->allocator, self);
-}
-#else
-int mg_secure_transport_init(int sockfd, const char *cert_file,
-                             const char *key_file,
-                             mg_secure_transport **transport,
-                             mg_allocator *allocator) {
-  return -1;
 }
 #endif

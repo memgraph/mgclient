@@ -453,8 +453,7 @@ static int init_tcp_connection(const mg_session_params *params, int *sockfd,
   }
   if (getaddrinfo_status != 0) {
 #ifdef __EMSCRIPTEN__
-    mg_session_set_error(session, "getaddrinfo failed: %s",
-                         "Replace with error");
+    mg_session_set_error(session, "getaddrinfo failed: %d", getaddrinfo_status);
     // Not supported by emscripten:
     // gai_strerror(getaddrinfo_status));
 #else
@@ -499,6 +498,7 @@ static int init_tcp_connection(const mg_session_params *params, int *sockfd,
   return 0;
 }
 
+#ifndef __EMSCRIPTEN__
 static int get_hostname_and_ip(const struct sockaddr *peer_addr, char *hostname,
                                char *ip, mg_session *session) {
   // Populate the ip.
@@ -539,6 +539,7 @@ static int get_hostname_and_ip(const struct sockaddr *peer_addr, char *hostname,
   }
   return 0;
 }
+#endif
 
 int mg_connect_ca(const mg_session_params *params, mg_session **session,
                   mg_allocator *allocator) {
@@ -570,6 +571,7 @@ int mg_connect_ca(const mg_session_params *params, mg_session **session,
         goto cleanup;
       }
       break;
+#ifndef __EMSCRIPTEN__
     case MG_SSLMODE_REQUIRE: {
       mg_secure_transport *ttransport;
       status = mg_secure_transport_init(sockfd, params->sslcert, params->sslkey,
@@ -599,6 +601,7 @@ int mg_connect_ca(const mg_session_params *params, mg_session **session,
       }
       break;
     }
+#endif
     default:
       // Should not get here.
       abort();
@@ -705,7 +708,7 @@ int mg_session_run(mg_session *session, const char *query, const mg_map *params,
     goto fatal_failure;
   }
 
-#ifdef __EMSCRIPTEN_
+#ifdef __EMSCRIPTEN__
   int socket = ((mg_raw_transport *)session->transport)->sockfd;
   yield_until_async_read(socket, 10);
 #endif

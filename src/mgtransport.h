@@ -24,15 +24,8 @@ extern "C" {
 #include <openssl/bio.h>
 #include <openssl/err.h>
 #include <openssl/ssl.h>
-
 #else
-// This is a small hack to allow the current code to compile without openSSL
-// support. This is guranteed to work because the API is defined natively by the
-// implementation language that consumes the mgclient wasm module.
-#define SSL int
-#define BIO int
 #include <stdio.h>
-
 #endif
 
 #include <stddef.h>
@@ -54,6 +47,7 @@ typedef struct mg_raw_transport {
   mg_allocator *allocator;
 } mg_raw_transport;
 
+#ifndef __EMSCRIPTEN__
 typedef struct mg_secure_transport {
   int (*send)(struct mg_transport *, const char *buf, size_t len);
   int (*recv)(struct mg_transport *, char *buf, size_t len);
@@ -64,6 +58,7 @@ typedef struct mg_secure_transport {
   char *peer_pubkey_fp;
   mg_allocator *allocator;
 } mg_secure_transport;
+#endif
 
 int mg_transport_send(mg_transport *transport, const char *buf, size_t len);
 
@@ -80,6 +75,7 @@ int mg_raw_transport_recv(struct mg_transport *, char *buf, size_t len);
 
 void mg_raw_transport_destroy(struct mg_transport *);
 
+#ifndef __EMSCRIPTEN__
 // This function is mocked in tests during linking by using --wrap. ON_APPLE
 // there is no --wrap. An alternative is to use -alias but if a symbol is
 // strong linking fails.
@@ -88,6 +84,7 @@ MG_ATTRIBUTE_WEAK int mg_secure_transport_init(int sockfd,
                                                const char *key_file,
                                                mg_secure_transport **transport,
                                                mg_allocator *allocator);
+#endif
 
 int mg_secure_transport_send(mg_transport *, const char *buf, size_t len);
 

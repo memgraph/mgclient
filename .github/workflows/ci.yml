@@ -128,3 +128,22 @@ jobs:
           cmake .. -G "MinGW Makefiles" -DBUILD_TESTING=ON -DBUILD_TESTING_INTEGRATION=ON -DC_WARNINGS_AS_ERRORS=ON -DCPP_WARNINGS_AS_ERRORS=ON
           cmake --build .
           ctest --verbose -R "allocator|value|example_basic|integration_basic"
+
+  build_and_test_linux_wasm:
+    strategy:
+     matrix:
+        platform: [ubuntu-18.04]
+    runs-on: ${{ matrix.platform }}
+    env:
+      MG_VERSION: "1.4.0"
+    steps:
+      - name: Set-up repository
+        uses: actions/checkout@v1
+      - name: Install environment
+        run: |
+          sudo apt install -y clang-8 clang++-8
+      - name: Build with gcc, test and install mgclient
+        run: |
+          mkdir build && ./wasm/install_deps.sh && ./wasm/activate.sh && cd build
+          cmake -DCMAKE_C_COMPILER=clang-8 -DCMAKE_CXX_COMPILER=clang++-8 -DCMAKE_BUILD_TYPE=Release -DC_WARNINGS_AS_ERRORS=ON ..
+          make

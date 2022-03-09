@@ -27,7 +27,9 @@
 #include "mgcommon.h"
 #include "mgconstants.h"
 #include "mgsession.h"
+#ifdef __EMSCRIPTEN__
 #include "mgwasm.h"
+#endif
 
 int mg_session_status(const mg_session *session) {
   if (!session) {

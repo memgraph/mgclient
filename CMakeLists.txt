@@ -22,7 +22,7 @@ set(WASM OFF CACHE BOOL "Compile mgclient for wasm")
 add_definitions(-DMGCLIENT_VERSION="${mgclient_VERSION}")
 
 if(WASM) 
-    set(CMAKE_TOOLCHAIN_FILE "/opt/mgclient/emsdk/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake")
+    set(CMAKE_TOOLCHAIN_FILE "./emsdk/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake")
 endif()
 
 # Deal with the operating system.
@@ -45,9 +45,9 @@ elseif(UNIX AND NOT APPLE)
     else() 
         message(FATAL_ERROR "Unsupported operating system. Please create issue or contribute!")
     endif()
-        set(MGCLIENT_ON_LINUX TRUE)
-        add_definitions(-DMGCLIENT_ON_LINUX)
-        set(MGCLIENT_FIND_LIBRARY_PREFIXES "${CMAKE_FIND_LIBRARY_PREFIXES}")
+    set(MGCLIENT_ON_LINUX TRUE)
+    add_definitions(-DMGCLIENT_ON_LINUX)
+    set(MGCLIENT_FIND_LIBRARY_PREFIXES "${CMAKE_FIND_LIBRARY_PREFIXES}")
 elseif(APPLE)
     message(STATUS "ON APPLE BUILD")
     set(MGCLIENT_ON_APPLE TRUE)
@@ -94,7 +94,7 @@ if(EMSCRIPTEN)
    #same as project_c_warnings but without -O3. In the future we should
    #experiment and switch to O3. because it reduces the js output size
    #significantly.
-   set(CMAKE_C_FLAGS_DEBUG "-g -O0-DNDEBUG -Wall -Wextra -Wpedantic -std=gnu11")
+   set(CMAKE_C_FLAGS_DEBUG "-g -O0 -Wall -Wextra -Wpedantic -std=gnu11")
    set(CMAKE_C_FLAGS_RELEASE "-O0 -DNDEBUG -Wall -Wextra -Wpedantic -std=gnu11")
 endif()
 
