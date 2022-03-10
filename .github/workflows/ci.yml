@@ -137,9 +137,6 @@ jobs:
     steps:
       - name: Set-up repository
         uses: actions/checkout@v2
-          #      - name: Install environment
-          #        run: |
-          #          sudo apt install -y clang-8 clang++-8
 
       - name: Build with clang
         run: |
