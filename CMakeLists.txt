@@ -91,9 +91,9 @@ add_library(project_cpp_warnings INTERFACE)
 set_project_cpp_warnings(project_cpp_warnings)
 
 if(EMSCRIPTEN)
-   #same as project_c_warnings but without -O3. In the future we should
-   #experiment and switch to O3. because it reduces the js output size
-   #significantly.
+   # same as project_c_warnings but without -O3. In the future we should
+   # experiment and switch to O3. because it reduces the js output size
+   # significantly.
    set(CMAKE_C_FLAGS_DEBUG "-g -O0 -Wall -Wextra -Wpedantic -std=gnu11")
    set(CMAKE_C_FLAGS_RELEASE "-O0 -DNDEBUG -Wall -Wextra -Wpedantic -std=gnu11")
 endif()

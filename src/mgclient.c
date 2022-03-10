@@ -34,7 +34,7 @@
 
 const char *mg_client_version() { return MGCLIENT_VERSION; }
 
-int EMSCRIPTEN_KEEPALIVE mg_init() { return mg_socket_init(); }
+int mg_init() { return mg_socket_init(); }
 
 void mg_finalize() { mg_socket_finalize(); }
 
@@ -209,8 +209,7 @@ static int mg_bolt_handshake(mg_session *session) {
   const uint32_t VERSION_1 = htobe32(1);
   const uint32_t VERSION_4_1 = htobe32(0x0104);
 #ifdef __EMSCRIPTEN__
-  int socket = ((mg_raw_transport *)session->transport)->sockfd;
-  yield_until_async_write(socket, 10);
+  mg_yield_until_async_write(session->transport);
 #endif
   if (mg_transport_send(session->transport, MG_HANDSHAKE_MAGIC,
                         strlen(MG_HANDSHAKE_MAGIC)) != 0 ||
@@ -224,7 +223,7 @@ static int mg_bolt_handshake(mg_session *session) {
 
   uint32_t server_version;
 #ifdef __EMSCRIPTEN__
-  yield_until_async_read(socket, 10);
+  mg_yield_until_async_read(session->transport);
 #endif
   if (mg_transport_recv(session->transport, (char *)&server_version, 4) != 0) {
     mg_session_set_error(session, "failed to receive handshake response");
@@ -709,8 +708,7 @@ int mg_session_run(mg_session *session, const char *query, const mg_map *params,
   }
 
 #ifdef __EMSCRIPTEN__
-  int socket = ((mg_raw_transport *)session->transport)->sockfd;
-  yield_until_async_read(socket, 10);
+  mg_yield_until_async_read(session->transport);
 #endif
   status = mg_session_receive_message(session);
   if (status != 0) {

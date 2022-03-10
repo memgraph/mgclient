@@ -4,12 +4,16 @@
 #ifdef __EMSCRIPTEN__
 
 #include "emscripten.h"
+#include "mgtransport.h"
 
 int read_loop(int sock);
 int write_loop(int sock);
 
-int yield_until_async_read(int sock, int ms);
-int yield_until_async_write(int sock, int ms);
+int mg_yield_until_async_read_sock(int sock);
+int mg_yield_until_async_write_sock(int sock);
+
+int mg_yield_until_async_read(const mg_transport *transport);
+int mg_yield_until_async_write(const mg_transport *transport);
 
 #endif
 

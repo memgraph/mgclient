@@ -73,7 +73,7 @@ int mg_socket_connect(int sock, const struct sockaddr *addr,
     return MG_ERROR_SOCKET;
   }
 #ifdef __EMSCRIPTEN__
-  if (yield_until_async_write(sock, 10)) {
+  if (mg_yield_until_async_write_sock(sock)) {
     return MG_ERROR_SOCKET;
   }
 #endif

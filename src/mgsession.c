@@ -231,8 +231,7 @@ int mg_session_ensure_space_for_chunk(mg_session *session, size_t chunk_size) {
 int mg_session_read_chunk(mg_session *session) {
   uint16_t chunk_size;
 #ifdef __EMSCRIPTEN__
-  int socket = ((mg_raw_transport *)session->transport)->sockfd;
-  yield_until_async_read(socket, 10);
+  mg_yield_until_async_read(session->transport);
 #endif
   if (mg_transport_recv(session->transport, (char *)&chunk_size, 2) != 0) {
     mg_session_set_error(session, "failed to receive chunk size");
@@ -249,7 +248,7 @@ int mg_session_read_chunk(mg_session *session) {
     }
   }
 #ifdef __EMSCRIPTEN__
-  yield_until_async_read(socket, 10);
+  mg_yield_until_async_read(session->transport);
 #endif
   if (mg_transport_recv(session->transport,
                         session->in_buffer + session->in_end,

@@ -34,9 +34,11 @@ int write_loop(const int sock) {
   return 1;
 }
 
-int yield_until_async_read(const int sock, const int ms) {
+static const size_t DELAY_MS = 10;
+
+int mg_yield_until_async_read_sock(const int sock) {
   while (1) {
-    emscripten_sleep(ms);
+    emscripten_sleep(DELAY_MS);
     int res = read_loop(sock);
     if (res == 1) {
       return 1;
@@ -47,9 +49,9 @@ int yield_until_async_read(const int sock, const int ms) {
   }
 }
 
-int yield_until_async_write(const int sock, const int ms) {
+int mg_yield_until_async_write_sock(const int sock) {
   while (1) {
-    emscripten_sleep(ms);
+    emscripten_sleep(DELAY_MS);
     int res = write_loop(sock);
     if (res == 1) {
       return 1;
@@ -58,6 +60,16 @@ int yield_until_async_write(const int sock, const int ms) {
       return -1;
     }
   }
+}
+
+int mg_yield_until_async_read(const mg_transport *transport) {
+  int sock = ((mg_raw_transport *)transport)->sockfd;
+  return mg_yield_until_async_read_sock(sock);
+}
+
+int mg_yield_until_async_write(const mg_transport *transport) {
+  int sock = ((mg_raw_transport *)transport)->sockfd;
+  return mg_yield_until_async_write_sock(sock);
 }
 
 #endif

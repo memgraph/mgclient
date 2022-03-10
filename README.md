@@ -128,8 +128,7 @@ cmake --build . --target install
 ```
 ## Building WASM (linux only)
 Compiling `mgclient` for wasm requires the Emscripten sdk. This is automated in the following steps:
-  1. sudo wasm/install_deps.sh 
-  2. wasm/activate.sh
+  1. wasm/install_deps.sh 
   3. mkdir build && cd build 
   4. cmake .. -DWASM=ON
   5. make
