@@ -12,18 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <gmock/gmock.h>
+#include <gtest/gtest.h>
+
 #include <optional>
 #include <random>
 #include <thread>
-
-#include <gmock/gmock.h>
-#include <gtest/gtest.h>
 
 #include "mgclient.h"
 #include "mgcommon.h"
 #include "mgsession.h"
 #include "mgsocket.h"
-
 #include "test-common.hpp"
 
 using namespace std::string_literals;
@@ -70,6 +69,8 @@ struct test_transport {
   int (*send)(struct mg_transport *, const char *buf, size_t len);
   int (*recv)(struct mg_transport *, char *buf, size_t len);
   void (*destroy)(struct mg_transport *);
+  void (*suspend_until_ready_to_read)(struct mg_transport *);
+  void (*suspend_until_ready_to_write)(struct mg_transport *);
   union {
     struct {
       SSL *ssl;
@@ -98,6 +99,8 @@ int __wrap_mg_secure_transport_init(int sockfd, const char *cert,
   ttransport->send = mg_raw_transport_send;
   ttransport->recv = mg_raw_transport_recv;
   ttransport->destroy = test_transport_destroy;
+  ttransport->suspend_until_ready_to_read = NULL;
+  ttransport->suspend_until_ready_to_write = NULL;
   ttransport->peer_pubkey_type = "rsaEncryption";
   ttransport->peer_pubkey_fp = TEST_KEY_FP;
   *transport = (mg_secure_transport *)ttransport;
