@@ -15,7 +15,7 @@
 #ifndef MGCLIENT_MGCLIENT_H
 #define MGCLIENT_MGCLIENT_H
 
-#ifdef EMSCRIPTEN
+#ifdef __EMSCRIPTEN__
 #define MGCLIENT_EXPORT EMSCRIPTEN_KEEPALIVE
 #include "emscripten.h"
 #else
@@ -1132,7 +1132,9 @@ MGCLIENT_EXPORT void mg_point_3d_destroy(mg_point_3d *point_3d);
 /// the server.
 enum mg_sslmode {
   MG_SSLMODE_DISABLE,  ///< Only try a non-SSL connection.
+#ifndef __EMSCRIPTEN__
   MG_SSLMODE_REQUIRE,  ///< Only try a SSL connection.
+#endif
 };
 
 /// An object encapsulating a Bolt session.

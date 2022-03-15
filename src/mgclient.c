@@ -29,10 +29,6 @@
 #include "mgtransport.h"
 #include "mgvalue.h"
 
-#ifdef __EMSCRIPTEN__
-#include "mgwasm.h"
-#endif
-
 const char *mg_client_version() { return MGCLIENT_VERSION; }
 
 int mg_init() { return mg_socket_init(); }
