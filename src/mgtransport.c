@@ -28,7 +28,9 @@
 #include "mgclient.h"
 #include "mgcommon.h"
 #include "mgsocket.h"
+#ifdef __EMSCRIPTEN__
 #include "mgwasm.h"
+#endif
 
 int mg_init_ssl = 1;
 

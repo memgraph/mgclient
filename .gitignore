@@ -14,5 +14,5 @@ tool/generated/
 # Doxygen output files.
 html/
 
-#emsdk folder pulled from wasm/install_deps.sh
+# emsdk folder pulled from wasm/install_deps.sh
 wasm/emsdk

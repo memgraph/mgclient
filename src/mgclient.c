@@ -478,12 +478,10 @@ static int init_tcp_connection(const mg_session_params *params, int *sockfd,
     return status;
   }
 
-#ifndef __EMSCRIPTEN__
   int set_options_status = mg_socket_options(tsockfd, session);
   if (set_options_status != MG_SUCCESS) {
     return set_options_status;
   }
-#endif
 
   *sockfd = tsockfd;
   return 0;
