@@ -14,13 +14,12 @@
 
 #include "mgsocket.h"
 
+#include <stdlib.h>
 #include <string.h>
 
 #include "mgcommon.h"
 
 #ifdef __EMSCRIPTEN__
-#include <stdlib.h>
-
 #include "emscripten.h"
 #include "mgwasm.h"
 #endif
@@ -73,7 +72,7 @@ int mg_socket_connect(int sock, const struct sockaddr *addr,
     return MG_ERROR_SOCKET;
   }
 #ifdef __EMSCRIPTEN__
-  if (mg_yield_until_async_write_sock(sock)) {
+  if (mg_wasm_suspend_until_ready_to_write(sock) == -1) {
     return MG_ERROR_SOCKET;
   }
 #endif

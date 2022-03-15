@@ -20,15 +20,13 @@ extern "C" {
 #endif
 
 #ifndef __EMSCRIPTEN__
-
 #include <openssl/bio.h>
 #include <openssl/err.h>
 #include <openssl/ssl.h>
-#else
-#include <stdio.h>
 #endif
 
 #include <stddef.h>
+#include <stdio.h>
 
 #include "mgallocator.h"
 #include "mgcommon.h"
@@ -37,12 +35,16 @@ typedef struct mg_transport {
   int (*send)(struct mg_transport *, const char *buf, size_t len);
   int (*recv)(struct mg_transport *, char *buf, size_t len);
   void (*destroy)(struct mg_transport *);
+  void (*suspend_until_ready_to_read)(struct mg_transport *);
+  void (*suspend_until_ready_to_write)(struct mg_transport *);
 } mg_transport;
 
 typedef struct mg_raw_transport {
   int (*send)(struct mg_transport *, const char *buf, size_t len);
   int (*recv)(struct mg_transport *, char *buf, size_t len);
   void (*destroy)(struct mg_transport *);
+  void (*suspend_until_ready_to_read)(struct mg_transport *);
+  void (*suspend_until_ready_to_write)(struct mg_transport *);
   int sockfd;
   mg_allocator *allocator;
 } mg_raw_transport;
@@ -52,6 +54,8 @@ typedef struct mg_secure_transport {
   int (*send)(struct mg_transport *, const char *buf, size_t len);
   int (*recv)(struct mg_transport *, char *buf, size_t len);
   void (*destroy)(struct mg_transport *);
+  void (*suspend_until_ready_to_read)(struct mg_transport *);
+  void (*suspend_until_ready_to_write)(struct mg_transport *);
   SSL *ssl;
   BIO *bio;
   const char *peer_pubkey_type;
@@ -66,6 +70,10 @@ int mg_transport_recv(mg_transport *transport, char *buf, size_t len);
 
 void mg_transport_destroy(mg_transport *transport);
 
+void mg_transport_suspend_until_ready_to_read(struct mg_transport *);
+
+void mg_transport_suspend_until_ready_to_write(struct mg_transport *);
+
 int mg_raw_transport_init(int sockfd, mg_raw_transport **transport,
                           mg_allocator *allocator);
 
@@ -74,6 +82,10 @@ int mg_raw_transport_send(struct mg_transport *, const char *buf, size_t len);
 int mg_raw_transport_recv(struct mg_transport *, char *buf, size_t len);
 
 void mg_raw_transport_destroy(struct mg_transport *);
+
+void mg_raw_transport_suspend_until_ready_to_read(struct mg_transport *);
+
+void mg_raw_transport_suspend_until_ready_to_write(struct mg_transport *);
 
 #ifndef __EMSCRIPTEN__
 // This function is mocked in tests during linking by using --wrap. ON_APPLE
@@ -84,13 +96,13 @@ MG_ATTRIBUTE_WEAK int mg_secure_transport_init(int sockfd,
                                                const char *key_file,
                                                mg_secure_transport **transport,
                                                mg_allocator *allocator);
-#endif
 
 int mg_secure_transport_send(mg_transport *, const char *buf, size_t len);
 
 int mg_secure_transport_recv(mg_transport *, char *buf, size_t len);
 
 void mg_secure_transport_destroy(mg_transport *);
+#endif
 
 #ifdef __cplusplus
 }

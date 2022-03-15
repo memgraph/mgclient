@@ -95,7 +95,7 @@ if(EMSCRIPTEN)
    # experiment and switch to O3. because it reduces the js output size
    # significantly.
    set(CMAKE_C_FLAGS_DEBUG "-g -O0 -Wall -Wextra -Wpedantic -std=gnu11")
-   set(CMAKE_C_FLAGS_RELEASE "-O0 -DNDEBUG -Wall -Wextra -Wpedantic -std=gnu11")
+   set(CMAKE_C_FLAGS_RELEASE "-O2 -DNDEBUG -Wall -Wextra -Wpedantic -std=gnu11")
 endif()
 
 # Set default build type to 'Release'

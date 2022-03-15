@@ -1,10 +1,9 @@
 #include "mgwasm.h"
 
-#ifdef __EMSCRIPTEN__
-
 #include <stddef.h>
-#include <stdio.h>
 #include <sys/select.h>
+
+#include "emscripten.h"
 
 int read_loop(const int sock) {
   fd_set fdr;
@@ -24,7 +23,7 @@ int write_loop(const int sock) {
   fd_set fdw;
   FD_ZERO(&fdw);
   FD_SET(sock, &fdw);
-  int poll = select(sock + 1, NULL, &fdw, NULL, NULL);
+  const int poll = select(sock + 1, NULL, &fdw, NULL, NULL);
   if (poll == -1) {
     return -1;
   }
@@ -36,40 +35,25 @@ int write_loop(const int sock) {
 
 static const size_t DELAY_MS = 10;
 
-int mg_yield_until_async_read_sock(const int sock) {
+int mg_wasm_suspend_until_ready_to_read(const int sock) {
   while (1) {
+    const int res = read_loop(sock);
+    if (res == 1 || res == -1) {
+      return res;
+    }
     emscripten_sleep(DELAY_MS);
-    int res = read_loop(sock);
-    if (res == 1) {
-      return 1;
+  }
+}
+
+int mg_wasm_suspend_until_ready_to_write(const int sock) {
+  while (1) {
+    const int res = write_loop(sock);
+    if (res == 1 || res == -1) {
+      return res;
     }
     if (res == -1) {
       return -1;
     }
-  }
-}
-
-int mg_yield_until_async_write_sock(const int sock) {
-  while (1) {
     emscripten_sleep(DELAY_MS);
-    int res = write_loop(sock);
-    if (res == 1) {
-      return 1;
-    }
-    if (res == -1) {
-      return -1;
-    }
   }
 }
-
-int mg_yield_until_async_read(const mg_transport *transport) {
-  int sock = ((mg_raw_transport *)transport)->sockfd;
-  return mg_yield_until_async_read_sock(sock);
-}
-
-int mg_yield_until_async_write(const mg_transport *transport) {
-  int sock = ((mg_raw_transport *)transport)->sockfd;
-  return mg_yield_until_async_write_sock(sock);
-}
-
-#endif

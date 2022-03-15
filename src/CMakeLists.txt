@@ -38,7 +38,7 @@ endif()
 if(EMSCRIPTEN)
     list(APPEND mgclient_src_files mgwasm.c)
     add_executable(mgclient ${mgclient_src_files})
-    set_target_properties(mgclient PROPERTIES LINK_FLAGS "-o mgclient.js -s ASYNCIFY=1 -s MODULARIZE -s EXPORT_NAME=\"load_mgclient\" --shared-memory --no-entry -s USE_PTHREADS=1 -s WEBSOCKET_SUBPROTOCOL=\"binary\" -s EXPORTED_FUNCTIONS='_mg_init, _mg_finalize, _mg_session_params_make, _mg_session_params_destroy, _mg_session_params_set_host, _mg_session_params_set_port, _mg_session_params_set_sslmode, _mg_session_error, _mg_session_run, _mg_session_fetch, _mg_session_pull, _mg_connect, _mg_client_version, _mg_result_row' -s EXPORTED_RUNTIME_METHODS=\"ccall, cwrap, getValue, setValue, UTF8ToString\"")
+    set_target_properties(mgclient PROPERTIES LINK_FLAGS "-s ASYNCIFY=1 -s MODULARIZE -s EXPORT_NAME=\"load_mgclient\" --shared-memory --no-entry -s USE_PTHREADS=1 -s WEBSOCKET_SUBPROTOCOL=\"binary\" -s EXPORTED_RUNTIME_METHODS=\"ccall, cwrap, getValue, setValue, UTF8ToString, allocateUTF8\"")
 
     target_include_directories(mgclient
             PRIVATE
@@ -46,7 +46,6 @@ if(EMSCRIPTEN)
             PUBLIC
             "${PROJECT_SOURCE_DIR}/include"
             "${CMAKE_CURRENT_BINARY_DIR}")
-
 else()
     find_package(OpenSSL REQUIRED)
     include(GenerateExportHeader)

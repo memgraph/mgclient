@@ -26,6 +26,7 @@
 #include "mgmessage.h"
 #include "mgsession.h"
 #include "mgsocket.h"
+#include "mgtransport.h"
 #include "mgvalue.h"
 
 #ifdef __EMSCRIPTEN__
@@ -208,9 +209,7 @@ static int mg_bolt_handshake(mg_session *session) {
   const uint32_t VERSION_NONE = htobe32(0);
   const uint32_t VERSION_1 = htobe32(1);
   const uint32_t VERSION_4_1 = htobe32(0x0104);
-#ifdef __EMSCRIPTEN__
-  mg_yield_until_async_write(session->transport);
-#endif
+  mg_transport_suspend_until_ready_to_write(session->transport);
   if (mg_transport_send(session->transport, MG_HANDSHAKE_MAGIC,
                         strlen(MG_HANDSHAKE_MAGIC)) != 0 ||
       mg_transport_send(session->transport, (char *)&VERSION_4_1, 4) != 0 ||
@@ -222,9 +221,7 @@ static int mg_bolt_handshake(mg_session *session) {
   }
 
   uint32_t server_version;
-#ifdef __EMSCRIPTEN__
-  mg_yield_until_async_read(session->transport);
-#endif
+  mg_transport_suspend_until_ready_to_read(session->transport);
   if (mg_transport_recv(session->transport, (char *)&server_version, 4) != 0) {
     mg_session_set_error(session, "failed to receive handshake response");
     return MG_ERROR_RECV_FAILED;
@@ -439,7 +436,6 @@ static int init_tcp_connection(const mg_session_params *params, int *sockfd,
 
   char portstr[6];
   sprintf(portstr, "%" PRIu16, params->port);
-
   int getaddrinfo_status;
   if (params->host) {
     getaddrinfo_status = getaddrinfo(params->host, portstr, &hints, &addr_list);
@@ -707,9 +703,7 @@ int mg_session_run(mg_session *session, const char *query, const mg_map *params,
     goto fatal_failure;
   }
 
-#ifdef __EMSCRIPTEN__
-  mg_yield_until_async_read(session->transport);
-#endif
+  mg_transport_suspend_until_ready_to_read(session->transport);
   status = mg_session_receive_message(session);
   if (status != 0) {
     goto fatal_failure;
