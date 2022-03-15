@@ -141,7 +141,6 @@ jobs:
       - name: Build with clang
         run: |
           mkdir build 
-          ./wasm/install_deps.sh
           cd build
           cmake .. -DCMAKE_BUILD_TYPE=Release -DC_WARNINGS_AS_ERRORS=ON -DWASM=ON
           make

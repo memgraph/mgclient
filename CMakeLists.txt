@@ -15,7 +15,8 @@
 cmake_minimum_required(VERSION 3.8)
 
 if(WASM) 
-    set(CMAKE_TOOLCHAIN_FILE "${CMAKE_SOURCE_DIR}/build/emsdk/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake")
+    execute_process(COMMAND ${CMAKE_SOURCE_DIR}/wasm/install_deps.sh)
+    set(CMAKE_TOOLCHAIN_FILE "${CMAKE_SOURCE_DIR}/wasm/emsdk/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake")
 endif()
 
 project(mgclient VERSION 1.2.0)
