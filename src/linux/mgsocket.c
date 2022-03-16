@@ -12,18 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include "mgsocket.h"
+
+#include <stdlib.h>
 #include <string.h>
 
 #include "mgcommon.h"
-#include "mgsocket.h"
 
-#define MG_RETRY_ON_EINTR(expression)          \
-  __extension__({                              \
-    long result;                               \
-    do {                                       \
-      result = (long)(expression);             \
-    } while (result == -1L && errno == EINTR); \
-    result;                                    \
+#ifdef __EMSCRIPTEN__
+#include "emscripten.h"
+#include "mgwasm.h"
+#endif
+
+#define MG_RETRY_ON_EINTR(expression)            \
+  __extension__({                                \
+    long result;                                 \
+    do {                                         \
+      result = (long)(expression);               \
+    } while (result == -1L && (errno == EINTR)); \
+    result;                                      \
   })
 
 // Please refer to https://man7.org/linux/man-pages/man2 for more details about
@@ -47,14 +54,32 @@ int mg_socket_create_handle_error(int sock, mg_session *session) {
   return MG_SUCCESS;
 }
 
+static int mg_socket_test_status_is_error(long status) {
+#ifdef __EMSCRIPTEN__
+  if (status == -1L && errno != EINPROGRESS) {
+#else
+  if (status == -1L) {
+#endif
+    return 1;
+  }
+  return 0;
+}
+
 int mg_socket_connect(int sock, const struct sockaddr *addr,
                       socklen_t addrlen) {
   long status = MG_RETRY_ON_EINTR(connect(sock, addr, addrlen));
-  if (status == -1L) {
+  if (mg_socket_test_status_is_error(status)) {
     return MG_ERROR_SOCKET;
   }
+#ifdef __EMSCRIPTEN__
+  if (mg_wasm_suspend_until_ready_to_write(sock) == -1) {
+    return MG_ERROR_SOCKET;
+  }
+#endif
+
   return MG_SUCCESS;
 }
+
 int mg_socket_connect_handle_error(int *sock, int status, mg_session *session) {
   if (status != MG_SUCCESS) {
     mg_session_set_error(session, "couldn't connect to host: %s",
@@ -69,6 +94,11 @@ int mg_socket_connect_handle_error(int *sock, int status, mg_session *session) {
 }
 
 int mg_socket_options(int sock, mg_session *session) {
+#ifdef __EMSCRIPTEN__
+  (void)sock;
+  (void)session;
+  return MG_SUCCESS;
+#else
   struct {
     int level;
     int optname;
@@ -100,6 +130,7 @@ int mg_socket_options(int sock, mg_session *session) {
     }
   }
   return MG_SUCCESS;
+#endif
 }
 
 ssize_t mg_socket_send(int sock, const void *buf, int len) {

@@ -126,6 +126,12 @@ cd build
 cmake .. -G "MinGW Makefiles"
 cmake --build . --target install
 ```
+## Building WASM (linux only)
+Compiling `mgclient` for wasm requires the Emscripten sdk. This is automated in the following steps:
+  1. mkdir build && cd build
+  2. cmake .. -DWASM=ON
+  3. make
+Now there should be an `mgclient.js` and an `mgclient.wasm` found in `mgclient/build/`
 
 ## Using the library
 

@@ -26,6 +26,7 @@
 #include "mgmessage.h"
 #include "mgsession.h"
 #include "mgsocket.h"
+#include "mgtransport.h"
 #include "mgvalue.h"
 
 const char *mg_client_version() { return MGCLIENT_VERSION; }
@@ -204,6 +205,7 @@ static int mg_bolt_handshake(mg_session *session) {
   const uint32_t VERSION_NONE = htobe32(0);
   const uint32_t VERSION_1 = htobe32(1);
   const uint32_t VERSION_4_1 = htobe32(0x0104);
+  mg_transport_suspend_until_ready_to_write(session->transport);
   if (mg_transport_send(session->transport, MG_HANDSHAKE_MAGIC,
                         strlen(MG_HANDSHAKE_MAGIC)) != 0 ||
       mg_transport_send(session->transport, (char *)&VERSION_4_1, 4) != 0 ||
@@ -213,12 +215,13 @@ static int mg_bolt_handshake(mg_session *session) {
     mg_session_set_error(session, "failed to send handshake data");
     return MG_ERROR_SEND_FAILED;
   }
+
   uint32_t server_version;
+  mg_transport_suspend_until_ready_to_read(session->transport);
   if (mg_transport_recv(session->transport, (char *)&server_version, 4) != 0) {
     mg_session_set_error(session, "failed to receive handshake response");
     return MG_ERROR_RECV_FAILED;
   }
-
   if (server_version == VERSION_1) {
     session->version = 1;
   } else if (server_version == VERSION_4_1) {
@@ -429,7 +432,6 @@ static int init_tcp_connection(const mg_session_params *params, int *sockfd,
 
   char portstr[6];
   sprintf(portstr, "%" PRIu16, params->port);
-
   int getaddrinfo_status;
   if (params->host) {
     getaddrinfo_status = getaddrinfo(params->host, portstr, &hints, &addr_list);
@@ -441,8 +443,14 @@ static int init_tcp_connection(const mg_session_params *params, int *sockfd,
     abort();
   }
   if (getaddrinfo_status != 0) {
+#ifdef __EMSCRIPTEN__
+    mg_session_set_error(session, "getaddrinfo failed: %d", getaddrinfo_status);
+    // Not supported by emscripten:
+    // gai_strerror(getaddrinfo_status));
+#else
     mg_session_set_error(session, "getaddrinfo failed: %s",
                          gai_strerror(getaddrinfo_status));
+#endif
     return MG_ERROR_NETWORK_FAILURE;
   }
 
@@ -479,6 +487,7 @@ static int init_tcp_connection(const mg_session_params *params, int *sockfd,
   return 0;
 }
 
+#ifndef __EMSCRIPTEN__
 static int get_hostname_and_ip(const struct sockaddr *peer_addr, char *hostname,
                                char *ip, mg_session *session) {
   // Populate the ip.
@@ -519,6 +528,7 @@ static int get_hostname_and_ip(const struct sockaddr *peer_addr, char *hostname,
   }
   return 0;
 }
+#endif
 
 int mg_connect_ca(const mg_session_params *params, mg_session **session,
                   mg_allocator *allocator) {
@@ -541,7 +551,6 @@ int mg_connect_ca(const mg_session_params *params, mg_session **session,
   if (status != 0) {
     goto cleanup;
   }
-
   switch (params->sslmode) {
     case MG_SSLMODE_DISABLE:
       status = mg_raw_transport_init(
@@ -551,6 +560,7 @@ int mg_connect_ca(const mg_session_params *params, mg_session **session,
         goto cleanup;
       }
       break;
+#ifndef __EMSCRIPTEN__
     case MG_SSLMODE_REQUIRE: {
       mg_secure_transport *ttransport;
       status = mg_secure_transport_init(sockfd, params->sslcert, params->sslkey,
@@ -580,6 +590,7 @@ int mg_connect_ca(const mg_session_params *params, mg_session **session,
       }
       break;
     }
+#endif
     default:
       // Should not get here.
       abort();
@@ -587,12 +598,10 @@ int mg_connect_ca(const mg_session_params *params, mg_session **session,
 
   // mg_transport object took ownership of the socket.
   sockfd = -1;
-
   status = mg_bolt_handshake(tsession);
   if (status != 0) {
     goto cleanup;
   }
-
   status = mg_bolt_init(tsession, params);
   if (status != 0) {
     goto cleanup;
@@ -688,6 +697,7 @@ int mg_session_run(mg_session *session, const char *query, const mg_map *params,
     goto fatal_failure;
   }
 
+  mg_transport_suspend_until_ready_to_read(session->transport);
   status = mg_session_receive_message(session);
   if (status != 0) {
     goto fatal_failure;
