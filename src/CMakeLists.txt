@@ -38,7 +38,7 @@ endif()
 if(EMSCRIPTEN)
     list(APPEND mgclient_src_files mgwasm.c)
     add_executable(mgclient ${mgclient_src_files})
-    set_target_properties(mgclient PROPERTIES LINK_FLAGS "-s ASYNCIFY=1 -s MODULARIZE -s EXPORT_NAME=\"load_mgclient\" --shared-memory --no-entry -s USE_PTHREADS=1 -s WEBSOCKET_SUBPROTOCOL=\"binary\" -s EXPORTED_RUNTIME_METHODS=\"ccall, cwrap, getValue, setValue, UTF8ToString, allocateUTF8\"")
+    set_target_properties(mgclient PROPERTIES LINK_FLAGS "-s ASYNCIFY=1 -s WASM_BIGINT -s MODULARIZE -s EXPORT_NAME=\"load_mgclient\" --shared-memory --no-entry -s USE_PTHREADS=1 -s WEBSOCKET_SUBPROTOCOL=\"binary\" -s EXPORTED_RUNTIME_METHODS=\"ccall, cwrap, getValue, setValue, UTF8ToString, allocateUTF8\"")
 
     target_include_directories(mgclient
             PRIVATE

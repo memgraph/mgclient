@@ -2,6 +2,7 @@
 
 #include <stddef.h>
 #include <sys/select.h>
+#include <sys/socket.h>
 
 #include "emscripten.h"
 
@@ -27,6 +28,16 @@ int write_loop(const int sock) {
   if (poll == -1) {
     return -1;
   }
+  int result;
+  socklen_t result_len = sizeof(result);
+  if (getsockopt(sock, SOL_SOCKET, SO_ERROR, &result, &result_len) < 0) {
+    return -1;
+  }
+
+  if (result != 0) {
+    return -1;
+  }
+
   if (!FD_ISSET(sock, &fdw)) {
     return -100;
   }
