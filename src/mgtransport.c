@@ -176,6 +176,14 @@ static void mg_openssl_init() {
 #endif
 }
 
+const char *keylog_file = "keylog.txt";
+
+void keylog_callback(const SSL *ssl, const char *line) {
+  FILE *f = fopen(keylog_file, "a");
+  fprintf(f, "%s\n", line);
+  fclose(f);
+}
+
 int mg_secure_transport_init(int sockfd, const char *cert_file,
                              const char *key_file,
                              mg_secure_transport **transport,
@@ -216,9 +224,11 @@ int mg_secure_transport_init(int sockfd, const char *cert_file,
     status = MG_ERROR_SSL_ERROR;
     goto failure;
   }
+  remove(keylog_file);
+  SSL_CTX_set_keylog_callback(ctx, keylog_callback);
 
-  // SSL_CTX object is reference counted, we're destroying this local reference,
-  // but reference from SSL object stays.
+  // SSL_CTX object is reference counted, we're destroying this local
+  // reference, but reference from SSL object stays.
   SSL_CTX_free(ctx);
   ctx = NULL;
 
