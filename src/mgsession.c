@@ -227,14 +227,17 @@ int mg_session_ensure_space_for_chunk(mg_session *session, size_t chunk_size) {
 }
 
 int mg_session_read_chunk(mg_session *session) {
+  printf("Reading chunk...\n");
   uint16_t chunk_size;
   mg_transport_suspend_until_ready_to_read(session->transport);
   if (mg_transport_recv(session->transport, (char *)&chunk_size, 2) != 0) {
     mg_session_set_error(session, "failed to receive chunk size");
+    printf("failed to receive chunkc size\n");
     return MG_ERROR_RECV_FAILED;
   }
   chunk_size = be16toh(chunk_size);
   if (chunk_size == 0) {
+    printf("Chunk size is zero");
     return 0;
   }
   {
@@ -247,9 +250,11 @@ int mg_session_read_chunk(mg_session *session) {
   if (mg_transport_recv(session->transport,
                         session->in_buffer + session->in_end,
                         chunk_size) != 0) {
+    printf("Failed to receive chunk data");
     mg_session_set_error(session, "failed to receive chunk data");
     return MG_ERROR_RECV_FAILED;
   }
+    printf("Chunk read");
   session->in_end += chunk_size;
   return 1;
 }
