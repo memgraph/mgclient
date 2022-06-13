@@ -20,7 +20,6 @@
 #include <random>
 #include <thread>
 
-#include <gmock/gmock.h>
 #include <gtest/gtest.h>
 #include <openssl/crypto.h>
 
@@ -38,6 +37,7 @@ extern "C" {
 #include "mgtransport.h"
 }
 
+#include "gmock_wrapper.h"
 #include "test-common.hpp"
 
 std::pair<X509 *, EVP_PKEY *> MakeCertAndKey(const char *name) {

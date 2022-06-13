@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
 #include <optional>
@@ -23,6 +22,8 @@
 #include "mgcommon.h"
 #include "mgsession.h"
 #include "mgsocket.h"
+
+#include "gmock_wrapper.h"
 #include "test-common.hpp"
 
 using namespace std::string_literals;
