@@ -54,12 +54,12 @@ jobs:
         uses: actions/cache@v1
         with:
           path: ~/memgraph
-          key: cache-memgraph-v${{ env.MG_VERSION }}-docker-image
+          key: cache-memgraph-v${{ matrix.mgversion }}-docker-image
       - name: Download Memgraph Docker image
         if: steps.cache-memgraph-docker.outputs.cache-hit != 'true'
         run: |
           mkdir ~/memgraph
-          curl -L https://memgraph.com/download/memgraph/v${MG_VERSION}/docker/memgraph-${{ matrix.mgversion }}-community-docker.tar.gz > ~/memgraph/memgraph-docker.tar.gz
+          curl -L https://memgraph.com/download/memgraph/v${{ matrix.mgversion }}/docker/memgraph-${{ matrix.mgversion }}-community-docker.tar.gz > ~/memgraph/memgraph-docker.tar.gz
       - name: Load and run Memgraph Docker image
         run: |
           docker load -i ~/memgraph/memgraph-docker.tar.gz
