@@ -28,7 +28,6 @@ extern "C" {
 #include <openssl/ssl.h>
 #endif
 
-
 #include "mgallocator.h"
 #include "mgcommon.h"
 
