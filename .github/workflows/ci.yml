@@ -4,13 +4,13 @@ on: [push]
 
 jobs:
   clang_check:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-22.04
     steps:
     - name: Set-up repository
       uses: actions/checkout@v2
     - name: Install environment
       run: |
-        sudo apt install -y clang-format-8
+        sudo apt install -y clang-format-14
     - name: Run clang formatter
       run: |
         ./tool/format.sh
@@ -39,10 +39,9 @@ jobs:
   build_and_test_linux:
     strategy:
      matrix:
-        platform: [ubuntu-18.04]
+        platform: [ubuntu-18.04, ubuntu-22.04]
+        mgversion: ["2.0.0", "2.3.0"]
     runs-on: ${{ matrix.platform }}
-    env:
-      MG_VERSION: "1.4.0"
     steps:
       - name: Set-up repository
         uses: actions/checkout@v1
@@ -60,7 +59,7 @@ jobs:
         if: steps.cache-memgraph-docker.outputs.cache-hit != 'true'
         run: |
           mkdir ~/memgraph
-          curl -L https://memgraph.com/download/memgraph/v${MG_VERSION}/docker/memgraph-${MG_VERSION}-community-docker.tar.gz > ~/memgraph/memgraph-docker.tar.gz
+          curl -L https://memgraph.com/download/memgraph/v${MG_VERSION}/docker/memgraph-${{ matrix.mgversion }}-community-docker.tar.gz > ~/memgraph/memgraph-docker.tar.gz
       - name: Load and run Memgraph Docker image
         run: |
           docker load -i ~/memgraph/memgraph-docker.tar.gz
@@ -69,14 +68,14 @@ jobs:
       - name: Build with gcc, test and install mgclient
         run: |
           mkdir build-gcc && cd build-gcc
-          cmake -DCMAKE_C_COMPILER=gcc-8 -DCMAKE_CXX_COMPILER=g++-8 -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=ON -DBUILD_TESTING_INTEGRATION=ON -DC_WARNINGS_AS_ERRORS=ON -DCPP_WARNINGS_AS_ERRORS=ON ..
+          cmake -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++ -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=ON -DBUILD_TESTING_INTEGRATION=ON -DC_WARNINGS_AS_ERRORS=ON -DCPP_WARNINGS_AS_ERRORS=ON ..
           make
           ctest --output-on-failure
           sudo make install
       - name: Build with clang, test and install mgclient
         run: |
           mkdir build-clang && cd build-clang
-          cmake -DCMAKE_C_COMPILER=clang-8 -DCMAKE_CXX_COMPILER=clang++-8 -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=ON -DBUILD_TESTING_INTEGRATION=ON -DC_WARNINGS_AS_ERRORS=ON -DCPP_WARNINGS_AS_ERRORS=ON ..
+          cmake -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=ON -DBUILD_TESTING_INTEGRATION=ON -DC_WARNINGS_AS_ERRORS=ON -DCPP_WARNINGS_AS_ERRORS=ON ..
           make
           ctest --output-on-failure
           sudo make install
@@ -140,7 +139,7 @@ jobs:
 
       - name: Build with clang
         run: |
-          mkdir build 
+          mkdir build
           cd build
           cmake .. -DCMAKE_BUILD_TYPE=Release -DC_WARNINGS_AS_ERRORS=ON -DWASM=ON
           make
