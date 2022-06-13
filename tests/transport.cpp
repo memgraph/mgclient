@@ -40,14 +40,19 @@ extern "C" {
 #include "test-common.hpp"
 
 std::pair<X509 *, EVP_PKEY *> MakeCertAndKey(const char *name) {
+  static constexpr int kModulusSize{2048};
+#if OPENSSL_VERSION_NUMBER < 0x30000000L
   RSA *rsa = RSA_new();
   BIGNUM *bne = BN_new();
   BN_set_word(bne, RSA_F4);
-  RSA_generate_key_ex(rsa, 2048, bne, NULL);
+  RSA_generate_key_ex(rsa, kModulusSize, bne, NULL);
   BN_free(bne);
 
   EVP_PKEY *pkey = EVP_PKEY_new();
   EVP_PKEY_assign_RSA(pkey, rsa);
+#else
+  EVP_PKEY *pkey = EVP_RSA_gen(kModulusSize);
+#endif
 
   X509 *x509 = X509_new();
   ASN1_INTEGER_set(X509_get_serialNumber(x509), 1);
