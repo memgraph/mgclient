@@ -12,10 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include "mgsocket.h"
+
 #include <string.h>
 
 #include "mgcommon.h"
-#include "mgsocket.h"
 
 #define MG_RETRY_ON_EINTR(expression)          \
   __extension__({                              \

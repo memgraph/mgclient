@@ -19,14 +19,15 @@
 extern "C" {
 #endif
 
+#include <stddef.h>
+#include <stdio.h>
+
 #ifndef __EMSCRIPTEN__
 #include <openssl/bio.h>
 #include <openssl/err.h>
 #include <openssl/ssl.h>
 #endif
 
-#include <stddef.h>
-#include <stdio.h>
 
 #include "mgallocator.h"
 #include "mgcommon.h"

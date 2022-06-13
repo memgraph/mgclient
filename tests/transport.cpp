@@ -14,14 +14,14 @@
 
 // TODO(mtomic): Maybe add test for raw transport.
 
-#include <gmock/gmock.h>
-#include <gtest/gtest.h>
-
 #include <filesystem>
 #include <fstream>
 #include <functional>
 #include <random>
 #include <thread>
+
+#include <gmock/gmock.h>
+#include <gtest/gtest.h>
 
 #if MGCLIENT_ON_WINDOWS
 // NOTE:
