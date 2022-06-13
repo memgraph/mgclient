@@ -32,7 +32,7 @@ jobs:
           mkdir build
           cd build
           cmake -DOPENSSL_ROOT_DIR="$(ls -rd -- /usr/local/Cellar/openssl@1.1/* | head -n 1)" -DCMAKE_INSTALL_PREFIX=/usr/local -DBUILD_TESTING=ON -DBUILD_TESTING_INTEGRATION=ON -DC_WARNINGS_AS_ERRORS=ON -DCPP_WARNINGS_AS_ERRORS=ON ..
-          make
+          cmake --build . --parallel
           ctest -E "example|integration"
           sudo make install
 
@@ -69,14 +69,14 @@ jobs:
         run: |
           mkdir build-gcc && cd build-gcc
           cmake -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++ -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=ON -DBUILD_TESTING_INTEGRATION=ON -DC_WARNINGS_AS_ERRORS=ON -DCPP_WARNINGS_AS_ERRORS=ON ..
-          make
+          cmake --build . --parallel
           ctest --output-on-failure
           sudo make install
       - name: Build with clang, test and install mgclient
         run: |
           mkdir build-clang && cd build-clang
           cmake -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=ON -DBUILD_TESTING_INTEGRATION=ON -DC_WARNINGS_AS_ERRORS=ON -DCPP_WARNINGS_AS_ERRORS=ON ..
-          make
+          cmake --build . --parallel
           ctest --output-on-failure
           sudo make install
 
@@ -125,7 +125,7 @@ jobs:
           mkdir build
           cd build
           cmake .. -G "MinGW Makefiles" -DBUILD_TESTING=ON -DBUILD_TESTING_INTEGRATION=ON -DC_WARNINGS_AS_ERRORS=ON -DCPP_WARNINGS_AS_ERRORS=ON
-          cmake --build .
+          cmake --build . --parallel
           ctest --verbose -R "allocator|value|example_basic|integration_basic"
 
   build_and_test_linux_wasm:
