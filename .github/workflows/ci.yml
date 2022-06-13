@@ -41,14 +41,18 @@ jobs:
      matrix:
         platform: [ubuntu-20.04, ubuntu-22.04]
         mgversion: ["2.0.0", "2.3.0"]
+        packages: ["gcc g++ clang"]
+        gcc-postfix: [""]
+        clang-postfix: [""]
+        include:
+          - {platform: [ubuntu-18.04], mgversion: "2.0.0", packages: "gcc-8 g++-8 clang-8 clang++-8", gcc-postfix: "-8", clang-postfix: "-8"}
     runs-on: ${{ matrix.platform }}
     steps:
       - name: Set-up repository
         uses: actions/checkout@v1
       - name: Install environment
         run: |
-          sudo apt install -y gcc g++ clang
-
+          sudo apt install -y ${{ matrix.packages }}
       - name: Cache Memgraph Docker image
         id: cache-memgraph-docker
         uses: actions/cache@v1
@@ -68,14 +72,14 @@ jobs:
       - name: Build with gcc, test and install mgclient
         run: |
           mkdir build-gcc && cd build-gcc
-          cmake -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++ -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=ON -DBUILD_TESTING_INTEGRATION=ON -DC_WARNINGS_AS_ERRORS=ON -DCPP_WARNINGS_AS_ERRORS=ON ..
+          cmake -DCMAKE_C_COMPILER=gcc${{ matrix.gcc-postfix }} -DCMAKE_CXX_COMPILER=g++${{ matrix.gcc-postfix }} -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=ON -DBUILD_TESTING_INTEGRATION=ON -DC_WARNINGS_AS_ERRORS=ON -DCPP_WARNINGS_AS_ERRORS=ON ..
           cmake --build . --parallel
           ctest --output-on-failure
           sudo make install
       - name: Build with clang, test and install mgclient
         run: |
           mkdir build-clang && cd build-clang
-          cmake -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=ON -DBUILD_TESTING_INTEGRATION=ON -DC_WARNINGS_AS_ERRORS=ON -DCPP_WARNINGS_AS_ERRORS=ON ..
+          cmake -DCMAKE_C_COMPILER=clang${{ matrix.clang-postfix }} -DCMAKE_CXX_COMPILER=clang++${{ matrix.clang-postfix }} -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=ON -DBUILD_TESTING_INTEGRATION=ON -DC_WARNINGS_AS_ERRORS=ON -DCPP_WARNINGS_AS_ERRORS=ON ..
           cmake --build . --parallel
           ctest --output-on-failure
           sudo make install
