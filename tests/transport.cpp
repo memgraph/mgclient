@@ -121,7 +121,8 @@ class SecureTransportTest : public ::testing::Test {
 
     client_key_path = std::filesystem::temp_directory_path() / "client.key";
     BIO *key_file = BIO_new_file(client_key_path.string().c_str(), "w");
-    PEM_write_bio_PrivateKey(key_file, client_key, nullptr, nullptr, 0, nullptr, nullptr);
+    PEM_write_bio_PrivateKey(key_file, client_key, nullptr, nullptr, 0, nullptr,
+                             nullptr);
     BIO_free(key_file);
 
     X509_free(client_cert);
