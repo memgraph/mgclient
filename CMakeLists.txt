@@ -14,12 +14,12 @@
 
 cmake_minimum_required(VERSION 3.8)
 
-if(WASM) 
+if(WASM)
     execute_process(COMMAND ${CMAKE_SOURCE_DIR}/wasm/install_deps.sh)
     set(CMAKE_TOOLCHAIN_FILE "${CMAKE_SOURCE_DIR}/wasm/emsdk/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake")
 endif()
 
-project(mgclient VERSION 1.2.0)
+project(mgclient VERSION 1.4.0)
 # Minor version increase can also mean ABI incompatibility with previous
 # versions. IMPORTANT: Take care of the SO version manually.
 set(mgclient_SOVERSION 2)
@@ -43,7 +43,7 @@ elseif(UNIX AND NOT APPLE)
         message(STATUS "ON LINUX WASM BUILD")
     elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
         message(STATUS "ON LINUX BUILD")
-    else() 
+    else()
         message(FATAL_ERROR "Unsupported operating system. Please create issue or contribute!")
     endif()
     set(MGCLIENT_ON_LINUX TRUE)
