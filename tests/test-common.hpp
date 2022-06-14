@@ -62,7 +62,7 @@ struct tracking_allocator {
 void *tracking_allocator_malloc(mg_allocator *allocator, size_t size) {
   std::set<void *> *allocated = &((tracking_allocator *)allocator)->allocated;
   void *buf = malloc(size);
-  if (buf != NULL) {
+  if (buf != nullptr) {
     allocated->insert(buf);
   }
   return buf;
@@ -72,14 +72,14 @@ void *tracking_allocator_realloc(mg_allocator *allocator, void *buf,
                                  size_t size) {
   std::set<void *> *allocated = &((tracking_allocator *)allocator)->allocated;
   assert(size > 0);
-  if (buf == NULL) {
+  if (buf == nullptr) {
     return tracking_allocator_malloc(allocator, size);
   } else {
     auto it = allocated->find(buf);
     assert(it != allocated->end());
     allocated->erase(it);
     void *new_buf = realloc(buf, size);
-    if (new_buf != NULL) {
+    if (new_buf != nullptr) {
       allocated->insert(new_buf);
     }
     return new_buf;
@@ -88,7 +88,7 @@ void *tracking_allocator_realloc(mg_allocator *allocator, void *buf,
 
 void tracking_allocator_free(mg_allocator *allocator, void *buf) {
   std::set<void *> *allocated = &((tracking_allocator *)allocator)->allocated;
-  if (buf != NULL) {
+  if (buf != nullptr) {
     auto it = allocated->find(buf);
     assert(it != allocated->end());
     allocated->erase(it);

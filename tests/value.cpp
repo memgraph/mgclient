@@ -424,10 +424,10 @@ TEST(Value, Path) {
     EXPECT_EQ(mg_path_relationship_reversed_at(path, 6), -1);
     EXPECT_EQ(mg_path_relationship_reversed_at(path, 83291038), -1);
   };
-  mg_node *nodes[] = {mg_node_make(1, 0, NULL, mg_map_make_empty(0)),
-                      mg_node_make(2, 0, NULL, mg_map_make_empty(0)),
-                      mg_node_make(3, 0, NULL, mg_map_make_empty(0)),
-                      mg_node_make(4, 0, NULL, mg_map_make_empty(0))};
+  mg_node *nodes[] = {mg_node_make(1, 0, nullptr, mg_map_make_empty(0)),
+                      mg_node_make(2, 0, nullptr, mg_map_make_empty(0)),
+                      mg_node_make(3, 0, nullptr, mg_map_make_empty(0)),
+                      mg_node_make(4, 0, nullptr, mg_map_make_empty(0))};
   mg_unbound_relationship *relationships[] = {
       mg_unbound_relationship_make(12, mg_string_make("EDGE"),
                                    mg_map_make_empty(0)),

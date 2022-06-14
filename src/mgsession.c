@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include "mgsession.h"
+
 #include <assert.h>
 #include <errno.h>
 #include <stdalign.h>
@@ -26,7 +28,6 @@
 
 #include "mgcommon.h"
 #include "mgconstants.h"
-#include "mgsession.h"
 #include "mgtransport.h"
 
 int mg_session_status(const mg_session *session) {

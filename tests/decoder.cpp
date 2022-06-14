@@ -12,11 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <gtest/gtest.h>
-
 #include <iostream>
 #include <string>
 #include <thread>
+
+#include <gtest/gtest.h>
 
 #include "mgclient.h"
 #include "mgcommon.h"

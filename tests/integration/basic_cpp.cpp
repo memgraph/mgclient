@@ -12,10 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
 #include "mgclient.hpp"
+
+#include "gmock_wrapper.h"
 
 template <typename T>
 T GetEnvOrDefault(const std::string &value_name, const T &default_value) {
