@@ -689,6 +689,7 @@ class RunTest : public ::testing::Test {
     sc = tmp[0];
     ss = tmp[1];
 
+    mg_init();
     session = mg_session_init((mg_allocator *)&allocator);
     mg_raw_transport_init(sc, (mg_raw_transport **)&session->transport,
                           (mg_allocator *)&allocator);
@@ -925,7 +926,7 @@ void RunTest::OkNoResults(int version) {
       if (version == 4) {
         mg_message_pull *pull_message = message->pull_v;
         ASSERT_TRUE(pull_message->extra);
-        ASSERT_EQ(mg_map_size(pull_message->extra), 0u);
+        ASSERT_EQ(mg_map_size(pull_message->extra), 1u);
       }
       mg_message_destroy_ca(message, session->decoder_allocator);
     }
@@ -1016,7 +1017,7 @@ void RunTest::MultipleQueries(int version) {
         if (version == 4) {
           mg_message_pull *pull_message = message->pull_v;
           ASSERT_TRUE(pull_message->extra);
-          ASSERT_EQ(mg_map_size(pull_message->extra), 0u);
+          ASSERT_EQ(mg_map_size(pull_message->extra), 1u);
         }
         mg_message_destroy_ca(message, session->decoder_allocator);
       }
@@ -1132,7 +1133,7 @@ void RunTest::OkWithResults(int version) {
       if (version == 4) {
         mg_message_pull *pull_message = message->pull_v;
         ASSERT_TRUE(pull_message->extra);
-        ASSERT_EQ(mg_map_size(pull_message->extra), 0u);
+        ASSERT_EQ(mg_map_size(pull_message->extra), 1u);
       }
       mg_message_destroy_ca(message, session->decoder_allocator);
     }
@@ -1252,7 +1253,7 @@ void RunTest::QueryRuntimeError(int version) {
       if (version == 4) {
         mg_message_pull *pull_message = message->pull_v;
         ASSERT_TRUE(pull_message->extra);
-        ASSERT_EQ(mg_map_size(pull_message->extra), 0u);
+        ASSERT_EQ(mg_map_size(pull_message->extra), 1u);
       }
       mg_message_destroy_ca(message, session->decoder_allocator);
     }
@@ -1363,7 +1364,7 @@ void RunTest::QueryDatabaseError(int version) {
       if (version == 4) {
         mg_message_pull *pull_message = message->pull_v;
         ASSERT_TRUE(pull_message->extra);
-        ASSERT_EQ(mg_map_size(pull_message->extra), 0u);
+        ASSERT_EQ(mg_map_size(pull_message->extra), 1u);
       }
       mg_message_destroy_ca(message, session->decoder_allocator);
     }
@@ -1454,7 +1455,7 @@ void RunTest::RunWithParams(int version) {
       if (version == 4) {
         mg_message_pull *pull_message = message->pull_v;
         ASSERT_TRUE(pull_message->extra);
-        ASSERT_EQ(mg_map_size(pull_message->extra), 0u);
+        ASSERT_EQ(mg_map_size(pull_message->extra), 1u);
       }
       mg_message_destroy_ca(message, session->decoder_allocator);
     }
@@ -1759,7 +1760,7 @@ TEST_F(RunTest, TransactionBasic) {
       ASSERT_EQ(message->type, MG_MESSAGE_TYPE_PULL);
       mg_message_pull *pull_message = message->pull_v;
       ASSERT_TRUE(pull_message->extra);
-      ASSERT_EQ(mg_map_size(pull_message->extra), 0u);
+      ASSERT_EQ(mg_map_size(pull_message->extra), 1u);
       mg_message_destroy_ca(message, session->decoder_allocator);
     }
 

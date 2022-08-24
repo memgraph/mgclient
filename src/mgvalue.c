@@ -1871,4 +1871,6 @@ int mg_value_equal(const mg_value *lhs, const mg_value *rhs) {
   return 0;
 }
 
+mg_map *mg_default_pull_extra_map;
+
 mg_map mg_empty_map = {0, 0, NULL, NULL};
