@@ -34,6 +34,7 @@ An examples follows:
 
 ```
 cmake -DOPENSSL_ROOT_DIR="$(ls -rd -- /usr/local/Cellar/openssl@1.1/* | head -n 1)" ..
+cmake -DOPENSSL_ROOT_DIR="$(brew --prefix openssl)" ..
 ```
 
 After running CMake, you should see a Makefile in the build directory. Then you
