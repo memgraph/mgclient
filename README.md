@@ -111,12 +111,24 @@ ctest
 
 ## Building and installing on Windows
 
-To build `mgclient` on Windows, MINGW environment should be used.
-   - Install MSYS2 from https://www.msys2.org/.
-   - Install MinGW toolchain with the following command:
-     ```
-     pacman -S --needed git base-devel mingw-w64-i686-toolchain mingw-w64-x86_64-toolchain mingw-w64-i686-cmake mingw-w64-x86_64-cmake mingw-w64-i686-openssl mingw-w64-x86_64-openssl
-     ```
+To build `mgclient` on Windows, there are multiple options.
+
+### MSVC
+
+```
+mkdir build
+cd build
+cmake ..
+cmake --build .
+```
+
+### MINGW
+
+- Install MSYS2 from https://www.msys2.org/.
+- Install MinGW toolchain with the following command:
+  ```
+  pacman -S --needed git base-devel mingw-w64-i686-toolchain mingw-w64-x86_64-toolchain mingw-w64-i686-cmake mingw-w64-x86_64-cmake mingw-w64-i686-openssl mingw-w64-x86_64-openssl
+  ```
 
 Once the environment is ready, please run:
 
