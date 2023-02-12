@@ -144,3 +144,6 @@ project root directory.
 
 All the examples of the usage of the mgclient are contained in the
 [examples](examples) folder, including the C++ wrapper.
+
+An example on how to include mgclient inside a CMake project is located under
+`examples/CMakeLists.txt`.
