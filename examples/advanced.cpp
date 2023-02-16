@@ -54,6 +54,17 @@ int main(int argc, char *argv[]) {
       std::cout << "Number of results: " << data.size() << std::endl;
     }
 
+    mg::Map query_params(1);
+    query_params.Insert("id", mg::Value(0));
+    if (!client->Execute("MATCH (n {id: $id}) RETURN n;", query_params.AsConstMap())) {
+      std::cerr << "Failed to read data by parametrized query." << std::endl;
+      return 1;
+    }
+    if (const auto maybe_data = client->FetchAll()) {
+      const auto data = *maybe_data;
+      std::cout << "Number of results: " << data.size() << std::endl;
+    }
+
     if (!client->Execute("MATCH (n) RETURN n;")) {
       std::cerr << "Failed to read data." << std::endl;
       return 1;
