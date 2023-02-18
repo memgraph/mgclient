@@ -38,9 +38,23 @@ jobs:
 
   build_windows_msvc:
     runs-on: windows-latest
+    env:
+      VCPKG_ROOT: '${{ github.workspace }}/vcpkg'
     steps:
       - name: Set-up repository
         uses: actions/checkout@v2
+      - name: Get vcpkg
+        run: |
+          cd ${{ github.workspace }}
+          git clone https://github.com/Microsoft/vcpkg.git
+          cd vcpkg
+          .\bootstrap-vcpkg.bat
+      - name: Remove system vcpkg
+        run: rm -rf "$VCPKG_INSTALLATION_ROOT"
+        shell: bash
+      - name: Install vcpkg packages
+        run: |
+          ${{ env.VCPKG_ROOT }}\vcpkg.exe install openssl
       - name: Build and test mgclient
         run: |
           mkdir build
