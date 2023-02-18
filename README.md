@@ -131,7 +131,7 @@ cmake --build .
 Depending on where OpenSSL is installed you might need to define
 `OPENSSL_ROOT_DIR`, example follows:
 ```
-cmake -DOPENSSL_ROOT_DIR="$VCPKG_ROOT\packages\openssl_x86-windows" ..
+cmake -DOPENSSL_ROOT_DIR="$VCPKG_ROOT\installed\x64-windows" ..
 ```
 
 ### MINGW
@@ -151,7 +151,7 @@ cmake .. -G "MinGW Makefiles"
 cmake --build . --target install
 ```
 
-## Building WASM (linux only)
+## Building WASM (Linux only)
 
 Compiling `mgclient` for wasm requires the Emscripten sdk. This is automated in
 the following steps:
