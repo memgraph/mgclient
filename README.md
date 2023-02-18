@@ -118,9 +118,12 @@ ctest
 To build and install mgclient from source on Windows you will need:
    - CMake version >= 3.8
    - OpenSSL version >= 1.0.2
-   - gcc >= 8 under MinGW or Windows compiler (MSVC) >= 2019
+   - MinGW: gcc >= 8 or Windows Compiler (take a look
+     [here](https://blog.knatten.org/2022/08/26/microsoft-c-versions-explained/)
+     to understand versioning in a bit more details):
+     VS >= 17 2022, MSVC >= 14.34, C >= 19.34
 
-### MSVC
+### Windows Compiler
 
 ```
 mkdir build
@@ -128,13 +131,19 @@ cd build
 cmake ..
 cmake --build .
 ```
+
 Depending on where OpenSSL is installed you might need to define
 `OPENSSL_ROOT_DIR`, example follows:
 ```
 cmake -DOPENSSL_ROOT_DIR="$VCPKG_ROOT\installed\x64-windows" ..
 ```
 
-### MINGW
+To install OpenSSL [vcpkg](https://vcpkg.io/en/index.html) can be used:
+```
+vcpkg install openssl:x64-windows
+```
+
+### MinGW
 
 - Install MSYS2 from https://www.msys2.org/.
 - Install MinGW toolchain with the following command:
