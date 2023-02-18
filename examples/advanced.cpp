@@ -23,7 +23,7 @@ std::string MgValueToString(const mg::ConstValue &value) {
     value_str = std::to_string(value.ValueDouble());
   } else if (value.type() == mg::Value::Type::List) {
     value_str += "[";
-    for (const auto &item : value.ValueList()) {
+    for (auto item : value.ValueList()) {
       value_str += MgValueToString(item) + ",";
     }
     value_str += "]";
