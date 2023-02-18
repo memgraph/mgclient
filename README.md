@@ -30,11 +30,13 @@ brew install openssl@1.1
 ```
 
 If `cmake` can't locate OpenSSL, please set `OPENSSL_ROOT_DIR` to a valid path.
-An examples follows:
+Examples follow:
 
 ```
-cmake -DOPENSSL_ROOT_DIR="$(ls -rd -- /usr/local/Cellar/openssl@1.1/* | head -n 1)" ..
+# M1 with brew installed
 cmake -DOPENSSL_ROOT_DIR="$(brew --prefix openssl)" ..
+# Using only ls command
+cmake -DOPENSSL_ROOT_DIR="$(ls -rd -- /usr/local/Cellar/openssl@1.1/* | head -n 1)" ..
 ```
 
 After running CMake, you should see a Makefile in the build directory. Then you
@@ -139,12 +141,17 @@ cd build
 cmake .. -G "MinGW Makefiles"
 cmake --build . --target install
 ```
+
 ## Building WASM (linux only)
-Compiling `mgclient` for wasm requires the Emscripten sdk. This is automated in the following steps:
+
+Compiling `mgclient` for wasm requires the Emscripten sdk. This is automated in
+the following steps:
   1. mkdir build && cd build
   2. cmake .. -DWASM=ON
   3. make
-Now there should be an `mgclient.js` and an `mgclient.wasm` found in `mgclient/build/`
+
+Now there should be an `mgclient.js` and an `mgclient.wasm` found in
+`mgclient/build/`
 
 ## Using the library
 
