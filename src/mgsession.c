@@ -23,9 +23,9 @@
 #include <string.h>
 // Somehow stdalign.h is not there (VS Build Tools 2019, Windows 11)
 // https://docs.microsoft.com/en-us/cpp/cpp/alignment-cpp-declarations?view=msvc-170
+// EVERYWHERE EXCEPT MSVC
 #if !defined(_WIN32) || !defined(_MSC_VER)
 #include <stdalign.h>
-#else
 #include <unistd.h>
 #endif
 

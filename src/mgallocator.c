@@ -17,11 +17,11 @@
 #include <assert.h>
 // Somehow stdalign.h is not there (VS Build Tools 2019, Windows 11)
 // https://docs.microsoft.com/en-us/cpp/cpp/alignment-cpp-declarations?view=msvc-170
-// The following block is EXCLUDED on MSVC.
+// EVERYWHERE EXCEPT MSVC
 #if !defined(_WIN32) || !defined(_MSC_VER)
 #include <stdalign.h>
 #endif
-// The following block is USED on MSVC.
+// ONLY ON MSVC
 #ifdef _MSC_VER
 #define alignof __alignof
 typedef double max_align_t;
