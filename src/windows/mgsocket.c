@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <limits.h>
-
 #include "mgsocket.h"
+
+#include <limits.h>
 
 // Please refer to https://docs.microsoft.com/en-us/windows/win32/api/winsock2/
 // for more details about Windows system calls.

@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include "mgsession.h"
+
 #include <assert.h>
 #include <errno.h>
 #include <stdarg.h>
@@ -28,7 +30,7 @@
 
 #include "mgcommon.h"
 #include "mgconstants.h"
-#include "mgsession.h"
+#include "mgtransport.h"
 
 int mg_session_status(const mg_session *session) {
   if (!session) {
@@ -229,6 +231,7 @@ int mg_session_ensure_space_for_chunk(mg_session *session, size_t chunk_size) {
 
 int mg_session_read_chunk(mg_session *session) {
   uint16_t chunk_size;
+  mg_transport_suspend_until_ready_to_read(session->transport);
   if (mg_transport_recv(session->transport, (char *)&chunk_size, 2) != 0) {
     mg_session_set_error(session, "failed to receive chunk size");
     return MG_ERROR_RECV_FAILED;
@@ -243,6 +246,7 @@ int mg_session_read_chunk(mg_session *session) {
       return status;
     }
   }
+  mg_transport_suspend_until_ready_to_read(session->transport);
   if (mg_transport_recv(session->transport,
                         session->in_buffer + session->in_end,
                         chunk_size) != 0) {

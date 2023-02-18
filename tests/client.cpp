@@ -12,18 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <gtest/gtest.h>
+
 #include <optional>
 #include <random>
 #include <thread>
-
-#include <gmock/gmock.h>
-#include <gtest/gtest.h>
 
 #include "mgclient.h"
 #include "mgcommon.h"
 #include "mgsession.h"
 #include "mgsocket.h"
 
+#include "gmock_wrapper.h"
 #include "test-common.hpp"
 
 using namespace std::string_literals;
@@ -70,6 +70,8 @@ struct test_transport {
   int (*send)(struct mg_transport *, const char *buf, size_t len);
   int (*recv)(struct mg_transport *, char *buf, size_t len);
   void (*destroy)(struct mg_transport *);
+  void (*suspend_until_ready_to_read)(struct mg_transport *);
+  void (*suspend_until_ready_to_write)(struct mg_transport *);
   union {
     struct {
       SSL *ssl;
@@ -98,6 +100,8 @@ int __wrap_mg_secure_transport_init(int sockfd, const char *cert,
   ttransport->send = mg_raw_transport_send;
   ttransport->recv = mg_raw_transport_recv;
   ttransport->destroy = test_transport_destroy;
+  ttransport->suspend_until_ready_to_read = nullptr;
+  ttransport->suspend_until_ready_to_write = nullptr;
   ttransport->peer_pubkey_type = "rsaEncryption";
   ttransport->peer_pubkey_fp = TEST_KEY_FP;
   *transport = (mg_secure_transport *)ttransport;
@@ -185,7 +189,7 @@ class ConnectTest : public ::testing::Test {
 
   void RunServer(const std::function<void(int)> &server_func) {
     server_thread = std::thread([this, server_func] {
-      int sockfd = accept(ss, NULL, NULL);
+      int sockfd = accept(ss, nullptr, nullptr);
       if (sockfd < 0) {
         abort();
       }
@@ -789,9 +793,9 @@ void RunTest::ProtocolViolation(int version) {
   });
 
   session->version = version;
-  ASSERT_EQ(
-      mg_session_run(session, "MATCH (n) RETURN n", NULL, NULL, NULL, NULL),
-      MG_ERROR_PROTOCOL_VIOLATION);
+  ASSERT_EQ(mg_session_run(session, "MATCH (n) RETURN n", nullptr, nullptr,
+                           nullptr, nullptr),
+            MG_ERROR_PROTOCOL_VIOLATION);
   ASSERT_EQ(mg_session_status(session), MG_SESSION_BAD);
   mg_session_destroy(session);
   StopServer();
@@ -860,9 +864,9 @@ void RunTest::InvalidStatement(int version) {
     mg_session_destroy(session);
   });
   session->version = version;
-  ASSERT_EQ(
-      mg_session_run(session, "MATCH (n) RETURN m", NULL, NULL, NULL, NULL),
-      MG_ERROR_CLIENT_ERROR);
+  ASSERT_EQ(mg_session_run(session, "MATCH (n) RETURN m", nullptr, nullptr,
+                           nullptr, nullptr),
+            MG_ERROR_CLIENT_ERROR);
   ASSERT_THAT(std::string(mg_session_error(session)),
               HasSubstr("Unbound variable: m"));
   ASSERT_EQ(mg_session_status(session), MG_SESSION_READY);
@@ -940,12 +944,13 @@ void RunTest::OkNoResults(int version) {
 
   session->version = version;
 
-  ASSERT_EQ(
-      mg_session_run(session, "MATCH (n) RETURN n", NULL, NULL, NULL, NULL), 0);
+  ASSERT_EQ(mg_session_run(session, "MATCH (n) RETURN n", nullptr, nullptr,
+                           nullptr, nullptr),
+            0);
   ASSERT_EQ(mg_session_status(session), MG_SESSION_EXECUTING);
 
   mg_result *result;
-  ASSERT_EQ(mg_session_pull(session, NULL), 0);
+  ASSERT_EQ(mg_session_pull(session, nullptr), 0);
   ASSERT_EQ(mg_session_fetch(session, &result), 0);
   ASSERT_TRUE(CheckColumns(result, std::vector<std::string>{"n"}));
   ASSERT_TRUE(CheckSummary(result, 0.01));
@@ -1042,7 +1047,7 @@ void RunTest::MultipleQueries(int version) {
   for (int i = 0; i < 10; ++i) {
     ASSERT_EQ(mg_session_run(session,
                              ("RETURN " + std::to_string(i) + " AS n").c_str(),
-                             NULL, NULL, NULL, NULL),
+                             nullptr, nullptr, nullptr, nullptr),
               0);
 
     ASSERT_EQ(mg_session_status(session), MG_SESSION_EXECUTING);
@@ -1050,7 +1055,7 @@ void RunTest::MultipleQueries(int version) {
     mg_result *result;
 
     // Check result.
-    ASSERT_EQ(mg_session_pull(session, NULL), 0);
+    ASSERT_EQ(mg_session_pull(session, nullptr), 0);
     ASSERT_EQ(mg_session_status(session), MG_SESSION_FETCHING);
     ASSERT_EQ(mg_session_fetch(session, &result), 1);
     ASSERT_EQ(mg_session_status(session), MG_SESSION_FETCHING);
@@ -1159,13 +1164,13 @@ void RunTest::OkWithResults(int version) {
 
   ASSERT_EQ(
       mg_session_run(session, "UNWIND [1, 2, 3] AS n RETURN n, n + 5 AS m",
-                     NULL, NULL, NULL, NULL),
+                     nullptr, nullptr, nullptr, nullptr),
       0);
   ASSERT_EQ(mg_session_status(session), MG_SESSION_EXECUTING);
 
   mg_result *result;
 
-  ASSERT_EQ(mg_session_pull(session, NULL), 0);
+  ASSERT_EQ(mg_session_pull(session, nullptr), 0);
   ASSERT_EQ(mg_session_status(session), MG_SESSION_FETCHING);
 
   // Check results.
@@ -1290,14 +1295,14 @@ void RunTest::QueryRuntimeError(int version) {
 
   session->version = version;
 
-  ASSERT_EQ(mg_session_run(session, "MATCH (n) RETURN size(n.prop)", NULL, NULL,
-                           NULL, NULL),
+  ASSERT_EQ(mg_session_run(session, "MATCH (n) RETURN size(n.prop)", nullptr,
+                           nullptr, nullptr, nullptr),
             0);
   ASSERT_EQ(mg_session_status(session), MG_SESSION_EXECUTING);
 
   mg_result *result;
 
-  ASSERT_EQ(mg_session_pull(session, NULL), 0);
+  ASSERT_EQ(mg_session_pull(session, nullptr), 0);
   ASSERT_EQ(mg_session_fetch(session, &result), MG_ERROR_CLIENT_ERROR);
   ASSERT_EQ(mg_session_status(session), MG_SESSION_READY);
 
@@ -1375,14 +1380,14 @@ void RunTest::QueryDatabaseError(int version) {
 
   session->version = version;
 
-  ASSERT_EQ(mg_session_run(session, "MATCH (n) RETURN size(n.prop)", NULL, NULL,
-                           NULL, NULL),
+  ASSERT_EQ(mg_session_run(session, "MATCH (n) RETURN size(n.prop)", nullptr,
+                           nullptr, nullptr, nullptr),
             0);
   ASSERT_EQ(mg_session_status(session), MG_SESSION_EXECUTING);
 
   mg_result *result;
 
-  ASSERT_EQ(mg_session_pull(session, NULL), 0);
+  ASSERT_EQ(mg_session_pull(session, nullptr), 0);
   ASSERT_NE(mg_session_fetch(session, &result), 0);
   ASSERT_EQ(mg_session_status(session), MG_SESSION_BAD);
 
@@ -1478,14 +1483,14 @@ void RunTest::RunWithParams(int version) {
 
   mg_map *params = mg_map_make_empty(1);
   mg_map_insert_unsafe(params, "param", mg_value_make_integer(42));
-  ASSERT_EQ(mg_session_run(session, "WITH $param AS x RETURN x", params, NULL,
-                           NULL, NULL),
+  ASSERT_EQ(mg_session_run(session, "WITH $param AS x RETURN x", params,
+                           nullptr, nullptr, nullptr),
             0);
   mg_map_destroy(params);
 
   mg_result *result;
   {
-    ASSERT_EQ(mg_session_pull(session, NULL), 0);
+    ASSERT_EQ(mg_session_pull(session, nullptr), 0);
     ASSERT_EQ(mg_session_fetch(session, &result), 1);
     ASSERT_TRUE(CheckColumns(result, std::vector<std::string>{"x"}));
     const mg_list *row = mg_result_row(result);
@@ -1633,7 +1638,7 @@ TEST_F(RunTest, MultipleResultPull) {
 
   ASSERT_EQ(
       mg_session_run(session, "UNWIND [1, 2, 3] AS n RETURN n, n + 5 AS m",
-                     NULL, NULL, NULL, NULL),
+                     nullptr, nullptr, nullptr, nullptr),
       0);
   ASSERT_EQ(mg_session_status(session), MG_SESSION_EXECUTING);
 
@@ -1788,17 +1793,18 @@ TEST_F(RunTest, TransactionBasic) {
 
   session->version = 4;
 
-  ASSERT_EQ(mg_session_begin_transaction(session, NULL), 0);
+  ASSERT_EQ(mg_session_begin_transaction(session, nullptr), 0);
 
-  ASSERT_EQ(
-      mg_session_run(session, "MATCH (n) RETURN n", NULL, NULL, NULL, NULL), 0);
+  ASSERT_EQ(mg_session_run(session, "MATCH (n) RETURN n", nullptr, nullptr,
+                           nullptr, nullptr),
+            0);
   ASSERT_EQ(mg_session_status(session), MG_SESSION_EXECUTING);
 
   mg_result *result;
   ASSERT_EQ(mg_session_rollback_transaction(session, &result),
             MG_ERROR_BAD_CALL);
 
-  ASSERT_EQ(mg_session_pull(session, NULL), 0);
+  ASSERT_EQ(mg_session_pull(session, nullptr), 0);
   ASSERT_EQ(mg_session_fetch(session, &result), 0);
   ASSERT_TRUE(CheckColumns(result, std::vector<std::string>{"n"}));
   ASSERT_TRUE(CheckSummary(result, 0.01));
@@ -1991,18 +1997,18 @@ TEST_F(RunTest, TransactionWithMultipleRuns) {
 
   session->version = 4;
 
-  ASSERT_EQ(mg_session_begin_transaction(session, NULL), 0);
+  ASSERT_EQ(mg_session_begin_transaction(session, nullptr), 0);
   ASSERT_EQ(mg_session_status(session), MG_SESSION_READY);
 
   int64_t r1_qid;
   ASSERT_EQ(mg_session_run(session, "UNWIND [1, 2] AS n RETURN n, n + 5 AS m",
-                           NULL, NULL, NULL, &r1_qid),
+                           nullptr, nullptr, nullptr, &r1_qid),
             0);
   ASSERT_EQ(mg_session_status(session), MG_SESSION_EXECUTING);
 
   int64_t r2_qid;
   ASSERT_EQ(mg_session_run(session, "UNWIND [3, 4] AS n RETURN n, n + 5 AS m",
-                           NULL, NULL, NULL, &r2_qid),
+                           nullptr, nullptr, nullptr, &r2_qid),
             0);
   ASSERT_EQ(mg_session_status(session), MG_SESSION_EXECUTING);
 
@@ -2051,7 +2057,7 @@ TEST_F(RunTest, TransactionWithMultipleRuns) {
   // Send third RUN
   int64_t r3_qid;
   ASSERT_EQ(mg_session_run(session, "UNWIND [5, 6] AS n RETURN n, n + 5 AS m",
-                           NULL, NULL, NULL, &r3_qid),
+                           nullptr, nullptr, nullptr, &r3_qid),
             0);
   ASSERT_EQ(mg_session_status(session), MG_SESSION_EXECUTING);
 

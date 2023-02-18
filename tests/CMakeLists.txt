@@ -54,9 +54,11 @@ set_target_properties(${GTEST_MAIN_LIBRARY} PROPERTIES
         INTERFACE_LINK_LIBRARIES "${CMAKE_THREAD_LIBS_INIT}")
 add_dependencies(${GTEST_MAIN_LIBRARY} gtest-proj)
 
+set(TESTS_ROOT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+
 macro(add_gtest target_name target_path)
   add_executable(${target_name} ${target_path})
-  target_include_directories(${target_name} PRIVATE ${GTEST_INCLUDE_DIRS} "${PROJECT_SOURCE_DIR}/src")
+  target_include_directories(${target_name} PRIVATE ${GTEST_INCLUDE_DIRS} "${PROJECT_SOURCE_DIR}/src" "${TESTS_ROOT_DIRECTORY}")
   target_link_libraries(${target_name} mgclient-static mgclient_cpp gtest gtest-main project_cpp_warnings)
 
   if (ENABLE_COVERAGE)

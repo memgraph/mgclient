@@ -12,10 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
 #include "mgclient.h"
+
+#include "gmock_wrapper.h"
 
 template <typename T>
 T GetEnvOrDefault(const std::string &value_name, const T &default_value) {
@@ -110,16 +111,17 @@ class MemgraphConnection : public ::testing::Test {
     mg_result *result;
     const char *delete_all_query = "MATCH (n) DETACH DELETE n";
 
-    ASSERT_EQ(mg_session_run(session, delete_all_query, NULL, NULL, NULL, NULL),
+    ASSERT_EQ(mg_session_run(session, delete_all_query, nullptr, nullptr,
+                             nullptr, nullptr),
               0);
-    ASSERT_EQ(mg_session_pull(session, NULL), 0);
+    ASSERT_EQ(mg_session_pull(session, nullptr), 0);
     ASSERT_EQ(mg_session_fetch(session, &result), 0);
     ASSERT_EQ(mg_session_fetch(session, &result), MG_ERROR_BAD_CALL);
   }
 };
 
 TEST_F(MemgraphConnection, InsertAndRetriveFromMemegraph) {
-  ASSERT_EQ(mg_session_begin_transaction(session, NULL), 0);
+  ASSERT_EQ(mg_session_begin_transaction(session, nullptr), 0);
   mg_result *result;
   int status = 0, rows = 0;
   const char *create_query =
@@ -128,13 +130,17 @@ TEST_F(MemgraphConnection, InsertAndRetriveFromMemegraph) {
       "'test2', is_deleted: false})";
   const char *get_query = "MATCH (n)-[r]->(m) RETURN n, r, m";
 
-  ASSERT_EQ(mg_session_run(session, create_query, NULL, NULL, NULL, NULL), 0);
-  ASSERT_EQ(mg_session_pull(session, NULL), 0);
+  ASSERT_EQ(
+      mg_session_run(session, create_query, nullptr, nullptr, nullptr, nullptr),
+      0);
+  ASSERT_EQ(mg_session_pull(session, nullptr), 0);
   ASSERT_EQ(mg_session_fetch(session, &result), 0);
   ASSERT_EQ(mg_session_fetch(session, &result), MG_ERROR_BAD_CALL);
 
-  ASSERT_EQ(mg_session_run(session, get_query, NULL, NULL, NULL, NULL), 0);
-  ASSERT_EQ(mg_session_pull(session, NULL), 0);
+  ASSERT_EQ(
+      mg_session_run(session, get_query, nullptr, nullptr, nullptr, nullptr),
+      0);
+  ASSERT_EQ(mg_session_pull(session, nullptr), 0);
   while ((status = mg_session_fetch(session, &result)) == 1) {
     const mg_list *mg_columns = mg_result_columns(result);
     const mg_list *mg_row = mg_result_row(result);
@@ -190,9 +196,9 @@ TEST_F(MemgraphConnection, InsertAndRetriveFromMemegraph) {
                              "CREATE (n:ValuesTest {int: 1, string:'Name', "
                              "float: 2.3, bool: True, "
                              "list: [1, 2], map: {key: 'value'}}) RETURN n;",
-                             NULL, NULL, NULL, NULL),
+                             nullptr, nullptr, nullptr, nullptr),
               0);
-    ASSERT_EQ(mg_session_pull(session, NULL), 0);
+    ASSERT_EQ(mg_session_pull(session, nullptr), 0);
     mg_result *result;
     ASSERT_EQ(mg_session_fetch(session, &result), 1);
     const mg_list *mg_columns = mg_result_columns(result);

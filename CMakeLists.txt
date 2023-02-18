@@ -14,13 +14,23 @@
 
 cmake_minimum_required(VERSION 3.8)
 
-project(mgclient VERSION 1.2.0)
+if(WASM)
+    execute_process(COMMAND ${CMAKE_SOURCE_DIR}/wasm/install_deps.sh)
+    set(CMAKE_TOOLCHAIN_FILE "${CMAKE_SOURCE_DIR}/wasm/emsdk/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake")
+endif()
+
+project(mgclient VERSION 1.4.0)
 # Minor version increase can also mean ABI incompatibility with previous
 # versions. IMPORTANT: Take care of the SO version manually.
 set(mgclient_SOVERSION 2)
+set(WASM OFF CACHE BOOL "Compile mgclient for wasm")
 add_definitions(-DMGCLIENT_VERSION="${mgclient_VERSION}")
 
 # Deal with the operating system.
+if((NOT UNIX) AND EMSCRIPTEN)
+    message(FATAL_ERROR "WASM build is only supported in Linux")
+endif()
+
 if(WIN32)
     message(STATUS "ON WINDOWS BUILD")
     set(MGCLIENT_ON_WINDOWS TRUE)
@@ -29,14 +39,16 @@ if(WIN32)
     # "lib;" breaks gtest lib referencing.
     set(MGCLIENT_FIND_LIBRARY_PREFIXES "lib")
 elseif(UNIX AND NOT APPLE)
-    if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    if(EMSCRIPTEN)
+        message(STATUS "ON LINUX WASM BUILD")
+    elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
         message(STATUS "ON LINUX BUILD")
-        set(MGCLIENT_ON_LINUX TRUE)
-        add_definitions(-DMGCLIENT_ON_LINUX)
-        set(MGCLIENT_FIND_LIBRARY_PREFIXES "${CMAKE_FIND_LIBRARY_PREFIXES}")
     else()
         message(FATAL_ERROR "Unsupported operating system. Please create issue or contribute!")
     endif()
+    set(MGCLIENT_ON_LINUX TRUE)
+    add_definitions(-DMGCLIENT_ON_LINUX)
+    set(MGCLIENT_FIND_LIBRARY_PREFIXES "${CMAKE_FIND_LIBRARY_PREFIXES}")
 elseif(APPLE)
     message(STATUS "ON APPLE BUILD")
     set(MGCLIENT_ON_APPLE TRUE)
@@ -78,6 +90,14 @@ add_library(project_c_warnings INTERFACE)
 set_project_c_warnings(project_c_warnings)
 add_library(project_cpp_warnings INTERFACE)
 set_project_cpp_warnings(project_cpp_warnings)
+
+if(EMSCRIPTEN)
+   # same as project_c_warnings but without -O3. In the future we should
+   # experiment and switch to O3. because it reduces the js output size
+   # significantly.
+   set(CMAKE_C_FLAGS_DEBUG "-g -O0 -Wall -Wextra -Wpedantic -std=gnu11")
+   set(CMAKE_C_FLAGS_RELEASE "-O2 -DNDEBUG -Wall -Wextra -Wpedantic -std=gnu11")
+endif()
 
 # Set default build type to 'Release'
 if(NOT CMAKE_BUILD_TYPE)

@@ -14,14 +14,14 @@
 
 // TODO(mtomic): Maybe add test for raw transport.
 
-#include <gmock/gmock.h>
-#include <gtest/gtest.h>
-
 #include <filesystem>
 #include <fstream>
 #include <functional>
 #include <random>
 #include <thread>
+
+#include <gtest/gtest.h>
+#include <openssl/crypto.h>
 
 #if MGCLIENT_ON_WINDOWS
 // NOTE:
@@ -37,17 +37,22 @@ extern "C" {
 #include "mgtransport.h"
 }
 
+#include "gmock_wrapper.h"
 #include "test-common.hpp"
 
 std::pair<X509 *, EVP_PKEY *> MakeCertAndKey(const char *name) {
+#if OPENSSL_VERSION_NUMBER < 0x30000000L
   RSA *rsa = RSA_new();
   BIGNUM *bne = BN_new();
   BN_set_word(bne, RSA_F4);
-  RSA_generate_key_ex(rsa, 2048, bne, NULL);
+  RSA_generate_key_ex(rsa, 2048, bne, nullptr);
   BN_free(bne);
 
   EVP_PKEY *pkey = EVP_PKEY_new();
   EVP_PKEY_assign_RSA(pkey, rsa);
+#else
+  EVP_PKEY *pkey = EVP_RSA_gen(2048);
+#endif
 
   X509 *x509 = X509_new();
   ASN1_INTEGER_set(X509_get_serialNumber(x509), 1);
@@ -78,6 +83,7 @@ class SecureTransportTest : public ::testing::Test {
 #endif
   }
   virtual void SetUp() override {
+    OPENSSL_init_crypto(OPENSSL_INIT_ADD_ALL_CIPHERS, nullptr);
     int sv[2];
     ASSERT_EQ(mg_socket_pair(AF_UNIX, SOCK_STREAM, 0, sv), 0);
     sc = sv[0];
@@ -115,7 +121,8 @@ class SecureTransportTest : public ::testing::Test {
 
     client_key_path = std::filesystem::temp_directory_path() / "client.key";
     BIO *key_file = BIO_new_file(client_key_path.string().c_str(), "w");
-    PEM_write_bio_PrivateKey(key_file, client_key, NULL, NULL, 0, NULL, NULL);
+    PEM_write_bio_PrivateKey(key_file, client_key, nullptr, nullptr, 0, nullptr,
+                             nullptr);
     BIO_free(key_file);
 
     X509_free(client_cert);
@@ -180,7 +187,7 @@ TEST_F(SecureTransportTest, NoCertificate) {
   });
 
   mg_transport *transport;
-  ASSERT_EQ(mg_secure_transport_init(sc, NULL, NULL,
+  ASSERT_EQ(mg_secure_transport_init(sc, nullptr, nullptr,
                                      (mg_secure_transport **)&transport,
                                      (mg_allocator *)&allocator),
             0);
@@ -211,7 +218,7 @@ TEST_F(SecureTransportTest, WithCertificate) {
       X509_STORE_add_cert(store, ca_cert);
     }
     SSL_CTX_set_verify(ctx, SSL_VERIFY_PEER | SSL_VERIFY_FAIL_IF_NO_PEER_CERT,
-                       NULL);
+                       nullptr);
 
     ASSERT_TRUE(ctx);
     SSL *ssl = SSL_new(ctx);

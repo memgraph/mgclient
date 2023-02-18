@@ -12,10 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
 #include "mgclient.hpp"
+
+#include "gmock_wrapper.h"
 
 template <typename T>
 T GetEnvOrDefault(const std::string &value_name, const T &default_value) {
@@ -165,4 +166,10 @@ TEST_F(MemgraphConnection, DiscardAllAndFetchAll) {
     const auto &value = row[0];
     ASSERT_EQ(value.type(), mg::Value::Type::Node);
   }
+}
+
+TEST_F(MemgraphConnection, ThrowClientException) {
+  ASSERT_NE(client, nullptr);
+  ASSERT_TRUE(client->Execute("CREATE(n {name: assert(false)})"));
+  ASSERT_THROW(client->DiscardAll(), mg::ClientException);
 }

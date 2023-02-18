@@ -4,13 +4,13 @@ on: [push]
 
 jobs:
   clang_check:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-22.04
     steps:
     - name: Set-up repository
       uses: actions/checkout@v2
     - name: Install environment
       run: |
-        sudo apt install -y clang-format-8
+        sudo apt install -y clang-format
     - name: Run clang formatter
       run: |
         ./tool/format.sh
@@ -32,35 +32,38 @@ jobs:
           mkdir build
           cd build
           cmake -DOPENSSL_ROOT_DIR="$(ls -rd -- /usr/local/Cellar/openssl@1.1/* | head -n 1)" -DCMAKE_INSTALL_PREFIX=/usr/local -DBUILD_TESTING=ON -DBUILD_TESTING_INTEGRATION=ON -DC_WARNINGS_AS_ERRORS=ON -DCPP_WARNINGS_AS_ERRORS=ON ..
-          make
+          cmake --build . --parallel
           ctest -E "example|integration"
           sudo make install
 
   build_and_test_linux:
     strategy:
      matrix:
-        platform: [ubuntu-18.04]
+        platform: [ubuntu-20.04, ubuntu-22.04]
+        mgversion: ["2.0.0", "2.3.0"]
+        packages: ["gcc g++ clang"]
+        gcc-postfix: [""]
+        clang-postfix: [""]
+        include:
+          - {platform: [ubuntu-18.04], mgversion: "2.0.0", packages: "gcc-8 g++-8 clang-8 clang++-8", gcc-postfix: "-8", clang-postfix: "-8"}
     runs-on: ${{ matrix.platform }}
-    env:
-      MG_VERSION: "1.4.0"
     steps:
       - name: Set-up repository
         uses: actions/checkout@v1
       - name: Install environment
         run: |
-          sudo apt install -y gcc-8 g++-8 clang-8 clang++-8
-
+          sudo apt install -y ${{ matrix.packages }}
       - name: Cache Memgraph Docker image
         id: cache-memgraph-docker
         uses: actions/cache@v1
         with:
           path: ~/memgraph
-          key: cache-memgraph-v${{ env.MG_VERSION }}-docker-image
+          key: cache-memgraph-v${{ matrix.mgversion }}-docker-image
       - name: Download Memgraph Docker image
         if: steps.cache-memgraph-docker.outputs.cache-hit != 'true'
         run: |
           mkdir ~/memgraph
-          curl -L https://memgraph.com/download/memgraph/v${MG_VERSION}/docker/memgraph-${MG_VERSION}-community-docker.tar.gz > ~/memgraph/memgraph-docker.tar.gz
+          curl -L https://memgraph.com/download/memgraph/v${{ matrix.mgversion }}/docker/memgraph-${{ matrix.mgversion }}-docker.tar.gz > ~/memgraph/memgraph-docker.tar.gz
       - name: Load and run Memgraph Docker image
         run: |
           docker load -i ~/memgraph/memgraph-docker.tar.gz
@@ -69,15 +72,15 @@ jobs:
       - name: Build with gcc, test and install mgclient
         run: |
           mkdir build-gcc && cd build-gcc
-          cmake -DCMAKE_C_COMPILER=gcc-8 -DCMAKE_CXX_COMPILER=g++-8 -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=ON -DBUILD_TESTING_INTEGRATION=ON -DC_WARNINGS_AS_ERRORS=ON -DCPP_WARNINGS_AS_ERRORS=ON ..
-          make
+          cmake -DCMAKE_C_COMPILER=gcc${{ matrix.gcc-postfix }} -DCMAKE_CXX_COMPILER=g++${{ matrix.gcc-postfix }} -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=ON -DBUILD_TESTING_INTEGRATION=ON -DC_WARNINGS_AS_ERRORS=ON -DCPP_WARNINGS_AS_ERRORS=ON ..
+          cmake --build . --parallel
           ctest --output-on-failure
           sudo make install
       - name: Build with clang, test and install mgclient
         run: |
           mkdir build-clang && cd build-clang
-          cmake -DCMAKE_C_COMPILER=clang-8 -DCMAKE_CXX_COMPILER=clang++-8 -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=ON -DBUILD_TESTING_INTEGRATION=ON -DC_WARNINGS_AS_ERRORS=ON -DCPP_WARNINGS_AS_ERRORS=ON ..
-          make
+          cmake -DCMAKE_C_COMPILER=clang${{ matrix.clang-postfix }} -DCMAKE_CXX_COMPILER=clang++${{ matrix.clang-postfix }} -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=ON -DBUILD_TESTING_INTEGRATION=ON -DC_WARNINGS_AS_ERRORS=ON -DCPP_WARNINGS_AS_ERRORS=ON ..
+          cmake --build . --parallel
           ctest --output-on-failure
           sudo make install
 
@@ -126,5 +129,21 @@ jobs:
           mkdir build
           cd build
           cmake .. -G "MinGW Makefiles" -DBUILD_TESTING=ON -DBUILD_TESTING_INTEGRATION=ON -DC_WARNINGS_AS_ERRORS=ON -DCPP_WARNINGS_AS_ERRORS=ON
-          cmake --build .
+          cmake --build . --parallel
           ctest --verbose -R "allocator|value|example_basic|integration_basic"
+
+  build_and_test_linux_wasm:
+    strategy:
+     matrix:
+        platform: [ubuntu-18.04]
+    runs-on: ${{ matrix.platform }}
+    steps:
+      - name: Set-up repository
+        uses: actions/checkout@v2
+
+      - name: Build with clang
+        run: |
+          mkdir build
+          cd build
+          cmake .. -DCMAKE_BUILD_TYPE=Release -DC_WARNINGS_AS_ERRORS=ON -DWASM=ON
+          make

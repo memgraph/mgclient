@@ -7,7 +7,7 @@ cd "$DIR/.."
 
 ALL_FILES_TO_CHECK=$(find . -type f -regex ".*\.\(cpp\|hpp\|c\|h\)$" -print | paste -sd " ")
 for file in ${ALL_FILES_TO_CHECK}; do
-  clang-format-8 -i -verbose "${file}"
+  clang-format -i -verbose "${file}"
 done
 changes="$(git diff)"
 if [[ ! -z "${changes}" ]]; then

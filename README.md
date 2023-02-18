@@ -34,6 +34,7 @@ An examples follows:
 
 ```
 cmake -DOPENSSL_ROOT_DIR="$(ls -rd -- /usr/local/Cellar/openssl@1.1/* | head -n 1)" ..
+cmake -DOPENSSL_ROOT_DIR="$(brew --prefix openssl)" ..
 ```
 
 After running CMake, you should see a Makefile in the build directory. Then you
@@ -138,6 +139,12 @@ cd build
 cmake .. -G "MinGW Makefiles"
 cmake --build . --target install
 ```
+## Building WASM (linux only)
+Compiling `mgclient` for wasm requires the Emscripten sdk. This is automated in the following steps:
+  1. mkdir build && cd build
+  2. cmake .. -DWASM=ON
+  3. make
+Now there should be an `mgclient.js` and an `mgclient.wasm` found in `mgclient/build/`
 
 ## Using the library
 
@@ -150,3 +157,6 @@ project root directory.
 
 All the examples of the usage of the mgclient are contained in the
 [examples](examples) folder, including the C++ wrapper.
+
+An example on how to include mgclient inside a CMake project is located under
+`examples/CMakeLists.txt`.

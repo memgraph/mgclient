@@ -19,13 +19,18 @@
 #include <stdlib.h>
 #include <string.h>
 #ifdef MGCLIENT_ON_LINUX
+#ifndef __EMSCRIPTEN__
 #include <pthread.h>
+#endif
 #endif  // MGCLIENT_ON_LINUX
 
 #include "mgallocator.h"
 #include "mgclient.h"
 #include "mgcommon.h"
 #include "mgsocket.h"
+#ifdef __EMSCRIPTEN__
+#include "mgwasm.h"
+#endif
 
 int mg_init_ssl = 1;
 
@@ -41,6 +46,18 @@ void mg_transport_destroy(mg_transport *transport) {
   transport->destroy(transport);
 }
 
+void mg_transport_suspend_until_ready_to_read(struct mg_transport *transport) {
+  if (transport->suspend_until_ready_to_read) {
+    transport->suspend_until_ready_to_read(transport);
+  }
+}
+
+void mg_transport_suspend_until_ready_to_write(struct mg_transport *transport) {
+  if (transport->suspend_until_ready_to_write) {
+    transport->suspend_until_ready_to_write(transport);
+  }
+}
+
 int mg_raw_transport_init(int sockfd, mg_raw_transport **transport,
                           mg_allocator *allocator) {
   mg_raw_transport *ttransport =
@@ -52,6 +69,10 @@ int mg_raw_transport_init(int sockfd, mg_raw_transport **transport,
   ttransport->send = mg_raw_transport_send;
   ttransport->recv = mg_raw_transport_recv;
   ttransport->destroy = mg_raw_transport_destroy;
+  ttransport->suspend_until_ready_to_read =
+      mg_raw_transport_suspend_until_ready_to_read;
+  ttransport->suspend_until_ready_to_write =
+      mg_raw_transport_suspend_until_ready_to_write;
   ttransport->allocator = allocator;
   *transport = ttransport;
   return 0;
@@ -103,6 +124,27 @@ void mg_raw_transport_destroy(struct mg_transport *transport) {
   mg_allocator_free(self->allocator, transport);
 }
 
+void mg_raw_transport_suspend_until_ready_to_read(
+    struct mg_transport *transport) {
+#ifdef __EMSCRIPTEN__
+  const int sock = ((mg_raw_transport *)transport)->sockfd;
+  mg_wasm_suspend_until_ready_to_read(sock);
+#else
+  (void)transport;
+#endif
+}
+
+void mg_raw_transport_suspend_until_ready_to_write(
+    struct mg_transport *transport) {
+#ifdef __EMSCRIPTEN__
+  const int sock = ((mg_raw_transport *)transport)->sockfd;
+  mg_wasm_suspend_until_ready_to_write(sock);
+#else
+  (void)transport;
+#endif
+}
+
+#ifndef __EMSCRIPTEN__
 static int print_ssl_error(const char *str, size_t len, void *u) {
   (void)len;
   fprintf(stderr, "%s: %s", (char *)u, str);
@@ -228,6 +270,8 @@ int mg_secure_transport_init(int sockfd, const char *cert_file,
       hex_encode(peer_pubkey_fp, peer_pubkey_fp_len, allocator);
   ttransport->send = mg_secure_transport_send;
   ttransport->recv = mg_secure_transport_recv;
+  ttransport->suspend_until_ready_to_read = NULL;
+  ttransport->suspend_until_ready_to_write = NULL;
   ttransport->destroy = mg_secure_transport_destroy;
   ttransport->allocator = allocator;
   *transport = ttransport;
@@ -319,3 +363,4 @@ void mg_secure_transport_destroy(mg_transport *transport) {
   mg_allocator_free(self->allocator, self->peer_pubkey_fp);
   mg_allocator_free(self->allocator, self);
 }
+#endif
