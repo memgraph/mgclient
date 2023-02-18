@@ -35,6 +35,7 @@ Examples follow:
 ```
 # M1 with brew installed
 cmake -DOPENSSL_ROOT_DIR="$(brew --prefix openssl)" ..
+
 # Using only ls command
 cmake -DOPENSSL_ROOT_DIR="$(ls -rd -- /usr/local/Cellar/openssl@1.1/* | head -n 1)" ..
 ```

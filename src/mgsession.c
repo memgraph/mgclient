@@ -21,11 +21,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#ifndef _MSC_VER
-#include <unistd.h>
-#endif
+// Somehow stdalign.h is not there (VS Build Tools 2019, Windows 11)
+// https://docs.microsoft.com/en-us/cpp/cpp/alignment-cpp-declarations?view=msvc-170
 #if !defined(_WIN32) || !defined(_MSC_VER)
 #include <stdalign.h>
+#else
+#include <unistd.h>
 #endif
 
 #include "mgcommon.h"
