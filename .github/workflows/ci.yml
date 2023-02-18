@@ -36,6 +36,18 @@ jobs:
           ctest -E "example|integration"
           sudo make install
 
+  build_windows_msvc:
+    runs-on: windows-latest
+    steps:
+      - name: Set-up repository
+        uses: actions/checkout@v2
+      - name: Build and test mgclient
+        run: |
+          mkdir build
+          cd build
+          cmake ..
+          cmake --build .
+
   build_and_test_linux:
     strategy:
      matrix:
@@ -68,7 +80,6 @@ jobs:
         run: |
           docker load -i ~/memgraph/memgraph-docker.tar.gz
           docker run -d -p 7687:7687 memgraph --telemetry-enabled=false
-
       - name: Build with gcc, test and install mgclient
         run: |
           mkdir build-gcc && cd build-gcc
@@ -84,9 +95,6 @@ jobs:
           ctest --output-on-failure
           sudo make install
 
-  # This project needs MinGW environment ON_WINDOWS to compile. CMake, make,
-  # gcc are all required.
-  #
   # GitHub actions can't run Linux Docker container on Windows machine
   # https://github.com/actions/virtual-environments/issues/1143.
   #
@@ -94,7 +102,7 @@ jobs:
   # run Memgraph under [WSL](https://docs.microsoft.com/en-us/windows/wsl/).
   # Memgraph has to be started manually because systemd is not available on
   # WSL (init process does not exist).
-  build_and_test_windows:
+  build_and_test_windows_mingw:
     runs-on: windows-latest
     strategy:
       matrix:
@@ -123,7 +131,6 @@ jobs:
           dpkg -i ~/memgraph/memgraph-community.deb
           nohup /usr/lib/memgraph/memgraph --bolt-port 7687 --bolt-cert-file="" --bolt-key-file="" --data-directory="~/memgraph/data" --storage-properties-on-edges=true --storage-snapshot-interval-sec=0 --storage-wal-enabled=false --storage-recover-on-startup=false --storage-snapshot-on-exit=false --telemetry-enabled=false --log-file='' &
           sleep 1 # Wait for Memgraph a bit.
-
       - name: Build and test mgclient
         run: |
           mkdir build
