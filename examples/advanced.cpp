@@ -11,6 +11,30 @@ void ClearDatabaseData(mg::Client *client) {
   client->DiscardAll();
 }
 
+std::string MgValueToString(const mg::ConstValue &value) {
+  std::string value_str = "";
+  if (value.type() == mg::Value::Type::Int) {
+    value_str = std::to_string(value.ValueInt());
+  } else if (value.type() == mg::Value::Type::String) {
+    value_str = value.ValueString();
+  } else if (value.type() == mg::Value::Type::Bool) {
+    value_str = std::to_string(value.ValueBool());
+  } else if (value.type() == mg::Value::Type::Double) {
+    value_str = std::to_string(value.ValueDouble());
+  } else if (value.type() == mg::Value::Type::List) {
+    value_str += "[";
+    for (auto item : value.ValueList()) {
+      value_str += MgValueToString(item) + ",";
+    }
+    value_str += "]";
+  } else {
+    std::cerr << "Uncovered converstion from data type to a string"
+              << std::endl;
+    std::exit(1);
+  }
+  return value_str;
+}
+
 int main(int argc, char *argv[]) {
   if (argc != 3) {
     std::cerr << "Usage: " << argv[0] << " [host] [port]\n";
@@ -54,6 +78,20 @@ int main(int argc, char *argv[]) {
       std::cout << "Number of results: " << data.size() << std::endl;
     }
 
+    mg::Map query_params(2);
+    query_params.Insert("id", mg::Value(0));
+    mg::List list_param(std::vector<mg::Value>{mg::Value(1), mg::Value(1)});
+    query_params.Insert("list", mg::Value(std::move(list_param)));
+    if (!client->Execute("CREATE (n {id: $id, list: $list}) RETURN n;",
+                         query_params.AsConstMap())) {
+      std::cerr << "Failed to read data by parametrized query." << std::endl;
+      return 1;
+    }
+    if (const auto maybe_data = client->FetchAll()) {
+      const auto data = *maybe_data;
+      std::cout << "Number of results: " << data.size() << std::endl;
+    }
+
     if (!client->Execute("MATCH (n) RETURN n;")) {
       std::cerr << "Failed to read data." << std::endl;
       return 1;
@@ -74,27 +112,12 @@ int main(int argc, char *argv[]) {
             });
         const auto props = node.properties();
         std::string props_str =
-            std::accumulate(
-                props.begin(), props.end(), std::string("{"),
-                [](const std::string &acc, const auto &key_value) {
-                  const auto &[key, value] = key_value;
-                  std::string value_str;
-                  if (value.type() == mg::Value::Type::Int) {
-                    value_str = std::to_string(value.ValueInt());
-                  } else if (value.type() == mg::Value::Type::String) {
-                    value_str = value.ValueString();
-                  } else if (value.type() == mg::Value::Type::Bool) {
-                    value_str = std::to_string(value.ValueBool());
-                  } else if (value.type() == mg::Value::Type::Double) {
-                    value_str = std::to_string(value.ValueDouble());
-                  } else {
-                    std::cerr
-                        << "Uncovered converstion from data type to a string"
-                        << std::endl;
-                    std::exit(1);
-                  }
-                  return acc + " " + std::string(key) + ": " + value_str;
-                }) +
+            std::accumulate(props.begin(), props.end(), std::string("{"),
+                            [](const std::string &acc, const auto &key_value) {
+                              const auto &[key, value] = key_value;
+                              return acc + " " + std::string(key) + ": " +
+                                     MgValueToString(value);
+                            }) +
             " }";
         std::cout << labels_str << " " << props_str << std::endl;
       }
