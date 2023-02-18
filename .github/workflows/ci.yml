@@ -37,13 +37,33 @@ jobs:
           sudo make install
 
   build_windows_msvc:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: windows-latest
     runs-on: windows-latest
     env:
-      VCPKG_ROOT: '${{ github.workspace }}/vcpkg'
+      VCPKG_ROOT: "${{ github.workspace }}/vcpkg"
+      deps: "openssl"
     steps:
       - name: Set-up repository
         uses: actions/checkout@v2
+      - name: Restore vcpkg and its artifacts
+        uses: actions/cache@v3
+        id: vcpkg-cache
+        with:
+          path: |
+            ${{ env.VCPKG_ROOT }}
+            vcpkg_installed
+            !${{ env.VCPKG_ROOT }}/.git
+            !${{ env.VCPKG_ROOT }}/buildtrees
+            !${{ env.VCPKG_ROOT }}/packages
+            !${{ env.VCPKG_ROOT }}/downloads
+          key: |
+            ${{ matrix.os }}-${{ env.deps }}
       - name: Get vcpkg
+        if: ${{ steps.vcpkg-cache.outputs.cache-hit != 'true' }}
         run: |
           cd ${{ github.workspace }}
           git clone https://github.com/Microsoft/vcpkg.git
@@ -54,7 +74,7 @@ jobs:
         shell: bash
       - name: Install vcpkg packages
         run: |
-          ${{ env.VCPKG_ROOT }}\vcpkg.exe install openssl
+          ${{ env.VCPKG_ROOT }}\vcpkg.exe install ${{ env.deps }}
       - name: Build and test mgclient
         run: |
           mkdir build
