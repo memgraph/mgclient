@@ -55,7 +55,7 @@ jobs:
           path: ${{ env.VCPKG_ROOT }}
           key: ${{ matrix.os }}-${{ env.deps }}
       - name: Get vcpkg
-        if: ${{ steps.vcpkg-cache.outputs.cache-hit != "true" }}
+        if: ${{ steps.vcpkg-cache.outputs.cache-hit != 'true' }}
         run: |
           cd ${{ github.workspace }}
           git clone https://github.com/Microsoft/vcpkg.git
