@@ -43,8 +43,8 @@ jobs:
         include:
           - os: windows-latest
     env:
-      VCPKG_ROOT: "${{ github.workspace }}/vcpkg"
-      deps: "openssl"
+      VCPKG_ROOT: "${{ github.workspace }}\\vcpkg"
+      deps: "openssl:x64-windows"
     steps:
       - name: Set-up repository
         uses: actions/checkout@v2
@@ -52,17 +52,10 @@ jobs:
         uses: actions/cache@v3
         id: vcpkg-cache
         with:
-          path: |
-            ${{ env.VCPKG_ROOT }}
-            vcpkg_installed
-            !${{ env.VCPKG_ROOT }}/.git
-            !${{ env.VCPKG_ROOT }}/buildtrees
-            !${{ env.VCPKG_ROOT }}/packages
-            !${{ env.VCPKG_ROOT }}/downloads
-          key: |
-            ${{ matrix.os }}-${{ env.deps }}
+          path: ${{ env.VCPKG_ROOT }}
+          key: ${{ matrix.os }}-${{ env.deps }}
       - name: Get vcpkg
-        if: ${{ steps.vcpkg-cache.outputs.cache-hit != 'true' }}
+        if: ${{ steps.vcpkg-cache.outputs.cache-hit != "true" }}
         run: |
           cd ${{ github.workspace }}
           git clone https://github.com/Microsoft/vcpkg.git
@@ -78,7 +71,7 @@ jobs:
         run: |
           mkdir build
           cd build
-          cmake -DOPENSSL_ROOT_DIR="${{ env.VCPKG_ROOT }}\packages\openssl_x86-windows" ..
+          cmake -DOPENSSL_ROOT_DIR="${{ env.VCPKG_ROOT }}\packages\openssl_x64-windows" ..
           cmake --build .
 
   build_and_test_linux:
