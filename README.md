@@ -142,6 +142,8 @@ To install OpenSSL [vcpkg](https://vcpkg.io/en/index.html) can be used:
 ```
 vcpkg install openssl:x64-windows
 ```
+or you can download and install OpenSSL from
+[here](https://slproweb.com/products/Win32OpenSSL.html).
 
 ### MinGW
 
