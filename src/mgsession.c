@@ -16,13 +16,16 @@
 
 #include <assert.h>
 #include <errno.h>
-#include <stdalign.h>
 #include <stdarg.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#ifndef _MSC_VER
+// Somehow stdalign.h is not there (VS Build Tools 2019, Windows 11)
+// https://docs.microsoft.com/en-us/cpp/cpp/alignment-cpp-declarations?view=msvc-170
+// EVERYWHERE EXCEPT MSVC
+#if !defined(_WIN32) || !defined(_MSC_VER)
+#include <stdalign.h>
 #include <unistd.h>
 #endif
 

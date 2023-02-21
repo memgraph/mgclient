@@ -36,6 +36,45 @@ jobs:
           ctest -E "example|integration"
           sudo make install
 
+  build_windows_compiler:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+    env:
+      VCPKG_ROOT: "${{ github.workspace }}\\vcpkg"
+      deps: "openssl:x64-windows"
+    steps:
+      - name: Set-up repository
+        uses: actions/checkout@v2
+      - name: Restore vcpkg and its artifacts
+        uses: actions/cache@v3
+        id: vcpkg-cache
+        with:
+          path: ${{ env.VCPKG_ROOT }}
+          key: ${{ matrix.os }}-${{ env.deps }}
+      - name: Get vcpkg
+        if: ${{ steps.vcpkg-cache.outputs.cache-hit != 'true' }}
+        run: |
+          cd ${{ github.workspace }}
+          git clone https://github.com/Microsoft/vcpkg.git
+          cd vcpkg
+          .\bootstrap-vcpkg.bat
+      - name: Remove system vcpkg
+        run: rm -rf "$VCPKG_INSTALLATION_ROOT"
+        shell: bash
+      - name: Install vcpkg packages
+        run: |
+          ${{ env.VCPKG_ROOT }}\vcpkg.exe install ${{ env.deps }}
+      - name: Build and test mgclient
+        run: |
+          mkdir build
+          cd build
+          cmake -DOPENSSL_ROOT_DIR="${{ env.VCPKG_ROOT }}\installed\x64-windows" ..
+          cmake --build .
+
   build_and_test_linux:
     strategy:
      matrix:
@@ -68,7 +107,6 @@ jobs:
         run: |
           docker load -i ~/memgraph/memgraph-docker.tar.gz
           docker run -d -p 7687:7687 memgraph --telemetry-enabled=false
-
       - name: Build with gcc, test and install mgclient
         run: |
           mkdir build-gcc && cd build-gcc
@@ -84,9 +122,6 @@ jobs:
           ctest --output-on-failure
           sudo make install
 
-  # This project needs MinGW environment ON_WINDOWS to compile. CMake, make,
-  # gcc are all required.
-  #
   # GitHub actions can't run Linux Docker container on Windows machine
   # https://github.com/actions/virtual-environments/issues/1143.
   #
@@ -94,7 +129,7 @@ jobs:
   # run Memgraph under [WSL](https://docs.microsoft.com/en-us/windows/wsl/).
   # Memgraph has to be started manually because systemd is not available on
   # WSL (init process does not exist).
-  build_and_test_windows:
+  build_and_test_windows_mingw:
     runs-on: windows-latest
     strategy:
       matrix:
@@ -123,7 +158,6 @@ jobs:
           dpkg -i ~/memgraph/memgraph-community.deb
           nohup /usr/lib/memgraph/memgraph --bolt-port 7687 --bolt-cert-file="" --bolt-key-file="" --data-directory="~/memgraph/data" --storage-properties-on-edges=true --storage-snapshot-interval-sec=0 --storage-wal-enabled=false --storage-recover-on-startup=false --storage-snapshot-on-exit=false --telemetry-enabled=false --log-file='' &
           sleep 1 # Wait for Memgraph a bit.
-
       - name: Build and test mgclient
         run: |
           mkdir build
