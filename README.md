@@ -12,8 +12,8 @@ To build and install mgclient from source you will need:
    - OpenSSL version >= 1.0.2
    - Apple LLVM/clang >= 8.0.0
 
-Once everything is in place, create a build directory inside the source
-directory and configure the build by running CMake from it:
+Once everything is in place, create a build directory inside the project
+root directory and configure the build by running CMake from it:
 
 ```
 mkdir build
