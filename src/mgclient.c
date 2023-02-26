@@ -32,18 +32,26 @@
 const char *mg_client_version() { return MGCLIENT_VERSION; }
 
 int mg_init_session_static_vars() {
+  mg_value *n_val = mg_value_make_integer(-1);
+  if (!n_val) {
+    goto fatal_failure;
+  }
   mg_default_pull_extra_map = mg_map_make_empty(1);
   if (!mg_default_pull_extra_map) {
     goto fatal_failure;
   }
-  mg_value *n_val = mg_value_make_integer(-1);
   if (mg_map_insert_unsafe(mg_default_pull_extra_map, "n", n_val) != 0) {
-    mg_value_destroy(n_val);
     goto fatal_failure;
   }
   return MG_SUCCESS;
 
 fatal_failure:
+  if (n_val) {
+    mg_value_destroy(n_val);
+  }
+  if (mg_default_pull_extra_map) {
+    mg_map_destroy(mg_default_pull_extra_map);
+  }
   return MG_ERROR_CLIENT_ERROR;
 }
 
