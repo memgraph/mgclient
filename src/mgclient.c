@@ -31,7 +31,35 @@
 
 const char *mg_client_version() { return MGCLIENT_VERSION; }
 
-int mg_init() { return mg_socket_init(); }
+int mg_init_session_static_vars() {
+  mg_value *n_val = mg_value_make_integer(-1);
+  if (!n_val) {
+    goto fatal_failure;
+  }
+  mg_default_pull_extra_map = mg_map_make_empty(1);
+  if (!mg_default_pull_extra_map) {
+    goto fatal_failure;
+  }
+  if (mg_map_insert_unsafe(mg_default_pull_extra_map, "n", n_val) != 0) {
+    goto fatal_failure;
+  }
+  return MG_SUCCESS;
+
+fatal_failure:
+  if (n_val) {
+    mg_value_destroy(n_val);
+  }
+  if (mg_default_pull_extra_map) {
+    mg_map_destroy(mg_default_pull_extra_map);
+  }
+  return MG_ERROR_CLIENT_ERROR;
+}
+
+int mg_init() {
+  int init_status = mg_init_session_static_vars();
+  if (init_status != 0) return init_status;
+  return mg_socket_init();
+}
 
 void mg_finalize() { mg_socket_finalize(); }
 
@@ -796,7 +824,7 @@ int mg_session_pull(mg_session *session, const mg_map *pull_information) {
 
   int status = 0;
   if (session->version == 4 && !pull_information) {
-    pull_information = &mg_empty_map;
+    pull_information = mg_default_pull_extra_map;
   }
 
   status = mg_session_send_pull_message(session, pull_information);
