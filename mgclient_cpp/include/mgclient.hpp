@@ -113,6 +113,8 @@ class Client {
   /// \brief Fetches all results.
   std::optional<std::vector<std::vector<Value>>> FetchAll();
 
+  std::vector<std::string> GetColumns();
+
   /// \brief Start a transaction.
   /// \return true when the transaction was successfully started, false
   /// otherwise.
@@ -138,6 +140,7 @@ class Client {
   explicit Client(mg_session *session);
 
   mg_session *session_;
+  mg_list *columns_;
 };
 
 inline std::unique_ptr<Client> Client::Connect(const Client::Params &params) {
@@ -178,7 +181,7 @@ inline void Client::Finalize() { mg_finalize(); }
 
 inline bool Client::Execute(const std::string &statement) {
   int status = mg_session_run(session_, statement.c_str(), nullptr, nullptr,
-                              nullptr, nullptr);
+                              &columns_, nullptr);
   if (status < 0) {
     return false;
   }
@@ -246,6 +249,19 @@ inline std::optional<std::vector<std::vector<Value>>> Client::FetchAll() {
     data.emplace_back(std::move(*maybe_result));
   }
   return data;
+}
+
+inline std::vector<std::string> Client::GetColumns() {
+  std::vector<std::string> columns;
+  const size_t list_length = mg_list_size(columns_);
+
+  columns.reserve(list_length);
+  for (size_t i = 0; i < columns.size(); i++) {
+    columns.push_back(
+        std::string(Value(mg_list_at(columns_, i)).ValueString()));
+  }
+
+  return columns;
 }
 
 inline bool Client::BeginTransaction() {
