@@ -140,7 +140,7 @@ class Client {
   explicit Client(mg_session *session);
 
   mg_session *session_;
-  mg_list *columns_;
+  std::vector<std::string> columns_;
 };
 
 inline std::unique_ptr<Client> Client::Connect(const Client::Params &params) {
@@ -180,8 +180,9 @@ inline int Client::Init() { return mg_init(); }
 inline void Client::Finalize() { mg_finalize(); }
 
 inline bool Client::Execute(const std::string &statement) {
+  const mg_list *columns;
   int status = mg_session_run(session_, statement.c_str(), nullptr, nullptr,
-                              &columns_, nullptr);
+                              &columns, nullptr);
   if (status < 0) {
     return false;
   }
@@ -189,6 +190,12 @@ inline bool Client::Execute(const std::string &statement) {
   status = mg_session_pull(session_, nullptr);
   if (status < 0) {
     return false;
+  }
+
+  const size_t list_length = mg_list_size(columns);
+  columns_.clear();
+  for (size_t i = 0; i < list_length; i++) {
+    columns_.push_back(std::string(Value(mg_list_at(columns, i)).ValueString()));
   }
 
   return true;
@@ -196,8 +203,9 @@ inline bool Client::Execute(const std::string &statement) {
 
 inline bool Client::Execute(const std::string &statement,
                             const ConstMap &params) {
+  const mg_list *columns;
   int status = mg_session_run(session_, statement.c_str(), params.ptr(),
-                              nullptr, nullptr, nullptr);
+                              nullptr, &columns, nullptr);
   if (status < 0) {
     return false;
   }
@@ -206,6 +214,13 @@ inline bool Client::Execute(const std::string &statement,
   if (status < 0) {
     return false;
   }
+
+  const size_t list_length = mg_list_size(columns);
+  columns_.clear();
+  for (size_t i = 0; i < list_length; i++) {
+    columns_.push_back(std::string(Value(mg_list_at(columns, i)).ValueString()));
+  }
+
   return true;
 }
 
@@ -251,18 +266,7 @@ inline std::optional<std::vector<std::vector<Value>>> Client::FetchAll() {
   return data;
 }
 
-inline std::vector<std::string> Client::GetColumns() {
-  std::vector<std::string> columns;
-  const size_t list_length = mg_list_size(columns_);
-
-  columns.reserve(list_length);
-  for (size_t i = 0; i < columns.size(); i++) {
-    columns.push_back(
-        std::string(Value(mg_list_at(columns_, i)).ValueString()));
-  }
-
-  return columns;
-}
+inline std::vector<std::string> Client::GetColumns() { return columns_; }
 
 inline bool Client::BeginTransaction() {
   return mg_session_begin_transaction(session_, nullptr) == 0;
