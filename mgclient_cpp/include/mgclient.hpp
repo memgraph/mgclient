@@ -195,7 +195,8 @@ inline bool Client::Execute(const std::string &statement) {
   const size_t list_length = mg_list_size(columns);
   columns_.clear();
   for (size_t i = 0; i < list_length; i++) {
-    columns_.push_back(std::string(Value(mg_list_at(columns, i)).ValueString()));
+    columns_.push_back(
+        std::string(Value(mg_list_at(columns, i)).ValueString()));
   }
 
   return true;
@@ -218,7 +219,8 @@ inline bool Client::Execute(const std::string &statement,
   const size_t list_length = mg_list_size(columns);
   columns_.clear();
   for (size_t i = 0; i < list_length; i++) {
-    columns_.push_back(std::string(Value(mg_list_at(columns, i)).ValueString()));
+    columns_.push_back(
+        std::string(Value(mg_list_at(columns, i)).ValueString()));
   }
 
   return true;
