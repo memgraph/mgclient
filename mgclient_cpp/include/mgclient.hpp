@@ -113,7 +113,7 @@ class Client {
   /// \brief Fetches all results.
   std::optional<std::vector<std::vector<Value>>> FetchAll();
 
-  const std::vector<std::string>& GetColumns() const;
+  const std::vector<std::string> &GetColumns() const;
 
   /// \brief Start a transaction.
   /// \return true when the transaction was successfully started, false
@@ -268,7 +268,9 @@ inline std::optional<std::vector<std::vector<Value>>> Client::FetchAll() {
   return data;
 }
 
-inline const std::vector<std::string>& Client::GetColumns() const { return columns_; }
+inline const std::vector<std::string> &Client::GetColumns() const {
+  return columns_;
+}
 
 inline bool Client::BeginTransaction() {
   return mg_session_begin_transaction(session_, nullptr) == 0;
