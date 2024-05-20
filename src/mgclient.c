@@ -67,8 +67,10 @@ typedef struct mg_session_params {
   const char *address;
   const char *host;
   uint16_t port;
+  const char *scheme;
   const char *username;
   const char *password;
+  const char *credentials;
   const char *user_agent;
   enum mg_sslmode sslmode;
   const char *sslcert;
@@ -118,6 +120,11 @@ void mg_session_params_set_port(mg_session_params *params, uint16_t port) {
   params->port = port;
 }
 
+void mg_session_params_set_scheme(mg_session_params *params,
+                                  const char *scheme) {
+  params->scheme = scheme;
+}
+
 void mg_session_params_set_username(mg_session_params *params,
                                     const char *username) {
   params->username = username;
@@ -126,6 +133,11 @@ void mg_session_params_set_username(mg_session_params *params,
 void mg_session_params_set_password(mg_session_params *params,
                                     const char *password) {
   params->password = password;
+}
+
+void mg_session_params_set_credentials(mg_session_params *params,
+                                       const char *credentials) {
+  params->credentials = credentials;
 }
 
 void mg_session_params_set_user_agent(mg_session_params *params,
@@ -364,8 +376,9 @@ int mg_bolt_init_v1(mg_session *session, const mg_session_params *params) {
   return status;
 }
 
-static mg_map *build_hello_extra(const char *user_agent, const char *username,
-                                 const char *password) {
+static mg_map *build_hello_extra(const char *user_agent, const char *scheme,
+                                 const char *username, const char *password,
+                                 const char *credentials) {
   mg_map *extra = mg_map_make_empty(4);
   if (!extra) {
     return NULL;
@@ -379,7 +392,7 @@ static mg_map *build_hello_extra(const char *user_agent, const char *username,
     }
   }
 
-  assert((username && password) || (!username && !password));
+  // TODO: support custom schemas
   if (username) {
     mg_value *scheme = mg_value_make_string("basic");
     if (!scheme || mg_map_insert_unsafe(extra, "scheme", scheme) != 0) {
@@ -412,7 +425,8 @@ cleanup:
 
 int mg_bolt_init_v4(mg_session *session, const mg_session_params *params) {
   mg_map *extra =
-      build_hello_extra(params->user_agent, params->username, params->password);
+      build_hello_extra(params->user_agent, params->scheme, params->username,
+                        params->password, params->credentials);
   if (!extra) {
     return MG_ERROR_OOM;
   }
