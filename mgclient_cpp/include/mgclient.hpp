@@ -60,7 +60,6 @@ class Client {
     std::string scheme = "basic";
     std::string username = "";
     std::string password = "";
-    std::string credentials = "";
     bool use_ssl = false;
     std::string user_agent = "mgclient++/" + std::string(mg_client_version());
   };
@@ -155,10 +154,9 @@ inline std::unique_ptr<Client> Client::Connect(const Client::Params &params) {
   mg_session_params_set_scheme(mg_params, params.scheme.c_str());
   if (!params.username.empty()) {
     mg_session_params_set_username(mg_params, params.username.c_str());
-    mg_session_params_set_password(mg_params, params.password.c_str());
   }
-  if (!params.credentials.empty()) {
-    mg_session_params_set_credentials(mg_params, params.credentials.c_str());
+  if (!params.password.empty()) {
+    mg_session_params_set_password(mg_params, params.password.c_str());
   }
   mg_session_params_set_user_agent(mg_params, params.user_agent.c_str());
   mg_session_params_set_sslmode(
