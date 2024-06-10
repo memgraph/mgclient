@@ -259,7 +259,7 @@ inline std::optional<std::vector<Value>> Client::FetchOne() {
   return values;
 }
 
-inline void Client::DiscardAll() { 
+inline void Client::DiscardAll() {
   while (FetchOne())
     ;
 }
