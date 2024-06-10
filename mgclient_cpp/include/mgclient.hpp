@@ -260,7 +260,8 @@ inline std::optional<std::vector<Value>> Client::FetchOne() {
 }
 
 inline void Client::DiscardAll() { 
-  while (FetchOne()); 
+  while (FetchOne())
+    ;
 }
 
 inline std::optional<std::vector<std::vector<Value>>> Client::FetchAll() {
