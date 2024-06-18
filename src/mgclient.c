@@ -390,7 +390,7 @@ static mg_map *build_hello_extra(const char *user_agent, const char *scheme,
   // not have such requirements:
   // https://neo4j.com/docs/bolt/current/bolt/message/#messages-hello
   // https://neo4j.com/docs/bolt/current/bolt/message/#messages-logon
-  if (scheme && strcmp(scheme, "basic")) {
+  if (scheme && strcmp(scheme, "basic") == 0) {
     assert(username && password);
   }
 
