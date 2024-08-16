@@ -1010,6 +1010,11 @@ MGCLIENT_EXPORT mg_duration *mg_duration_copy(const mg_duration *duration);
 /// Destroy the given duration.
 MGCLIENT_EXPORT void mg_duration_destroy(mg_duration *duration);
 
+/// Creates mg_point_2d from srid, x_longitude and y_latitude.
+/// \return a pointer to mg_point_2d or NULL if an error occured.
+MGCLIENT_EXPORT mg_point_2d *mg_point_2d_make(uint16_t srid, double x_longitude,
+                                              double y_latitude);
+
 /// Returns SRID of the 2D point.
 MGCLIENT_EXPORT int64_t mg_point_2d_srid(const mg_point_2d *point_2d);
 
@@ -1026,6 +1031,12 @@ MGCLIENT_EXPORT mg_point_2d *mg_point_2d_copy(const mg_point_2d *point_2d);
 
 /// Destroys the given 2D point.
 MGCLIENT_EXPORT void mg_point_2d_destroy(mg_point_2d *point_2d);
+
+/// Creates mg_point_3d from srid, x_longitude, y_latitude and z_height.
+/// \return a pointer to mg_point_3d or NULL if an error occured.
+MGCLIENT_EXPORT mg_point_3d *mg_point_3d_make(uint16_t srid, double x_longitude,
+                                              double y_latitude,
+                                              double z_height);
 
 /// Returns SRID of the 3D point.
 MGCLIENT_EXPORT int64_t mg_point_3d_srid(const mg_point_3d *point_3d);
