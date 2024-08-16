@@ -178,6 +178,17 @@ int mg_session_write_point_2d(mg_session *session, const mg_point_2d *point) {
   return 0;
 }
 
+int mg_session_write_point_3d(mg_session *session, const mg_point_3d *point) {
+  MG_RETURN_IF_FAILED(
+      mg_session_write_uint8(session, (uint8_t)(MG_MARKER_TINY_STRUCT4)));
+  MG_RETURN_IF_FAILED(mg_session_write_uint8(session, MG_SIGNATURE_POINT_3D));
+  MG_RETURN_IF_FAILED(mg_session_write_integer(session, point->srid));
+  MG_RETURN_IF_FAILED(mg_session_write_float(session, point->x));
+  MG_RETURN_IF_FAILED(mg_session_write_float(session, point->y));
+  MG_RETURN_IF_FAILED(mg_session_write_float(session, point->z));
+  return 0;
+}
+
 int mg_session_write_value(mg_session *session, const mg_value *value) {
   switch (value->type) {
     case MG_VALUE_TYPE_NULL:
@@ -230,11 +241,8 @@ int mg_session_write_value(mg_session *session, const mg_value *value) {
       return mg_session_write_duration(session, value->duration_v);
     case MG_VALUE_TYPE_POINT_2D:
       return mg_session_write_point_2d(session, value->point_2d_v);
-      // mg_session_set_error(session, "tried to send value of type
-      // 'point_2d'"); // TODO(gitbuda): remove return MG_ERROR_INVALID_VALUE;
     case MG_VALUE_TYPE_POINT_3D:
-      mg_session_set_error(session, "tried to send value of type 'point_3d'");
-      return MG_ERROR_INVALID_VALUE;
+      return mg_session_write_point_3d(session, value->point_3d_v);
     case MG_VALUE_TYPE_UNKNOWN:
       mg_session_set_error(session, "tried to send value of unknown type");
       return MG_ERROR_INVALID_VALUE;
