@@ -20,8 +20,6 @@ jobs:
       matrix:
         platform: [macos-14]
     runs-on: ${{ matrix.platform }}
-    env:
-      MG_VERSION: "1.4.0"
     steps:
       - name: Set-up repository
         uses: actions/checkout@v2
@@ -78,8 +76,8 @@ jobs:
   build_and_test_linux:
     strategy:
      matrix:
-        platform: [ubuntu-20.04, ubuntu-22.04]
-        mgversion: ["2.0.0", "2.3.0"]
+        platform: [ubuntu-24.04]
+        mgversion: ["2.19.0"]
         packages: ["gcc g++ clang"]
         gcc-postfix: [""]
         clang-postfix: [""]
