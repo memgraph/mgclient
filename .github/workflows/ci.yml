@@ -102,7 +102,7 @@ jobs:
       - name: Load and run Memgraph Docker image
         run: |
           docker load -i ~/memgraph/memgraph-docker.tar.gz
-          docker run -d -p 7687:7687 memgraph --telemetry-enabled=false
+          docker run -d -p 7687:7687 memgraph/memgraph --telemetry-enabled=false
       - name: Build with gcc, test and install mgclient
         run: |
           mkdir build-gcc && cd build-gcc
