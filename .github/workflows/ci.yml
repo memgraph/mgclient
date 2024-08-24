@@ -18,7 +18,7 @@ jobs:
   build_and_test_apple:
     strategy:
       matrix:
-        platform: [macos-11]
+        platform: [macos-14]
     runs-on: ${{ matrix.platform }}
     env:
       MG_VERSION: "1.4.0"

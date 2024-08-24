@@ -123,7 +123,7 @@ To build and install mgclient from source on Windows you will need:
      to understand versioning in a bit more details):
      VS >= 17 2022, MSVC >= 14.34, C >= 19.34
 
-### Windows Compiler (FIX)
+### Windows Compiler
 
 ```
 mkdir build
