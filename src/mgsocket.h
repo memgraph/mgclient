@@ -54,7 +54,7 @@ typedef long ssize_t;
 
 /// Initializes underlying resources. Has to be called at the beginning of a
 /// process using socket resources.
-int mg_socket_init();
+int mg_socket_init(void);
 
 /// Returns a descriptor referencing the new socket or MG_ERROR_SOCKET in the
 /// case of any failure.
@@ -110,11 +110,11 @@ int mg_socket_close(int sock);
 
 /// Used to get a native error message after some socket call fails.
 /// Has to be called immediately after the failed socket function.
-char *mg_socket_error();
+char *mg_socket_error(void);
 
 /// Should be called at the end of any process which previously called the
 /// \ref mg_socket_init function.
-void mg_socket_finalize();
+void mg_socket_finalize(void);
 
 #ifdef __cplusplus
 }

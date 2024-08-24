@@ -17,8 +17,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "mgcommon.h"
-
 #ifdef __EMSCRIPTEN__
 #include "emscripten.h"
 #include "mgwasm.h"
@@ -36,7 +34,7 @@
 // Please refer to https://man7.org/linux/man-pages/man2 for more details about
 // Linux system calls.
 
-int mg_socket_init() { return MG_SUCCESS; }
+int mg_socket_init(void) { return MG_SUCCESS; }
 
 int mg_socket_create(int af, int type, int protocol) {
   int sockfd = socket(af, type, protocol);
@@ -151,6 +149,6 @@ int mg_socket_pair(int d, int type, int protocol, int *sv) {
 
 int mg_socket_close(int sock) { return MG_RETRY_ON_EINTR(close(sock)); }
 
-char *mg_socket_error() { return strerror(errno); }
+char *mg_socket_error(void) { return strerror(errno); }
 
-void mg_socket_finalize() {}
+void mg_socket_finalize(void) {}

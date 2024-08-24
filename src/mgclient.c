@@ -29,9 +29,9 @@
 #include "mgtransport.h"
 #include "mgvalue.h"
 
-const char *mg_client_version() { return MGCLIENT_VERSION; }
+const char *mg_client_version(void) { return MGCLIENT_VERSION; }
 
-int mg_init_session_static_vars() {
+int mg_init_session_static_vars(void) {
   mg_value *n_val = mg_value_make_integer(-1);
   if (!n_val) {
     goto fatal_failure;
@@ -55,13 +55,13 @@ fatal_failure:
   return MG_ERROR_CLIENT_ERROR;
 }
 
-int mg_init() {
+int mg_init(void) {
   int init_status = mg_init_session_static_vars();
   if (init_status != 0) return init_status;
   return mg_socket_init();
 }
 
-void mg_finalize() { mg_socket_finalize(); }
+void mg_finalize(void) { mg_socket_finalize(); }
 
 typedef struct mg_session_params {
   const char *address;
@@ -78,7 +78,7 @@ typedef struct mg_session_params {
   void *trust_data;
 } mg_session_params;
 
-mg_session_params *mg_session_params_make() {
+mg_session_params *mg_session_params_make(void) {
   mg_session_params *params =
       mg_allocator_malloc(&mg_system_allocator, sizeof(mg_session_params));
   if (!params) {
