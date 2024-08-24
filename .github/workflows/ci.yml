@@ -126,11 +126,11 @@ jobs:
   # Memgraph has to be started manually because systemd is not available on
   # WSL (init process does not exist).
   build_and_test_windows_mingw:
-    runs-on: windows-2019
+    runs-on: windows-2022
     strategy:
       matrix:
         include: [
-          { msystem: MINGW64, arch: x86_64, mgversion: "1.4.0" }
+          { msystem: MINGW64, arch: x86_64, mgversion: "2.19.0" }
         ]
     defaults:
       run:
@@ -145,13 +145,14 @@ jobs:
           install: git base-devel mingw-w64-${{ matrix.arch }}-toolchain mingw-w64-${{ matrix.arch }}-cmake mingw-w64-${{ matrix.arch }}-openssl
       - uses: Vampire/setup-wsl@v1
         with:
-            distribution: Ubuntu-18.04
+            distribution: Ubuntu-22.04
       - name: Download, install and run Memgraph under WSL
         shell: wsl-bash {0} # root shell
         run: |
           mkdir ~/memgraph
-          curl -L https://download.memgraph.com/memgraph/v${{matrix.mgversion}}/ubuntu-18.04/memgraph_${{matrix.mgversion}}-community-1_amd64.deb --output ~/memgraph/memgraph-community.deb
-          dpkg -i ~/memgraph/memgraph-community.deb
+          # https://download.memgraph.com/memgraph/v2.19.0/ubuntu-24.04/memgraph_2.19.0-1_amd64.deb
+          curl -L https://download.memgraph.com/memgraph/v${{matrix.mgversion}}/ubuntu-22.04/memgraph_${{matrix.mgversion}}-1_amd64.deb --output ~/memgraph/memgraph.deb
+          dpkg -i ~/memgraph/memgraph.deb
           nohup /usr/lib/memgraph/memgraph --bolt-port 7687 --bolt-cert-file="" --bolt-key-file="" --data-directory="~/memgraph/data" --storage-properties-on-edges=true --storage-snapshot-interval-sec=0 --storage-wal-enabled=false --storage-recover-on-startup=false --storage-snapshot-on-exit=false --telemetry-enabled=false --log-file='' &
           sleep 1 # Wait for Memgraph a bit.
       - name: Build and test mgclient
