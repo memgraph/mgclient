@@ -1681,6 +1681,32 @@ mg_duration *mg_duration_make(int64_t months, int64_t days, int64_t seconds,
   return dur;
 }
 
+mg_point_2d *mg_point_2d_make(uint16_t srid, double x_longitude,
+                              double y_latitude) {
+  mg_point_2d *point = mg_point_2d_alloc(&mg_system_allocator);
+  if (!point) {
+    return NULL;
+  }
+  point->srid = srid;
+  point->x = x_longitude;
+  point->y = y_latitude;
+  return point;
+}
+
+mg_point_3d *mg_point_3d_make(uint16_t srid, double x_longitude,
+                              double y_latitude, double z_height) {
+  mg_point_3d *point = mg_point_3d_alloc(&mg_system_allocator);
+  if (!point) {
+    return NULL;
+  }
+  point->srid = srid;
+  point->x = x_longitude;
+  point->y = y_latitude;
+  point->z = z_height;
+  ;
+  return point;
+}
+
 int mg_string_equal(const mg_string *lhs, const mg_string *rhs) {
   if (lhs->size != rhs->size) {
     return 0;
