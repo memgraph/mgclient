@@ -21,6 +21,17 @@ std::string MgValueToString(const mg::ConstValue &value) {
     value_str = std::to_string(value.ValueBool());
   } else if (value.type() == mg::Value::Type::Double) {
     value_str = std::to_string(value.ValueDouble());
+  } else if (value.type() == mg::Value::Type::Point2d) {
+    auto point2d = value.ValuePoint2d();
+    value_str += "Point2D({ srid:" + std::to_string(point2d.srid()) +
+                 ", x:" + std::to_string(point2d.x()) +
+                 ", y:" + std::to_string(point2d.y()) + " })";
+  } else if (value.type() == mg::Value::Type::Point3d) {
+    auto point3d = value.ValuePoint3d();
+    value_str += "Point3D({ srid:" + std::to_string(point3d.srid()) +
+                 ", x:" + std::to_string(point3d.x()) +
+                 ", y:" + std::to_string(point3d.y()) +
+                 ", z:" + std::to_string(point3d.z()) + " })";
   } else if (value.type() == mg::Value::Type::List) {
     value_str += "[";
     for (auto item : value.ValueList()) {
@@ -63,7 +74,9 @@ int main(int argc, char *argv[]) {
 
     if (!client->Execute(
             "CREATE (:Person:Entrepreneur {id: 0, age: 40, name: 'John', "
-            "isStudent: false, score: 5.0});")) {
+            "isStudent: false, score: 5.0, "
+            "position2D: point({x: 1, y: 2, srid: 4326}), "
+            "position3D: point({x: 8, y: 9, z: 10, srid: 9757}) });")) {
       std::cerr << "Failed to add data." << std::endl;
       return 1;
     }
