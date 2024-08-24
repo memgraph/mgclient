@@ -15,7 +15,6 @@
 #include "mgtransport.h"
 
 #include <assert.h>
-#include <errno.h>
 #include <stdlib.h>
 #include <string.h>
 #ifdef MGCLIENT_ON_LINUX
@@ -26,7 +25,6 @@
 
 #include "mgallocator.h"
 #include "mgclient.h"
-#include "mgcommon.h"
 #include "mgsocket.h"
 #ifdef __EMSCRIPTEN__
 #include "mgwasm.h"
@@ -160,7 +158,7 @@ static char *hex_encode(unsigned char *data, unsigned int len,
   return encoded;
 }
 
-static void mg_openssl_init() {
+static void mg_openssl_init(void) {
 #if OPENSSL_VERSION_NUMBER < 0x10100000L
   static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
   static int mg_ssl_initialized = 0;
