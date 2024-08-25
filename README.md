@@ -1,4 +1,4 @@
-[![Actions Status](https://github.com/memgraph/mgclient/workflows/CI/badge.svg)](https://github.com/memgraph/mgclient/actions)
+[![Actions Status](https://github.com/memgraph/mgclient/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/memgraph/mgclient/actions)
 
 # mgclient
 
