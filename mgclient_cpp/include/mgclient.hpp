@@ -57,7 +57,7 @@ class Client {
   struct Params {
     std::string host = "127.0.0.1";
     uint16_t port = 7687;
-    std::string scheme = "basic";
+    std::string scheme = "none";
     std::string username = "";
     std::string password = "";
     bool use_ssl = false;
@@ -149,16 +149,24 @@ inline std::unique_ptr<Client> Client::Connect(const Client::Params &params) {
   if (!mg_params) {
     return nullptr;
   }
-  mg_session_params_set_host(mg_params, params.host.c_str());
-  mg_session_params_set_port(mg_params, params.port);
-  mg_session_params_set_scheme(mg_params, params.scheme.c_str());
+  if (!params.host.empty()) {
+    mg_session_params_set_host(mg_params, params.host.c_str());
+  }
+  if (params.port != 0) {
+    mg_session_params_set_port(mg_params, params.port);
+  }
+  if (!params.scheme.empty()) {
+    mg_session_params_set_scheme(mg_params, params.scheme.c_str());
+  }
   if (!params.username.empty()) {
     mg_session_params_set_username(mg_params, params.username.c_str());
   }
   if (!params.password.empty()) {
     mg_session_params_set_password(mg_params, params.password.c_str());
   }
-  mg_session_params_set_user_agent(mg_params, params.user_agent.c_str());
+  if (!params.user_agent.empty()) {
+    mg_session_params_set_user_agent(mg_params, params.user_agent.c_str());
+  }
   mg_session_params_set_sslmode(
       mg_params, params.use_ssl ? MG_SSLMODE_REQUIRE : MG_SSLMODE_DISABLE);
 
