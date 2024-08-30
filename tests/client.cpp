@@ -19,7 +19,6 @@
 #include <thread>
 
 #include "mgclient.h"
-#include "mgcommon.h"
 #include "mgsession.h"
 #include "mgsocket.h"
 

@@ -390,6 +390,7 @@ static mg_map *build_hello_extra(const char *user_agent, const char *scheme,
   // by Memgraph) do not have such requirements:
   // https://neo4j.com/docs/bolt/current/bolt/message/#messages-hello
   // https://neo4j.com/docs/bolt/current/bolt/message/#messages-logon
+  // NOTE: HELLO message does NOT contain schema after Bolt 5.0.
   if (scheme && strcmp(scheme, "basic") == 0) {
     assert(username && password);
   }
@@ -402,7 +403,7 @@ static mg_map *build_hello_extra(const char *user_agent, const char *scheme,
     return extra;
   }
 
-  mg_value *scheme_ = mg_value_make_string(scheme ? scheme : "basic");
+  mg_value *scheme_ = mg_value_make_string(scheme ? scheme : "none"); // NOTE: Makes none default.
   if (!scheme_ || mg_map_insert_unsafe(extra, "scheme", scheme_) != 0) {
     goto cleanup;
   }
