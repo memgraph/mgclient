@@ -19,7 +19,6 @@
 
 #include "mgallocator.h"
 #include "mgclient.h"
-#include "mgconstants.h"
 
 mg_string *mg_string_alloc(uint32_t size, mg_allocator *allocator) {
   char *block = mg_allocator_malloc(allocator, sizeof(mg_string) + size);
@@ -178,7 +177,7 @@ mg_point_3d *mg_point_3d_alloc(mg_allocator *allocator) {
   return point_3d;
 }
 
-mg_value *mg_value_make_null() {
+mg_value *mg_value_make_null(void) {
   mg_value *value = mg_allocator_malloc(&mg_system_allocator, sizeof(mg_value));
   if (!value) {
     return NULL;
@@ -1680,6 +1679,32 @@ mg_duration *mg_duration_make(int64_t months, int64_t days, int64_t seconds,
   dur->seconds = seconds;
   dur->nanoseconds = nanoseconds;
   return dur;
+}
+
+mg_point_2d *mg_point_2d_make(uint16_t srid, double x_longitude,
+                              double y_latitude) {
+  mg_point_2d *point = mg_point_2d_alloc(&mg_system_allocator);
+  if (!point) {
+    return NULL;
+  }
+  point->srid = srid;
+  point->x = x_longitude;
+  point->y = y_latitude;
+  return point;
+}
+
+mg_point_3d *mg_point_3d_make(uint16_t srid, double x_longitude,
+                              double y_latitude, double z_height) {
+  mg_point_3d *point = mg_point_3d_alloc(&mg_system_allocator);
+  if (!point) {
+    return NULL;
+  }
+  point->srid = srid;
+  point->x = x_longitude;
+  point->y = y_latitude;
+  point->z = z_height;
+  ;
+  return point;
 }
 
 int mg_string_equal(const mg_string *lhs, const mg_string *rhs) {

@@ -137,17 +137,17 @@ extern "C" {
 /// Client software version.
 ///
 /// \return Client version in the major.minor.patch format.
-MGCLIENT_EXPORT const char *mg_client_version();
+MGCLIENT_EXPORT const char *mg_client_version(void);
 
 /// Initializes the client (the whole process).
 /// Should be called at the beginning of each process using the client.
 ///
 /// \return Zero if initialization was successful.
-MGCLIENT_EXPORT int mg_init();
+MGCLIENT_EXPORT int mg_init(void);
 
 /// Finalizes the client (the whole process).
 /// Should be called at the end of each process using the client.
-MGCLIENT_EXPORT void mg_finalize();
+MGCLIENT_EXPORT void mg_finalize(void);
 
 /// An enum listing all the types as specified by Bolt protocol.
 enum mg_value_type {
@@ -297,7 +297,7 @@ typedef struct mg_point_3d mg_point_3d;
 /// Constructs a nil \ref mg_value.
 ///
 /// \return Pointer to the newly constructed value or NULL if error occurred.
-MGCLIENT_EXPORT mg_value *mg_value_make_null();
+MGCLIENT_EXPORT mg_value *mg_value_make_null(void);
 
 /// Constructs a boolean \ref mg_value.
 ///
@@ -1010,6 +1010,11 @@ MGCLIENT_EXPORT mg_duration *mg_duration_copy(const mg_duration *duration);
 /// Destroy the given duration.
 MGCLIENT_EXPORT void mg_duration_destroy(mg_duration *duration);
 
+/// Creates mg_point_2d from srid, x_longitude and y_latitude.
+/// \return a pointer to mg_point_2d or NULL if an error occured.
+MGCLIENT_EXPORT mg_point_2d *mg_point_2d_make(uint16_t srid, double x_longitude,
+                                              double y_latitude);
+
 /// Returns SRID of the 2D point.
 MGCLIENT_EXPORT int64_t mg_point_2d_srid(const mg_point_2d *point_2d);
 
@@ -1026,6 +1031,12 @@ MGCLIENT_EXPORT mg_point_2d *mg_point_2d_copy(const mg_point_2d *point_2d);
 
 /// Destroys the given 2D point.
 MGCLIENT_EXPORT void mg_point_2d_destroy(mg_point_2d *point_2d);
+
+/// Creates mg_point_3d from srid, x_longitude, y_latitude and z_height.
+/// \return a pointer to mg_point_3d or NULL if an error occured.
+MGCLIENT_EXPORT mg_point_3d *mg_point_3d_make(uint16_t srid, double x_longitude,
+                                              double y_latitude,
+                                              double z_height);
 
 /// Returns SRID of the 3D point.
 MGCLIENT_EXPORT int64_t mg_point_3d_srid(const mg_point_3d *point_3d);
@@ -1221,7 +1232,7 @@ typedef int (*mg_trust_callback_type)(const char *, const char *, const char *,
                                       const char *, void *);
 
 /// Creates a new `mg_session_params` object.
-MGCLIENT_EXPORT mg_session_params *mg_session_params_make();
+MGCLIENT_EXPORT mg_session_params *mg_session_params_make(void);
 
 /// Destroys a `mg_session_params` object.
 MGCLIENT_EXPORT void mg_session_params_destroy(mg_session_params *);
