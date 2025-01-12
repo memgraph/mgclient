@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
     - name: Set-up repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
     - name: Install environment
       run: |
         sudo apt install -y clang-format
@@ -22,7 +22,7 @@ jobs:
     runs-on: ${{ matrix.platform }}
     steps:
       - name: Set-up repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       # NOTE: CI can't execute end2end tests because there is no way to run
       #       Memgraph on CI MacOS machines.
       - name: Build and test mgclient
@@ -46,9 +46,9 @@ jobs:
       deps: "openssl:x64-windows"
     steps:
       - name: Set-up repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       - name: Restore vcpkg and its artifacts
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         id: vcpkg-cache
         with:
           path: ${{ env.VCPKG_ROOT }}
@@ -84,13 +84,13 @@ jobs:
     runs-on: ${{ matrix.platform }}
     steps:
       - name: Set-up repository
-        uses: actions/checkout@v1
+        uses: actions/checkout@v4
       - name: Install environment
         run: |
           sudo apt install -y ${{ matrix.packages }}
       - name: Cache Memgraph Docker image
         id: cache-memgraph-docker
-        uses: actions/cache@v1
+        uses: actions/cache@v4
         with:
           path: ~/memgraph
           key: cache-memgraph-v${{ matrix.mgversion }}-docker-image
@@ -137,7 +137,7 @@ jobs:
         shell: msys2 {0}
     steps:
       - name: Set-up repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       - uses: msys2/setup-msys2@v2
         with:
           msystem: ${{ matrix.msystem }}
@@ -170,7 +170,7 @@ jobs:
     runs-on: ${{ matrix.platform }}
     steps:
       - name: Set-up repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Build with clang
         run: |
