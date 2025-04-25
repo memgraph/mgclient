@@ -107,7 +107,7 @@ jobs:
      matrix:
         platform: [ubuntu-24.04, fedora-41]
         mgversion: ["latest"]
-        packages: ["gcc g++ clang"]
+        packages: ["gcc g++ clang cmake"]
         gcc-postfix: [""]
         clang-postfix: [""]
     runs-on: ["self-hosted", "X64"]
@@ -207,8 +207,8 @@ jobs:
         run: |
           docker stop testcontainer || echo "testcontainer already stopped"
           docker stop memgraphcontainer || echo "memgraphcontainer already stopped"
-          docker wait testcontainer
-          docker wait memgraphcontainer
+          docker wait testcontainer || true
+          docker wait memgraphcontainer || true
           docker rm "${{ env.MEMGRAPH_NETWORK }}" || echo "network already removed"
           docker rmi "${{ matrix.platform }}" || echo "${{ matrix.platform }} image not found"
           docker rmi memgraph/memgraph || echo "memgraph/memgraph image not found"
