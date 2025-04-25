@@ -112,7 +112,7 @@ jobs:
         clang-postfix: [""]
     runs-on: ["self-hosted", "X64"]
     env:
-      MEMGRAPH_NETWORK: "memgraph_test_network"
+      MEMGRAPH_NETWORK: "host"
     steps:
       - name: Set-up repository
         uses: actions/checkout@v4
@@ -177,8 +177,6 @@ jobs:
             .."
 
           docker exec -i testcontainer bash -c "
-            export MEMGRAPH_HOST=memgraphcontainer &&
-            export MEMGRAPH_PORT=7687 &&
             mkdir /mgclient/build-gcc && 
             cd /mgclient/build-gcc && 
             $cmake_configure && 
