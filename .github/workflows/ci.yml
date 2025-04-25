@@ -161,6 +161,8 @@ jobs:
           docker load -i memgraph-docker.tar.gz
           docker run -d --rm --name memgraphcontainer --network ${{ env.MEMGRAPH_NETWORK }} -p 7687:7687 memgraph/memgraph --telemetry-enabled=false 
           rm memgraph-docker.tar.gz
+          sleep 5
+          docker logs memgraphcontainer
 
       - name: Build with gcc, test and install mgclient
         run: |
