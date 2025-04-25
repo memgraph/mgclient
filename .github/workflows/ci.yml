@@ -133,9 +133,9 @@ jobs:
       - name: Install environment
         run: |
           if [[ "${{ matrix.platform }}" == ubuntu* ]]; then
-            docker exec -i testcontainer bash -c "apt update && apt install -y ${{ matrix.packages }}"
+            docker exec -i testcontainer bash -c "apt update && apt install -y ${{ matrix.packages }} openssl-devel"
           else
-            docker exec -i testcontainer bash -c "dnf install -y ${{ matrix.packages }}"
+            docker exec -i testcontainer bash -c "dnf install -y ${{ matrix.packages }} libssl-dev"
           fi
 
       - name: Copy Repo Into Container
