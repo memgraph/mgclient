@@ -107,7 +107,7 @@ jobs:
      matrix:
         platform: [ubuntu-24.04, fedora-41]
         mgversion: ["latest"]
-        packages: ["gcc g++ clang cmake"]
+        packages: ["gcc g++ clang cmake git"]
         gcc-postfix: [""]
         clang-postfix: [""]
     runs-on: ["self-hosted", "X64"]
