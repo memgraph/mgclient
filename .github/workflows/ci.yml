@@ -244,7 +244,7 @@ jobs:
         with:
           msystem: ${{ matrix.msystem }}
           update: true
-          install: git base-devel mingw-w64-${{ matrix.arch }}-toolchain mingw-w64-${{ matrix.arch }}-cmake mingw-w64-${{ matrix.arch }}-openssl
+          install: git base-devel jq mingw-w64-${{ matrix.arch }}-toolchain mingw-w64-${{ matrix.arch }}-cmake mingw-w64-${{ matrix.arch }}-openssl
       - uses: Vampire/setup-wsl@v5
         with:
             distribution: Ubuntu-24.04
