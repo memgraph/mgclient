@@ -245,17 +245,18 @@ jobs:
           msystem: ${{ matrix.msystem }}
           update: true
           install: git base-devel mingw-w64-${{ matrix.arch }}-toolchain mingw-w64-${{ matrix.arch }}-cmake mingw-w64-${{ matrix.arch }}-openssl
-      - name: Install jq in MSYS2
-        run: pacman -S --noconfirm jq
-        shell: msys2 {0}
       - uses: Vampire/setup-wsl@v5
         with:
             distribution: Ubuntu-24.04
       - name: Set Memgraph Version
         run: |
           if [[ "${{ matrix.mgversion }}" == "latest" ]]; then
-            mgversion=$(curl -s https://api.github.com/repos/memgraph/memgraph/releases/latest | jq -r .tag_name)
-            mgversion=${mgversion#v}
+            mgversion=$(
+              curl -s https://api.github.com/repos/memgraph/memgraph/releases/latest \
+              | grep -m1 '"tag_name":' \
+              | sed -E 's/.*"([^"]+)".*/\1/' \
+              | sed 's/^v//'
+            )
           else
             mgversion="${{ matrix.mgversion }}"
           fi
