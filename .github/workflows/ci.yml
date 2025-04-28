@@ -41,7 +41,7 @@ jobs:
         ./tool/format.sh
 
   build_and_test_apple:
-    if: ${{ github.event_name == 'push' || github.event_name == 'pull_request' || (github.event_name == 'workflow_dispatch' && inputs.apple) }}
+    # if: ${{ github.event_name == 'pull_request' || (github.event_name == 'workflow_dispatch' && inputs.apple) }}
     strategy:
       matrix:
         platform: [macos-14, macos-15]
