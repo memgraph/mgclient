@@ -266,7 +266,7 @@ jobs:
         run: |
           mkdir ~/memgraph
           # https://download.memgraph.com/memgraph/v2.19.0/ubuntu-24.04/memgraph_2.19.0-1_amd64.deb
-          curl -L https://download.memgraph.com/memgraph/v${{ env.MGVERSION }}}/ubuntu-24.04/memgraph_${{ env.MGVERSION }}-1_amd64.deb --output ~/memgraph/memgraph.deb
+          curl -L https://download.memgraph.com/memgraph/v${{ env.MGVERSION }}/ubuntu-24.04/memgraph_${{ env.MGVERSION }}-1_amd64.deb --output ~/memgraph/memgraph.deb
           dpkg -i ~/memgraph/memgraph.deb
           nohup /usr/lib/memgraph/memgraph --bolt-port 7687 --bolt-cert-file="" --bolt-key-file="" --data-directory="~/memgraph/data" --storage-properties-on-edges=true --storage-snapshot-interval-sec=0 --storage-wal-enabled=false --data-recovery-on-startup=false --storage-snapshot-on-exit=false --telemetry-enabled=false --log-file='' &
           sleep 1 # Wait for Memgraph a bit.
