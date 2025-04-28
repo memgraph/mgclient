@@ -61,7 +61,7 @@ jobs:
           sudo make install
 
   build_windows_compiler:
-    # if: ${{ github.event_name == 'pull_request' || (github.event_name == 'workflow_dispatch' && inputs.windows) }}
+    if: ${{ github.event_name == 'pull_request' || (github.event_name == 'workflow_dispatch' && inputs.windows) }}
     strategy:
       fail-fast: false
       matrix:
@@ -225,7 +225,7 @@ jobs:
   # Memgraph has to be started manually because systemd is not available on
   # WSL (init process does not exist).
   build_and_test_windows_mingw:
-    if: ${{ github.event_name == 'pull_request' || (github.event_name == 'workflow_dispatch' && inputs.windows_mingw) }}
+    # if: ${{ github.event_name == 'pull_request' || (github.event_name == 'workflow_dispatch' && inputs.windows_mingw) }}
     strategy:
       fail-fast: false
       matrix:
