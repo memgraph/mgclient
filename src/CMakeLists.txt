@@ -71,7 +71,8 @@ else()
             ${OPENSSL_LIBRARIES} project_options project_c_warnings)
 
     if(MGCLIENT_ON_WINDOWS)
-        target_link_libraries(mgclient-static PUBLIC ws2_32)
+        target_link_libraries(mgclient-static PUBLIC ws2_32 crypt32 gdi32)
+        target_link_libraries(mgclient-shared PUBLIC ws2_32 crypt32 gdi32)
     endif()
 
     add_library(mgclient-shared SHARED ${mgclient_src_files})
