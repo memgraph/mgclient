@@ -1,9 +1,34 @@
 name: CI
 
-on: [push]
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      apple:
+        type: boolean
+        default: false
+        description: "Build and test on Mac OS"
+      windows:
+        type: boolean
+        default: false
+        description: "Build and test on Windows (VCPKG)"
+      windows_mingw:
+        type: boolean
+        default: false
+        description: "Build and test on Windows (MinGW)"
+      linux:
+        type: boolean
+        default: false
+        description: "Build and test on Linux"
+      linux_wasm:
+        type: boolean
+        default: false
+        description: "Build and test on Linux (Wasm)"
 
 jobs:
   clang_check:
+    if: ${{ github.event_name == 'push' || github.event_name == 'pull_request' }}
     runs-on: ubuntu-latest
     steps:
     - name: Set-up repository
@@ -16,9 +41,10 @@ jobs:
         ./tool/format.sh
 
   build_and_test_apple:
+    if: ${{ github.event_name == 'pull_request' || (github.event_name == 'workflow_dispatch' && inputs.apple) }}
     strategy:
       matrix:
-        platform: [macos-14]
+        platform: [macos-14, macos-15]
     runs-on: ${{ matrix.platform }}
     steps:
       - name: Set-up repository
@@ -35,12 +61,14 @@ jobs:
           sudo make install
 
   build_windows_compiler:
-    runs-on: ${{ matrix.os }}
+    if: ${{ github.event_name == 'pull_request' || (github.event_name == 'workflow_dispatch' && inputs.windows) }}
     strategy:
       fail-fast: false
       matrix:
         include:
           - os: windows-2022
+          - os: windows-2025
+    runs-on: ${{ matrix.os }}
     env:
       VCPKG_ROOT: "${{ github.workspace }}\\vcpkg"
       deps: "openssl:x64-windows"
@@ -74,49 +102,120 @@ jobs:
           cmake --build .
 
   build_and_test_linux:
+    if: ${{ github.event_name == 'pull_request' || (github.event_name == 'workflow_dispatch' && inputs.linux) }}
     strategy:
      matrix:
-        platform: [ubuntu-24.04]
-        mgversion: ["2.19.0"]
-        packages: ["gcc g++ clang"]
+        platform: [ubuntu-24.04, fedora-41]
+        mgversion: ["latest"]
+        packages: ["gcc g++ clang cmake git"]
         gcc-postfix: [""]
         clang-postfix: [""]
-    runs-on: ${{ matrix.platform }}
+    runs-on: ["self-hosted", "X64"]
+    env:
+      MEMGRAPH_NETWORK: "host"
     steps:
       - name: Set-up repository
         uses: actions/checkout@v4
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Launch Docker Container
+        run: |
+          docker network create ${{ env.MEMGRAPH_NETWORK }} || true
+          platform="${{ matrix.platform }}"
+          tag=${platform//-/:}
+          docker run -d --rm --name testcontainer --network ${{ env.MEMGRAPH_NETWORK }} "$tag" sleep infinity      
+
       - name: Install environment
         run: |
-          sudo apt install -y ${{ matrix.packages }}
-      - name: Cache Memgraph Docker image
-        id: cache-memgraph-docker
-        uses: actions/cache@v4
-        with:
-          path: ~/memgraph
-          key: cache-memgraph-v${{ matrix.mgversion }}-docker-image
-      - name: Download Memgraph Docker image
-        if: steps.cache-memgraph-docker.outputs.cache-hit != 'true'
+          if [[ "${{ matrix.platform }}" == ubuntu* ]]; then
+            docker exec -i testcontainer bash -c "apt update && apt install -y ${{ matrix.packages }} libssl-dev"
+          else
+            docker exec -i testcontainer bash -c "dnf install -y ${{ matrix.packages }} openssl-devel"
+          fi
+
+      - name: Copy Repo Into Container
         run: |
-          mkdir ~/memgraph
-          curl -L https://download.memgraph.com/memgraph/v${{ matrix.mgversion }}/docker/memgraph-${{ matrix.mgversion }}-docker.tar.gz > ~/memgraph/memgraph-docker.tar.gz
+          docker cp . testcontainer:/mgclient
+
+      - name: Set Memgraph Version
+        run: |
+          if [[ "${{ matrix.mgversion }}" == "latest" ]]; then
+            mgversion=$(curl -s https://api.github.com/repos/memgraph/memgraph/releases/latest | jq -r .tag_name)
+            mgversion=${mgversion#v}
+          else
+            mgversion="${{ matrix.mgversion }}"
+          fi
+          echo "MGVERSION=$mgversion" >> $GITHUB_ENV
+
+      - name: Download Memgraph Docker image
+        run: |
+          curl -L https://download.memgraph.com/memgraph/v${{ env.MGVERSION }}/docker/memgraph-${{ env.MGVERSION }}-docker.tar.gz > memgraph-docker.tar.gz
+
       - name: Load and run Memgraph Docker image
         run: |
-          docker load -i ~/memgraph/memgraph-docker.tar.gz
-          docker run -d -p 7687:7687 memgraph/memgraph --telemetry-enabled=false
+          docker load -i memgraph-docker.tar.gz
+          docker run -d --rm --name memgraphcontainer --network ${{ env.MEMGRAPH_NETWORK }} -p 7687:7687 memgraph/memgraph --telemetry-enabled=false 
+          rm memgraph-docker.tar.gz
+          sleep 5
+          docker logs memgraphcontainer
+
       - name: Build with gcc, test and install mgclient
         run: |
-          mkdir build-gcc && cd build-gcc
-          cmake -DCMAKE_C_COMPILER=gcc${{ matrix.gcc-postfix }} -DCMAKE_CXX_COMPILER=g++${{ matrix.gcc-postfix }} -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=ON -DBUILD_TESTING_INTEGRATION=ON -DC_WARNINGS_AS_ERRORS=ON -DCPP_WARNINGS_AS_ERRORS=ON ..
-          cmake --build . --parallel
-          ctest --output-on-failure
-          sudo make install
+          cmake_configure="cmake \
+            -DCMAKE_C_COMPILER=gcc${{ matrix.gcc-postfix }} \
+            -DCMAKE_CXX_COMPILER=g++${{ matrix.gcc-postfix }} \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DBUILD_TESTING=ON \
+            -DBUILD_TESTING_INTEGRATION=ON \
+            -DC_WARNINGS_AS_ERRORS=ON \
+            -DCPP_WARNINGS_AS_ERRORS=ON \
+            .."
+
+          docker exec -i testcontainer bash -c "
+            mkdir /mgclient/build-gcc && 
+            cd /mgclient/build-gcc && 
+            $cmake_configure && 
+            cmake --build . --parallel && 
+            ctest --output-on-failure && 
+            make install"
+          
       - name: Build with clang, test and install mgclient
         run: |
-          mkdir build-clang && cd build-clang
-          cmake -DCMAKE_C_COMPILER=clang${{ matrix.clang-postfix }} -DCMAKE_CXX_COMPILER=clang++${{ matrix.clang-postfix }} -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=ON -DBUILD_TESTING_INTEGRATION=ON -DC_WARNINGS_AS_ERRORS=ON -DCPP_WARNINGS_AS_ERRORS=ON ..
-          cmake --build . --parallel
-          ctest --output-on-failure
-          sudo make install
+          cmake_configure="cmake \
+            -DCMAKE_C_COMPILER=clang${{ matrix.clang-postfix }} \
+            -DCMAKE_CXX_COMPILER=clang++${{ matrix.clang-postfix }} \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DBUILD_TESTING=ON \
+            -DBUILD_TESTING_INTEGRATION=ON \
+            -DC_WARNINGS_AS_ERRORS=ON \
+            -DCPP_WARNINGS_AS_ERRORS=ON \
+          .."
+
+          docker exec -i testcontainer bash -c "
+            mkdir /mgclient/build-clang && 
+            cd /mgclient/build-clang && 
+            $cmake_configure && 
+            cmake --build . --parallel && 
+            ctest --output-on-failure && 
+            make install"
+
+      - name: Cleanup
+        if: always()
+        run: |
+          docker stop testcontainer || echo "testcontainer already stopped"
+          docker stop memgraphcontainer || echo "memgraphcontainer already stopped"
+          docker wait testcontainer || true
+          docker wait memgraphcontainer || true
+          docker rm "${{ env.MEMGRAPH_NETWORK }}" || echo "network already removed"
+          docker rmi "${{ matrix.platform }}" || echo "${{ matrix.platform }} image not found"
+          docker rmi memgraph/memgraph || echo "memgraph/memgraph image not found"
+
+
 
   # GitHub actions can't run Linux Docker container on Windows machine
   # https://github.com/actions/virtual-environments/issues/1143.
@@ -125,13 +224,17 @@ jobs:
   # run Memgraph under [WSL](https://docs.microsoft.com/en-us/windows/wsl/).
   # Memgraph has to be started manually because systemd is not available on
   # WSL (init process does not exist).
+  # This particular test might be flaky (hence the additional memgraph process check)
   build_and_test_windows_mingw:
-    runs-on: windows-2022
+    if: ${{ github.event_name == 'pull_request' || (github.event_name == 'workflow_dispatch' && inputs.windows_mingw) }}
     strategy:
+      fail-fast: false
       matrix:
-        include: [
-          { msystem: MINGW64, arch: x86_64, mgversion: "2.19.0" }
-        ]
+        os: [windows-2022, windows-2025]
+        msystem: [MINGW64]
+        arch: [x86_64]
+        mgversion: ["latest"]
+    runs-on: ${{ matrix.os }}
     defaults:
       run:
         shell: msys2 {0}
@@ -143,15 +246,27 @@ jobs:
           msystem: ${{ matrix.msystem }}
           update: true
           install: git base-devel mingw-w64-${{ matrix.arch }}-toolchain mingw-w64-${{ matrix.arch }}-cmake mingw-w64-${{ matrix.arch }}-openssl
-      - uses: Vampire/setup-wsl@v1
+      - uses: Vampire/setup-wsl@v5
         with:
-            distribution: Ubuntu-22.04
+            distribution: Ubuntu-24.04
+      - name: Set Memgraph Version
+        run: |
+          if [[ "${{ matrix.mgversion }}" == "latest" ]]; then
+            mgversion=$(
+              curl -s https://api.github.com/repos/memgraph/memgraph/releases/latest \
+              | grep -m1 '"tag_name":' \
+              | sed -E 's/.*"([^"]+)".*/\1/' \
+              | sed 's/^v//'
+            )
+          else
+            mgversion="${{ matrix.mgversion }}"
+          fi
+          echo "MGVERSION=$mgversion" >> $GITHUB_ENV
       - name: Download, install and run Memgraph under WSL
         shell: wsl-bash {0} # root shell
         run: |
           mkdir ~/memgraph
-          # https://download.memgraph.com/memgraph/v2.19.0/ubuntu-24.04/memgraph_2.19.0-1_amd64.deb
-          curl -L https://download.memgraph.com/memgraph/v${{matrix.mgversion}}/ubuntu-22.04/memgraph_${{matrix.mgversion}}-1_amd64.deb --output ~/memgraph/memgraph.deb
+          curl -L https://download.memgraph.com/memgraph/v${{ env.MGVERSION }}/ubuntu-24.04/memgraph_${{ env.MGVERSION }}-1_amd64.deb --output ~/memgraph/memgraph.deb
           dpkg -i ~/memgraph/memgraph.deb
           nohup /usr/lib/memgraph/memgraph --bolt-port 7687 --bolt-cert-file="" --bolt-key-file="" --data-directory="~/memgraph/data" --storage-properties-on-edges=true --storage-snapshot-interval-sec=0 --storage-wal-enabled=false --data-recovery-on-startup=false --storage-snapshot-on-exit=false --telemetry-enabled=false --log-file='' &
           sleep 1 # Wait for Memgraph a bit.
@@ -159,11 +274,25 @@ jobs:
         run: |
           mkdir build
           cd build
-          cmake .. -G "MinGW Makefiles" -DBUILD_TESTING=ON -DBUILD_TESTING_INTEGRATION=ON -DC_WARNINGS_AS_ERRORS=ON -DCPP_WARNINGS_AS_ERRORS=ON
+          cmake .. -G "MinGW Makefiles" -DBUILD_TESTING=ON -DBUILD_TESTING_INTEGRATION=ON -DC_WARNINGS_AS_ERRORS=ON -DCPP_WARNINGS_AS_ERRORS=ON -DCMAKE_POLICY_VERSION_MINIMUM=3.5
           cmake --build . --parallel
+
+      - name: Verify Memgraph is running under WSL
+        shell: wsl-bash {0}
+        run: |
+          # process
+          if ! pgrep -x memgraph; then
+            echo "❌ Memgraph not running" >&2
+            exit 1
+          fi
+          echo "✅ Memgraph check passed"
+
+      - name: Run Tests
+        run: |
           ctest --verbose -R "allocator|value|example_basic|integration_basic"
 
   build_and_test_linux_wasm:
+    if: ${{ github.event_name == 'pull_request' || (github.event_name == 'workflow_dispatch' && inputs.linux_wasm) }}
     strategy:
      matrix:
         platform: [ubuntu-24.04]
