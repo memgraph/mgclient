@@ -430,7 +430,7 @@ std::vector<ValueTestParam> DateTimeTestCases() {
     encoded_date_time += "\xB3\x46"s;
     encoded_date_time += "\x01"s;
     encoded_date_time += "\x01"s;
-    encoded_date_time += "\x01"s;
+    encoded_date_time += "\x3C"s;
 
     inputs.push_back({mg_value_make_date_time(date_time), encoded_date_time});
   }
