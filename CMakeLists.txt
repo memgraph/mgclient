@@ -19,7 +19,7 @@ if(WASM)
     set(CMAKE_TOOLCHAIN_FILE "${CMAKE_SOURCE_DIR}/wasm/emsdk/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake")
 endif()
 
-project(mgclient VERSION 1.4.5)
+project(mgclient VERSION 1.4.6)
 # Minor version increase can also mean ABI incompatibility with previous
 # versions. IMPORTANT: Take care of the SO version manually.
 set(mgclient_SOVERSION 2)
