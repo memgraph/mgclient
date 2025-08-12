@@ -163,7 +163,8 @@ int mg_session_write_date_time(mg_session *session, const mg_date_time *dt) {
   MG_RETURN_IF_FAILED(mg_session_write_uint8(session, MG_SIGNATURE_DATE_TIME));
   MG_RETURN_IF_FAILED(mg_session_write_integer(session, dt->seconds));
   MG_RETURN_IF_FAILED(mg_session_write_integer(session, dt->nanoseconds));
-  MG_RETURN_IF_FAILED(mg_session_write_integer(session, dt->tz_offset_minutes * 60));
+  MG_RETURN_IF_FAILED(
+      mg_session_write_integer(session, dt->tz_offset_minutes * 60));
   return 0;
 }
 
