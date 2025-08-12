@@ -157,6 +157,16 @@ int mg_session_write_local_date_time(mg_session *session,
   return 0;
 }
 
+int mg_session_write_date_time(mg_session *session, const mg_date_time *dt) {
+  MG_RETURN_IF_FAILED(
+      mg_session_write_uint8(session, (uint8_t)(MG_MARKER_TINY_STRUCT3)));
+  MG_RETURN_IF_FAILED(mg_session_write_uint8(session, MG_SIGNATURE_DATE_TIME));
+  MG_RETURN_IF_FAILED(mg_session_write_integer(session, dt->seconds));
+  MG_RETURN_IF_FAILED(mg_session_write_integer(session, dt->nanoseconds));
+  MG_RETURN_IF_FAILED(mg_session_write_integer(session, dt->tz_offset_minutes * 60));
+  return 0;
+}
+
 int mg_session_write_duration(mg_session *session, const mg_duration *dur) {
   MG_RETURN_IF_FAILED(
       mg_session_write_uint8(session, (uint8_t)(MG_MARKER_TINY_STRUCT4)));
@@ -228,8 +238,7 @@ int mg_session_write_value(mg_session *session, const mg_value *value) {
     case MG_VALUE_TYPE_LOCAL_TIME:
       return mg_session_write_local_time(session, value->local_time_v);
     case MG_VALUE_TYPE_DATE_TIME:
-      mg_session_set_error(session, "tried to send value of type 'date_time'");
-      return MG_ERROR_INVALID_VALUE;
+      return mg_session_write_date_time(session, value->date_time_v);
     case MG_VALUE_TYPE_DATE_TIME_ZONE_ID:
       mg_session_set_error(session,
                            "tried to send value of type 'date_time_zone_id'");

@@ -1657,6 +1657,18 @@ mg_local_time *mg_local_time_make(int64_t nanoseconds) {
   return lt;
 }
 
+mg_date_time *mg_zoned_date_time_make(int64_t seconds, int64_t nanoseconds,
+                                      int32_t tz_offset_minutes) {
+  mg_date_time *dt = mg_date_time_alloc(&mg_system_allocator);
+  if (!dt) {
+    return NULL;
+  }
+  dt->seconds = seconds;
+  dt->nanoseconds = nanoseconds;
+  dt->tz_offset_minutes = tz_offset_minutes;
+  return dt;
+}
+
 mg_local_date_time *mg_local_date_time_make(int64_t seconds,
                                             int64_t nanoseconds) {
   mg_local_date_time *ldt = mg_local_date_time_alloc(&mg_system_allocator);
