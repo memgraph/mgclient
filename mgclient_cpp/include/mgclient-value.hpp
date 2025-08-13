@@ -44,14 +44,6 @@ TDest MemcpyCast(TSrc src) {
   return dest;
 }
 
-inline bool AreStringsEqual(const mg_string *s1, const mg_string *s2) {
-  if (s1 == s2) return true;
-  if (!s1 || !s2) return false;
-  return mg_string_size(s1) == mg_string_size(s2) &&
-         memcmp(mg_string_data(s1), mg_string_data(s2), mg_string_size(s1)) ==
-             0;
-}
-
 }  // namespace detail
 
 // Forward declarations:
@@ -1695,6 +1687,14 @@ inline Value::Type ConvertType(mg_value_type type) {
 }
 
 inline bool AreValuesEqual(const mg_value *value1, const mg_value *value2);
+
+inline bool AreStringsEqual(const mg_string *s1, const mg_string *s2) {
+  if (s1 == s2) return true;
+  if (!s1 || !s2) return false;
+  return mg_string_size(s1) == mg_string_size(s2) &&
+         memcmp(mg_string_data(s1), mg_string_data(s2), mg_string_size(s1)) ==
+             0;
+}
 
 inline bool AreListsEqual(const mg_list *list1, const mg_list *list2) {
   if (list1 == list2) {
