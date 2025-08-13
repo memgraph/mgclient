@@ -1826,7 +1826,7 @@ int mg_local_date_time_equal(const mg_local_date_time *lhs,
 int mg_date_time_zone_id_equal(const mg_date_time_zone_id *lhs,
                                const mg_date_time_zone_id *rhs) {
   return lhs->seconds == rhs->seconds && lhs->nanoseconds == rhs->nanoseconds &&
-         mg_string_equal(lhs->timezone_name, rhs->timezone_name) == 0;
+         mg_string_equal(lhs->timezone_name, rhs->timezone_name);
 }
 
 int mg_duration_equal(const mg_duration *lhs, const mg_duration *rhs) {
