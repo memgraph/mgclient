@@ -1279,9 +1279,9 @@ int64_t mg_date_time_zone_id_nanoseconds(
   return date_time_zone_id->nanoseconds;
 }
 
-int64_t mg_date_time_zone_id_tz_id(
+const mg_string *mg_date_time_zone_id_timezone_name(
     const mg_date_time_zone_id *date_time_zone_id) {
-  return date_time_zone_id->tz_id;
+  return date_time_zone_id->timezone_name;
 }
 
 int64_t mg_local_date_time_seconds(const mg_local_date_time *local_date_time) {
@@ -1826,7 +1826,7 @@ int mg_local_date_time_equal(const mg_local_date_time *lhs,
 int mg_date_time_zone_id_equal(const mg_date_time_zone_id *lhs,
                                const mg_date_time_zone_id *rhs) {
   return lhs->seconds == rhs->seconds && lhs->nanoseconds == rhs->nanoseconds &&
-         lhs->tz_id == rhs->tz_id;
+         mg_string_equal(lhs->timezone_name, rhs->timezone_name) == 0;
 }
 
 int mg_duration_equal(const mg_duration *lhs, const mg_duration *rhs) {

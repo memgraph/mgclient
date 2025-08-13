@@ -946,9 +946,9 @@ mg_date_time_zone_id_seconds(const mg_date_time_zone_id *date_time_zone_id);
 MGCLIENT_EXPORT int64_t
 mg_date_time_zone_id_nanoseconds(const mg_date_time_zone_id *date_time_zone_id);
 
-/// Returns time zone represented by the identifier.
-MGCLIENT_EXPORT int64_t
-mg_date_time_zone_id_tz_id(const mg_date_time_zone_id *date_time_zone_id);
+/// Returns time zone name.
+MGCLIENT_EXPORT const mg_string *
+mg_date_time_zone_id_timezone_name(const mg_date_time_zone_id *date_time_zone_id);
 
 /// Creates a copy of the given date and time.
 ///

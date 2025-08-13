@@ -94,7 +94,7 @@ typedef struct mg_date_time {
 typedef struct mg_date_time_zone_id {
   int64_t seconds;
   int64_t nanoseconds;
-  int64_t tz_id;
+  mg_string *timezone_name;
 } mg_date_time_zone_id;
 
 typedef struct mg_local_date_time {
