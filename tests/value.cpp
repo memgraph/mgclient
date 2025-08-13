@@ -529,7 +529,7 @@ TEST(Value, DateTimeZoneId) {
               static_cast<int64_t>(1));
     const mg_string *tz_name =
         mg_date_time_zone_id_timezone_name(date_time_zone_id);
-    EXPECT_STREQ(mg_string_data(tz_name), "Europe/Zagreb");
+    EXPECT_TRUE(Equal(tz_name, "Europe/Zagreb"s));
     mg_date_time_zone_id *date_time_zone_id2 =
         mg_date_time_zone_id_copy(date_time_zone_id);
     mg_date_time_zone_id_destroy(date_time_zone_id);
@@ -539,7 +539,7 @@ TEST(Value, DateTimeZoneId) {
               static_cast<int64_t>(1));
     const mg_string *tz_name2 =
         mg_date_time_zone_id_timezone_name(date_time_zone_id2);
-    EXPECT_STREQ(mg_string_data(tz_name2), "Europe/Zagreb");
+    EXPECT_TRUE(Equal(tz_name2, "Europe/Zagreb"s));
     mg_date_time_zone_id_destroy(date_time_zone_id2);
   }
 }
