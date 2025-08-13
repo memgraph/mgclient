@@ -168,13 +168,16 @@ int mg_session_write_date_time(mg_session *session, const mg_date_time *dt) {
   return 0;
 }
 
-int mg_session_write_date_time_zone_id(mg_session *session, const mg_date_time_zone_id *dtz) {
+int mg_session_write_date_time_zone_id(mg_session *session,
+                                       const mg_date_time_zone_id *dtz) {
   MG_RETURN_IF_FAILED(
       mg_session_write_uint8(session, (uint8_t)(MG_MARKER_TINY_STRUCT3)));
-  MG_RETURN_IF_FAILED(mg_session_write_uint8(session, MG_SIGNATURE_DATE_TIME_ZONE_ID));
+  MG_RETURN_IF_FAILED(
+      mg_session_write_uint8(session, MG_SIGNATURE_DATE_TIME_ZONE_ID));
   MG_RETURN_IF_FAILED(mg_session_write_integer(session, dtz->seconds));
   MG_RETURN_IF_FAILED(mg_session_write_integer(session, dtz->nanoseconds));
-  MG_RETURN_IF_FAILED(mg_session_write_string(session, dtz->timezone_name->data));
+  MG_RETURN_IF_FAILED(
+      mg_session_write_string(session, dtz->timezone_name->data));
   return 0;
 }
 
@@ -251,7 +254,8 @@ int mg_session_write_value(mg_session *session, const mg_value *value) {
     case MG_VALUE_TYPE_DATE_TIME:
       return mg_session_write_date_time(session, value->date_time_v);
     case MG_VALUE_TYPE_DATE_TIME_ZONE_ID:
-      return mg_session_write_date_time_zone_id(session, value->date_time_zone_id_v);
+      return mg_session_write_date_time_zone_id(session,
+                                                value->date_time_zone_id_v);
     case MG_VALUE_TYPE_LOCAL_DATE_TIME:
       return mg_session_write_local_date_time(session,
                                               value->local_date_time_v);

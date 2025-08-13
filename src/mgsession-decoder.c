@@ -714,7 +714,8 @@ int mg_session_read_date_time_zone_id(
     goto cleanup;
   }
 
-  status = mg_session_read_string(session, &date_time_zone_id_tmp->timezone_name);
+  status =
+      mg_session_read_string(session, &date_time_zone_id_tmp->timezone_name);
 
   *date_time_zone_id = date_time_zone_id_tmp;
   return 0;

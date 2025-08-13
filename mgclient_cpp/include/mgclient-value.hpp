@@ -48,7 +48,8 @@ inline bool AreStringsEqual(const mg_string *s1, const mg_string *s2) {
   if (s1 == s2) return true;
   if (!s1 || !s2) return false;
   return mg_string_size(s1) == mg_string_size(s2) &&
-         memcmp(mg_string_data(s1), mg_string_data(s2), mg_string_size(s1)) == 0;
+         memcmp(mg_string_data(s1), mg_string_data(s2), mg_string_size(s1)) ==
+             0;
 }
 
 }  // namespace detail
@@ -1854,8 +1855,9 @@ inline bool AreDateTimeZoneIdsEqual(
              mg_date_time_zone_id_seconds(date_time_zone_id2) &&
          mg_date_time_zone_id_nanoseconds(date_time_zone_id1) ==
              mg_date_time_zone_id_nanoseconds(date_time_zone_id2) &&
-         detail::AreStringsEqual(mg_date_time_zone_id_timezone_name(date_time_zone_id1),
-                                 mg_date_time_zone_id_timezone_name(date_time_zone_id2));
+         detail::AreStringsEqual(
+             mg_date_time_zone_id_timezone_name(date_time_zone_id1),
+             mg_date_time_zone_id_timezone_name(date_time_zone_id2));
 }
 
 inline bool AreLocalDateTimesEqual(const mg_local_date_time *local_date_time1,

@@ -527,7 +527,8 @@ TEST(Value, DateTimeZoneId) {
               static_cast<int64_t>(1));
     EXPECT_EQ(mg_date_time_zone_id_nanoseconds(date_time_zone_id),
               static_cast<int64_t>(1));
-    const mg_string *tz_name = mg_date_time_zone_id_timezone_name(date_time_zone_id);
+    const mg_string *tz_name =
+        mg_date_time_zone_id_timezone_name(date_time_zone_id);
     EXPECT_STREQ(mg_string_data(tz_name), "Europe/Zagreb");
     mg_date_time_zone_id *date_time_zone_id2 =
         mg_date_time_zone_id_copy(date_time_zone_id);
@@ -536,7 +537,8 @@ TEST(Value, DateTimeZoneId) {
               static_cast<int64_t>(1));
     EXPECT_EQ(mg_date_time_zone_id_nanoseconds(date_time_zone_id2),
               static_cast<int64_t>(1));
-    const mg_string *tz_name2 = mg_date_time_zone_id_timezone_name(date_time_zone_id2);
+    const mg_string *tz_name2 =
+        mg_date_time_zone_id_timezone_name(date_time_zone_id2);
     EXPECT_STREQ(mg_string_data(tz_name2), "Europe/Zagreb");
     mg_date_time_zone_id_destroy(date_time_zone_id2);
   }
