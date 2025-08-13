@@ -176,8 +176,8 @@ int mg_session_write_date_time_zone_id(mg_session *session,
       mg_session_write_uint8(session, MG_SIGNATURE_DATE_TIME_ZONE_ID));
   MG_RETURN_IF_FAILED(mg_session_write_integer(session, dtz->seconds));
   MG_RETURN_IF_FAILED(mg_session_write_integer(session, dtz->nanoseconds));
-  MG_RETURN_IF_FAILED(mg_session_write_string2(session, dtz->timezone_name->size,
-                                               dtz->timezone_name->data));
+  MG_RETURN_IF_FAILED(mg_session_write_string2(
+      session, dtz->timezone_name->size, dtz->timezone_name->data));
   return 0;
 }
 
