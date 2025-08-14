@@ -716,6 +716,9 @@ int mg_session_read_date_time_zone_id(
 
   status =
       mg_session_read_string(session, &date_time_zone_id_tmp->timezone_name);
+  if (status != 0) {
+    goto cleanup;
+  }
 
   *date_time_zone_id = date_time_zone_id_tmp;
   return 0;
