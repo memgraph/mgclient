@@ -134,6 +134,9 @@ mg_date_time_zone_id *mg_date_time_zone_id_alloc(mg_allocator *allocator) {
     return NULL;
   }
   mg_date_time_zone_id *date_time_zone_id = (mg_date_time_zone_id *)block;
+  date_time_zone_id->seconds = 0;
+  date_time_zone_id->nanoseconds = 0;
+  date_time_zone_id->timezone_name = NULL;
   return date_time_zone_id;
 }
 
@@ -1442,7 +1445,13 @@ mg_date_time_zone_id *mg_date_time_zone_id_copy_ca(
   if (!date_time_zone_id) {
     return NULL;
   }
-  memcpy(date_time_zone_id, src, sizeof(mg_date_time_zone_id));
+  date_time_zone_id->seconds = src->seconds;
+  date_time_zone_id->nanoseconds = src->nanoseconds;
+  date_time_zone_id->timezone_name = mg_string_copy_ca(src->timezone_name, allocator);
+  if (!date_time_zone_id->timezone_name) {
+    mg_date_time_zone_id_destroy_ca(date_time_zone_id, allocator);
+    return NULL;
+  }
   return date_time_zone_id;
 }
 
@@ -1456,6 +1465,7 @@ void mg_date_time_zone_id_destroy_ca(mg_date_time_zone_id *date_time_zone_id,
   if (!date_time_zone_id) {
     return;
   }
+  mg_string_destroy_ca(date_time_zone_id->timezone_name, allocator);
   mg_allocator_free(allocator, date_time_zone_id);
 }
 
