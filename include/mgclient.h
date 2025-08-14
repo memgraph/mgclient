@@ -962,8 +962,14 @@ MGCLIENT_EXPORT void mg_date_time_zone_id_destroy(
 
 /// Creates mg_date_time from seconds, nanoseconds and timezone offset.
 /// \return a pointer to mg_date_time or NULL if an error occurred.
-MGCLIENT_EXPORT mg_date_time *mg_date_time_make(
-    int64_t seconds, int64_t nanoseconds, int32_t tz_offset_minutes);
+MGCLIENT_EXPORT mg_date_time *mg_date_time_make(int64_t seconds,
+                                                int64_t nanoseconds,
+                                                int32_t tz_offset_minutes);
+
+/// Creates mg_date_time_zone_id from seconds, nanoseconds, and timezone name.
+/// \return a pointer to mg_date_time_zone_id or NULL if an error occurred.
+MGCLIENT_EXPORT mg_date_time_zone_id *mg_date_time_zone_id_make(
+    int64_t seconds, int64_t nanoseconds, const char *timezone_name);
 
 /// Creates mg_local_date_time from seconds and nanoseconds.
 /// \return a pointer to mg_local_date_time or NULL if an error occurred.

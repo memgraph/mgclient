@@ -1658,7 +1658,7 @@ mg_local_time *mg_local_time_make(int64_t nanoseconds) {
 }
 
 mg_date_time *mg_date_time_make(int64_t seconds, int64_t nanoseconds,
-                                      int32_t tz_offset_minutes) {
+                                int32_t tz_offset_minutes) {
   mg_date_time *dt = mg_date_time_alloc(&mg_system_allocator);
   if (!dt) {
     return NULL;
@@ -1667,6 +1667,27 @@ mg_date_time *mg_date_time_make(int64_t seconds, int64_t nanoseconds,
   dt->nanoseconds = nanoseconds;
   dt->tz_offset_minutes = tz_offset_minutes;
   return dt;
+}
+
+mg_date_time_zone_id *mg_date_time_zone_id_make(int64_t seconds,
+                                                int64_t nanoseconds,
+                                                const char *timezone_name) {
+  mg_date_time_zone_id *dt_zone_id =
+      mg_date_time_zone_id_alloc(&mg_system_allocator);
+  if (!dt_zone_id) {
+    return NULL;
+  }
+
+  mg_string *tz_name = mg_string_make(timezone_name);
+  if (!tz_name) {
+    mg_date_time_zone_id_destroy_ca(dt_zone_id, &mg_system_allocator);
+    return NULL;
+  }
+
+  dt_zone_id->seconds = seconds;
+  dt_zone_id->nanoseconds = nanoseconds;
+  dt_zone_id->timezone_name = tz_name;
+  return dt_zone_id;
 }
 
 mg_local_date_time *mg_local_date_time_make(int64_t seconds,
