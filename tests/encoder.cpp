@@ -298,6 +298,9 @@ INSTANTIATE_TEST_CASE_P(LocalTime, ValueTest,
 INSTANTIATE_TEST_CASE_P(LocalDateTime, ValueTest,
                         ::testing::ValuesIn(LocalDateTimeTestCases()), );
 
+INSTANTIATE_TEST_CASE_P(DateTime, ValueTest,
+                        ::testing::ValuesIn(DateTimeTestCases()), );
+
 INSTANTIATE_TEST_CASE_P(Duration, ValueTest,
                         ::testing::ValuesIn((DurationTestCases())), );
 

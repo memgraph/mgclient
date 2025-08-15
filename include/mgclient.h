@@ -946,9 +946,9 @@ mg_date_time_zone_id_seconds(const mg_date_time_zone_id *date_time_zone_id);
 MGCLIENT_EXPORT int64_t
 mg_date_time_zone_id_nanoseconds(const mg_date_time_zone_id *date_time_zone_id);
 
-/// Returns time zone represented by the identifier.
-MGCLIENT_EXPORT int64_t
-mg_date_time_zone_id_tz_id(const mg_date_time_zone_id *date_time_zone_id);
+/// Returns time zone name.
+MGCLIENT_EXPORT const mg_string *mg_date_time_zone_id_timezone_name(
+    const mg_date_time_zone_id *date_time_zone_id);
 
 /// Creates a copy of the given date and time.
 ///
@@ -959,6 +959,17 @@ MGCLIENT_EXPORT mg_date_time_zone_id *mg_date_time_zone_id_copy(
 /// Destroys the given date and time.
 MGCLIENT_EXPORT void mg_date_time_zone_id_destroy(
     mg_date_time_zone_id *date_time_zone_id);
+
+/// Creates mg_date_time from seconds, nanoseconds and timezone offset.
+/// \return a pointer to mg_date_time or NULL if an error occurred.
+MGCLIENT_EXPORT mg_date_time *mg_date_time_make(int64_t seconds,
+                                                int64_t nanoseconds,
+                                                int32_t tz_offset_minutes);
+
+/// Creates mg_date_time_zone_id from seconds, nanoseconds, and timezone name.
+/// \return a pointer to mg_date_time_zone_id or NULL if an error occurred.
+MGCLIENT_EXPORT mg_date_time_zone_id *mg_date_time_zone_id_make(
+    int64_t seconds, int64_t nanoseconds, const char *timezone_name);
 
 /// Creates mg_local_date_time from seconds and nanoseconds.
 /// \return a pointer to mg_local_date_time or NULL if an error occurred.
