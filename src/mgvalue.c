@@ -1447,7 +1447,8 @@ mg_date_time_zone_id *mg_date_time_zone_id_copy_ca(
   }
   date_time_zone_id->seconds = src->seconds;
   date_time_zone_id->nanoseconds = src->nanoseconds;
-  date_time_zone_id->timezone_name = mg_string_copy_ca(src->timezone_name, allocator);
+  date_time_zone_id->timezone_name =
+      mg_string_copy_ca(src->timezone_name, allocator);
   if (!date_time_zone_id->timezone_name) {
     mg_date_time_zone_id_destroy_ca(date_time_zone_id, allocator);
     return NULL;
