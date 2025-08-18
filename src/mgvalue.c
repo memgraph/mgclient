@@ -134,6 +134,9 @@ mg_date_time_zone_id *mg_date_time_zone_id_alloc(mg_allocator *allocator) {
     return NULL;
   }
   mg_date_time_zone_id *date_time_zone_id = (mg_date_time_zone_id *)block;
+  date_time_zone_id->seconds = 0;
+  date_time_zone_id->nanoseconds = 0;
+  date_time_zone_id->timezone_name = NULL;
   return date_time_zone_id;
 }
 
@@ -1279,9 +1282,9 @@ int64_t mg_date_time_zone_id_nanoseconds(
   return date_time_zone_id->nanoseconds;
 }
 
-int64_t mg_date_time_zone_id_tz_id(
+const mg_string *mg_date_time_zone_id_timezone_name(
     const mg_date_time_zone_id *date_time_zone_id) {
-  return date_time_zone_id->tz_id;
+  return date_time_zone_id->timezone_name;
 }
 
 int64_t mg_local_date_time_seconds(const mg_local_date_time *local_date_time) {
@@ -1442,7 +1445,14 @@ mg_date_time_zone_id *mg_date_time_zone_id_copy_ca(
   if (!date_time_zone_id) {
     return NULL;
   }
-  memcpy(date_time_zone_id, src, sizeof(mg_date_time_zone_id));
+  date_time_zone_id->seconds = src->seconds;
+  date_time_zone_id->nanoseconds = src->nanoseconds;
+  date_time_zone_id->timezone_name =
+      mg_string_copy_ca(src->timezone_name, allocator);
+  if (!date_time_zone_id->timezone_name) {
+    mg_date_time_zone_id_destroy_ca(date_time_zone_id, allocator);
+    return NULL;
+  }
   return date_time_zone_id;
 }
 
@@ -1456,6 +1466,7 @@ void mg_date_time_zone_id_destroy_ca(mg_date_time_zone_id *date_time_zone_id,
   if (!date_time_zone_id) {
     return;
   }
+  mg_string_destroy_ca(date_time_zone_id->timezone_name, allocator);
   mg_allocator_free(allocator, date_time_zone_id);
 }
 
@@ -1657,6 +1668,39 @@ mg_local_time *mg_local_time_make(int64_t nanoseconds) {
   return lt;
 }
 
+mg_date_time *mg_date_time_make(int64_t seconds, int64_t nanoseconds,
+                                int32_t tz_offset_minutes) {
+  mg_date_time *dt = mg_date_time_alloc(&mg_system_allocator);
+  if (!dt) {
+    return NULL;
+  }
+  dt->seconds = seconds;
+  dt->nanoseconds = nanoseconds;
+  dt->tz_offset_minutes = tz_offset_minutes;
+  return dt;
+}
+
+mg_date_time_zone_id *mg_date_time_zone_id_make(int64_t seconds,
+                                                int64_t nanoseconds,
+                                                const char *timezone_name) {
+  mg_date_time_zone_id *dt_zone_id =
+      mg_date_time_zone_id_alloc(&mg_system_allocator);
+  if (!dt_zone_id) {
+    return NULL;
+  }
+
+  mg_string *tz_name = mg_string_make(timezone_name);
+  if (!tz_name) {
+    mg_date_time_zone_id_destroy_ca(dt_zone_id, &mg_system_allocator);
+    return NULL;
+  }
+
+  dt_zone_id->seconds = seconds;
+  dt_zone_id->nanoseconds = nanoseconds;
+  dt_zone_id->timezone_name = tz_name;
+  return dt_zone_id;
+}
+
 mg_local_date_time *mg_local_date_time_make(int64_t seconds,
                                             int64_t nanoseconds) {
   mg_local_date_time *ldt = mg_local_date_time_alloc(&mg_system_allocator);
@@ -1814,7 +1858,7 @@ int mg_local_date_time_equal(const mg_local_date_time *lhs,
 int mg_date_time_zone_id_equal(const mg_date_time_zone_id *lhs,
                                const mg_date_time_zone_id *rhs) {
   return lhs->seconds == rhs->seconds && lhs->nanoseconds == rhs->nanoseconds &&
-         lhs->tz_id == rhs->tz_id;
+         mg_string_equal(lhs->timezone_name, rhs->timezone_name);
 }
 
 int mg_duration_equal(const mg_duration *lhs, const mg_duration *rhs) {

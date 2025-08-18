@@ -445,13 +445,14 @@ std::vector<ValueTestParam> DateTimeZoneIdTestCases() {
 
     date_time_zone_id->seconds = 1;
     date_time_zone_id->nanoseconds = 1;
-    date_time_zone_id->tz_id = 1;
+    date_time_zone_id->timezone_name = mg_string_make("Europe/Zagreb");
 
     std::string encoded_date_time_zone_id;
     encoded_date_time_zone_id += "\xB3\x66"s;
     encoded_date_time_zone_id += "\x01"s;
     encoded_date_time_zone_id += "\x01"s;
-    encoded_date_time_zone_id += "\x01"s;
+    encoded_date_time_zone_id += "\x8D"s;
+    encoded_date_time_zone_id += "Europe/Zagreb"s;
 
     inputs.push_back({mg_value_make_date_time_zone_id(date_time_zone_id),
                       encoded_date_time_zone_id});

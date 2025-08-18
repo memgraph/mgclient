@@ -43,6 +43,7 @@ TDest MemcpyCast(TSrc src) {
   std::memcpy(&dest, &src, sizeof(src));
   return dest;
 }
+
 }  // namespace detail
 
 // Forward declarations:
@@ -1041,7 +1042,10 @@ class DateTimeZoneId final {
   /// Returns nanoseconds since midnight.
   int64_t nanoseconds() const { return mg_date_time_zone_id_nanoseconds(ptr_); }
   /// Returns time zone represented by the identifier.
-  int64_t tzId() const { return mg_date_time_zone_id_tz_id(ptr_); }
+  std::string_view timezoneName() const {
+    const mg_string *name = mg_date_time_zone_id_timezone_name(ptr_);
+    return std::string_view{mg_string_data(name), mg_string_size(name)};
+  }
 
   ConstDateTimeZoneId AsConstDateTimeZoneId() const;
 
@@ -1072,7 +1076,10 @@ class ConstDateTimeZoneId final {
     return mg_date_time_zone_id_nanoseconds(const_ptr_);
   }
   /// Returns time zone represented by the identifier.
-  int64_t tzId() const { return mg_date_time_zone_id_tz_id(const_ptr_); }
+  std::string_view timezoneName() const {
+    const mg_string *name = mg_date_time_zone_id_timezone_name(const_ptr_);
+    return std::string_view{mg_string_data(name), mg_string_size(name)};
+  }
 
   bool operator==(const ConstDateTimeZoneId &other) const;
   bool operator==(const DateTimeZoneId &other) const;
@@ -1681,6 +1688,14 @@ inline Value::Type ConvertType(mg_value_type type) {
 
 inline bool AreValuesEqual(const mg_value *value1, const mg_value *value2);
 
+inline bool AreStringsEqual(const mg_string *s1, const mg_string *s2) {
+  if (s1 == s2) return true;
+  if (!s1 || !s2) return false;
+  return mg_string_size(s1) == mg_string_size(s2) &&
+         memcmp(mg_string_data(s1), mg_string_data(s2), mg_string_size(s1)) ==
+             0;
+}
+
 inline bool AreListsEqual(const mg_list *list1, const mg_list *list2) {
   if (list1 == list2) {
     return true;
@@ -1840,8 +1855,9 @@ inline bool AreDateTimeZoneIdsEqual(
              mg_date_time_zone_id_seconds(date_time_zone_id2) &&
          mg_date_time_zone_id_nanoseconds(date_time_zone_id1) ==
              mg_date_time_zone_id_nanoseconds(date_time_zone_id2) &&
-         mg_date_time_zone_id_tz_id(date_time_zone_id1) ==
-             mg_date_time_zone_id_tz_id(date_time_zone_id2);
+         detail::AreStringsEqual(
+             mg_date_time_zone_id_timezone_name(date_time_zone_id1),
+             mg_date_time_zone_id_timezone_name(date_time_zone_id2));
 }
 
 inline bool AreLocalDateTimesEqual(const mg_local_date_time *local_date_time1,
