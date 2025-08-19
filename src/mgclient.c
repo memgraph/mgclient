@@ -67,6 +67,7 @@ typedef struct mg_session_params {
   const char *address;
   const char *host;
   uint16_t port;
+  const char *scheme;
   const char *username;
   const char *password;
   const char *user_agent;
@@ -116,6 +117,11 @@ void mg_session_params_set_host(mg_session_params *params, const char *host) {
 
 void mg_session_params_set_port(mg_session_params *params, uint16_t port) {
   params->port = port;
+}
+
+void mg_session_params_set_scheme(mg_session_params *params,
+                                  const char *scheme) {
+  params->scheme = scheme;
 }
 
 void mg_session_params_set_username(mg_session_params *params,
@@ -364,8 +370,8 @@ int mg_bolt_init_v1(mg_session *session, const mg_session_params *params) {
   return status;
 }
 
-static mg_map *build_hello_extra(const char *user_agent, const char *username,
-                                 const char *password) {
+static mg_map *build_hello_extra(const char *user_agent, const char *scheme,
+                                 const char *username, const char *password) {
   mg_map *extra = mg_map_make_empty(4);
   if (!extra) {
     return NULL;
@@ -379,40 +385,53 @@ static mg_map *build_hello_extra(const char *user_agent, const char *username,
     }
   }
 
-  assert((username && password) || (!username && !password));
-  if (username) {
-    mg_value *scheme = mg_value_make_string("basic");
-    if (!scheme || mg_map_insert_unsafe(extra, "scheme", scheme) != 0) {
+  // The "basic" scheme requires a username and a password/credential within the
+  // HELLO message. Other schemes (save for "kerberos", which is not supported
+  // by Memgraph) do not have such requirements:
+  // https://neo4j.com/docs/bolt/current/bolt/message/#messages-hello
+  // https://neo4j.com/docs/bolt/current/bolt/message/#messages-logon
+  // NOTE: HELLO message does NOT contain schema after Bolt 5.0.
+  if (scheme && strcmp(scheme, "basic") == 0) {
+    assert(username && password);
+  }
+
+  if (!username && !password) {
+    mg_value *scheme_ = mg_value_make_string("none");
+    if (!scheme_ || mg_map_insert_unsafe(extra, "scheme", scheme_) != 0) {
       goto cleanup;
     }
+    return extra;
+  }
 
+  mg_value *scheme_ = mg_value_make_string(scheme ? scheme : "none"); // NOTE: Makes none default.
+  if (!scheme_ || mg_map_insert_unsafe(extra, "scheme", scheme_) != 0) {
+    goto cleanup;
+  }
+
+  if (username) {
     mg_value *principal = mg_value_make_string(username);
     if (!principal || mg_map_insert_unsafe(extra, "principal", principal)) {
       goto cleanup;
     }
+  }
 
+  if (password) {
     mg_value *credentials = mg_value_make_string(password);
     if (!credentials ||
         mg_map_insert_unsafe(extra, "credentials", credentials)) {
       goto cleanup;
     }
-  } else {
-    mg_value *scheme = mg_value_make_string("none");
-    if (!scheme || mg_map_insert_unsafe(extra, "scheme", scheme) != 0) {
-      goto cleanup;
-    }
   }
 
   return extra;
-
 cleanup:
   mg_map_destroy(extra);
   return NULL;
 }
 
 int mg_bolt_init_v4(mg_session *session, const mg_session_params *params) {
-  mg_map *extra =
-      build_hello_extra(params->user_agent, params->username, params->password);
+  mg_map *extra = build_hello_extra(params->user_agent, params->scheme,
+                                    params->username, params->password);
   if (!extra) {
     return MG_ERROR_OOM;
   }
