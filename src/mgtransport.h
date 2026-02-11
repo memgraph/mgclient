@@ -46,6 +46,11 @@ typedef struct mg_raw_transport {
   void (*suspend_until_ready_to_read)(struct mg_transport *);
   void (*suspend_until_ready_to_write)(struct mg_transport *);
   int sockfd;
+  /* Buffered read: reduce recv() syscalls by reading in larger chunks */
+  char *recv_buf;
+  size_t recv_buf_capacity;
+  size_t recv_buf_len;
+  size_t recv_buf_pos;
   mg_allocator *allocator;
 } mg_raw_transport;
 

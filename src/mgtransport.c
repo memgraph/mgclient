@@ -63,6 +63,14 @@ int mg_raw_transport_init(int sockfd, mg_raw_transport **transport,
   if (!ttransport) {
     return MG_ERROR_OOM;
   }
+  ttransport->recv_buf_capacity = 65536;
+  ttransport->recv_buf = mg_allocator_malloc(allocator, ttransport->recv_buf_capacity);
+  if (!ttransport->recv_buf) {
+    mg_allocator_free(allocator, ttransport);
+    return MG_ERROR_OOM;
+  }
+  ttransport->recv_buf_len = 0;
+  ttransport->recv_buf_pos = 0;
   ttransport->sockfd = sockfd;
   ttransport->send = mg_raw_transport_send;
   ttransport->recv = mg_raw_transport_recv;
@@ -95,21 +103,31 @@ int mg_raw_transport_send(struct mg_transport *transport, const char *buf,
 
 int mg_raw_transport_recv(struct mg_transport *transport, char *buf,
                           size_t len) {
-  int sockfd = ((mg_raw_transport *)transport)->sockfd;
+  mg_raw_transport *raw = (mg_raw_transport *)transport;
   size_t total_received = 0;
   while (total_received < len) {
-    ssize_t received_now =
-        mg_socket_receive(sockfd, buf + total_received, len - total_received);
-    if (received_now == 0) {
-      // Server closed the connection.
-      fprintf(stderr, "mg_raw_transport_recv: connection closed by server\n");
-      return -1;
+    if (raw->recv_buf_pos < raw->recv_buf_len) {
+      size_t from_buf = len - total_received;
+      if (from_buf > raw->recv_buf_len - raw->recv_buf_pos) {
+        from_buf = raw->recv_buf_len - raw->recv_buf_pos;
+      }
+      memcpy(buf + total_received, raw->recv_buf + raw->recv_buf_pos, from_buf);
+      total_received += from_buf;
+      raw->recv_buf_pos += from_buf;
+    } else {
+      ssize_t received_now = mg_socket_receive(raw->sockfd, raw->recv_buf,
+                                              raw->recv_buf_capacity);
+      if (received_now == 0) {
+        fprintf(stderr, "mg_raw_transport_recv: connection closed by server\n");
+        return -1;
+      }
+      if (received_now == -1) {
+        perror("mg_raw_transport_recv");
+        return -1;
+      }
+      raw->recv_buf_len = (size_t)received_now;
+      raw->recv_buf_pos = 0;
     }
-    if (received_now == -1) {
-      perror("mg_raw_transport_recv");
-      return -1;
-    }
-    total_received += (size_t)received_now;
   }
   return 0;
 }
@@ -118,6 +136,10 @@ void mg_raw_transport_destroy(struct mg_transport *transport) {
   mg_raw_transport *self = (mg_raw_transport *)transport;
   if (mg_socket_close(self->sockfd) != 0) {
     abort();
+  }
+  if (self->recv_buf) {
+    mg_allocator_free(self->allocator, self->recv_buf);
+    self->recv_buf = NULL;
   }
   mg_allocator_free(self->allocator, transport);
 }
