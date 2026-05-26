@@ -675,10 +675,12 @@ int mg_session_read_date_time(mg_session *session, mg_date_time **date_time) {
     goto cleanup;
   }
 
-  status = mg_session_read_integer(session, &date_time_tmp->tz_offset_minutes);
+  int64_t tz_offset_seconds;
+  status = mg_session_read_integer(session, &tz_offset_seconds);
   if (status != 0) {
     goto cleanup;
   }
+  date_time_tmp->tz_offset_minutes = tz_offset_seconds / 60;
 
   *date_time = date_time_tmp;
   return 0;
@@ -712,7 +714,11 @@ int mg_session_read_date_time_zone_id(
     goto cleanup;
   }
 
-  status = mg_session_read_integer(session, &date_time_zone_id_tmp->tz_id);
+  status =
+      mg_session_read_string(session, &date_time_zone_id_tmp->timezone_name);
+  if (status != 0) {
+    goto cleanup;
+  }
 
   *date_time_zone_id = date_time_zone_id_tmp;
   return 0;
