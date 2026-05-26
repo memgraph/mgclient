@@ -88,6 +88,7 @@ mg_session_params *mg_session_params_make(void) {
   params->address = NULL;
   params->host = NULL;
   params->port = 0;
+  params->scheme = NULL;
   params->username = NULL;
   params->password = NULL;
   params->user_agent = MG_USER_AGENT;

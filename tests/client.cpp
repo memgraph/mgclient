@@ -507,76 +507,92 @@ TEST_F(ConnectTest, Success) {
   ASSERT_MEMORY_OK();
 }
 
-auto run_v4_server_success = [](int sockfd) {
-  // Perform handshake.
-  {
-    char handshake[20];
-    ASSERT_EQ(RecvData(sockfd, handshake, 20), 0);
-    ASSERT_EQ(std::string(handshake, 4), "\x60\x60\xB0\x17"s);
-    ASSERT_EQ(std::string(handshake + 4, 4), "\x00\x00\x01\x04"s);
-    ASSERT_EQ(std::string(handshake + 8, 4), "\x00\x00\x00\x01"s);
-    ASSERT_EQ(std::string(handshake + 12, 4), "\x00\x00\x00\x00"s);
-    ASSERT_EQ(std::string(handshake + 16, 4), "\x00\x00\x00\x00"s);
-
-    uint32_t version = htobe32(1);
-    ASSERT_EQ(SendData(sockfd, (char *)&version, 4), 0);
-  }
-
-  mg_session *session = mg_session_init(&mg_system_allocator);
-  ASSERT_TRUE(session);
-  session->version = 1;
-  mg_raw_transport_init(sockfd, (mg_raw_transport **)&session->transport,
-                        &mg_system_allocator);
-
-  // Read INIT message.
-  {
-    mg_message *message;
-    ASSERT_EQ(mg_session_receive_message(session), 0);
-    ASSERT_EQ(mg_session_read_bolt_message(session, &message), 0);
-    ASSERT_EQ(message->type, MG_MESSAGE_TYPE_INIT);
-
-    mg_message_init *msg_init = message->init_v;
-    EXPECT_EQ(
-        std::string(msg_init->client_name->data, msg_init->client_name->size),
-        MG_USER_AGENT);
+// Bolt v4 server that completes the handshake by selecting version 4.1,
+// reads the client's HELLO message, verifies the auth fields against the
+// supplied expectations, and replies with SUCCESS. When expected_principal /
+// expected_credentials are empty, the server expects an extra map of just
+// {user_agent, scheme}; otherwise it expects all four fields.
+auto make_v4_server_success(std::string expected_scheme,
+                            std::string expected_principal = "",
+                            std::string expected_credentials = "") {
+  return [expected_scheme = std::move(expected_scheme),
+          expected_principal = std::move(expected_principal),
+          expected_credentials = std::move(expected_credentials)](int sockfd) {
     {
-      ASSERT_EQ(mg_map_size(msg_init->auth_token), 3u);
+      char handshake[20];
+      ASSERT_EQ(RecvData(sockfd, handshake, 20), 0);
+      ASSERT_EQ(std::string(handshake, 4), "\x60\x60\xB0\x17"s);
+      ASSERT_EQ(std::string(handshake + 4, 4), "\x00\x00\x01\x04"s);
+      ASSERT_EQ(std::string(handshake + 8, 4), "\x00\x00\x00\x01"s);
+      ASSERT_EQ(std::string(handshake + 12, 4), "\x00\x00\x00\x00"s);
+      ASSERT_EQ(std::string(handshake + 16, 4), "\x00\x00\x00\x00"s);
 
-      const mg_value *scheme_val = mg_map_at(msg_init->auth_token, "scheme");
+      uint32_t version = htobe32(0x0104);
+      ASSERT_EQ(SendData(sockfd, (char *)&version, 4), 0);
+    }
+
+    mg_session *session = mg_session_init(&mg_system_allocator);
+    ASSERT_TRUE(session);
+    session->version = 4;
+    mg_raw_transport_init(sockfd, (mg_raw_transport **)&session->transport,
+                          &mg_system_allocator);
+
+    {
+      mg_message *message;
+      ASSERT_EQ(mg_session_receive_message(session), 0);
+      ASSERT_EQ(mg_session_read_bolt_message(session, &message), 0);
+      ASSERT_EQ(message->type, MG_MESSAGE_TYPE_HELLO);
+
+      mg_message_hello *msg_hello = message->hello_v;
+      const bool with_creds = !expected_principal.empty();
+      ASSERT_EQ(mg_map_size(msg_hello->extra), with_creds ? 4u : 2u);
+
+      const mg_value *user_agent_val =
+          mg_map_at(msg_hello->extra, "user_agent");
+      ASSERT_TRUE(user_agent_val);
+      ASSERT_EQ(mg_value_get_type(user_agent_val), MG_VALUE_TYPE_STRING);
+      const mg_string *user_agent = mg_value_string(user_agent_val);
+      ASSERT_EQ(std::string(user_agent->data, user_agent->size), MG_USER_AGENT);
+
+      const mg_value *scheme_val = mg_map_at(msg_hello->extra, "scheme");
       ASSERT_TRUE(scheme_val);
       ASSERT_EQ(mg_value_get_type(scheme_val), MG_VALUE_TYPE_STRING);
       const mg_string *scheme = mg_value_string(scheme_val);
-      ASSERT_EQ(std::string(scheme->data, scheme->size), "basic");
+      ASSERT_EQ(std::string(scheme->data, scheme->size), expected_scheme);
 
-      const mg_value *principal_val =
-          mg_map_at(msg_init->auth_token, "principal");
-      ASSERT_TRUE(principal_val);
-      ASSERT_EQ(mg_value_get_type(principal_val), MG_VALUE_TYPE_STRING);
-      const mg_string *principal = mg_value_string(principal_val);
-      ASSERT_EQ(std::string(principal->data, principal->size), "user");
+      if (with_creds) {
+        const mg_value *principal_val =
+            mg_map_at(msg_hello->extra, "principal");
+        ASSERT_TRUE(principal_val);
+        ASSERT_EQ(mg_value_get_type(principal_val), MG_VALUE_TYPE_STRING);
+        const mg_string *principal = mg_value_string(principal_val);
+        ASSERT_EQ(std::string(principal->data, principal->size),
+                  expected_principal);
 
-      const mg_value *credentials_val =
-          mg_map_at(msg_init->auth_token, "credentials");
-      ASSERT_TRUE(credentials_val);
-      ASSERT_EQ(mg_value_get_type(credentials_val), MG_VALUE_TYPE_STRING);
-      const mg_string *credentials = mg_value_string(credentials_val);
-      ASSERT_EQ(std::string(credentials->data, credentials->size), "pass");
+        const mg_value *credentials_val =
+            mg_map_at(msg_hello->extra, "credentials");
+        ASSERT_TRUE(credentials_val);
+        ASSERT_EQ(mg_value_get_type(credentials_val), MG_VALUE_TYPE_STRING);
+        const mg_string *credentials = mg_value_string(credentials_val);
+        ASSERT_EQ(std::string(credentials->data, credentials->size),
+                  expected_credentials);
+      }
+
+      mg_message_destroy_ca(message, session->decoder_allocator);
     }
 
-    mg_message_destroy_ca(message, session->decoder_allocator);
-  }
+    ASSERT_EQ(mg_session_send_success_message(session, &mg_empty_map), 0);
 
-  // Send SUCCESS message.
-  ASSERT_EQ(mg_session_send_success_message(session, &mg_empty_map), 0);
-
-  mg_session_destroy(session);
-};
+    mg_session_destroy(session);
+  };
+}
 
 TEST_F(ConnectTest, Success_v4) {
-  RunServer(run_v4_server_success);
+  RunServer(make_v4_server_success("basic", "user", "pass"));
   mg_session_params *params = mg_session_params_make();
   mg_session_params_set_host(params, "127.0.0.1");
   mg_session_params_set_port(params, port);
+  mg_session_params_set_scheme(params, "basic");
   mg_session_params_set_username(params, "user");
   mg_session_params_set_password(params, "pass");
   mg_session *session;
@@ -588,7 +604,7 @@ TEST_F(ConnectTest, Success_v4) {
 }
 
 TEST_F(ConnectTest, SuccessWithSSL) {
-  RunServer(run_v4_server_success);
+  RunServer(make_v4_server_success("basic", "user", "pass"));
 
   mg_secure_transport_init_called = 0;
   trust_callback_ok = 0;
@@ -596,6 +612,7 @@ TEST_F(ConnectTest, SuccessWithSSL) {
   mg_session_params *params = mg_session_params_make();
   mg_session_params_set_host(params, "localhost");
   mg_session_params_set_port(params, port);
+  mg_session_params_set_scheme(params, "basic");
   mg_session_params_set_username(params, "user");
   mg_session_params_set_password(params, "pass");
   mg_session_params_set_sslmode(params, MG_SSLMODE_REQUIRE);
@@ -615,13 +632,26 @@ TEST_F(ConnectTest, SuccessWithSSL) {
 }
 
 TEST_F(ConnectTest, CustomScheme) {
-  RunServer(run_v4_server_success);
+  RunServer(make_v4_server_success("custom_scheme", "user", "pass"));
   mg_session_params *params = mg_session_params_make();
   mg_session_params_set_host(params, "127.0.0.1");
   mg_session_params_set_port(params, port);
   mg_session_params_set_scheme(params, "custom_scheme");
   mg_session_params_set_username(params, "user");
   mg_session_params_set_password(params, "pass");
+  mg_session *session;
+  ASSERT_EQ(mg_connect_ca(params, &session, (mg_allocator *)&allocator), 0);
+  EXPECT_EQ(mg_session_status(session), MG_SESSION_READY);
+  mg_session_params_destroy(params);
+  mg_session_destroy(session);
+  ASSERT_MEMORY_OK();
+}
+
+TEST_F(ConnectTest, SuccessNoAuth_v4) {
+  RunServer(make_v4_server_success("none"));
+  mg_session_params *params = mg_session_params_make();
+  mg_session_params_set_host(params, "127.0.0.1");
+  mg_session_params_set_port(params, port);
   mg_session *session;
   ASSERT_EQ(mg_connect_ca(params, &session, (mg_allocator *)&allocator), 0);
   EXPECT_EQ(mg_session_status(session), MG_SESSION_READY);
