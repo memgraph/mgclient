@@ -870,15 +870,19 @@ int mg_session_route(mg_session *session, const mg_map *routing,
   } else {
     // Bolt 4.3 carries the database name as a separate string field. Extract it
     // from extra["db"] if present, otherwise send an empty string (default db).
+    // The mg_string data is not null-terminated, so carry its size explicitly.
     const char *db = "";
+    uint32_t db_size = 0;
     if (extra) {
       const mg_value *db_tmp = mg_map_at(extra, "db");
       if (db_tmp && mg_value_get_type(db_tmp) == MG_VALUE_TYPE_STRING) {
-        db = mg_value_string(db_tmp)->data;
+        const mg_string *db_str = mg_value_string(db_tmp);
+        db = db_str->data;
+        db_size = db_str->size;
       }
     }
-    status =
-        mg_session_send_route_message_v4_3(session, routing, bookmarks, db);
+    status = mg_session_send_route_message_v4_3(session, routing, bookmarks, db,
+                                                db_size);
   }
 
   if (empty_bookmarks) {

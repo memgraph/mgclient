@@ -182,13 +182,13 @@ int mg_session_send_commit_messsage(mg_session *session);
 
 int mg_session_send_rollback_messsage(mg_session *session);
 
-// TODO: (andi) What to do with the versioning?
-// from v4.4 db is moved into extra, let's support that for now
-
+// From Bolt 4.4 the database name is carried inside `extra`; on 4.3 it is a
+// separate string field. `db`/`db_size` describe that field for the 4.3 form
+// (db need not be null-terminated, hence the explicit size).
 int mg_session_send_route_message_v4_3(mg_session *session,
                                        const mg_map *routing,
-                                       const mg_list *bookmarks,
-                                       const char *db);
+                                       const mg_list *bookmarks, const char *db,
+                                       uint32_t db_size);
 
 int mg_session_send_route_message_v4_4(mg_session *session,
                                        const mg_map *routing,

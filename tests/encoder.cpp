@@ -260,7 +260,7 @@ TEST_F(RouteMessageTest, V4_3) {
   mg_list *bookmarks = mg_list_make_empty(0);
 
   ASSERT_EQ(mg_session_send_route_message_v4_3(&session, routing, bookmarks,
-                                               "memgraph"),
+                                               "memgraph", 8),
             0);
   mg_raw_transport_destroy(session.transport);
 
@@ -286,7 +286,8 @@ TEST_F(RouteMessageTest, V4_3EmptyDb) {
   mg_list *bookmarks = mg_list_make_empty(0);
 
   ASSERT_EQ(
-      mg_session_send_route_message_v4_3(&session, routing, bookmarks, ""), 0);
+      mg_session_send_route_message_v4_3(&session, routing, bookmarks, "", 0),
+      0);
   mg_raw_transport_destroy(session.transport);
 
   mg_map_destroy(routing);

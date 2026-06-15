@@ -318,8 +318,8 @@ int mg_session_send_run_message(mg_session *session, const char *statement,
 
 int mg_session_send_route_message_v4_3(mg_session *session,
                                        const mg_map *routing,
-                                       const mg_list *bookmarks,
-                                       const char *db) {
+                                       const mg_list *bookmarks, const char *db,
+                                       uint32_t db_size) {
   int const field_number = 3;
   MG_RETURN_IF_FAILED(mg_session_write_uint8(
       session, (uint8_t)(MG_MARKER_TINY_STRUCT + field_number)));
@@ -327,7 +327,9 @@ int mg_session_send_route_message_v4_3(mg_session *session,
       mg_session_write_uint8(session, MG_SIGNATURE_MESSAGE_ROUTE));
   MG_RETURN_IF_FAILED(mg_session_write_map(session, routing));
   MG_RETURN_IF_FAILED(mg_session_write_list(session, bookmarks));
-  MG_RETURN_IF_FAILED(mg_session_write_string(session, db));
+  // Use the explicit size: db may point at an mg_string's data, which is not
+  // null-terminated, so strlen-based mg_session_write_string is unsafe here.
+  MG_RETURN_IF_FAILED(mg_session_write_string2(session, db_size, db));
 
   return mg_session_flush_message(session);
 }

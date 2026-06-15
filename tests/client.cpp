@@ -2276,6 +2276,65 @@ TEST_F(RouteTest, Success) {
   ASSERT_MEMORY_OK();
 }
 
+TEST_F(RouteTest, SuccessV4_3WithDb) {
+  // On Bolt 4.3 the database name is a separate string field that
+  // mg_session_route extracts from extra["db"] and re-encodes. This exercises
+  // that extraction path (untested by RouteTest.Success, which uses 4.4 where
+  // the whole extra map is sent verbatim).
+  session->version = 4;
+  session->version_minor = 3;
+
+  RunServer([](int sockfd) {
+    mg_session *session = mg_session_init(&mg_system_allocator);
+    session->version = 4;
+    session->version_minor = 3;
+    mg_raw_transport_init(sockfd, (mg_raw_transport **)&session->transport,
+                          &mg_system_allocator);
+
+    // Consume the ROUTE message (the decoder does not decode ROUTE, so we just
+    // receive its chunks without trying to parse it).
+    ASSERT_EQ(mg_session_receive_message(session), 0);
+
+    // Reply with a SUCCESS carrying the routing table.
+    {
+      mg_map *metadata = mg_map_make_empty(1);
+      mg_map_insert_unsafe(metadata, "rt",
+                           MakeRoutingTable(/*ttl=*/300, "localhost:7687"));
+      ASSERT_EQ(mg_session_send_success_message(session, metadata), 0);
+      mg_map_destroy(metadata);
+    }
+
+    mg_session_destroy(session);
+  });
+
+  mg_map *routing = mg_map_make_empty(1);
+  mg_map_insert_unsafe(routing, "address",
+                       mg_value_make_string("localhost:7688"));
+
+  // extra = {"db": "memgraph"}; the "db" value is a decoded-style mg_string
+  // (data is NOT null-terminated), so re-encoding it must use its stored size.
+  mg_map *extra = mg_map_make_empty(1);
+  mg_map_insert_unsafe(extra, "db", mg_value_make_string("memgraph"));
+
+  mg_map *routing_table = nullptr;
+  ASSERT_EQ(mg_session_route(session, routing, nullptr, extra, &routing_table),
+            0);
+  ASSERT_EQ(mg_session_status(session), MG_SESSION_READY);
+  ASSERT_TRUE(routing_table);
+
+  const mg_value *ttl = mg_map_at(routing_table, "ttl");
+  ASSERT_TRUE(ttl);
+  ASSERT_EQ(mg_value_get_type(ttl), MG_VALUE_TYPE_INTEGER);
+  ASSERT_EQ(mg_value_integer(ttl), 300);
+
+  mg_map_destroy(routing_table);
+  mg_map_destroy(extra);
+  mg_map_destroy(routing);
+  mg_session_destroy(session);
+  StopServer();
+  ASSERT_MEMORY_OK();
+}
+
 TEST_F(RouteTest, UnsupportedVersion) {
   // Negotiated Bolt 4.1: ROUTE is not available.
   session->version = 4;
