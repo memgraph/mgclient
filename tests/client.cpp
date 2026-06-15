@@ -256,10 +256,10 @@ TEST_F(ConnectTest, HandshakeFail) {
     char handshake[20];
     ASSERT_EQ(RecvData(sockfd, handshake, 20), 0);
     ASSERT_EQ(std::string(handshake, 4), "\x60\x60\xB0\x17"s);
-    ASSERT_EQ(std::string(handshake + 4, 4), "\x00\x00\x01\x04"s);
-    ASSERT_EQ(std::string(handshake + 8, 4), "\x00\x00\x00\x01"s);
-    ASSERT_EQ(std::string(handshake + 12, 4), "\x00\x00\x00\x00"s);
-    ASSERT_EQ(std::string(handshake + 16, 4), "\x00\x00\x00\x00"s);
+    ASSERT_EQ(std::string(handshake + 4, 4), "\x00\x00\x04\x04"s);
+    ASSERT_EQ(std::string(handshake + 8, 4), "\x00\x00\x03\x04"s);
+    ASSERT_EQ(std::string(handshake + 12, 4), "\x00\x00\x01\x04"s);
+    ASSERT_EQ(std::string(handshake + 16, 4), "\x00\x00\x00\x01"s);
 
     // Send unsupported version to client.
     uint32_t version = htobe32(2);
@@ -286,10 +286,10 @@ TEST_F(ConnectTest, InitFail) {
       char handshake[20];
       ASSERT_EQ(RecvData(sockfd, handshake, 20), 0);
       ASSERT_EQ(std::string(handshake, 4), "\x60\x60\xB0\x17"s);
-      ASSERT_EQ(std::string(handshake + 4, 4), "\x00\x00\x01\x04"s);
-      ASSERT_EQ(std::string(handshake + 8, 4), "\x00\x00\x00\x01"s);
-      ASSERT_EQ(std::string(handshake + 12, 4), "\x00\x00\x00\x00"s);
-      ASSERT_EQ(std::string(handshake + 16, 4), "\x00\x00\x00\x00"s);
+      ASSERT_EQ(std::string(handshake + 4, 4), "\x00\x00\x04\x04"s);
+      ASSERT_EQ(std::string(handshake + 8, 4), "\x00\x00\x03\x04"s);
+      ASSERT_EQ(std::string(handshake + 12, 4), "\x00\x00\x01\x04"s);
+      ASSERT_EQ(std::string(handshake + 16, 4), "\x00\x00\x00\x01"s);
 
       uint32_t version = htobe32(1);
       ASSERT_EQ(SendData(sockfd, (char *)&version, 4), 0);
@@ -359,10 +359,10 @@ TEST_F(ConnectTest, InitFail_v4) {
       char handshake[20];
       ASSERT_EQ(RecvData(sockfd, handshake, 20), 0);
       ASSERT_EQ(std::string(handshake, 4), "\x60\x60\xB0\x17"s);
-      ASSERT_EQ(std::string(handshake + 4, 4), "\x00\x00\x01\x04"s);
-      ASSERT_EQ(std::string(handshake + 8, 4), "\x00\x00\x00\x01"s);
-      ASSERT_EQ(std::string(handshake + 12, 4), "\x00\x00\x00\x00"s);
-      ASSERT_EQ(std::string(handshake + 16, 4), "\x00\x00\x00\x00"s);
+      ASSERT_EQ(std::string(handshake + 4, 4), "\x00\x00\x04\x04"s);
+      ASSERT_EQ(std::string(handshake + 8, 4), "\x00\x00\x03\x04"s);
+      ASSERT_EQ(std::string(handshake + 12, 4), "\x00\x00\x01\x04"s);
+      ASSERT_EQ(std::string(handshake + 16, 4), "\x00\x00\x00\x01"s);
 
       uint32_t version = htobe32(0x0104);
       ASSERT_EQ(SendData(sockfd, (char *)&version, 4), 0);
@@ -437,10 +437,10 @@ TEST_F(ConnectTest, Success) {
       char handshake[20];
       ASSERT_EQ(RecvData(sockfd, handshake, 20), 0);
       ASSERT_EQ(std::string(handshake, 4), "\x60\x60\xB0\x17"s);
-      ASSERT_EQ(std::string(handshake + 4, 4), "\x00\x00\x01\x04"s);
-      ASSERT_EQ(std::string(handshake + 8, 4), "\x00\x00\x00\x01"s);
-      ASSERT_EQ(std::string(handshake + 12, 4), "\x00\x00\x00\x00"s);
-      ASSERT_EQ(std::string(handshake + 16, 4), "\x00\x00\x00\x00"s);
+      ASSERT_EQ(std::string(handshake + 4, 4), "\x00\x00\x04\x04"s);
+      ASSERT_EQ(std::string(handshake + 8, 4), "\x00\x00\x03\x04"s);
+      ASSERT_EQ(std::string(handshake + 12, 4), "\x00\x00\x01\x04"s);
+      ASSERT_EQ(std::string(handshake + 16, 4), "\x00\x00\x00\x01"s);
 
       uint32_t version = htobe32(1);
       ASSERT_EQ(SendData(sockfd, (char *)&version, 4), 0);
@@ -515,10 +515,10 @@ TEST_F(ConnectTest, Success_v4) {
       char handshake[20];
       ASSERT_EQ(RecvData(sockfd, handshake, 20), 0);
       ASSERT_EQ(std::string(handshake, 4), "\x60\x60\xB0\x17"s);
-      ASSERT_EQ(std::string(handshake + 4, 4), "\x00\x00\x01\x04"s);
-      ASSERT_EQ(std::string(handshake + 8, 4), "\x00\x00\x00\x01"s);
-      ASSERT_EQ(std::string(handshake + 12, 4), "\x00\x00\x00\x00"s);
-      ASSERT_EQ(std::string(handshake + 16, 4), "\x00\x00\x00\x00"s);
+      ASSERT_EQ(std::string(handshake + 4, 4), "\x00\x00\x04\x04"s);
+      ASSERT_EQ(std::string(handshake + 8, 4), "\x00\x00\x03\x04"s);
+      ASSERT_EQ(std::string(handshake + 12, 4), "\x00\x00\x01\x04"s);
+      ASSERT_EQ(std::string(handshake + 16, 4), "\x00\x00\x00\x01"s);
 
       uint32_t version = htobe32(0x0104);
       ASSERT_EQ(SendData(sockfd, (char *)&version, 4), 0);
@@ -598,10 +598,10 @@ TEST_F(ConnectTest, SuccessWithSSL) {
       char handshake[20];
       ASSERT_EQ(RecvData(sockfd, handshake, 20), 0);
       ASSERT_EQ(std::string(handshake, 4), "\x60\x60\xB0\x17"s);
-      ASSERT_EQ(std::string(handshake + 4, 4), "\x00\x00\x01\x04"s);
-      ASSERT_EQ(std::string(handshake + 8, 4), "\x00\x00\x00\x01"s);
-      ASSERT_EQ(std::string(handshake + 12, 4), "\x00\x00\x00\x00"s);
-      ASSERT_EQ(std::string(handshake + 16, 4), "\x00\x00\x00\x00"s);
+      ASSERT_EQ(std::string(handshake + 4, 4), "\x00\x00\x04\x04"s);
+      ASSERT_EQ(std::string(handshake + 8, 4), "\x00\x00\x03\x04"s);
+      ASSERT_EQ(std::string(handshake + 12, 4), "\x00\x00\x01\x04"s);
+      ASSERT_EQ(std::string(handshake + 16, 4), "\x00\x00\x00\x01"s);
 
       uint32_t version = htobe32(1);
       ASSERT_EQ(SendData(sockfd, (char *)&version, 4), 0);
@@ -860,7 +860,9 @@ void RunTest::InvalidStatement(int version) {
     }
 
     // Server responds with SUCCESS.
-    { ASSERT_EQ(mg_session_send_success_message(session, &mg_empty_map), 0); }
+    {
+      ASSERT_EQ(mg_session_send_success_message(session, &mg_empty_map), 0);
+    }
 
     mg_session_destroy(session);
   });
@@ -1290,7 +1292,9 @@ void RunTest::QueryRuntimeError(int version) {
       mg_message_destroy_ca(message, session->decoder_allocator);
     }
 
-    { ASSERT_EQ(mg_session_send_success_message(session, &mg_empty_map), 0); }
+    {
+      ASSERT_EQ(mg_session_send_success_message(session, &mg_empty_map), 0);
+    }
     mg_session_destroy(session);
   });
 
@@ -2142,5 +2146,156 @@ TEST_F(RunTest, TransactionWithMultipleRuns) {
 
   mg_session_destroy(session);
   StopServer();
+  ASSERT_MEMORY_OK();
+}
+
+class RouteTest : public ::testing::Test {
+ protected:
+  virtual void SetUp() override {
+    int tmp[2];
+    ASSERT_EQ(mg_socket_pair(AF_UNIX, SOCK_STREAM, 0, tmp), 0);
+    sc = tmp[0];
+    ss = tmp[1];
+
+    mg_init();
+    session = mg_session_init((mg_allocator *)&allocator);
+    mg_raw_transport_init(sc, (mg_raw_transport **)&session->transport,
+                          (mg_allocator *)&allocator);
+    session->status = MG_SESSION_READY;
+  }
+
+  void RunServer(const std::function<void(int)> &server_func) {
+    server_thread = std::thread(server_func, ss);
+  }
+  void StopServer() {
+    if (server_thread.joinable()) {
+      server_thread.join();
+    }
+  }
+
+  int sc;
+  int ss;
+  mg_session *session;
+  std::thread server_thread;
+
+  tracking_allocator allocator;
+};
+
+// Builds an "rt" routing-table value:
+//   {"ttl": <ttl>, "servers": [{"addresses": [<address>], "role": "WRITE"}]}
+static mg_value *MakeRoutingTable(int64_t ttl, const char *address) {
+  mg_list *addresses = mg_list_make_empty(1);
+  mg_list_append(addresses, mg_value_make_string(address));
+
+  mg_map *server = mg_map_make_empty(2);
+  mg_map_insert_unsafe(server, "addresses", mg_value_make_list(addresses));
+  mg_map_insert_unsafe(server, "role", mg_value_make_string("WRITE"));
+
+  mg_list *servers = mg_list_make_empty(1);
+  mg_list_append(servers, mg_value_make_map(server));
+
+  mg_map *rt = mg_map_make_empty(2);
+  mg_map_insert_unsafe(rt, "ttl", mg_value_make_integer(ttl));
+  mg_map_insert_unsafe(rt, "servers", mg_value_make_list(servers));
+
+  return mg_value_make_map(rt);
+}
+
+TEST_F(RouteTest, Success) {
+  session->version = 4;
+  session->version_minor = 4;
+
+  RunServer([](int sockfd) {
+    mg_session *session = mg_session_init(&mg_system_allocator);
+    session->version = 4;
+    session->version_minor = 4;
+    mg_raw_transport_init(sockfd, (mg_raw_transport **)&session->transport,
+                          &mg_system_allocator);
+
+    // Consume the ROUTE message (the decoder does not decode ROUTE, so we just
+    // receive its chunks without trying to parse it).
+    ASSERT_EQ(mg_session_receive_message(session), 0);
+
+    // Reply with a SUCCESS carrying the routing table.
+    {
+      mg_map *metadata = mg_map_make_empty(1);
+      mg_map_insert_unsafe(metadata, "rt",
+                           MakeRoutingTable(/*ttl=*/300, "localhost:7687"));
+      ASSERT_EQ(mg_session_send_success_message(session, metadata), 0);
+      mg_map_destroy(metadata);
+    }
+
+    mg_session_destroy(session);
+  });
+
+  mg_map *routing = mg_map_make_empty(1);
+  mg_map_insert_unsafe(routing, "address",
+                       mg_value_make_string("localhost:7688"));
+
+  mg_map *routing_table = nullptr;
+  ASSERT_EQ(
+      mg_session_route(session, routing, nullptr, nullptr, &routing_table), 0);
+  ASSERT_EQ(mg_session_status(session), MG_SESSION_READY);
+  ASSERT_TRUE(routing_table);
+
+  const mg_value *ttl = mg_map_at(routing_table, "ttl");
+  ASSERT_TRUE(ttl);
+  ASSERT_EQ(mg_value_get_type(ttl), MG_VALUE_TYPE_INTEGER);
+  ASSERT_EQ(mg_value_integer(ttl), 300);
+
+  const mg_value *servers = mg_map_at(routing_table, "servers");
+  ASSERT_TRUE(servers);
+  ASSERT_EQ(mg_value_get_type(servers), MG_VALUE_TYPE_LIST);
+  const mg_list *servers_list = mg_value_list(servers);
+  ASSERT_EQ(mg_list_size(servers_list), 1u);
+
+  const mg_value *server = mg_list_at(servers_list, 0);
+  ASSERT_EQ(mg_value_get_type(server), MG_VALUE_TYPE_MAP);
+  const mg_map *server_map = mg_value_map(server);
+
+  const mg_value *role = mg_map_at(server_map, "role");
+  ASSERT_TRUE(role);
+  ASSERT_EQ(
+      std::string(mg_value_string(role)->data, mg_value_string(role)->size),
+      "WRITE");
+
+  const mg_value *addresses = mg_map_at(server_map, "addresses");
+  ASSERT_TRUE(addresses);
+  ASSERT_EQ(mg_value_get_type(addresses), MG_VALUE_TYPE_LIST);
+  const mg_list *addr_list = mg_value_list(addresses);
+  ASSERT_EQ(mg_list_size(addr_list), 1u);
+  const mg_value *addr = mg_list_at(addr_list, 0);
+  ASSERT_EQ(
+      std::string(mg_value_string(addr)->data, mg_value_string(addr)->size),
+      "localhost:7687");
+
+  mg_map_destroy(routing_table);
+  mg_map_destroy(routing);
+  mg_session_destroy(session);
+  StopServer();
+  ASSERT_MEMORY_OK();
+}
+
+TEST_F(RouteTest, UnsupportedVersion) {
+  // Negotiated Bolt 4.1: ROUTE is not available.
+  session->version = 4;
+  session->version_minor = 1;
+
+  mg_map *routing = mg_map_make_empty(1);
+  mg_map_insert_unsafe(routing, "address",
+                       mg_value_make_string("localhost:7688"));
+
+  mg_map *routing_table = nullptr;
+  ASSERT_EQ(
+      mg_session_route(session, routing, nullptr, nullptr, &routing_table),
+      MG_ERROR_CLIENT_ERROR);
+  // The session must remain usable (no transport interaction happened).
+  ASSERT_EQ(mg_session_status(session), MG_SESSION_READY);
+  ASSERT_EQ(routing_table, nullptr);
+  ASSERT_THAT(std::string(mg_session_error(session)),
+              HasSubstr("ROUTE requires Bolt >= 4.3"));
+
+  mg_map_destroy(routing);
+  mg_session_destroy(session);
   ASSERT_MEMORY_OK();
 }

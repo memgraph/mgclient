@@ -44,6 +44,7 @@ typedef struct mg_session {
   mg_transport *transport;
 
   int version;
+  int version_minor;
 
   char *out_buffer;
   size_t out_begin;
@@ -180,6 +181,19 @@ int mg_session_send_begin_message(mg_session *session, const mg_map *extra);
 int mg_session_send_commit_messsage(mg_session *session);
 
 int mg_session_send_rollback_messsage(mg_session *session);
+
+// TODO: (andi) What to do with the versioning?
+// from v4.4 db is moved into extra, let's support that for now
+
+int mg_session_send_route_message_v4_3(mg_session *session,
+                                       const mg_map *routing,
+                                       const mg_list *bookmarks,
+                                       const char *db);
+
+int mg_session_send_route_message_v4_4(mg_session *session,
+                                       const mg_map *routing,
+                                       const mg_list *bookmarks,
+                                       const mg_map *extra);
 
 #ifdef __cplusplus
 }

@@ -1374,35 +1374,84 @@ MGCLIENT_EXPORT int mg_session_run(mg_session *session, const char *query,
                                    const mg_map *extra_run_information,
                                    const mg_list **columns, int64_t *qid);
 
+/// Sends a Bolt ROUTE message to a coordinator and returns the routing table.
+///
+/// ROUTE is available only on Bolt protocol versions >= 4.3, which must have
+/// been negotiated during \ref mg_connect. It is used for client-side routing
+/// against a Memgraph high-availability cluster: the client asks a coordinator
+/// for the current cluster topology and then connects directly to the
+/// appropriate server based on the desired access mode.
+///
+/// The session must be in the ready state (not executing/fetching a query and
+/// not inside an explicit transaction).
+///
+/// \param session       A \ref mg_session connected to a coordinator. The Bolt
+///                      version negotiated for this session must be >= 4.3.
+/// \param routing       A \ref mg_map with routing context (e.g. the address
+///                      used to contact the coordinator). Must not be NULL; use
+///                      an empty map if there is no routing context.
+/// \param bookmarks     A \ref mg_list of bookmark strings, or NULL for none
+///                      (treated as an empty list).
+/// \param extra         A \ref mg_map with extra information. On Bolt 4.4 it is
+///                      sent verbatim as the third ROUTE field; on Bolt 4.3
+///                      only its "db" string entry (if present) is used to
+///                      populate the separate database-name field. NULL is
+///                      allowed.
+/// \param routing_table On success, a freshly allocated \ref mg_map holding the
+///                      routing table is stored here (ownership transferred to
+///                      the caller, who must call \ref mg_map_destroy on it).
+///                      NULL may be supplied to discard the result. The map has
+///                      the shape:
+///                        {
+///                          "ttl": <integer, time-to-live in seconds>,
+///                          "servers": [
+///                            {
+///                              "addresses": ["host:port", ...],
+///                              "role": "READ" | "WRITE" | "ROUTE"
+///                            },
+///                            ...
+///                          ]
+///                        }
+/// \return Returns 0 if the routing table was obtained successfully.
+///         Returns \ref MG_ERROR_BAD_PARAMETER if \p routing is NULL,
+///         \ref MG_ERROR_BAD_CALL if the session is not ready,
+///         \ref MG_ERROR_CLIENT_ERROR if the negotiated Bolt version is < 4.3,
+///         or another non-zero error code otherwise.
+MGCLIENT_EXPORT int mg_session_route(mg_session *session, const mg_map *routing,
+                                     const mg_list *bookmarks,
+                                     const mg_map *extra,
+                                     mg_map **routing_table);
+
 /// Starts an Explicit transaction on the server.
 ///
 /// Every run will be part of that transaction until its explicitly ended.
 ///
 /// \param session               A \ref mg_session on which the transaction
 /// should be started. \param extra_run_information A \ref mg_map containing
-/// extra information that will be used for every statement that is ran as part
-/// of the transaction.
+/// extra information that will be used for every statement that is ran as
+/// part of the transaction.
 ///                              It can contain the following information:
-///                               - bookmarks - list of strings containing some
-///                               kind of bookmark identification
+///                               - bookmarks - list of strings containing
+///                               some kind of bookmark identification
 ///                               - tx_timeout - integer that specifies a
 ///                               transaction timeout in ms.
-///                               - tx_metadata - dictionary taht can contain
-///                               some metadata information, mainly used for
-///                               logging.
-///                               - mode - specifies what kind of server is the
-///                               run targeting. For write access use "w" and
-///                               for read access use "r". Defaults to write
-///                               access.
+///                               - tx_metadata - dictionary taht can
+///                               contain some metadata information, mainly
+///                               used for logging.
+///                               - mode - specifies what kind of server is
+///                               the run targeting. For write access use
+///                               "w" and for read access use "r". Defaults
+///                               to write access.
 ///                               - db - specifies the database name for
-///                               multi-database to select where the transaction
-///                               takes place. If no `db` is sent or empty
-///                               string it implies that it is the default
-///                               database.
+///                               multi-database to select where the
+///                               transaction takes place. If no `db` is
+///                               sent or empty string it implies that it is
+///                               the default database.
 /// \return Returns 0 if the transaction was started successfuly.
 ///         Otherwise, a non-zero error code is returned.
-MGCLIENT_EXPORT int mg_session_begin_transaction(
-    mg_session *session, const mg_map *extra_run_information);
+MGCLIENT_EXPORT
+int mg_session_begin_transaction(mg_session *session,
+                                 const mg_map *extra_run_information);
 
 /// Commits current Explicit transaction.
 ///

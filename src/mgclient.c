@@ -230,16 +230,21 @@ int validate_session_params(const mg_session_params *params,
 }
 
 static int mg_bolt_handshake(mg_session *session) {
-  const uint32_t VERSION_NONE = htobe32(0);
-  const uint32_t VERSION_1 = htobe32(1);
+  // Advertise supported Bolt versions, highest first. The version word is
+  // big-endian with the layout 0x0000<minor><major>, so e.g. 4.4 is 0x0404 and
+  // 1.0 is 0x0001. ROUTE (Bolt >= 4.3) requires negotiating 4.3 or 4.4; 4.1 and
+  // 1.0 are kept for backward compatibility.
+  const uint32_t VERSION_4_4 = htobe32(0x0404);
+  const uint32_t VERSION_4_3 = htobe32(0x0304);
   const uint32_t VERSION_4_1 = htobe32(0x0104);
+  const uint32_t VERSION_1 = htobe32(0x0001);
   mg_transport_suspend_until_ready_to_write(session->transport);
   if (mg_transport_send(session->transport, MG_HANDSHAKE_MAGIC,
                         strlen(MG_HANDSHAKE_MAGIC)) != 0 ||
+      mg_transport_send(session->transport, (char *)&VERSION_4_4, 4) != 0 ||
+      mg_transport_send(session->transport, (char *)&VERSION_4_3, 4) != 0 ||
       mg_transport_send(session->transport, (char *)&VERSION_4_1, 4) != 0 ||
-      mg_transport_send(session->transport, (char *)&VERSION_1, 4) != 0 ||
-      mg_transport_send(session->transport, (char *)&VERSION_NONE, 4) != 0 ||
-      mg_transport_send(session->transport, (char *)&VERSION_NONE, 4) != 0) {
+      mg_transport_send(session->transport, (char *)&VERSION_1, 4) != 0) {
     mg_session_set_error(session, "failed to send handshake data");
     return MG_ERROR_SEND_FAILED;
   }
@@ -250,13 +255,18 @@ static int mg_bolt_handshake(mg_session *session) {
     mg_session_set_error(session, "failed to receive handshake response");
     return MG_ERROR_RECV_FAILED;
   }
-  if (server_version == VERSION_1) {
+  uint32_t v = be32toh(server_version);
+  uint8_t major = (uint8_t)(v & 0xFF);
+  uint8_t minor = (uint8_t)((v >> 8) & 0xFF);
+  // Accept exactly the versions we advertised: 1.0, 4.1, 4.3, 4.4.
+  if (major == 1 && minor == 0) {
     session->version = 1;
-  } else if (server_version == VERSION_4_1) {
+    session->version_minor = 0;
+  } else if (major == 4 && (minor == 1 || minor == 3 || minor == 4)) {
     session->version = 4;
+    session->version_minor = minor;
   } else {
-    mg_session_set_error(session, "unsupported protocol version: %" PRIu32,
-                         be32toh(server_version));
+    mg_session_set_error(session, "unsupported protocol version: %" PRIu32, v);
     return MG_ERROR_PROTOCOL_VIOLATION;
   }
   return 0;
@@ -778,6 +788,141 @@ int mg_session_run(mg_session *session, const char *query, const mg_map *params,
     }
 
     session->status = MG_SESSION_EXECUTING;
+    return 0;
+  }
+
+  if (response->type == MG_MESSAGE_TYPE_FAILURE) {
+    int failure_status = handle_failure_message(session, response->failure_v);
+
+    status = handle_failure(session);
+    if (status != 0) {
+      goto fatal_failure;
+    }
+
+    mg_message_destroy_ca(response, session->decoder_allocator);
+    return failure_status;
+  }
+
+  status = MG_ERROR_PROTOCOL_VIOLATION;
+  mg_message_destroy_ca(response, session->decoder_allocator);
+  mg_session_set_error(session, "unexpected message type");
+
+fatal_failure:
+  mg_session_invalidate(session);
+  assert(status != 0);
+  return status;
+}
+
+int mg_session_route(mg_session *session, const mg_map *routing,
+                     const mg_list *bookmarks, const mg_map *extra,
+                     mg_map **routing_table) {
+  if (!routing) {
+    mg_session_set_error(session, "routing map must not be NULL");
+    return MG_ERROR_BAD_PARAMETER;
+  }
+  if (session->status == MG_SESSION_BAD) {
+    mg_session_set_error(session, "bad session");
+    return MG_ERROR_BAD_CALL;
+  }
+  if (session->status == MG_SESSION_EXECUTING) {
+    mg_session_set_error(session, "already executing a query");
+    return MG_ERROR_BAD_CALL;
+  }
+  if (session->status == MG_SESSION_FETCHING) {
+    mg_session_set_error(session, "fetching results of a query");
+    return MG_ERROR_BAD_CALL;
+  }
+  if (session->explicit_transaction) {
+    mg_session_set_error(session,
+                         "cannot route while in an explicit transaction");
+    return MG_ERROR_BAD_CALL;
+  }
+
+  assert(session->status == MG_SESSION_READY && !session->explicit_transaction);
+
+  if (session->version != 4 || session->version_minor < 3) {
+    mg_session_set_error(session, "ROUTE requires Bolt >= 4.3");
+    return MG_ERROR_CLIENT_ERROR;
+  }
+
+  mg_message_destroy_ca(session->result.message, session->decoder_allocator);
+  session->result.message = NULL;
+
+  // The encoders dereference the bookmarks list, so a non-NULL empty list must
+  // be supplied when the caller passes NULL.
+  mg_list *empty_bookmarks = NULL;
+  if (!bookmarks) {
+    empty_bookmarks = mg_list_make_empty(0);
+    if (!empty_bookmarks) {
+      mg_session_set_error(session, "out of memory");
+      return MG_ERROR_OOM;
+    }
+    bookmarks = empty_bookmarks;
+  }
+
+  int status = 0;
+  if (session->version_minor >= 4) {
+    if (!extra) {
+      extra = &mg_empty_map;
+    }
+    status =
+        mg_session_send_route_message_v4_4(session, routing, bookmarks, extra);
+  } else {
+    // Bolt 4.3 carries the database name as a separate string field. Extract it
+    // from extra["db"] if present, otherwise send an empty string (default db).
+    const char *db = "";
+    if (extra) {
+      const mg_value *db_tmp = mg_map_at(extra, "db");
+      if (db_tmp && mg_value_get_type(db_tmp) == MG_VALUE_TYPE_STRING) {
+        db = mg_value_string(db_tmp)->data;
+      }
+    }
+    status =
+        mg_session_send_route_message_v4_3(session, routing, bookmarks, db);
+  }
+
+  if (empty_bookmarks) {
+    mg_list_destroy(empty_bookmarks);
+  }
+
+  if (status != 0) {
+    goto fatal_failure;
+  }
+
+  mg_transport_suspend_until_ready_to_read(session->transport);
+  status = mg_session_receive_message(session);
+  if (status != 0) {
+    goto fatal_failure;
+  }
+
+  mg_message *response;
+  status = mg_session_read_bolt_message(session, &response);
+  if (status != 0) {
+    goto fatal_failure;
+  }
+
+  if (response->type == MG_MESSAGE_TYPE_SUCCESS) {
+    const mg_value *rt = mg_map_at(response->success_v->metadata, "rt");
+    if (!rt || mg_value_get_type(rt) != MG_VALUE_TYPE_MAP) {
+      status = MG_ERROR_PROTOCOL_VIOLATION;
+      mg_message_destroy_ca(response, session->decoder_allocator);
+      mg_session_set_error(session, "invalid response metadata: missing 'rt'");
+      goto fatal_failure;
+    }
+    // Copy with the system allocator (not session->allocator): ownership is
+    // transferred to the caller, who releases it with the public
+    // mg_map_destroy, which itself uses the system allocator.
+    mg_map *copy = mg_map_copy_ca(mg_value_map(rt), &mg_system_allocator);
+    mg_message_destroy_ca(response, session->decoder_allocator);
+    if (!copy) {
+      mg_session_set_error(session, "out of memory");
+      return MG_ERROR_OOM;
+    }
+    if (routing_table) {
+      *routing_table = copy;
+    } else {
+      mg_map_destroy(copy);
+    }
     return 0;
   }
 

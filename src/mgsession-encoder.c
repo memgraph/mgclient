@@ -316,6 +316,38 @@ int mg_session_send_run_message(mg_session *session, const char *statement,
   return mg_session_flush_message(session);
 }
 
+int mg_session_send_route_message_v4_3(mg_session *session,
+                                       const mg_map *routing,
+                                       const mg_list *bookmarks,
+                                       const char *db) {
+  int const field_number = 3;
+  MG_RETURN_IF_FAILED(mg_session_write_uint8(
+      session, (uint8_t)(MG_MARKER_TINY_STRUCT + field_number)));
+  MG_RETURN_IF_FAILED(
+      mg_session_write_uint8(session, MG_SIGNATURE_MESSAGE_ROUTE));
+  MG_RETURN_IF_FAILED(mg_session_write_map(session, routing));
+  MG_RETURN_IF_FAILED(mg_session_write_list(session, bookmarks));
+  MG_RETURN_IF_FAILED(mg_session_write_string(session, db));
+
+  return mg_session_flush_message(session);
+}
+
+int mg_session_send_route_message_v4_4(mg_session *session,
+                                       const mg_map *routing,
+                                       const mg_list *bookmarks,
+                                       const mg_map *extra) {
+  int const field_number = 3;
+  MG_RETURN_IF_FAILED(mg_session_write_uint8(
+      session, (uint8_t)(MG_MARKER_TINY_STRUCT + field_number)));
+  MG_RETURN_IF_FAILED(
+      mg_session_write_uint8(session, MG_SIGNATURE_MESSAGE_ROUTE));
+  MG_RETURN_IF_FAILED(mg_session_write_map(session, routing));
+  MG_RETURN_IF_FAILED(mg_session_write_list(session, bookmarks));
+  MG_RETURN_IF_FAILED(mg_session_write_map(session, extra));
+
+  return mg_session_flush_message(session);
+}
+
 int mg_session_send_pull_message(mg_session *session, const mg_map *extra) {
   uint8_t marker = MG_MARKER_TINY_STRUCT + (session->version == 4);
   MG_RETURN_IF_FAILED(mg_session_write_uint8(session, marker));
