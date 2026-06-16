@@ -265,6 +265,8 @@ jobs:
       - name: Download, install and run Memgraph under WSL
         shell: wsl-bash {0} # root shell
         run: |
+          sudo apt update
+          sudo apt install -y libatomic1
           mkdir ~/memgraph
           curl -L https://download.memgraph.com/memgraph/v${{ env.MGVERSION }}/ubuntu-24.04/memgraph_${{ env.MGVERSION }}-1_amd64.deb --output ~/memgraph/memgraph.deb
           dpkg -i ~/memgraph/memgraph.deb

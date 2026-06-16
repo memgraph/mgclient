@@ -22,6 +22,7 @@ FetchContent_Declare(googletest
 )
 # For Windows: Prevent overriding the parent project's compiler/linker settings
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+set(CMAKE_POLICY_VERSION_MINIMUM 3.5)
 FetchContent_MakeAvailable(googletest)
 
 set(TESTS_ROOT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
