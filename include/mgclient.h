@@ -1255,6 +1255,8 @@ MGCLIENT_EXPORT void mg_session_params_set_host(mg_session_params *,
                                                 const char *host);
 MGCLIENT_EXPORT void mg_session_params_set_port(mg_session_params *,
                                                 uint16_t port);
+MGCLIENT_EXPORT void mg_session_params_set_scheme(mg_session_params *,
+                                                  const char *scheme);
 MGCLIENT_EXPORT void mg_session_params_set_username(mg_session_params *,
                                                     const char *username);
 MGCLIENT_EXPORT void mg_session_params_set_password(mg_session_params *,
