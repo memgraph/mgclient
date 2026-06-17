@@ -840,7 +840,8 @@ int mg_session_route(mg_session *session, const mg_map *routing,
 
   assert(session->status == MG_SESSION_READY && !session->explicit_transaction);
 
-  if (session->version != 4 || session->version_minor < 3) {
+  if (session->version < 4 ||
+      (session->version == 4 && session->version_minor < 3)) {
     mg_session_set_error(session, "ROUTE requires Bolt >= 4.3");
     return MG_ERROR_CLIENT_ERROR;
   }
