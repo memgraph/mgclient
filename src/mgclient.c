@@ -843,10 +843,11 @@ int mg_session_route(mg_session *session, const mg_map *routing,
   if (session->version < 4 ||
       (session->version == 4 && session->version_minor < 3)) {
     mg_session_set_error(session, "ROUTE requires Bolt >= 4.3");
-    return MG_ERROR_CLIENT_ERROR;
+    return MG_ERROR_BAD_CALL;
   }
 
   mg_message_destroy_ca(session->result.message, session->decoder_allocator);
+  session->result.columns = NULL;
   session->result.message = NULL;
 
   // The encoders dereference the bookmarks list, so a non-NULL empty list must
@@ -921,7 +922,8 @@ int mg_session_route(mg_session *session, const mg_map *routing,
     mg_message_destroy_ca(response, session->decoder_allocator);
     if (!copy) {
       mg_session_set_error(session, "out of memory");
-      return MG_ERROR_OOM;
+      status = MG_ERROR_OOM;
+      goto fatal_failure;
     }
     if (routing_table) {
       *routing_table = copy;
