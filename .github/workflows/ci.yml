@@ -252,9 +252,10 @@ jobs:
       - name: Set Memgraph Version
         run: |
           if [[ "${{ matrix.mgversion }}" == "latest" ]]; then
+            release_json=$(curl -s https://api.github.com/repos/memgraph/memgraph/releases/latest)
             mgversion=$(
-              curl -s https://api.github.com/repos/memgraph/memgraph/releases/latest \
-              | grep -m1 '"tag_name":' \
+              printf '%s' "$release_json" \
+              | grep '"tag_name":' \
               | sed -E 's/.*"([^"]+)".*/\1/' \
               | sed 's/^v//'
             )
