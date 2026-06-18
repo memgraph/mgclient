@@ -87,6 +87,8 @@ mg_session *mg_session_init(mg_allocator *allocator) {
   session->result.message = NULL;
   session->result.columns = NULL;
 
+  session->version = 0;
+  session->version_minor = 0;
   session->explicit_transaction = 0;
   session->query_number = 0;
 

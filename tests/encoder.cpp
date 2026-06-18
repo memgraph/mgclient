@@ -109,7 +109,10 @@ void AssertReadRaw(std::stringstream &sstr, const std::string &expected) {
 }
 
 void AssertEnd(std::stringstream &sstr) {
-  std::stringstream::char_type got = sstr.get();
+  // Use int_type (not char_type) to hold the result: on platforms where char is
+  // unsigned (e.g. aarch64), assigning EOF (-1) to a char yields 0xFF which
+  // never compares equal to traits::eof().
+  std::stringstream::int_type got = sstr.get();
   if (got != std::stringstream::traits_type::eof()) {
     FAIL() << "Expected end of input stream, got character "
            << ::testing::PrintToString(got);
@@ -243,6 +246,102 @@ TEST_F(MessageChunkingTest, ManyMessages) {
   ASSERT_READ_RAW(sstr, "\x00\x04"s);
   ASSERT_READ_RAW(sstr, "defg"s);
   ASSERT_READ_RAW(sstr, "\x00\x00"s);
+  ASSERT_END(sstr);
+  ASSERT_MEMORY_OK();
+}
+
+class RouteMessageTest : public EncoderTest {};
+
+TEST_F(RouteMessageTest, V4_3) {
+  session.version = 4;
+  session.version_minor = 3;
+
+  mg_map *routing = mg_map_make_empty(0);
+  mg_list *bookmarks = mg_list_make_empty(0);
+
+  ASSERT_EQ(mg_session_send_route_message_v4_3(&session, routing, bookmarks,
+                                               "memgraph", 8),
+            0);
+  mg_raw_transport_destroy(session.transport);
+
+  mg_map_destroy(routing);
+  mg_list_destroy(bookmarks);
+
+  server.Stop();
+  ASSERT_FALSE(server.error);
+  std::stringstream sstr(server.data);
+
+  // TINY_STRUCT + 3 fields, ROUTE signature, empty map, empty list,
+  // tiny string "memgraph" (length 8).
+  ASSERT_READ_MESSAGE(sstr, "\xB3\x66\xA0\x90\x88memgraph"s);
+  ASSERT_END(sstr);
+  ASSERT_MEMORY_OK();
+}
+
+TEST_F(RouteMessageTest, V4_3EmptyDb) {
+  session.version = 4;
+  session.version_minor = 3;
+
+  mg_map *routing = mg_map_make_empty(0);
+  mg_list *bookmarks = mg_list_make_empty(0);
+
+  ASSERT_EQ(
+      mg_session_send_route_message_v4_3(&session, routing, bookmarks, "", 0),
+      0);
+  mg_raw_transport_destroy(session.transport);
+
+  mg_map_destroy(routing);
+  mg_list_destroy(bookmarks);
+
+  server.Stop();
+  ASSERT_FALSE(server.error);
+  std::stringstream sstr(server.data);
+
+  // ... empty map, empty list, empty tiny string (0x80).
+  ASSERT_READ_MESSAGE(sstr, "\xB3\x66\xA0\x90\x80"s);
+  ASSERT_END(sstr);
+  ASSERT_MEMORY_OK();
+}
+
+TEST_F(RouteMessageTest, V4_4) {
+  session.version = 4;
+  session.version_minor = 4;
+
+  // routing = {"address": "host:7687"}
+  mg_map *routing = mg_map_make_empty(1);
+  ASSERT_EQ(
+      mg_map_insert(routing, "address", mg_value_make_string("host:7687")), 0);
+  mg_list *bookmarks = mg_list_make_empty(0);
+  // extra = {"db": "memgraph"}
+  mg_map *extra = mg_map_make_empty(1);
+  ASSERT_EQ(mg_map_insert(extra, "db", mg_value_make_string("memgraph")), 0);
+
+  ASSERT_EQ(
+      mg_session_send_route_message_v4_4(&session, routing, bookmarks, extra),
+      0);
+  mg_raw_transport_destroy(session.transport);
+
+  mg_map_destroy(routing);
+  mg_list_destroy(bookmarks);
+  mg_map_destroy(extra);
+
+  server.Stop();
+  ASSERT_FALSE(server.error);
+  std::stringstream sstr(server.data);
+
+  // TINY_STRUCT + 3, ROUTE signature,
+  // map {"address"(0x87): "host:7687"(0x89)},
+  // empty list (0x90),
+  // map {"db"(0x82): "memgraph"(0x88)}.
+  ASSERT_READ_MESSAGE(sstr,
+                      "\xB3\x66\xA1\x87"
+                      "address"
+                      "\x89"
+                      "host:7687"
+                      "\x90\xA1\x82"
+                      "db"
+                      "\x88"
+                      "memgraph"s);
   ASSERT_END(sstr);
   ASSERT_MEMORY_OK();
 }

@@ -244,6 +244,97 @@ TEST_F(MessageChunkingTest, ManyMessages) {
   ASSERT_MEMORY_OK();
 }
 
+class RouteResponseTest : public DecoderTest {};
+
+TEST_F(RouteResponseTest, RoutingTable) {
+  session = mg_session_init((mg_allocator *)&allocator);
+  mg_raw_transport_init(sc, (mg_raw_transport **)&session->transport,
+                        (mg_allocator *)&allocator);
+  ASSERT_TRUE(session);
+  session->version = 4;
+  session->version_minor = 4;
+
+  // SUCCESS message (0xB1 0x70) with metadata = {"rt": <routing table>}.
+  // rt = {"ttl": 100, "servers": [{"addresses": ["localhost:7687"],
+  //                                "role": "WRITE"}]}
+  std::string msg =
+      "\xB1\x70"  // TINY_STRUCT1, SUCCESS signature
+      "\xA1\x82"
+      "rt"    // metadata map with single key "rt"
+      "\xA2"  // rt map with 2 entries
+      "\x83"
+      "ttl"
+      "\x64"  // "ttl" -> 100
+      "\x87"
+      "servers"
+      "\x91"  // "servers" -> list of 1
+      "\xA2"  // server map with 2 entries
+      "\x89"
+      "addresses"
+      "\x91"  // "addresses" -> list of 1
+      "\x8E"
+      "localhost:7687"  // "localhost:7687"
+      "\x84"
+      "role"
+      "\x85"
+      "WRITE"s;  // "role" -> "WRITE"
+
+  client.WriteInChunks(ss, msg);
+  ASSERT_EQ(mg_session_receive_message(session), 0);
+
+  mg_message *message;
+  ASSERT_EQ(mg_session_read_bolt_message(session, &message), 0);
+  ASSERT_EQ(message->type, MG_MESSAGE_TYPE_SUCCESS);
+
+  const mg_map *metadata = message->success_v->metadata;
+  const mg_value *rt = mg_map_at(metadata, "rt");
+  ASSERT_TRUE(rt);
+  ASSERT_EQ(mg_value_get_type(rt), MG_VALUE_TYPE_MAP);
+  const mg_map *rt_map = mg_value_map(rt);
+
+  const mg_value *ttl = mg_map_at(rt_map, "ttl");
+  ASSERT_TRUE(ttl);
+  ASSERT_EQ(mg_value_get_type(ttl), MG_VALUE_TYPE_INTEGER);
+  ASSERT_EQ(mg_value_integer(ttl), 100);
+
+  const mg_value *servers = mg_map_at(rt_map, "servers");
+  ASSERT_TRUE(servers);
+  ASSERT_EQ(mg_value_get_type(servers), MG_VALUE_TYPE_LIST);
+  const mg_list *servers_list = mg_value_list(servers);
+  ASSERT_EQ(mg_list_size(servers_list), 1u);
+
+  const mg_value *server = mg_list_at(servers_list, 0);
+  ASSERT_EQ(mg_value_get_type(server), MG_VALUE_TYPE_MAP);
+  const mg_map *server_map = mg_value_map(server);
+
+  const mg_value *role = mg_map_at(server_map, "role");
+  ASSERT_TRUE(role);
+  ASSERT_EQ(mg_value_get_type(role), MG_VALUE_TYPE_STRING);
+  ASSERT_EQ(
+      std::string(mg_value_string(role)->data, mg_value_string(role)->size),
+      "WRITE");
+
+  const mg_value *addresses = mg_map_at(server_map, "addresses");
+  ASSERT_TRUE(addresses);
+  ASSERT_EQ(mg_value_get_type(addresses), MG_VALUE_TYPE_LIST);
+  const mg_list *addr_list = mg_value_list(addresses);
+  ASSERT_EQ(mg_list_size(addr_list), 1u);
+  const mg_value *addr = mg_list_at(addr_list, 0);
+  ASSERT_EQ(mg_value_get_type(addr), MG_VALUE_TYPE_STRING);
+  ASSERT_EQ(
+      std::string(mg_value_string(addr)->data, mg_value_string(addr)->size),
+      "localhost:7687");
+
+  mg_message_destroy_ca(message, session->decoder_allocator);
+
+  client.Stop();
+  close(ss);
+  ASSERT_FALSE(client.error);
+
+  mg_session_destroy(session);
+  ASSERT_MEMORY_OK();
+}
+
 class ValueTest : public DecoderTest,
                   public ::testing::WithParamInterface<ValueTestParam> {
  protected:

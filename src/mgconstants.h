@@ -107,6 +107,9 @@ static const uint8_t MG_MARKERS_MAP[] = {MG_MARKER_TINY_MAP, MG_MARKER_MAP_8,
 #define MG_SIGNATURE_MESSAGE_BEGIN 0x11
 #define MG_SIGNATURE_MESSAGE_COMMIT 0x12
 #define MG_SIGNATURE_MESSAGE_ROLLBACK 0x13
+// 0x66 also equals MG_SIGNATURE_DATE_TIME_ZONE_ID, but the two are decoded in
+// different contexts (struct value vs. message), so the collision is safe.
+#define MG_SIGNATURE_MESSAGE_ROUTE 0x66
 
 #ifdef __cplusplus
 }
