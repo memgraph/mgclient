@@ -2343,7 +2343,7 @@ TEST_F(RouteTest, UnsupportedVersion) {
   mg_map *routing_table = nullptr;
   ASSERT_EQ(
       mg_session_route(session, routing, nullptr, nullptr, &routing_table),
-      MG_ERROR_CLIENT_ERROR);
+      MG_ERROR_BAD_CALL);
   // The session must remain usable (no transport interaction happened).
   ASSERT_EQ(mg_session_status(session), MG_SESSION_READY);
   ASSERT_EQ(routing_table, nullptr);
