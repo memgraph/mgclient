@@ -1320,6 +1320,9 @@ MGCLIENT_EXPORT int mg_session_status(const mg_session *session);
 /// Obtains the error message stored in \ref mg_session (if any).
 MGCLIENT_EXPORT const char *mg_session_error(mg_session *session);
 
+/// Obtains the error code associated with the last error on \ref mg_session.
+MGCLIENT_EXPORT const char *mg_session_error_code(mg_session *session);
+
 /// Destroys a \ref mg_session and releases all of its resources.
 MGCLIENT_EXPORT void mg_session_destroy(mg_session *session);
 

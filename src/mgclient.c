@@ -358,6 +358,9 @@ done:
   } else {
     mg_session_set_error(session, "unknown error occurred");
   }
+  if (code) {
+    mg_session_set_error_code(session, "%.*s", code->size, code->data);
+  }
   return type;
 }
 

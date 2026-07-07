@@ -93,6 +93,7 @@ mg_session *mg_session_init(mg_allocator *allocator) {
   session->query_number = 0;
 
   session->error_buffer[0] = 0;
+  session->error_code_buffer[0] = 0;
 
   return session;
 
@@ -105,6 +106,7 @@ cleanup:
 }
 
 void mg_session_set_error(mg_session *session, const char *fmt, ...) {
+  session->error_code_buffer[0] = 0;
   va_list arglist;
   va_start(arglist, fmt);
   if (vsnprintf(session->error_buffer, MG_MAX_ERROR_SIZE, fmt, arglist) < 0) {
@@ -114,11 +116,28 @@ void mg_session_set_error(mg_session *session, const char *fmt, ...) {
   va_end(arglist);
 }
 
+void mg_session_set_error_code(mg_session *session, const char *fmt, ...) {
+  va_list arglist;
+  va_start(arglist, fmt);
+  if (vsnprintf(session->error_code_buffer, MG_MAX_ERROR_SIZE, fmt, arglist) <
+      0) {
+    session->error_code_buffer[0] = 0;
+  }
+  va_end(arglist);
+}
+
 const char *mg_session_error(mg_session *session) {
   if (!session) {
     return "session is NULL (possibly out of memory)";
   }
   return session->error_buffer;
+}
+
+const char *mg_session_error_code(mg_session *session) {
+  if (!session) {
+    return "";
+  }
+  return session->error_code_buffer;
 }
 
 void mg_session_invalidate(mg_session *session) {

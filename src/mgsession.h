@@ -59,6 +59,7 @@ typedef struct mg_session {
   mg_result result;
 
   char error_buffer[MG_MAX_ERROR_SIZE];
+  char error_code_buffer[MG_MAX_ERROR_SIZE];
 
   mg_allocator *allocator;
   mg_allocator *decoder_allocator;
@@ -69,6 +70,8 @@ mg_session *mg_session_init(mg_allocator *allocator);
 void mg_session_invalidate(mg_session *session);
 
 void mg_session_set_error(mg_session *session, const char *fmt, ...);
+
+void mg_session_set_error_code(mg_session *session, const char *fmt, ...);
 
 void mg_session_destroy(mg_session *session);
 
