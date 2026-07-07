@@ -346,6 +346,8 @@ TEST_F(ConnectTest, InitFail) {
             MG_ERROR_CLIENT_ERROR);
   ASSERT_THAT(std::string(mg_session_error(session)),
               HasSubstr("Authentication failure"));
+  ASSERT_STREQ(mg_session_error_code(session),
+               "Memgraph.ClientError.Security.Authenticated");
   EXPECT_EQ(mg_session_status(session), MG_SESSION_BAD);
   mg_session_params_destroy(params);
   mg_session_destroy(session);
@@ -424,6 +426,8 @@ TEST_F(ConnectTest, InitFail_v4) {
             MG_ERROR_CLIENT_ERROR);
   ASSERT_THAT(std::string(mg_session_error(session)),
               HasSubstr("Authentication failure"));
+  ASSERT_STREQ(mg_session_error_code(session),
+               "Memgraph.ClientError.Security.Authenticated");
   EXPECT_EQ(mg_session_status(session), MG_SESSION_BAD);
   mg_session_params_destroy(params);
   mg_session_destroy(session);
@@ -870,6 +874,8 @@ void RunTest::InvalidStatement(int version) {
             MG_ERROR_CLIENT_ERROR);
   ASSERT_THAT(std::string(mg_session_error(session)),
               HasSubstr("Unbound variable: m"));
+  ASSERT_STREQ(mg_session_error_code(session),
+               "Memgraph.ClientError.Statement.SyntaxError");
   ASSERT_EQ(mg_session_status(session), MG_SESSION_READY);
   mg_session_destroy(session);
   StopServer();
@@ -2353,4 +2359,23 @@ TEST_F(RouteTest, UnsupportedVersion) {
   mg_map_destroy(routing);
   mg_session_destroy(session);
   ASSERT_MEMORY_OK();
+}
+
+TEST(SessionErrorCode, SetAndClear) {
+  mg_session *session = mg_session_init(&mg_system_allocator);
+  ASSERT_NE(session, nullptr);
+
+  ASSERT_STREQ(mg_session_error_code(session), "");
+
+  mg_session_set_error_code(session,
+                            "Memgraph.TransientError.MemgraphError.MemgraphError");
+  ASSERT_STREQ(mg_session_error_code(session),
+               "Memgraph.TransientError.MemgraphError.MemgraphError");
+
+  mg_session_set_error(session, "connection reset");
+  ASSERT_STREQ(mg_session_error_code(session), "");
+  ASSERT_THAT(std::string(mg_session_error(session)),
+              HasSubstr("connection reset"));
+
+  mg_session_destroy(session);
 }
