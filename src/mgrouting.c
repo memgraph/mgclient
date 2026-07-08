@@ -14,6 +14,7 @@
 
 #include "mgclient.h"
 
+#include <ctype.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -173,4 +174,52 @@ const char *mg_routing_table_address_at(const mg_routing_table *table,
     return NULL;
   }
   return table->roles[role].items[index];
+}
+
+int mg_error_is_transient(int error) {
+  switch (error) {
+    // The server told us so (Bolt "TransientError" category).
+    case MG_ERROR_TRANSIENT_ERROR:
+    // Low-level transport/connection failures: no Bolt code, but retryable in
+    // an HA cluster (an instance dropped mid-request, or was momentarily
+    // unreachable during a failover). Non-transport failures such as
+    // MG_ERROR_BAD_PARAMETER, MG_ERROR_DECODING_FAILED,
+    // MG_ERROR_PROTOCOL_VIOLATION and MG_ERROR_SSL_ERROR are deliberately
+    // excluded.
+    case MG_ERROR_SEND_FAILED:
+    case MG_ERROR_RECV_FAILED:
+    case MG_ERROR_NETWORK_FAILURE:
+    case MG_ERROR_SOCKET:
+      return 1;
+    default:
+      return 0;
+  }
+}
+
+// Case-insensitive substring search. `needle` is matched regardless of case;
+// strcasestr is a non-standard extension so we roll our own for portability.
+static int contains_ci(const char *haystack, const char *needle) {
+  if (!haystack || !needle) {
+    return 0;
+  }
+  size_t needle_len = strlen(needle);
+  if (needle_len == 0) {
+    return 1;
+  }
+  for (const char *h = haystack; *h; ++h) {
+    size_t i = 0;
+    while (i < needle_len && h[i] &&
+           tolower((unsigned char)h[i]) == tolower((unsigned char)needle[i])) {
+      ++i;
+    }
+    if (i == needle_len) {
+      return 1;
+    }
+  }
+  return 0;
+}
+
+int mg_error_is_committed_on_main(const char *message) {
+  return contains_ci(message, "replication exception") &&
+         contains_ci(message, "committed on the main");
 }

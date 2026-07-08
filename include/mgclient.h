@@ -1474,6 +1474,26 @@ MGCLIENT_EXPORT uint32_t mg_routing_table_address_count(
 MGCLIENT_EXPORT const char *mg_routing_table_address_at(
     const mg_routing_table *table, enum mg_routing_role role, uint32_t index);
 
+/// Returns non-zero if \p error (an MG_ERROR_* status code) denotes a transient
+/// condition worth retrying.
+///
+/// This is the server's TransientError category (\ref MG_ERROR_TRANSIENT_ERROR)
+/// or a low-level transport/connection failure (\ref MG_ERROR_SEND_FAILED,
+/// \ref MG_ERROR_RECV_FAILED, \ref MG_ERROR_NETWORK_FAILURE, \ref
+/// MG_ERROR_SOCKET) -- all of which may succeed on a retry after the cluster
+/// reconverges. Non-transport failures (bad parameters, decoding/protocol
+/// errors, SSL errors, and the client/database error categories) return 0.
+MGCLIENT_EXPORT int mg_error_is_transient(int error);
+
+/// Returns non-zero if \p message reports a write that committed on the main
+/// but could not be replicated to a synchronous replica.
+///
+/// Such a write is durable, so it is safe to treat as success rather than
+/// retry it (a retry would duplicate it). This is the one condition that has no
+/// distinct error code and must be recognised from the message text (e.g. as
+/// returned by \ref mg_session_error). \p message may be NULL (returns 0).
+MGCLIENT_EXPORT int mg_error_is_committed_on_main(const char *message);
+
 /// Starts an Explicit transaction on the server.
 ///
 /// Every run will be part of that transaction until its explicitly ended.

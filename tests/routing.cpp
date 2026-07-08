@@ -80,6 +80,44 @@ TEST(RoutingTable, ParseNullReturnsNull) {
   EXPECT_EQ(mg_routing_table_parse(nullptr), nullptr);
 }
 
+TEST(ErrorClassification, TransientCoversServerAndTransportFailures) {
+  // Server-signalled transient + low-level transport/connection failures.
+  EXPECT_TRUE(mg_error_is_transient(MG_ERROR_TRANSIENT_ERROR));
+  EXPECT_TRUE(mg_error_is_transient(MG_ERROR_SEND_FAILED));
+  EXPECT_TRUE(mg_error_is_transient(MG_ERROR_RECV_FAILED));
+  EXPECT_TRUE(mg_error_is_transient(MG_ERROR_NETWORK_FAILURE));
+  EXPECT_TRUE(mg_error_is_transient(MG_ERROR_SOCKET));
+}
+
+TEST(ErrorClassification, TransientIsFalseForNonTransportFailures) {
+  EXPECT_FALSE(mg_error_is_transient(0));  // success
+  EXPECT_FALSE(mg_error_is_transient(MG_ERROR_CLIENT_ERROR));
+  EXPECT_FALSE(mg_error_is_transient(MG_ERROR_DATABASE_ERROR));
+  EXPECT_FALSE(mg_error_is_transient(MG_ERROR_BAD_PARAMETER));
+  EXPECT_FALSE(mg_error_is_transient(MG_ERROR_DECODING_FAILED));
+  EXPECT_FALSE(mg_error_is_transient(MG_ERROR_PROTOCOL_VIOLATION));
+  EXPECT_FALSE(mg_error_is_transient(MG_ERROR_SSL_ERROR));
+}
+
+TEST(ErrorClassification, CommittedOnMainNeedsBothMarkers) {
+  const char *committed =
+      "Replication Exception: Failed to replicate to SYNC replica 'instance_1': "
+      "replica is not reachable or not in sync with the main. Transaction is "
+      "still committed on the main instance and other alive replicas.";
+  EXPECT_TRUE(mg_error_is_committed_on_main(committed));
+
+  // Case-insensitive.
+  EXPECT_TRUE(mg_error_is_committed_on_main(
+      "REPLICATION EXCEPTION ... COMMITTED ON THE MAIN instance"));
+
+  // A replication error where the transaction was aborted is NOT committed.
+  EXPECT_FALSE(mg_error_is_committed_on_main(
+      "Replication Exception: ... Transaction was aborted on all instances."));
+  // Unrelated errors and NULL.
+  EXPECT_FALSE(mg_error_is_committed_on_main("Syntax error near 'FOO'"));
+  EXPECT_FALSE(mg_error_is_committed_on_main(nullptr));
+}
+
 TEST(RoutingTable, AddressAtOutOfRangeReturnsNull) {
   mg_list *servers = mg_list_make_empty(1);
   mg_list_append(servers, Server({"m:7687"}, "WRITE"));
