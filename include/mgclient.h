@@ -1,4 +1,4 @@
-// Copyright (c) 2016-2020 Memgraph Ltd. [https://memgraph.com]
+// Copyright (c) 2016-2026 Memgraph Ltd. [https://memgraph.com]
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -1421,6 +1421,58 @@ MGCLIENT_EXPORT int mg_session_route(mg_session *session, const mg_map *routing,
                                      const mg_list *bookmarks,
                                      const mg_map *extra,
                                      mg_map **routing_table);
+
+/// The role a server plays in a client-side routing table.
+enum mg_routing_role {
+  MG_ROUTING_ROLE_READ,
+  MG_ROUTING_ROLE_WRITE,
+  MG_ROUTING_ROLE_ROUTE,
+};
+
+/// A parsed client-side routing table: the advertised "host:port" addresses
+/// grouped by role, together with the table's time-to-live. Build one from the
+/// map returned by \ref mg_session_route using \ref mg_routing_table_parse.
+///
+/// \ref mg_routing_table is an opaque data type. The addresses of every server
+/// sharing a role are flattened into a single list for that role, in the order
+/// they appear in the source map.
+typedef struct mg_routing_table mg_routing_table;
+
+/// Parses the routing-table map returned by \ref mg_session_route.
+///
+/// \param raw The routing-table map (see \ref mg_session_route for its shape).
+///            The map is only read; ownership is not taken.
+///
+/// \return A freshly allocated \ref mg_routing_table (ownership transferred to
+///         the caller, who must call \ref mg_routing_table_destroy), or NULL if
+///         \p raw is NULL or an allocation failed.
+///
+///         Parsing is lenient: only \p raw being NULL (or an allocation
+///         failure) causes a NULL result. Anything malformed is skipped rather
+///         than treated as an error -- a missing or non-integer "ttl" defaults
+///         to 0, a missing or non-list "servers" yields an empty table, and any
+///         server entry that is not a map, whose "role" is missing/non-string
+///         or not one of "READ"/"WRITE"/"ROUTE", or whose "addresses" are
+///         missing/non-list is ignored (individual non-string addresses are
+///         skipped too).
+MGCLIENT_EXPORT mg_routing_table *mg_routing_table_parse(const mg_map *raw);
+
+/// Destroys a \ref mg_routing_table.
+MGCLIENT_EXPORT void mg_routing_table_destroy(mg_routing_table *table);
+
+/// Returns the time-to-live of the routing table, in seconds.
+MGCLIENT_EXPORT int64_t mg_routing_table_ttl(const mg_routing_table *table);
+
+/// Returns the number of advertised addresses for \p role.
+MGCLIENT_EXPORT uint32_t mg_routing_table_address_count(
+    const mg_routing_table *table, enum mg_routing_role role);
+
+/// Returns the \p index-th advertised "host:port" address for \p role.
+///
+/// The returned string is NUL-terminated and owned by \p table (valid until it
+/// is destroyed). Returns NULL if \p index is out of range.
+MGCLIENT_EXPORT const char *mg_routing_table_address_at(
+    const mg_routing_table *table, enum mg_routing_role role, uint32_t index);
 
 /// Starts an Explicit transaction on the server.
 ///
