@@ -14,11 +14,62 @@
 
 #include <gtest/gtest.h>
 
+#include <cstdint>
+#include <cstdlib>
+#include <string>
 #include <vector>
 
 #include "mgclient.h"
+#include "mgrouting.h"  // internal selection helper (white-box test)
+
+// A resolver (C linkage) that collapses every advertised address to one target,
+// used to check resolver application + de-duplication.
+extern "C" int CollapseResolver(const char *advertised,
+                                mg_resolver_result *result, void *data) {
+  (void)advertised;
+  (void)data;
+  return mg_resolver_result_add(result, "10.0.0.1:7687");
+}
+
+// Resolver that remaps advertised addresses per MEMGRAPH_HA_ADDRESS_MAP
+// ("adv1=target1,adv2=target2,..."), falling back to identity. Lets the
+// cluster-gated tests reach a Kubernetes cluster through kubectl port-forwards.
+extern "C" int EnvMapResolver(const char *advertised, mg_resolver_result *result,
+                              void *data) {
+  (void)data;
+  const char *map = std::getenv("MEMGRAPH_HA_ADDRESS_MAP");
+  if (map) {
+    const std::string advertised_str(advertised);
+    const std::string entries(map);
+    size_t pos = 0;
+    while (pos <= entries.size()) {
+      size_t comma = entries.find(',', pos);
+      std::string pair = entries.substr(
+          pos, comma == std::string::npos ? std::string::npos : comma - pos);
+      size_t eq = pair.find('=');
+      if (eq != std::string::npos && pair.substr(0, eq) == advertised_str) {
+        return mg_resolver_result_add(result, pair.substr(eq + 1).c_str());
+      }
+      if (comma == std::string::npos) {
+        break;
+      }
+      pos = comma + 1;
+    }
+  }
+  return mg_resolver_result_add(result, advertised);
+}
 
 namespace {
+
+// Initialises mgclient once for the whole test binary (mg_init sets up the
+// process-global state that mg_session_pull and friends rely on).
+class MgclientEnvironment : public ::testing::Environment {
+ public:
+  void SetUp() override { mg_init(); }
+  void TearDown() override { mg_finalize(); }
+};
+::testing::Environment *const kMgclientEnv =
+    ::testing::AddGlobalTestEnvironment(new MgclientEnvironment);
 
 // Build a `mg_value` list-of-strings from the given addresses.
 mg_value *StringList(const std::vector<const char *> &addrs) {
@@ -97,6 +148,280 @@ TEST(ErrorClassification, TransientIsFalseForNonTransportFailures) {
   EXPECT_FALSE(mg_error_is_transient(MG_ERROR_DECODING_FAILED));
   EXPECT_FALSE(mg_error_is_transient(MG_ERROR_PROTOCOL_VIOLATION));
   EXPECT_FALSE(mg_error_is_transient(MG_ERROR_SSL_ERROR));
+}
+
+// ---------------------------------------------------------------------------
+// Router selection (round-robin) -- pure logic via the internal seam.
+// ---------------------------------------------------------------------------
+
+namespace {
+mg_routing_table *ParseTable(int64_t ttl, mg_list *servers) {
+  mg_map *raw = mg_map_make_empty(2);
+  mg_map_insert(raw, "ttl", mg_value_make_integer(ttl));
+  mg_map_insert(raw, "servers", mg_value_make_list(servers));
+  mg_routing_table *table = mg_routing_table_parse(raw);
+  mg_map_destroy(raw);
+  return table;
+}
+}  // namespace
+
+TEST(RouterSelect, ReadRoundRobinsAcrossReplicas) {
+  mg_list *servers = mg_list_make_empty(2);
+  mg_list_append(servers, Server({"m:7687"}, "WRITE"));
+  mg_list_append(servers, Server({"r1:7687", "r2:7687", "r3:7687"}, "READ"));
+  mg_routing_table *table = ParseTable(300, servers);
+  ASSERT_NE(table, nullptr);
+
+  uint32_t read_index = 0;
+  std::vector<std::string> firsts;
+  for (int i = 0; i < 4; ++i) {
+    mg_addr_list out;
+    memset(&out, 0, sizeof(out));
+    ASSERT_EQ(mg_routing_select_targets(table, MG_ROUTING_ROLE_READ, nullptr,
+                                        nullptr, &read_index, &out),
+              0);
+    ASSERT_EQ(out.size, 3u);  // every replica stays a failover candidate
+    firsts.emplace_back(out.items[0]);
+    mg_addr_list_clear(&out);
+  }
+  // Each selection starts at the next replica, wrapping around.
+  EXPECT_EQ(firsts[0], "r1:7687");
+  EXPECT_EQ(firsts[1], "r2:7687");
+  EXPECT_EQ(firsts[2], "r3:7687");
+  EXPECT_EQ(firsts[3], "r1:7687");
+
+  mg_routing_table_destroy(table);
+}
+
+TEST(RouterSelect, WriteDoesNotRotate) {
+  mg_list *servers = mg_list_make_empty(2);
+  mg_list_append(servers, Server({"m:7687"}, "WRITE"));
+  mg_list_append(servers, Server({"r1:7687", "r2:7687"}, "READ"));
+  mg_routing_table *table = ParseTable(300, servers);
+  ASSERT_NE(table, nullptr);
+
+  uint32_t read_index = 5;
+  mg_addr_list out;
+  memset(&out, 0, sizeof(out));
+  ASSERT_EQ(mg_routing_select_targets(table, MG_ROUTING_ROLE_WRITE, nullptr,
+                                      nullptr, &read_index, &out),
+            0);
+  ASSERT_EQ(out.size, 1u);
+  EXPECT_STREQ(out.items[0], "m:7687");
+  EXPECT_EQ(read_index, 5u);  // WRITE selection leaves the READ cursor alone
+  mg_addr_list_clear(&out);
+
+  mg_routing_table_destroy(table);
+}
+
+TEST(RouterSelect, ResolverAppliedAndDuplicatesSkipped) {
+  mg_list *servers = mg_list_make_empty(1);
+  mg_list_append(servers, Server({"r1:7687", "r2:7687"}, "READ"));
+  mg_routing_table *table = ParseTable(300, servers);
+  ASSERT_NE(table, nullptr);
+
+  uint32_t read_index = 0;
+  mg_addr_list out;
+  memset(&out, 0, sizeof(out));
+  ASSERT_EQ(mg_routing_select_targets(table, MG_ROUTING_ROLE_READ,
+                                      CollapseResolver, nullptr, &read_index,
+                                      &out),
+            0);
+  // Both replicas resolve to the same target, so it is listed once.
+  ASSERT_EQ(out.size, 1u);
+  EXPECT_STREQ(out.items[0], "10.0.0.1:7687");
+  mg_addr_list_clear(&out);
+
+  mg_routing_table_destroy(table);
+}
+
+// ---------------------------------------------------------------------------
+// Router config + lifecycle (no cluster needed).
+// ---------------------------------------------------------------------------
+
+namespace {
+mg_session_params *SeedParams(const char *host, uint16_t port) {
+  mg_session_params *params = mg_session_params_make();
+  mg_session_params_set_host(params, host);
+  mg_session_params_set_port(params, port);
+  return params;
+}
+}  // namespace
+
+TEST(RouterConfig, MakeAndDestroy) {
+  mg_router_config *config = mg_router_config_make();
+  ASSERT_NE(config, nullptr);
+  mg_router_config_destroy(config);
+  mg_router_config_destroy(nullptr);  // must be a no-op
+}
+
+TEST(Router, MakeRequiresConfigAndSessionParams) {
+  EXPECT_EQ(mg_router_make(nullptr), nullptr);
+
+  // A config with no session params set cannot make a router.
+  mg_router_config *config = mg_router_config_make();
+  EXPECT_EQ(mg_router_make(config), nullptr);
+  mg_router_config_destroy(config);
+}
+
+TEST(Router, MakeCopiesConfigSoItCanBeFreed) {
+  mg_router_config *config = mg_router_config_make();
+  mg_session_params *params = SeedParams("coordinator", 7687);
+  mg_session_params_set_username(params, "user");
+  mg_session_params_set_password(params, "pass");
+  mg_router_config_set_session_params(config, params);
+
+  mg_router *router = mg_router_make(config);
+  ASSERT_NE(router, nullptr);
+
+  // The router copied what it needs, so the params and config may be freed
+  // now while the router lives on (ASan verifies the deep copy is clean).
+  mg_session_params_destroy(params);
+  mg_router_config_destroy(config);
+
+  mg_router_destroy(router);
+  mg_router_destroy(nullptr);  // must be a no-op
+}
+
+namespace {
+mg_router *MakeRouter(const char *host, uint16_t port) {
+  mg_router_config *config = mg_router_config_make();
+  mg_session_params *params = SeedParams(host, port);
+  mg_router_config_set_session_params(config, params);
+  mg_router *router = mg_router_make(config);
+  mg_session_params_destroy(params);
+  mg_router_config_destroy(config);
+  return router;
+}
+}  // namespace
+
+TEST(RouterRefresh, AccessorsBeforeAnyRefresh) {
+  mg_router *router = MakeRouter("127.0.0.1", 7687);
+  ASSERT_NE(router, nullptr);
+  EXPECT_EQ(mg_router_routing_table(router), nullptr);
+  EXPECT_STREQ(mg_router_error(router), "");
+  mg_router_destroy(router);
+}
+
+TEST(RouterRefresh, FailsWhenSeedUnreachable) {
+  // Port 1 has nothing listening, so the refresh can't reach any coordinator.
+  mg_router *router = MakeRouter("127.0.0.1", 1);
+  ASSERT_NE(router, nullptr);
+
+  int status = mg_router_refresh(router);
+  EXPECT_NE(status, 0);
+  EXPECT_TRUE(mg_error_is_transient(status));  // connection refused is transient
+  EXPECT_STRNE(mg_router_error(router), "");   // a message was recorded
+  EXPECT_EQ(mg_router_routing_table(router), nullptr);  // nothing cached
+
+  mg_router_destroy(router);
+}
+
+// Runs only against a real HA cluster; set MEMGRAPH_HA_COORDINATOR_HOST (and
+// optionally _PORT) to enable it.
+TEST(RouterRefresh, FetchesTableFromCoordinator) {
+  const char *host = std::getenv("MEMGRAPH_HA_COORDINATOR_HOST");
+  if (!host) {
+    GTEST_SKIP() << "set MEMGRAPH_HA_COORDINATOR_HOST to run";
+  }
+  const char *port_str = std::getenv("MEMGRAPH_HA_COORDINATOR_PORT");
+  uint16_t port = port_str ? static_cast<uint16_t>(std::atoi(port_str)) : 7687;
+
+  mg_router *router = MakeRouter(host, port);
+  ASSERT_NE(router, nullptr);
+
+  int status = mg_router_refresh(router);
+  ASSERT_EQ(status, 0) << mg_router_error(router);
+
+  const mg_routing_table *table = mg_router_routing_table(router);
+  ASSERT_NE(table, nullptr);
+  EXPECT_GT(mg_routing_table_ttl(table), 0);
+  EXPECT_GT(mg_routing_table_address_count(table, MG_ROUTING_ROLE_WRITE), 0u);
+  EXPECT_GT(mg_routing_table_address_count(table, MG_ROUTING_ROLE_READ), 0u);
+  EXPECT_GT(mg_routing_table_address_count(table, MG_ROUTING_ROLE_ROUTE), 0u);
+
+  mg_router_destroy(router);
+}
+
+namespace {
+std::string ReplicationRole(mg_session *session) {
+  std::string role;
+  if (mg_session_run(session, "SHOW REPLICATION ROLE", nullptr, nullptr,
+                     nullptr, nullptr) != 0 ||
+      mg_session_pull(session, nullptr) != 0) {
+    return role;
+  }
+  mg_result *result = nullptr;
+  while (mg_session_fetch(session, &result) == 1) {
+    const mg_list *row = mg_result_row(result);
+    if (row && mg_list_size(row) > 0) {
+      const mg_value *value = mg_list_at(row, 0);
+      if (value && mg_value_get_type(value) == MG_VALUE_TYPE_STRING) {
+        const mg_string *str = mg_value_string(value);
+        role.assign(mg_string_data(str), mg_string_size(str));
+      }
+    }
+  }
+  return role;
+}
+
+mg_router *MakeRouterWithResolver(const char *host, uint16_t port,
+                                  mg_resolver_fn resolver) {
+  mg_router_config *config = mg_router_config_make();
+  mg_session_params *params = SeedParams(host, port);
+  mg_router_config_set_session_params(config, params);
+  mg_router_config_set_resolver(config, resolver, nullptr);
+  mg_router *router = mg_router_make(config);
+  mg_session_params_destroy(params);
+  mg_router_config_destroy(config);
+  return router;
+}
+
+// Returns the coordinator port from MEMGRAPH_HA_COORDINATOR_PORT (default 7687).
+uint16_t CoordinatorPort() {
+  const char *port_str = std::getenv("MEMGRAPH_HA_COORDINATOR_PORT");
+  return port_str ? static_cast<uint16_t>(std::atoi(port_str)) : 7687;
+}
+}  // namespace
+
+// Cluster-gated: set MEMGRAPH_HA_COORDINATOR_HOST (and MEMGRAPH_HA_ADDRESS_MAP
+// if the advertised addresses are not directly reachable) to run these.
+TEST(RouterConnect, WriteReachesMain) {
+  const char *host = std::getenv("MEMGRAPH_HA_COORDINATOR_HOST");
+  if (!host) {
+    GTEST_SKIP() << "set MEMGRAPH_HA_COORDINATOR_HOST to run";
+  }
+  mg_router *router = MakeRouterWithResolver(host, CoordinatorPort(),
+                                             EnvMapResolver);
+  ASSERT_NE(router, nullptr);
+
+  mg_session *session = nullptr;
+  int status = mg_router_connect_write(router, &session);
+  ASSERT_EQ(status, 0) << mg_router_error(router);
+  ASSERT_NE(session, nullptr);
+  EXPECT_EQ(ReplicationRole(session), "main");
+
+  mg_session_destroy(session);
+  mg_router_destroy(router);
+}
+
+TEST(RouterConnect, ReadReachesReplica) {
+  const char *host = std::getenv("MEMGRAPH_HA_COORDINATOR_HOST");
+  if (!host) {
+    GTEST_SKIP() << "set MEMGRAPH_HA_COORDINATOR_HOST to run";
+  }
+  mg_router *router = MakeRouterWithResolver(host, CoordinatorPort(),
+                                             EnvMapResolver);
+  ASSERT_NE(router, nullptr);
+
+  mg_session *session = nullptr;
+  int status = mg_router_connect_read(router, &session);
+  ASSERT_EQ(status, 0) << mg_router_error(router);
+  ASSERT_NE(session, nullptr);
+  EXPECT_EQ(ReplicationRole(session), "replica");
+
+  mg_session_destroy(session);
+  mg_router_destroy(router);
 }
 
 TEST(ErrorClassification, CommittedOnMainNeedsBothMarkers) {

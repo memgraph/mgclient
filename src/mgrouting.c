@@ -13,19 +13,15 @@
 // limitations under the License.
 
 #include "mgclient.h"
+#include "mgrouting.h"
 
 #include <ctype.h>
 #include <stddef.h>
 #include <stdint.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-// A growable array of owned, NUL-terminated address strings.
-typedef struct {
-  char **items;
-  uint32_t size;
-  uint32_t capacity;
-} mg_addr_list;
+#include <time.h>
 
 struct mg_routing_table {
   int64_t ttl;
@@ -222,4 +218,501 @@ static int contains_ci(const char *haystack, const char *needle) {
 int mg_error_is_committed_on_main(const char *message) {
   return contains_ci(message, "replication exception") &&
          contains_ci(message, "committed on the main");
+}
+
+// ---------------------------------------------------------------------------
+// Router configuration and lifecycle.
+// ---------------------------------------------------------------------------
+
+struct mg_router_config {
+  const mg_session_params *session_params;  // borrowed; deep-copied by _make.
+  mg_resolver_fn resolver;
+  void *resolver_data;
+  mg_map *routing_context;  // owned copy, or NULL.
+};
+
+struct mg_router {
+  // Connection template, deep-copied from the seed session params so the caller
+  // may free the params after mg_router_make. Exactly one of seed_host /
+  // seed_address is set (the other is NULL), mirroring mg_session_params.
+  char *seed_host;
+  char *seed_address;
+  uint16_t seed_port;
+  char *username;
+  char *password;
+  char *user_agent;
+  enum mg_sslmode sslmode;
+  char *sslcert;
+  char *sslkey;
+  mg_trust_callback_type trust_callback;  // borrowed
+  void *trust_data;                       // borrowed
+
+  mg_resolver_fn resolver;  // borrowed; NULL means identity.
+  void *resolver_data;      // borrowed
+  mg_map *routing_context;  // owned copy, or NULL.
+
+  // Cached routing table (populated by refresh) and when it expires (seconds,
+  // wall clock). expires_at == 0 while no table is cached.
+  mg_routing_table *table;
+  time_t expires_at;
+  // Round-robin cursor for READ selection.
+  uint32_t read_index;
+
+  char error[1024];
+};
+
+// strdup that treats NULL as "not set" (returns NULL). Sets *oom on failure.
+static char *dup_or_null(const char *str, int *oom) {
+  if (!str) {
+    return NULL;
+  }
+  size_t size = strlen(str) + 1;
+  char *copy = (char *)malloc(size);
+  if (!copy) {
+    *oom = 1;
+    return NULL;
+  }
+  memcpy(copy, str, size);
+  return copy;
+}
+
+mg_router_config *mg_router_config_make(void) {
+  return (mg_router_config *)calloc(1, sizeof(mg_router_config));
+}
+
+void mg_router_config_destroy(mg_router_config *config) {
+  if (!config) {
+    return;
+  }
+  mg_map_destroy(config->routing_context);
+  free(config);
+}
+
+void mg_router_config_set_session_params(mg_router_config *config,
+                                         const mg_session_params *params) {
+  config->session_params = params;
+}
+
+void mg_router_config_set_resolver(mg_router_config *config,
+                                   mg_resolver_fn resolver,
+                                   void *resolver_data) {
+  config->resolver = resolver;
+  config->resolver_data = resolver_data;
+}
+
+void mg_router_config_set_routing_context(mg_router_config *config,
+                                          const mg_map *routing_context) {
+  mg_map_destroy(config->routing_context);
+  config->routing_context =
+      routing_context ? mg_map_copy(routing_context) : NULL;
+}
+
+mg_router *mg_router_make(const mg_router_config *config) {
+  if (!config || !config->session_params) {
+    return NULL;
+  }
+  mg_router *router = (mg_router *)calloc(1, sizeof(mg_router));
+  if (!router) {
+    return NULL;
+  }
+  const mg_session_params *params = config->session_params;
+
+  router->seed_port = mg_session_params_get_port(params);
+  router->sslmode = mg_session_params_get_sslmode(params);
+  router->trust_callback = mg_session_params_get_trust_callback(params);
+  router->trust_data = mg_session_params_get_trust_data(params);
+  router->resolver = config->resolver;
+  router->resolver_data = config->resolver_data;
+
+  int oom = 0;
+  router->seed_host = dup_or_null(mg_session_params_get_host(params), &oom);
+  router->seed_address =
+      dup_or_null(mg_session_params_get_address(params), &oom);
+  router->username = dup_or_null(mg_session_params_get_username(params), &oom);
+  router->password = dup_or_null(mg_session_params_get_password(params), &oom);
+  router->user_agent =
+      dup_or_null(mg_session_params_get_user_agent(params), &oom);
+  router->sslcert = dup_or_null(mg_session_params_get_sslcert(params), &oom);
+  router->sslkey = dup_or_null(mg_session_params_get_sslkey(params), &oom);
+
+  if (config->routing_context) {
+    router->routing_context = mg_map_copy(config->routing_context);
+    if (!router->routing_context) {
+      oom = 1;
+    }
+  }
+
+  if (oom) {
+    mg_router_destroy(router);
+    return NULL;
+  }
+  return router;
+}
+
+void mg_router_destroy(mg_router *router) {
+  if (!router) {
+    return;
+  }
+  free(router->seed_host);
+  free(router->seed_address);
+  free(router->username);
+  free(router->password);
+  free(router->user_agent);
+  free(router->sslcert);
+  free(router->sslkey);
+  mg_map_destroy(router->routing_context);
+  mg_routing_table_destroy(router->table);
+  free(router);
+}
+
+// ---------------------------------------------------------------------------
+// Refresh: fetch, parse and cache the routing table (with coordinator failover).
+// ---------------------------------------------------------------------------
+
+struct mg_resolver_result {
+  mg_addr_list list;
+};
+
+int mg_resolver_result_add(mg_resolver_result *result, const char *target) {
+  if (!result || !target) {
+    return MG_ERROR_BAD_PARAMETER;
+  }
+  return addr_list_append(&result->list, target, (uint32_t)strlen(target)) == 0
+             ? 0
+             : MG_ERROR_OOM;
+}
+
+void mg_addr_list_clear(mg_addr_list *list) {
+  for (uint32_t i = 0; i < list->size; ++i) {
+    free(list->items[i]);
+  }
+  free(list->items);
+  list->items = NULL;
+  list->size = 0;
+  list->capacity = 0;
+}
+
+// Resolve an advertised "host:port" into candidate targets, applying the
+// router's resolver, or the identity mapping if none is set.
+static int resolve_address(mg_router *router, const char *advertised,
+                           mg_resolver_result *result) {
+  if (router->resolver) {
+    return router->resolver(advertised, result, router->resolver_data);
+  }
+  return mg_resolver_result_add(result, advertised);
+}
+
+// Split "host:port" (on the last ':') into a freshly allocated host and a port.
+// Returns 0 on success.
+static int split_host_port(const char *address, char **host_out,
+                           uint16_t *port_out) {
+  const char *colon = strrchr(address, ':');
+  if (!colon || colon == address || colon[1] == '\0') {
+    return -1;
+  }
+  char *end = NULL;
+  long port = strtol(colon + 1, &end, 10);
+  if (*end != '\0' || port < 0 || port > 65535) {
+    return -1;
+  }
+  size_t host_len = (size_t)(colon - address);
+  char *host = (char *)malloc(host_len + 1);
+  if (!host) {
+    return -1;
+  }
+  memcpy(host, address, host_len);
+  host[host_len] = '\0';
+  *host_out = host;
+  *port_out = (uint16_t)port;
+  return 0;
+}
+
+static void router_set_error(mg_router *router, const char *message) {
+  snprintf(router->error, sizeof(router->error), "%s",
+           message ? message : "");
+}
+
+// Open a connection using the router's connection template, directed at
+// host/port. On failure returns NULL, stores the message in the router, and
+// sets *status_out.
+static mg_session *router_connect_to(mg_router *router, const char *host,
+                                     uint16_t port, int use_address,
+                                     int *status_out) {
+  mg_session_params *params = mg_session_params_make();
+  if (!params) {
+    router_set_error(router, "couldn't allocate session parameters");
+    *status_out = MG_ERROR_OOM;
+    return NULL;
+  }
+  if (use_address) {
+    mg_session_params_set_address(params, host);
+  } else {
+    mg_session_params_set_host(params, host);
+  }
+  mg_session_params_set_port(params, port);
+  mg_session_params_set_username(params, router->username);
+  mg_session_params_set_password(params, router->password);
+  if (router->user_agent) {
+    mg_session_params_set_user_agent(params, router->user_agent);
+  }
+  mg_session_params_set_sslmode(params, router->sslmode);
+  mg_session_params_set_sslcert(params, router->sslcert);
+  mg_session_params_set_sslkey(params, router->sslkey);
+  if (router->trust_callback) {
+    mg_session_params_set_trust_callback(params, router->trust_callback);
+    mg_session_params_set_trust_data(params, router->trust_data);
+  }
+
+  mg_session *session = NULL;
+  int status = mg_connect(params, &session);
+  mg_session_params_destroy(params);
+  if (status != 0) {
+    router_set_error(router, mg_session_error(session));
+    mg_session_destroy(session);
+    *status_out = status;
+    return NULL;
+  }
+  *status_out = 0;
+  return session;
+}
+
+// Send ROUTE on an established coordinator session, parse the result, and cache
+// it (replacing any previous table and resetting the TTL). Returns 0 on success.
+static int refresh_from_session(mg_router *router, mg_session *session) {
+  mg_map *empty_context = NULL;
+  const mg_map *routing = router->routing_context;
+  if (!routing) {
+    empty_context = mg_map_make_empty(0);
+    if (!empty_context) {
+      router_set_error(router, "couldn't allocate routing context");
+      return MG_ERROR_OOM;
+    }
+    routing = empty_context;
+  }
+
+  mg_map *raw = NULL;
+  int status = mg_session_route(session, routing, NULL, NULL, &raw);
+  mg_map_destroy(empty_context);
+  if (status != 0) {
+    router_set_error(router, mg_session_error(session));
+    return status;
+  }
+
+  mg_routing_table *table = mg_routing_table_parse(raw);
+  mg_map_destroy(raw);
+  if (!table) {
+    router_set_error(router, "couldn't parse routing table");
+    return MG_ERROR_OOM;
+  }
+
+  mg_routing_table_destroy(router->table);
+  router->table = table;
+  router->expires_at = time(NULL) + (time_t)mg_routing_table_ttl(table);
+  return 0;
+}
+
+int mg_router_refresh(mg_router *router) {
+  router->error[0] = '\0';
+  int last_status = MG_ERROR_TRANSIENT_ERROR;
+
+  // 1) The seed coordinator (used as given, not resolved).
+  {
+    const char *seed_host =
+        router->seed_host ? router->seed_host : router->seed_address;
+    int use_address = router->seed_host == NULL;
+    int status = 0;
+    mg_session *session = router_connect_to(router, seed_host,
+                                            router->seed_port, use_address,
+                                            &status);
+    if (session) {
+      status = refresh_from_session(router, session);
+      mg_session_destroy(session);
+      if (status == 0) {
+        return 0;
+      }
+    }
+    last_status = status;
+  }
+
+  // 2) Fall back to the ROUTE-role coordinators from the cached table (if any),
+  //    resolved to reachable targets.
+  if (router->table) {
+    uint32_t count =
+        mg_routing_table_address_count(router->table, MG_ROUTING_ROLE_ROUTE);
+    for (uint32_t i = 0; i < count; ++i) {
+      const char *advertised =
+          mg_routing_table_address_at(router->table, MG_ROUTING_ROLE_ROUTE, i);
+      mg_resolver_result result;
+      memset(&result, 0, sizeof(result));
+      if (resolve_address(router, advertised, &result) != 0) {
+        mg_addr_list_clear(&result.list);
+        continue;
+      }
+      for (uint32_t j = 0; j < result.list.size; ++j) {
+        char *host = NULL;
+        uint16_t port = 0;
+        if (split_host_port(result.list.items[j], &host, &port) != 0) {
+          continue;
+        }
+        int status = 0;
+        mg_session *session = router_connect_to(router, host, port, 0, &status);
+        free(host);
+        if (session) {
+          status = refresh_from_session(router, session);
+          mg_session_destroy(session);
+          if (status == 0) {
+            mg_addr_list_clear(&result.list);
+            return 0;
+          }
+        }
+        last_status = status;
+      }
+      mg_addr_list_clear(&result.list);
+    }
+  }
+
+  if (router->error[0] == '\0') {
+    router_set_error(router,
+                     "could not refresh routing table from any coordinator");
+  }
+  return last_status;
+}
+
+const mg_routing_table *mg_router_routing_table(mg_router *router) {
+  return router ? router->table : NULL;
+}
+
+const char *mg_router_error(mg_router *router) {
+  return router ? router->error : "";
+}
+
+// ---------------------------------------------------------------------------
+// Connect: select a server for the access mode (round-robin for READ), resolve,
+// and fail over across candidates, refreshing the table once on exhaustion.
+// ---------------------------------------------------------------------------
+
+static int addr_list_contains(const mg_addr_list *list, const char *value) {
+  for (uint32_t i = 0; i < list->size; ++i) {
+    if (strcmp(list->items[i], value) == 0) {
+      return 1;
+    }
+  }
+  return 0;
+}
+
+int mg_routing_select_targets(const mg_routing_table *table,
+                              enum mg_routing_role role,
+                              mg_resolver_fn resolver, void *resolver_data,
+                              uint32_t *read_index, mg_addr_list *out) {
+  if (!table) {
+    return 0;
+  }
+  uint32_t count = mg_routing_table_address_count(table, role);
+  if (count == 0) {
+    return 0;
+  }
+  uint32_t start = 0;
+  if (role == MG_ROUTING_ROLE_READ && read_index) {
+    start = *read_index % count;
+    *read_index += 1;
+  }
+  for (uint32_t k = 0; k < count; ++k) {
+    const char *advertised =
+        mg_routing_table_address_at(table, role, (start + k) % count);
+    mg_resolver_result result;
+    memset(&result, 0, sizeof(result));
+    int rc = resolver ? resolver(advertised, &result, resolver_data)
+                      : mg_resolver_result_add(&result, advertised);
+    if (rc == 0) {
+      for (uint32_t j = 0; j < result.list.size; ++j) {
+        const char *target = result.list.items[j];
+        if (!addr_list_contains(out, target) &&
+            addr_list_append(out, target, (uint32_t)strlen(target)) != 0) {
+          mg_addr_list_clear(&result.list);
+          return MG_ERROR_OOM;
+        }
+      }
+    }
+    mg_addr_list_clear(&result.list);
+  }
+  return 0;
+}
+
+static const char *role_name(enum mg_routing_role role) {
+  return role == MG_ROUTING_ROLE_WRITE ? "WRITE" : "READ";
+}
+
+static int router_connect_role(mg_router *router, enum mg_routing_role role,
+                               mg_session **session_out) {
+  if (!router || !session_out) {
+    return MG_ERROR_BAD_PARAMETER;
+  }
+  *session_out = NULL;
+  router->error[0] = '\0';
+  int last_status = MG_ERROR_TRANSIENT_ERROR;
+
+  // Two attempts: the second runs against a freshly refreshed table, in case
+  // the topology changed (e.g. a failover) since it was cached.
+  for (int attempt = 0; attempt < 2; ++attempt) {
+    if (!router->table || time(NULL) >= router->expires_at) {
+      int status = mg_router_refresh(router);
+      if (status != 0) {
+        last_status = status;  // error already recorded by refresh.
+      }
+    }
+
+    mg_addr_list candidates;
+    memset(&candidates, 0, sizeof(candidates));
+    mg_routing_select_targets(router->table, role, router->resolver,
+                              router->resolver_data, &router->read_index,
+                              &candidates);
+
+    if (candidates.size == 0) {
+      char message[128];
+      snprintf(message, sizeof(message), "no %s server in the routing table",
+               role_name(role));
+      router_set_error(router, message);
+      last_status = MG_ERROR_TRANSIENT_ERROR;
+    } else {
+      for (uint32_t i = 0; i < candidates.size; ++i) {
+        char *host = NULL;
+        uint16_t port = 0;
+        if (split_host_port(candidates.items[i], &host, &port) != 0) {
+          continue;
+        }
+        int status = 0;
+        mg_session *session = router_connect_to(router, host, port, 0, &status);
+        free(host);
+        if (session) {
+          *session_out = session;
+          mg_addr_list_clear(&candidates);
+          return 0;
+        }
+        last_status = status;
+      }
+    }
+    mg_addr_list_clear(&candidates);
+
+    if (attempt == 0) {
+      // The selected servers were unreachable (or none were listed); discard
+      // the cached table and retry against a fresh one.
+      mg_router_refresh(router);
+    }
+  }
+
+  if (router->error[0] == '\0') {
+    char message[128];
+    snprintf(message, sizeof(message), "could not connect to any %s server",
+             role_name(role));
+    router_set_error(router, message);
+  }
+  return last_status;
+}
+
+int mg_router_connect_read(mg_router *router, mg_session **session) {
+  return router_connect_role(router, MG_ROUTING_ROLE_READ, session);
+}
+
+int mg_router_connect_write(mg_router *router, mg_session **session) {
+  return router_connect_role(router, MG_ROUTING_ROLE_WRITE, session);
 }
