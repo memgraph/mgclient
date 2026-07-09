@@ -375,28 +375,28 @@ INSTANTIATE_TEST_SUITE_P(Null, ValueTest, ::testing::ValuesIn(NullTestCases()));
 INSTANTIATE_TEST_SUITE_P(Bool, ValueTest, ::testing::ValuesIn(BoolTestCases()));
 
 INSTANTIATE_TEST_SUITE_P(Integer, ValueTest,
-                        ::testing::ValuesIn(IntegerTestCases()));
+                         ::testing::ValuesIn(IntegerTestCases()));
 
 INSTANTIATE_TEST_SUITE_P(Float, ValueTest,
-                        ::testing::ValuesIn(FloatTestCases()));
+                         ::testing::ValuesIn(FloatTestCases()));
 
 INSTANTIATE_TEST_SUITE_P(String, ValueTest,
-                        ::testing::ValuesIn(StringTestCases()));
+                         ::testing::ValuesIn(StringTestCases()));
 
 INSTANTIATE_TEST_SUITE_P(List, ValueTest, ::testing::ValuesIn(ListTestCases()));
 
 INSTANTIATE_TEST_SUITE_P(Date, ValueTest, ::testing::ValuesIn(DateTestCases()));
 
 INSTANTIATE_TEST_SUITE_P(LocalTime, ValueTest,
-                        ::testing::ValuesIn(LocalTimeTestCases()));
+                         ::testing::ValuesIn(LocalTimeTestCases()));
 
 INSTANTIATE_TEST_SUITE_P(LocalDateTime, ValueTest,
-                        ::testing::ValuesIn(LocalDateTimeTestCases()));
+                         ::testing::ValuesIn(LocalDateTimeTestCases()));
 
 INSTANTIATE_TEST_SUITE_P(DateTime, ValueTest,
-                        ::testing::ValuesIn(DateTimeTestCases()));
+                         ::testing::ValuesIn(DateTimeTestCases()));
 
 INSTANTIATE_TEST_SUITE_P(Duration, ValueTest,
-                        ::testing::ValuesIn((DurationTestCases())));
+                         ::testing::ValuesIn((DurationTestCases())));
 
 INSTANTIATE_TEST_SUITE_P(Map, ValueTest, ::testing::ValuesIn(MapTestCases()));
