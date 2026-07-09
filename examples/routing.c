@@ -67,8 +67,9 @@ static int write_greeting(mg_session *session, void *data) {
 // A managed *read*: read the greeting text back into the caller's buffer.
 static int read_greeting(mg_session *session, void *data) {
   char *out = (char *)data;
-  int status = mg_session_run(session, "MATCH (n:Greeting {id: 1}) RETURN n.text",
-                              NULL, NULL, NULL, NULL);
+  int status =
+      mg_session_run(session, "MATCH (n:Greeting {id: 1}) RETURN n.text", NULL,
+                     NULL, NULL, NULL);
   if (status != 0) {
     return status;
   }
