@@ -1485,15 +1485,6 @@ MGCLIENT_EXPORT const char *mg_routing_table_address_at(
 /// errors, SSL errors, and the client/database error categories) return 0.
 MGCLIENT_EXPORT int mg_error_is_transient(int error);
 
-/// Returns non-zero if \p message reports a write that committed on the main
-/// but could not be replicated to a synchronous replica.
-///
-/// Such a write is durable, so it is safe to treat as success rather than
-/// retry it (a retry would duplicate it). This is the one condition that has no
-/// distinct error code and must be recognised from the message text (e.g. as
-/// returned by \ref mg_session_error). \p message may be NULL (returns 0).
-MGCLIENT_EXPORT int mg_error_is_committed_on_main(const char *message);
-
 /// An opaque accumulator to which a \ref mg_resolver_fn appends the candidate
 /// "host:port" targets that an advertised address resolves to.
 typedef struct mg_resolver_result mg_resolver_result;
@@ -1672,9 +1663,7 @@ MGCLIENT_EXPORT int mg_router_execute_read(mg_router *router, mg_work_fn work,
 ///
 /// Like \ref mg_router_execute_read, but routed to the main and wrapped in an
 /// explicit transaction that execute begins before \p work and commits after
-/// it. A write that committed on the main but could not reach a SYNC replica is
-/// durable, so it is treated as success and NOT retried (a retry would
-/// duplicate the write); see \ref mg_error_is_committed_on_main.
+/// it.
 MGCLIENT_EXPORT int mg_router_execute_write(mg_router *router, mg_work_fn work,
                                             void *work_data);
 

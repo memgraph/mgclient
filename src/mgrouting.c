@@ -15,7 +15,6 @@
 #include "mgrouting.h"
 #include "mgclient.h"
 
-#include <ctype.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -189,34 +188,6 @@ int mg_error_is_transient(int error) {
     default:
       return 0;
   }
-}
-
-// Case-insensitive substring search. `needle` is matched regardless of case;
-// strcasestr is a non-standard extension so we roll our own for portability.
-static int contains_ci(const char *haystack, const char *needle) {
-  if (!haystack || !needle) {
-    return 0;
-  }
-  size_t needle_len = strlen(needle);
-  if (needle_len == 0) {
-    return 1;
-  }
-  for (const char *h = haystack; *h; ++h) {
-    size_t i = 0;
-    while (i < needle_len && h[i] &&
-           tolower((unsigned char)h[i]) == tolower((unsigned char)needle[i])) {
-      ++i;
-    }
-    if (i == needle_len) {
-      return 1;
-    }
-  }
-  return 0;
-}
-
-int mg_error_is_committed_on_main(const char *message) {
-  return contains_ci(message, "replication exception") &&
-         contains_ci(message, "committed on the main");
 }
 
 // ---------------------------------------------------------------------------
@@ -821,13 +792,7 @@ static int router_run_unit(mg_router *router, mg_session *session, int writing,
     mg_result *result = NULL;
     status = mg_session_commit_transaction(session, &result);
     if (status != 0) {
-      const char *message = mg_session_error(session);
-      if (mg_error_is_committed_on_main(message)) {
-        // The write is durable on the main; a retry would duplicate it, so
-        // report success even though the SYNC-replica guarantee was not met.
-        return 0;
-      }
-      router_set_error(router, message);
+      router_set_error(router, mg_session_error(session));
       return status;
     }
   }
