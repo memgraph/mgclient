@@ -165,8 +165,101 @@ jobs:
           sleep 5
           docker logs memgraphcontainer
 
+      - name: Run Memgraph HA Cluster
+        env:
+          MEMGRAPH_ENTERPRISE_LICENSE: ${{ secrets.MEMGRAPH_ENTERPRISE_LICENSE }}
+          MEMGRAPH_ORGANIZATION_NAME: ${{ secrets.MEMGRAPH_ORGANIZATION_NAME }}
+        run: |
+          # High availability is a Memgraph Enterprise feature. The license
+          # secrets are unavailable on PRs from forks, so skip the cluster (and
+          # the routing tests, which GTEST_SKIP when the coordinator env vars are
+          # unset) with a warning rather than failing the whole build.
+          if [ -z "$MEMGRAPH_ENTERPRISE_LICENSE" ] || [ -z "$MEMGRAPH_ORGANIZATION_NAME" ]; then
+            echo "::warning::Memgraph enterprise license secrets are not set; skipping the HA cluster and the routing tests."
+            exit 0
+          fi
+
+          net="${{ env.MEMGRAPH_NETWORK }}"
+          lic=(-e "MEMGRAPH_ENTERPRISE_LICENSE=$MEMGRAPH_ENTERPRISE_LICENSE" \
+               -e "MEMGRAPH_ORGANIZATION_NAME=$MEMGRAPH_ORGANIZATION_NAME")
+
+          # Three data instances. On host networking every container shares
+          # localhost, so each needs a distinct set of ports (the single
+          # instance above already holds 7687).
+          docker run -d --rm --name mg-data1 --network "$net" "${lic[@]}" memgraph/memgraph \
+            --bolt-port=7688 --management-port=13011 --telemetry-enabled=false
+          docker run -d --rm --name mg-data2 --network "$net" "${lic[@]}" memgraph/memgraph \
+            --bolt-port=7689 --management-port=13012 --telemetry-enabled=false
+          docker run -d --rm --name mg-data3 --network "$net" "${lic[@]}" memgraph/memgraph \
+            --bolt-port=7690 --management-port=13013 --telemetry-enabled=false
+
+          # Three coordinators for a Raft quorum. mg-coord1 is the bootstrap
+          # leader; the others are added during registration below.
+          docker run -d --rm --name mg-coord1 --network "$net" "${lic[@]}" memgraph/memgraph \
+            --bolt-port=7691 --coordinator-id=1 --coordinator-port=12121 \
+            --coordinator-hostname=127.0.0.1 --management-port=13021 --telemetry-enabled=false
+          docker run -d --rm --name mg-coord2 --network "$net" "${lic[@]}" memgraph/memgraph \
+            --bolt-port=7692 --coordinator-id=2 --coordinator-port=12122 \
+            --coordinator-hostname=127.0.0.1 --management-port=13022 --telemetry-enabled=false
+          docker run -d --rm --name mg-coord3 --network "$net" "${lic[@]}" memgraph/memgraph \
+            --bolt-port=7693 --coordinator-id=3 --coordinator-port=12123 \
+            --coordinator-hostname=127.0.0.1 --management-port=13023 --telemetry-enabled=false
+
+          # Fail early (with logs) if any container didn't come up, rather than
+          # as an opaque connection error later.
+          sleep 10
+          for name in mg-data1 mg-data2 mg-data3 mg-coord1 mg-coord2 mg-coord3; do
+            if [ "$(docker inspect -f '{{.State.Running}}' "$name" 2>/dev/null)" != "true" ]; then
+              echo "::error::Memgraph HA container $name is not running"
+              docker logs "$name" || true
+              exit 1
+            fi
+          done
+
+          # Register the topology on the bootstrap coordinator (mg-coord1),
+          # using the mgconsole binary bundled in the memgraph image. Addresses
+          # are 127.0.0.1:<port> because every container is on host networking
+          # and therefore reachable there.
+          printf '%s\n' \
+            'ADD COORDINATOR 2 WITH CONFIG {"bolt_server": "127.0.0.1:7692", "coordinator_server": "127.0.0.1:12122", "management_server": "127.0.0.1:13022"};' \
+            'ADD COORDINATOR 3 WITH CONFIG {"bolt_server": "127.0.0.1:7693", "coordinator_server": "127.0.0.1:12123", "management_server": "127.0.0.1:13023"};' \
+            'REGISTER INSTANCE instance_1 WITH CONFIG {"bolt_server": "127.0.0.1:7688", "management_server": "127.0.0.1:13011", "replication_server": "127.0.0.1:10001"};' \
+            'REGISTER INSTANCE instance_2 WITH CONFIG {"bolt_server": "127.0.0.1:7689", "management_server": "127.0.0.1:13012", "replication_server": "127.0.0.1:10002"};' \
+            'REGISTER INSTANCE instance_3 WITH CONFIG {"bolt_server": "127.0.0.1:7690", "management_server": "127.0.0.1:13013", "replication_server": "127.0.0.1:10003"};' \
+            'SET INSTANCE instance_1 TO MAIN;' \
+            | docker exec -i mg-coord1 mgconsole --host 127.0.0.1 --port 7691
+
+          # Wait for the cluster to converge before letting the tests run: the
+          # coordinator must advertise a main (WRITE) and at least one replica.
+          converged=false
+          for _ in $(seq 1 60); do
+            instances="$(echo 'SHOW INSTANCES;' \
+              | docker exec -i mg-coord1 mgconsole --host 127.0.0.1 --port 7691 2>/dev/null || true)"
+            if echo "$instances" | grep -qiw main && echo "$instances" | grep -qiw replica; then
+              converged=true
+              break
+            fi
+            sleep 1
+          done
+          if [ "$converged" != "true" ]; then
+            echo "::error::HA cluster did not converge"
+            echo "$instances"
+            exit 1
+          fi
+
+          # Tell the test steps to run the routing tests against mg-coord1.
+          echo "MEMGRAPH_HA_COORDINATOR_HOST=127.0.0.1" >> "$GITHUB_ENV"
+          echo "MEMGRAPH_HA_COORDINATOR_PORT=7691" >> "$GITHUB_ENV"
+
       - name: Build with gcc, test and install mgclient
         run: |
+          # Forward the HA coordinator env vars into the container only when the
+          # cluster is up; when unset the routing tests GTEST_SKIP.
+          ha_env=()
+          if [ -n "${MEMGRAPH_HA_COORDINATOR_HOST:-}" ]; then
+            ha_env=(-e "MEMGRAPH_HA_COORDINATOR_HOST=${MEMGRAPH_HA_COORDINATOR_HOST}" \
+                    -e "MEMGRAPH_HA_COORDINATOR_PORT=${MEMGRAPH_HA_COORDINATOR_PORT}")
+          fi
           cmake_configure="cmake \
             -DCMAKE_C_COMPILER=gcc${{ matrix.gcc-postfix }} \
             -DCMAKE_CXX_COMPILER=g++${{ matrix.gcc-postfix }} \
@@ -177,7 +270,7 @@ jobs:
             -DCPP_WARNINGS_AS_ERRORS=ON \
             .."
 
-          docker exec -i testcontainer bash -c "
+          docker exec -i "${ha_env[@]}" testcontainer bash -c "
             mkdir /mgclient/build-gcc &&
             cd /mgclient/build-gcc &&
             $cmake_configure &&
@@ -187,6 +280,13 @@ jobs:
 
       - name: Build with clang, test and install mgclient
         run: |
+          # Forward the HA coordinator env vars into the container only when the
+          # cluster is up; when unset the routing tests GTEST_SKIP.
+          ha_env=()
+          if [ -n "${MEMGRAPH_HA_COORDINATOR_HOST:-}" ]; then
+            ha_env=(-e "MEMGRAPH_HA_COORDINATOR_HOST=${MEMGRAPH_HA_COORDINATOR_HOST}" \
+                    -e "MEMGRAPH_HA_COORDINATOR_PORT=${MEMGRAPH_HA_COORDINATOR_PORT}")
+          fi
           cmake_configure="cmake \
             -DCMAKE_C_COMPILER=clang${{ matrix.clang-postfix }} \
             -DCMAKE_CXX_COMPILER=clang++${{ matrix.clang-postfix }} \
@@ -197,7 +297,7 @@ jobs:
             -DCPP_WARNINGS_AS_ERRORS=ON \
           .."
 
-          docker exec -i testcontainer bash -c "
+          docker exec -i "${ha_env[@]}" testcontainer bash -c "
             mkdir /mgclient/build-clang &&
             cd /mgclient/build-clang &&
             $cmake_configure &&
@@ -210,6 +310,9 @@ jobs:
         run: |
           docker stop testcontainer || echo "testcontainer already stopped"
           docker stop memgraphcontainer || echo "memgraphcontainer already stopped"
+          for name in mg-data1 mg-data2 mg-data3 mg-coord1 mg-coord2 mg-coord3; do
+            docker stop "$name" || echo "$name already stopped"
+          done
           docker wait testcontainer || true
           docker wait memgraphcontainer || true
           docker rm "${{ env.MEMGRAPH_NETWORK }}" || echo "network already removed"
