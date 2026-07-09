@@ -367,63 +367,56 @@ TEST_P(ValueTest, Decoding) {
   ASSERT_MEMORY_OK();
 }
 
-INSTANTIATE_TEST_CASE_P(Null, ValueTest,
-                        ::testing::ValuesIn(NullTestCases()));
+INSTANTIATE_TEST_SUITE_P(Null, ValueTest, ::testing::ValuesIn(NullTestCases()));
 
-INSTANTIATE_TEST_CASE_P(Bool, ValueTest,
-                        ::testing::ValuesIn(BoolTestCases()));
+INSTANTIATE_TEST_SUITE_P(Bool, ValueTest, ::testing::ValuesIn(BoolTestCases()));
 
-INSTANTIATE_TEST_CASE_P(Integer, ValueTest,
+INSTANTIATE_TEST_SUITE_P(Integer, ValueTest,
                         ::testing::ValuesIn(IntegerTestCases()));
 
-INSTANTIATE_TEST_CASE_P(Float, ValueTest,
+INSTANTIATE_TEST_SUITE_P(Float, ValueTest,
                         ::testing::ValuesIn(FloatTestCases()));
 
-INSTANTIATE_TEST_CASE_P(String, ValueTest,
+INSTANTIATE_TEST_SUITE_P(String, ValueTest,
                         ::testing::ValuesIn(StringTestCases()));
 
-INSTANTIATE_TEST_CASE_P(List, ValueTest,
-                        ::testing::ValuesIn(ListTestCases()));
+INSTANTIATE_TEST_SUITE_P(List, ValueTest, ::testing::ValuesIn(ListTestCases()));
 
-INSTANTIATE_TEST_CASE_P(Map, ValueTest, ::testing::ValuesIn(MapTestCases()));
+INSTANTIATE_TEST_SUITE_P(Map, ValueTest, ::testing::ValuesIn(MapTestCases()));
 
-INSTANTIATE_TEST_CASE_P(Node, ValueTest,
-                        ::testing::ValuesIn(NodeTestCases()));
+INSTANTIATE_TEST_SUITE_P(Node, ValueTest, ::testing::ValuesIn(NodeTestCases()));
 
-INSTANTIATE_TEST_CASE_P(Relationship, ValueTest,
+INSTANTIATE_TEST_SUITE_P(Relationship, ValueTest,
                         ::testing::ValuesIn(RelationshipTestCases()));
 
-INSTANTIATE_TEST_CASE_P(UnboundRelationship, ValueTest,
+INSTANTIATE_TEST_SUITE_P(UnboundRelationship, ValueTest,
                         ::testing::ValuesIn(UnboundRelationshipTestCases()));
 
-INSTANTIATE_TEST_CASE_P(Path, ValueTest,
-                        ::testing::ValuesIn(PathTestCases()));
+INSTANTIATE_TEST_SUITE_P(Path, ValueTest, ::testing::ValuesIn(PathTestCases()));
 
-INSTANTIATE_TEST_CASE_P(Date, ValueTest,
-                        ::testing::ValuesIn(DateTestCases()));
+INSTANTIATE_TEST_SUITE_P(Date, ValueTest, ::testing::ValuesIn(DateTestCases()));
 
-INSTANTIATE_TEST_CASE_P(Time, ValueTest,
-                        ::testing::ValuesIn(TimeTestCases()));
+INSTANTIATE_TEST_SUITE_P(Time, ValueTest, ::testing::ValuesIn(TimeTestCases()));
 
-INSTANTIATE_TEST_CASE_P(LocalTime, ValueTest,
+INSTANTIATE_TEST_SUITE_P(LocalTime, ValueTest,
                         ::testing::ValuesIn(LocalTimeTestCases()));
 
-INSTANTIATE_TEST_CASE_P(DateTime, ValueTest,
+INSTANTIATE_TEST_SUITE_P(DateTime, ValueTest,
                         ::testing::ValuesIn(DateTimeTestCases()));
 
-INSTANTIATE_TEST_CASE_P(DateTimeZoneId, ValueTest,
+INSTANTIATE_TEST_SUITE_P(DateTimeZoneId, ValueTest,
                         ::testing::ValuesIn(DateTimeZoneIdTestCases()));
 
-INSTANTIATE_TEST_CASE_P(LocalDateTime, ValueTest,
+INSTANTIATE_TEST_SUITE_P(LocalDateTime, ValueTest,
                         ::testing::ValuesIn(LocalDateTimeTestCases()));
 
-INSTANTIATE_TEST_CASE_P(Duration, ValueTest,
+INSTANTIATE_TEST_SUITE_P(Duration, ValueTest,
                         ::testing::ValuesIn(DurationTestCases()));
 
-INSTANTIATE_TEST_CASE_P(Point2d, ValueTest,
+INSTANTIATE_TEST_SUITE_P(Point2d, ValueTest,
                         ::testing::ValuesIn(Point2dTestCases()));
 
-INSTANTIATE_TEST_CASE_P(Point3d, ValueTest,
+INSTANTIATE_TEST_SUITE_P(Point3d, ValueTest,
                         ::testing::ValuesIn(Point3dTestCases()));
 
 // TODO(mtomic): When these tests fail, just a bunch of bytes is outputted, we
@@ -460,7 +453,7 @@ TEST_P(IntegerFailure, Test) {
   ASSERT_MEMORY_OK();
 }
 
-INSTANTIATE_TEST_CASE_P(
+INSTANTIATE_TEST_SUITE_P(
     Test, IntegerFailure,
     ::testing::ValuesIn({""s, "\xC8"s, "\xC9\x01"s, "\xCA\x01\x02\x03"s,
                          "\xCB\x01\x02\x03\x04\x05\x06\x07"s, "\xCC"s}));
@@ -487,8 +480,7 @@ TEST_P(BoolFailure, Test) {
   ASSERT_MEMORY_OK();
 }
 
-INSTANTIATE_TEST_CASE_P(Test, BoolFailure,
-                        ::testing::ValuesIn({""s, "\xCC"s}));
+INSTANTIATE_TEST_SUITE_P(Test, BoolFailure, ::testing::ValuesIn({""s, "\xCC"s}));
 
 class FloatFailure : public DecodingFailure {};
 
@@ -512,7 +504,7 @@ TEST_P(FloatFailure, Test) {
   ASSERT_MEMORY_OK();
 }
 
-INSTANTIATE_TEST_CASE_P(
+INSTANTIATE_TEST_SUITE_P(
     Test, FloatFailure,
     ::testing::ValuesIn({""s, "\xCC"s, "\xC1\x01\x02\x03\x04\x05\x06\x07"s}));
 
@@ -538,7 +530,7 @@ TEST_P(StringFailure, Test) {
   ASSERT_MEMORY_OK();
 }
 
-INSTANTIATE_TEST_CASE_P(Test, StringFailure,
+INSTANTIATE_TEST_SUITE_P(Test, StringFailure,
                         ::testing::ValuesIn({""s, "\xCC"s, "\xD0"s, "\xD1\x01"s,
                                              "\xD2\x01\x02\x03"s,
                                              "\x85pqrs"s}));
@@ -565,7 +557,7 @@ TEST_P(ListFailure, Test) {
   ASSERT_MEMORY_OK();
 }
 
-INSTANTIATE_TEST_CASE_P(Test, ListFailure,
+INSTANTIATE_TEST_SUITE_P(Test, ListFailure,
                         ::testing::ValuesIn({""s, "\xCC"s, "\xD4"s, "\xD5\x01"s,
                                              "\xD6\x01\x02\x03"s,
                                              "\x93\x01\x02"s,
@@ -593,12 +585,11 @@ TEST_P(MapFailure, Test) {
   ASSERT_MEMORY_OK();
 }
 
-INSTANTIATE_TEST_CASE_P(
-    Test, MapFailure,
-    ::testing::ValuesIn({""s, "\xCC"s, "\xD8"s, "\xD9\x01"s,
-                         "\xDA\x01\x02\x03"s,
-                         "\xA3\x81x\x01\x81y\xCC\x81z\x03"s,
-                         "\xA3\x81x\x01\x81y\x02\x85z"s}));
+INSTANTIATE_TEST_SUITE_P(Test, MapFailure,
+                        ::testing::ValuesIn({""s, "\xCC"s, "\xD8"s, "\xD9\x01"s,
+                                             "\xDA\x01\x02\x03"s,
+                                             "\xA3\x81x\x01\x81y\xCC\x81z\x03"s,
+                                             "\xA3\x81x\x01\x81y\x02\x85z"s}));
 
 class NodeFailure : public DecodingFailure {};
 
@@ -622,7 +613,7 @@ TEST_P(NodeFailure, Test) {
   ASSERT_MEMORY_OK();
 }
 
-INSTANTIATE_TEST_CASE_P(
+INSTANTIATE_TEST_SUITE_P(
     Test, NodeFailure,
     ::testing::ValuesIn({""s, "\xB2\x4E"s, "\xB3\x5E"s, "\xB3\x4E"s,
                          "\xB3\x4E\xCC"s, "\xB3\x4E\x01\x95\x82L1\xCC"s,
@@ -650,7 +641,7 @@ TEST_P(RelationshipFailure, Test) {
   ASSERT_MEMORY_OK();
 }
 
-INSTANTIATE_TEST_CASE_P(
+INSTANTIATE_TEST_SUITE_P(
     Test, RelationshipFailure,
     ::testing::ValuesIn({""s, "\xB2\x52"s, "\xB5\x02"s, "\xB5\x52"s,
                          "\xB5\x52\xCC"s, "\xB5\x52\x01\xCC"s,
@@ -679,7 +670,7 @@ TEST_P(UnboundRelationshipFailure, Test) {
   ASSERT_MEMORY_OK();
 }
 
-INSTANTIATE_TEST_CASE_P(Test, UnboundRelationshipFailure,
+INSTANTIATE_TEST_SUITE_P(Test, UnboundRelationshipFailure,
                         ::testing::ValuesIn({""s, "\xB2\x72"s, "\xB3\x02"s,
                                              "\xB3\x72"s, "\xB3\x72\xCC"s,
                                              "\xB3\x72\x01\xCC"s,
@@ -707,7 +698,7 @@ TEST_P(PathFailure, Test) {
   ASSERT_MEMORY_OK();
 }
 
-INSTANTIATE_TEST_CASE_P(
+INSTANTIATE_TEST_SUITE_P(
     Test, PathFailure,
     ::testing::ValuesIn(
         {""s, "\xB2\x50"s, "\xB3\x02"s, "\xB3\x50"s, "\xB3\x50\x92"s,

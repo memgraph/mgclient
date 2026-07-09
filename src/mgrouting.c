@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "mgclient.h"
 #include "mgrouting.h"
+#include "mgclient.h"
 
 #include <ctype.h>
 #include <stddef.h>
@@ -114,8 +114,7 @@ mg_routing_table *mg_routing_table_parse(const mg_map *raw) {
       }
 
       const mg_value *addresses = mg_map_at(server, "addresses");
-      if (!addresses ||
-          mg_value_get_type(addresses) != MG_VALUE_TYPE_LIST) {
+      if (!addresses || mg_value_get_type(addresses) != MG_VALUE_TYPE_LIST) {
         continue;
       }
       const mg_list *address_list = mg_value_list(addresses);
@@ -127,7 +126,7 @@ mg_routing_table *mg_routing_table_parse(const mg_map *raw) {
         }
         const mg_string *str = mg_value_string(address);
         if (addr_list_append(&table->roles[role], mg_string_data(str),
-                              mg_string_size(str)) != 0) {
+                             mg_string_size(str)) != 0) {
           mg_routing_table_destroy(table);
           return NULL;
         }
@@ -404,7 +403,8 @@ void mg_router_destroy(mg_router *router) {
 }
 
 // ---------------------------------------------------------------------------
-// Refresh: fetch, parse and cache the routing table (with coordinator failover).
+// Refresh: fetch, parse and cache the routing table (with coordinator
+// failover).
 // ---------------------------------------------------------------------------
 
 struct mg_resolver_result {
@@ -466,8 +466,7 @@ static int split_host_port(const char *address, char **host_out,
 }
 
 static void router_set_error(mg_router *router, const char *message) {
-  snprintf(router->error, sizeof(router->error), "%s",
-           message ? message : "");
+  snprintf(router->error, sizeof(router->error), "%s", message ? message : "");
 }
 
 // Open a connection using the router's connection template, directed at
@@ -515,7 +514,8 @@ static mg_session *router_connect_to(mg_router *router, const char *host,
 }
 
 // Send ROUTE on an established coordinator session, parse the result, and cache
-// it (replacing any previous table and resetting the TTL). Returns 0 on success.
+// it (replacing any previous table and resetting the TTL). Returns 0 on
+// success.
 static int refresh_from_session(mg_router *router, mg_session *session) {
   mg_map *empty_context = NULL;
   const mg_map *routing = router->routing_context;
@@ -559,9 +559,8 @@ int mg_router_refresh(mg_router *router) {
         router->seed_host ? router->seed_host : router->seed_address;
     int use_address = router->seed_host == NULL;
     int status = 0;
-    mg_session *session = router_connect_to(router, seed_host,
-                                            router->seed_port, use_address,
-                                            &status);
+    mg_session *session = router_connect_to(
+        router, seed_host, router->seed_port, use_address, &status);
     if (session) {
       status = refresh_from_session(router, session);
       mg_session_destroy(session);
@@ -871,7 +870,8 @@ static int router_execute(mg_router *router, enum mg_routing_role role,
   return last_status;
 }
 
-int mg_router_execute_read(mg_router *router, mg_work_fn work, void *work_data) {
+int mg_router_execute_read(mg_router *router, mg_work_fn work,
+                           void *work_data) {
   return router_execute(router, MG_ROUTING_ROLE_READ, work, work_data);
 }
 

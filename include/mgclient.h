@@ -1505,7 +1505,7 @@ typedef struct mg_resolver_result mg_resolver_result;
 /// \return 0 on success, or \ref MG_ERROR_OOM if the copy could not be
 ///         allocated.
 MGCLIENT_EXPORT int mg_resolver_result_add(mg_resolver_result *result,
-                                            const char *target);
+                                           const char *target);
 
 /// Maps an advertised "host:port" address from the routing table to zero or
 /// more reachable "host:port" targets.
@@ -1569,9 +1569,8 @@ MGCLIENT_EXPORT void mg_router_config_set_max_retries(mg_router_config *config,
 /// ``min(base_seconds * 2^(N-1), cap_seconds)``. The defaults are
 /// ``base_seconds = 1.0`` and ``cap_seconds = 15.0``. A ``base_seconds`` of 0
 /// disables waiting between attempts.
-MGCLIENT_EXPORT void mg_router_config_set_retry_backoff(mg_router_config *config,
-                                                        double base_seconds,
-                                                        double cap_seconds);
+MGCLIENT_EXPORT void mg_router_config_set_retry_backoff(
+    mg_router_config *config, double base_seconds, double cap_seconds);
 
 /// A client-side routing engine for a Memgraph high-availability cluster.
 ///
@@ -1605,7 +1604,8 @@ MGCLIENT_EXPORT void mg_router_destroy(mg_router *router);
 /// used (refreshing it if it is missing or expired), the role's replicas are
 /// tried in round-robin order, and if all are unreachable the table is
 /// refreshed once and the attempt retried. A failover condition (no reachable
-/// replica) yields a transient-classified code (see \ref mg_error_is_transient).
+/// replica) yields a transient-classified code (see \ref
+/// mg_error_is_transient).
 MGCLIENT_EXPORT int mg_router_connect_read(mg_router *router,
                                            mg_session **session);
 

@@ -34,8 +34,8 @@ extern "C" int CollapseResolver(const char *advertised,
 // Resolver that remaps advertised addresses per MEMGRAPH_HA_ADDRESS_MAP
 // ("adv1=target1,adv2=target2,..."), falling back to identity. Lets the
 // cluster-gated tests reach a Kubernetes cluster through kubectl port-forwards.
-extern "C" int EnvMapResolver(const char *advertised, mg_resolver_result *result,
-                              void *data) {
+extern "C" int EnvMapResolver(const char *advertised,
+                              mg_resolver_result *result, void *data) {
   (void)data;
   const char *map = std::getenv("MEMGRAPH_HA_ADDRESS_MAP");
   if (map) {
@@ -82,8 +82,9 @@ static int DrainResults(mg_session *session) {
 // mg_router_execute_write owns the transaction boundary.
 extern "C" int WriteNoOpWork(mg_session *session, void *data) {
   (void)data;
-  int status = mg_session_run(session, "CREATE (n:_MgRouterExecuteTest) DELETE n",
-                              nullptr, nullptr, nullptr, nullptr);
+  int status =
+      mg_session_run(session, "CREATE (n:_MgRouterExecuteTest) DELETE n",
+                     nullptr, nullptr, nullptr, nullptr);
   if (status != 0) {
     return status;
   }
@@ -95,8 +96,8 @@ extern "C" int WriteNoOpWork(mg_session *session, void *data) {
 
 // A read unit of work: runs "RETURN 1" and stores the value through `data`.
 extern "C" int ReadReturnsOneWork(mg_session *session, void *data) {
-  int status = mg_session_run(session, "RETURN 1", nullptr, nullptr, nullptr,
-                              nullptr);
+  int status =
+      mg_session_run(session, "RETURN 1", nullptr, nullptr, nullptr, nullptr);
   if (status != 0) {
     return status;
   }
@@ -281,10 +282,10 @@ TEST(RouterSelect, ResolverAppliedAndDuplicatesSkipped) {
   uint32_t read_index = 0;
   mg_addr_list out;
   memset(&out, 0, sizeof(out));
-  ASSERT_EQ(mg_routing_select_targets(table, MG_ROUTING_ROLE_READ,
-                                      CollapseResolver, nullptr, &read_index,
-                                      &out),
-            0);
+  ASSERT_EQ(
+      mg_routing_select_targets(table, MG_ROUTING_ROLE_READ, CollapseResolver,
+                                nullptr, &read_index, &out),
+      0);
   // Both replicas resolve to the same target, so it is listed once.
   ASSERT_EQ(out.size, 1u);
   EXPECT_STREQ(out.items[0], "10.0.0.1:7687");
@@ -368,8 +369,9 @@ TEST(RouterRefresh, FailsWhenSeedUnreachable) {
 
   int status = mg_router_refresh(router);
   EXPECT_NE(status, 0);
-  EXPECT_TRUE(mg_error_is_transient(status));  // connection refused is transient
-  EXPECT_STRNE(mg_router_error(router), "");   // a message was recorded
+  EXPECT_TRUE(
+      mg_error_is_transient(status));         // connection refused is transient
+  EXPECT_STRNE(mg_router_error(router), "");  // a message was recorded
   EXPECT_EQ(mg_router_routing_table(router), nullptr);  // nothing cached
 
   mg_router_destroy(router);
@@ -435,7 +437,8 @@ mg_router *MakeRouterWithResolver(const char *host, uint16_t port,
   return router;
 }
 
-// Returns the coordinator port from MEMGRAPH_HA_COORDINATOR_PORT (default 7687).
+// Returns the coordinator port from MEMGRAPH_HA_COORDINATOR_PORT (default
+// 7687).
 uint16_t CoordinatorPort() {
   const char *port_str = std::getenv("MEMGRAPH_HA_COORDINATOR_PORT");
   return port_str ? static_cast<uint16_t>(std::atoi(port_str)) : 7687;
@@ -449,8 +452,8 @@ TEST(RouterConnect, WriteReachesMain) {
   if (!host) {
     GTEST_SKIP() << "set MEMGRAPH_HA_COORDINATOR_HOST to run";
   }
-  mg_router *router = MakeRouterWithResolver(host, CoordinatorPort(),
-                                             EnvMapResolver);
+  mg_router *router =
+      MakeRouterWithResolver(host, CoordinatorPort(), EnvMapResolver);
   ASSERT_NE(router, nullptr);
 
   mg_session *session = nullptr;
@@ -468,8 +471,8 @@ TEST(RouterConnect, ReadReachesReplica) {
   if (!host) {
     GTEST_SKIP() << "set MEMGRAPH_HA_COORDINATOR_HOST to run";
   }
-  mg_router *router = MakeRouterWithResolver(host, CoordinatorPort(),
-                                             EnvMapResolver);
+  mg_router *router =
+      MakeRouterWithResolver(host, CoordinatorPort(), EnvMapResolver);
   ASSERT_NE(router, nullptr);
 
   mg_session *session = nullptr;
@@ -484,7 +487,8 @@ TEST(RouterConnect, ReadReachesReplica) {
 
 TEST(ErrorClassification, CommittedOnMainNeedsBothMarkers) {
   const char *committed =
-      "Replication Exception: Failed to replicate to SYNC replica 'instance_1': "
+      "Replication Exception: Failed to replicate to SYNC replica "
+      "'instance_1': "
       "replica is not reachable or not in sync with the main. Transaction is "
       "still committed on the main instance and other alive replicas.";
   EXPECT_TRUE(mg_error_is_committed_on_main(committed));
@@ -532,7 +536,8 @@ TEST(RoutingTable, ParseIgnoresMalformedEntries) {
   {
     mg_map *bad_addrs = mg_map_make_empty(2);
     mg_map_insert(bad_addrs, "role", mg_value_make_string("WRITE"));
-    mg_map_insert(bad_addrs, "addresses", mg_value_make_integer(1));  // not a list
+    mg_map_insert(bad_addrs, "addresses",
+                  mg_value_make_integer(1));  // not a list
     mg_list_append(servers, mg_value_make_map(bad_addrs));
   }
   // A valid server survives alongside the malformed ones.
@@ -564,18 +569,22 @@ TEST(RouterBackoff, CappedExponential) {
   EXPECT_DOUBLE_EQ(mg_router_backoff_seconds(3, 1.0, 15.0), 4.0);
   EXPECT_DOUBLE_EQ(mg_router_backoff_seconds(4, 1.0, 15.0), 8.0);
   EXPECT_DOUBLE_EQ(mg_router_backoff_seconds(5, 1.0, 15.0), 15.0);  // capped
-  EXPECT_DOUBLE_EQ(mg_router_backoff_seconds(9, 1.0, 15.0), 15.0);  // stays capped
+  EXPECT_DOUBLE_EQ(mg_router_backoff_seconds(9, 1.0, 15.0),
+                   15.0);  // stays capped
 }
 
 TEST(RouterBackoff, EdgeCases) {
-  EXPECT_DOUBLE_EQ(mg_router_backoff_seconds(0, 1.0, 15.0), 0.0);  // no attempt 0
+  EXPECT_DOUBLE_EQ(mg_router_backoff_seconds(0, 1.0, 15.0),
+                   0.0);  // no attempt 0
   EXPECT_DOUBLE_EQ(mg_router_backoff_seconds(1, 0.0, 15.0), 0.0);  // zero base
-  EXPECT_DOUBLE_EQ(mg_router_backoff_seconds(3, 2.5, 5.0), 5.0);   // 2.5,5,capped
+  EXPECT_DOUBLE_EQ(mg_router_backoff_seconds(3, 2.5, 5.0),
+                   5.0);  // 2.5,5,capped
 }
 
 namespace {
 mg_router *MakeRouterWithRetries(const char *host, uint16_t port,
-                                 uint32_t max_retries, double base, double cap) {
+                                 uint32_t max_retries, double base,
+                                 double cap) {
   mg_router_config *config = mg_router_config_make();
   mg_session_params *params = SeedParams(host, port);
   mg_router_config_set_session_params(config, params);
