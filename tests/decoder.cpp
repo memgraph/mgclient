@@ -1,4 +1,4 @@
-// Copyright (c) 2016-2020 Memgraph Ltd. [https://memgraph.com]
+// Copyright (c) 2016-2026 Memgraph Ltd. [https://memgraph.com]
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -368,63 +368,63 @@ TEST_P(ValueTest, Decoding) {
 }
 
 INSTANTIATE_TEST_CASE_P(Null, ValueTest,
-                        ::testing::ValuesIn(NullTestCases()), );
+                        ::testing::ValuesIn(NullTestCases()));
 
 INSTANTIATE_TEST_CASE_P(Bool, ValueTest,
-                        ::testing::ValuesIn(BoolTestCases()), );
+                        ::testing::ValuesIn(BoolTestCases()));
 
 INSTANTIATE_TEST_CASE_P(Integer, ValueTest,
-                        ::testing::ValuesIn(IntegerTestCases()), );
+                        ::testing::ValuesIn(IntegerTestCases()));
 
 INSTANTIATE_TEST_CASE_P(Float, ValueTest,
-                        ::testing::ValuesIn(FloatTestCases()), );
+                        ::testing::ValuesIn(FloatTestCases()));
 
 INSTANTIATE_TEST_CASE_P(String, ValueTest,
-                        ::testing::ValuesIn(StringTestCases()), );
+                        ::testing::ValuesIn(StringTestCases()));
 
 INSTANTIATE_TEST_CASE_P(List, ValueTest,
-                        ::testing::ValuesIn(ListTestCases()), );
+                        ::testing::ValuesIn(ListTestCases()));
 
-INSTANTIATE_TEST_CASE_P(Map, ValueTest, ::testing::ValuesIn(MapTestCases()), );
+INSTANTIATE_TEST_CASE_P(Map, ValueTest, ::testing::ValuesIn(MapTestCases()));
 
 INSTANTIATE_TEST_CASE_P(Node, ValueTest,
-                        ::testing::ValuesIn(NodeTestCases()), );
+                        ::testing::ValuesIn(NodeTestCases()));
 
 INSTANTIATE_TEST_CASE_P(Relationship, ValueTest,
-                        ::testing::ValuesIn(RelationshipTestCases()), );
+                        ::testing::ValuesIn(RelationshipTestCases()));
 
 INSTANTIATE_TEST_CASE_P(UnboundRelationship, ValueTest,
-                        ::testing::ValuesIn(UnboundRelationshipTestCases()), );
+                        ::testing::ValuesIn(UnboundRelationshipTestCases()));
 
 INSTANTIATE_TEST_CASE_P(Path, ValueTest,
-                        ::testing::ValuesIn(PathTestCases()), );
+                        ::testing::ValuesIn(PathTestCases()));
 
 INSTANTIATE_TEST_CASE_P(Date, ValueTest,
-                        ::testing::ValuesIn(DateTestCases()), );
+                        ::testing::ValuesIn(DateTestCases()));
 
 INSTANTIATE_TEST_CASE_P(Time, ValueTest,
-                        ::testing::ValuesIn(TimeTestCases()), );
+                        ::testing::ValuesIn(TimeTestCases()));
 
 INSTANTIATE_TEST_CASE_P(LocalTime, ValueTest,
-                        ::testing::ValuesIn(LocalTimeTestCases()), );
+                        ::testing::ValuesIn(LocalTimeTestCases()));
 
 INSTANTIATE_TEST_CASE_P(DateTime, ValueTest,
-                        ::testing::ValuesIn(DateTimeTestCases()), );
+                        ::testing::ValuesIn(DateTimeTestCases()));
 
 INSTANTIATE_TEST_CASE_P(DateTimeZoneId, ValueTest,
-                        ::testing::ValuesIn(DateTimeZoneIdTestCases()), );
+                        ::testing::ValuesIn(DateTimeZoneIdTestCases()));
 
 INSTANTIATE_TEST_CASE_P(LocalDateTime, ValueTest,
-                        ::testing::ValuesIn(LocalDateTimeTestCases()), );
+                        ::testing::ValuesIn(LocalDateTimeTestCases()));
 
 INSTANTIATE_TEST_CASE_P(Duration, ValueTest,
-                        ::testing::ValuesIn(DurationTestCases()), );
+                        ::testing::ValuesIn(DurationTestCases()));
 
 INSTANTIATE_TEST_CASE_P(Point2d, ValueTest,
-                        ::testing::ValuesIn(Point2dTestCases()), );
+                        ::testing::ValuesIn(Point2dTestCases()));
 
 INSTANTIATE_TEST_CASE_P(Point3d, ValueTest,
-                        ::testing::ValuesIn(Point3dTestCases()), );
+                        ::testing::ValuesIn(Point3dTestCases()));
 
 // TODO(mtomic): When these tests fail, just a bunch of bytes is outputted, we
 // might want to make this nicer (maybe add names or descriptions to
@@ -463,7 +463,7 @@ TEST_P(IntegerFailure, Test) {
 INSTANTIATE_TEST_CASE_P(
     Test, IntegerFailure,
     ::testing::ValuesIn({""s, "\xC8"s, "\xC9\x01"s, "\xCA\x01\x02\x03"s,
-                         "\xCB\x01\x02\x03\x04\x05\x06\x07"s, "\xCC"s}), );
+                         "\xCB\x01\x02\x03\x04\x05\x06\x07"s, "\xCC"s}));
 
 class BoolFailure : public DecodingFailure {};
 
@@ -488,7 +488,7 @@ TEST_P(BoolFailure, Test) {
 }
 
 INSTANTIATE_TEST_CASE_P(Test, BoolFailure,
-                        ::testing::ValuesIn({""s, "\xCC"s}), );
+                        ::testing::ValuesIn({""s, "\xCC"s}));
 
 class FloatFailure : public DecodingFailure {};
 
@@ -514,7 +514,7 @@ TEST_P(FloatFailure, Test) {
 
 INSTANTIATE_TEST_CASE_P(
     Test, FloatFailure,
-    ::testing::ValuesIn({""s, "\xCC"s, "\xC1\x01\x02\x03\x04\x05\x06\x07"s}), );
+    ::testing::ValuesIn({""s, "\xCC"s, "\xC1\x01\x02\x03\x04\x05\x06\x07"s}));
 
 class StringFailure : public DecodingFailure {};
 
@@ -541,7 +541,7 @@ TEST_P(StringFailure, Test) {
 INSTANTIATE_TEST_CASE_P(Test, StringFailure,
                         ::testing::ValuesIn({""s, "\xCC"s, "\xD0"s, "\xD1\x01"s,
                                              "\xD2\x01\x02\x03"s,
-                                             "\x85pqrs"s}), );
+                                             "\x85pqrs"s}));
 
 class ListFailure : public DecodingFailure {};
 
@@ -569,7 +569,7 @@ INSTANTIATE_TEST_CASE_P(Test, ListFailure,
                         ::testing::ValuesIn({""s, "\xCC"s, "\xD4"s, "\xD5\x01"s,
                                              "\xD6\x01\x02\x03"s,
                                              "\x93\x01\x02"s,
-                                             "\x93\x01\x02\xCC"s}), );
+                                             "\x93\x01\x02\xCC"s}));
 
 class MapFailure : public DecodingFailure {};
 
@@ -598,7 +598,7 @@ INSTANTIATE_TEST_CASE_P(
     ::testing::ValuesIn({""s, "\xCC"s, "\xD8"s, "\xD9\x01"s,
                          "\xDA\x01\x02\x03"s,
                          "\xA3\x81x\x01\x81y\xCC\x81z\x03"s,
-                         "\xA3\x81x\x01\x81y\x02\x85z"s}), );
+                         "\xA3\x81x\x01\x81y\x02\x85z"s}));
 
 class NodeFailure : public DecodingFailure {};
 
@@ -626,7 +626,7 @@ INSTANTIATE_TEST_CASE_P(
     Test, NodeFailure,
     ::testing::ValuesIn({""s, "\xB2\x4E"s, "\xB3\x5E"s, "\xB3\x4E"s,
                          "\xB3\x4E\xCC"s, "\xB3\x4E\x01\x95\x82L1\xCC"s,
-                         "\xB3\x4E\x01\x92\x82L1\x82L2\xA2\x81x"s}), );
+                         "\xB3\x4E\x01\x92\x82L1\x82L2\xA2\x81x"s}));
 
 class RelationshipFailure : public DecodingFailure {};
 
@@ -655,7 +655,7 @@ INSTANTIATE_TEST_CASE_P(
     ::testing::ValuesIn({""s, "\xB2\x52"s, "\xB5\x02"s, "\xB5\x52"s,
                          "\xB5\x52\xCC"s, "\xB5\x52\x01\xCC"s,
                          "\xB5\x52\x01\x02\xCC"s, "\xB5\x52\x01\x02\x03\xCC"s,
-                         "\xB5\x52\x01\x02\x03\x84type\xCC"s}), );
+                         "\xB5\x52\x01\x02\x03\x84type\xCC"s}));
 
 class UnboundRelationshipFailure : public DecodingFailure {};
 
@@ -683,7 +683,7 @@ INSTANTIATE_TEST_CASE_P(Test, UnboundRelationshipFailure,
                         ::testing::ValuesIn({""s, "\xB2\x72"s, "\xB3\x02"s,
                                              "\xB3\x72"s, "\xB3\x72\xCC"s,
                                              "\xB3\x72\x01\xCC"s,
-                                             "\xB3\x72\x01\x84type\xCC"s}), );
+                                             "\xB3\x72\x01\x84type\xCC"s}));
 
 class PathFailure : public DecodingFailure {};
 
@@ -717,4 +717,4 @@ INSTANTIATE_TEST_CASE_P(
          "\xB3\x50\x92\xB3\x4E\x01\x90\xA0\xB3\x4E\x02\x90\xA0\x92\xB3\x72\x01\x84type\xA0\xB3\x72\x02\x84type\xA0\x94"s,
          "\xB3\x50\x92\xB3\x4E\x01\x90\xA0\xB3\x4E\x02\x90\xA0\x92\xB3\x72\x01\x84type\xA0\xB3\x72\x02\x84type\xA0\x93\x01\x01\x01"s,
          "\xB3\x50\x92\xB3\x4E\x01\x90\xA0\xB3\x4E\x02\x90\xA0\x92\xB3\x72\x01\x84type\xA0\xB3\x72\x02\x84type\xA0\x94\xF0\x00\x01\x00"s,
-         "\xB3\x50\x92\xB3\x4E\x01\x90\xA0\xB3\x4E\x02\x90\xA0\x92\xB3\x72\x01\x84type\xA0\xB3\x72\x02\x84type\xA0\x94\x01\x08\x01\x00"s}), );
+         "\xB3\x50\x92\xB3\x4E\x01\x90\xA0\xB3\x4E\x02\x90\xA0\x92\xB3\x72\x01\x84type\xA0\xB3\x72\x02\x84type\xA0\x94\x01\x08\x01\x00"s}));
