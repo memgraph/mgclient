@@ -104,7 +104,8 @@ jobs:
   build_and_test_linux:
     if: ${{ github.event_name == 'pull_request' || (github.event_name == 'workflow_dispatch' && inputs.linux) }}
     strategy:
-     matrix:
+      fail-fast: false
+      matrix:
         platform: [ubuntu-24.04, fedora-41]
         mgversion: ["latest"]
         packages: ["gcc g++ clang cmake git"]
@@ -128,7 +129,7 @@ jobs:
           docker network create ${{ env.MEMGRAPH_NETWORK }} || true
           platform="${{ matrix.platform }}"
           tag=${platform//-/:}
-          docker run -d --rm --name testcontainer --network ${{ env.MEMGRAPH_NETWORK }} "$tag" sleep infinity      
+          docker run -d --rm --name testcontainer --network ${{ env.MEMGRAPH_NETWORK }} "$tag" sleep infinity
 
       - name: Install environment
         run: |
@@ -159,7 +160,7 @@ jobs:
       - name: Load and run Memgraph Docker image
         run: |
           docker load -i memgraph-docker.tar.gz
-          docker run -d --rm --name memgraphcontainer --network ${{ env.MEMGRAPH_NETWORK }} -p 7687:7687 memgraph/memgraph --telemetry-enabled=false 
+          docker run -d --rm --name memgraphcontainer --network ${{ env.MEMGRAPH_NETWORK }} -p 7687:7687 memgraph/memgraph --telemetry-enabled=false
           rm memgraph-docker.tar.gz
           sleep 5
           docker logs memgraphcontainer
@@ -177,13 +178,13 @@ jobs:
             .."
 
           docker exec -i testcontainer bash -c "
-            mkdir /mgclient/build-gcc && 
-            cd /mgclient/build-gcc && 
-            $cmake_configure && 
-            cmake --build . --parallel && 
-            ctest --output-on-failure && 
+            mkdir /mgclient/build-gcc &&
+            cd /mgclient/build-gcc &&
+            $cmake_configure &&
+            cmake --build . --parallel &&
+            ctest --output-on-failure &&
             make install"
-          
+
       - name: Build with clang, test and install mgclient
         run: |
           cmake_configure="cmake \
@@ -197,11 +198,11 @@ jobs:
           .."
 
           docker exec -i testcontainer bash -c "
-            mkdir /mgclient/build-clang && 
-            cd /mgclient/build-clang && 
-            $cmake_configure && 
-            cmake --build . --parallel && 
-            ctest --output-on-failure && 
+            mkdir /mgclient/build-clang &&
+            cd /mgclient/build-clang &&
+            $cmake_configure &&
+            cmake --build . --parallel &&
+            ctest --output-on-failure &&
             make install"
 
       - name: Cleanup
