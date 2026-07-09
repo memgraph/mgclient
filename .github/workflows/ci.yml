@@ -305,6 +305,12 @@ jobs:
             ctest --output-on-failure &&
             make install"
 
+      - name: Run routing example
+        run: |
+          docker exec -i testcontainer \
+            /mgclient/build-gcc/tests/example_routing_c \
+            "$MEMGRAPH_HA_COORDINATOR_HOST" "$MEMGRAPH_HA_COORDINATOR_PORT"
+
       - name: Cleanup
         if: always()
         run: |
