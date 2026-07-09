@@ -229,7 +229,17 @@ struct mg_router_config {
   mg_resolver_fn resolver;
   void *resolver_data;
   mg_map *routing_context;  // owned copy, or NULL.
+  // Managed-transaction retry policy (see mg_router_execute_*).
+  uint32_t max_retries;
+  double retry_backoff;
+  double retry_backoff_cap;
 };
+
+// Defaults for the managed-transaction retry policy, applied by
+// mg_router_config_make and overridable via the setters.
+#define MG_DEFAULT_MAX_RETRIES 8
+#define MG_DEFAULT_RETRY_BACKOFF 1.0
+#define MG_DEFAULT_RETRY_BACKOFF_CAP 15.0
 
 struct mg_router {
   // Connection template, deep-copied from the seed session params so the caller
@@ -258,6 +268,11 @@ struct mg_router {
   // Round-robin cursor for READ selection.
   uint32_t read_index;
 
+  // Managed-transaction retry policy (copied from the config).
+  uint32_t max_retries;
+  double retry_backoff;
+  double retry_backoff_cap;
+
   char error[1024];
 };
 
@@ -277,7 +292,15 @@ static char *dup_or_null(const char *str, int *oom) {
 }
 
 mg_router_config *mg_router_config_make(void) {
-  return (mg_router_config *)calloc(1, sizeof(mg_router_config));
+  mg_router_config *config =
+      (mg_router_config *)calloc(1, sizeof(mg_router_config));
+  if (!config) {
+    return NULL;
+  }
+  config->max_retries = MG_DEFAULT_MAX_RETRIES;
+  config->retry_backoff = MG_DEFAULT_RETRY_BACKOFF;
+  config->retry_backoff_cap = MG_DEFAULT_RETRY_BACKOFF_CAP;
+  return config;
 }
 
 void mg_router_config_destroy(mg_router_config *config) {
@@ -307,6 +330,18 @@ void mg_router_config_set_routing_context(mg_router_config *config,
       routing_context ? mg_map_copy(routing_context) : NULL;
 }
 
+void mg_router_config_set_max_retries(mg_router_config *config,
+                                      uint32_t max_retries) {
+  config->max_retries = max_retries;
+}
+
+void mg_router_config_set_retry_backoff(mg_router_config *config,
+                                        double base_seconds,
+                                        double cap_seconds) {
+  config->retry_backoff = base_seconds;
+  config->retry_backoff_cap = cap_seconds;
+}
+
 mg_router *mg_router_make(const mg_router_config *config) {
   if (!config || !config->session_params) {
     return NULL;
@@ -323,6 +358,9 @@ mg_router *mg_router_make(const mg_router_config *config) {
   router->trust_data = mg_session_params_get_trust_data(params);
   router->resolver = config->resolver;
   router->resolver_data = config->resolver_data;
+  router->max_retries = config->max_retries;
+  router->retry_backoff = config->retry_backoff;
+  router->retry_backoff_cap = config->retry_backoff_cap;
 
   int oom = 0;
   router->seed_host = dup_or_null(mg_session_params_get_host(params), &oom);
@@ -715,4 +753,129 @@ int mg_router_connect_read(mg_router *router, mg_session **session) {
 
 int mg_router_connect_write(mg_router *router, mg_session **session) {
   return router_connect_role(router, MG_ROUTING_ROLE_WRITE, session);
+}
+
+// ---------------------------------------------------------------------------
+// Managed transactions: run a unit of work with retry + capped backoff.
+// ---------------------------------------------------------------------------
+
+#ifdef _WIN32
+#include <windows.h>
+#endif
+
+// Sleep for `seconds` (fractional). No-op for non-positive values.
+static void router_sleep_seconds(double seconds) {
+  if (seconds <= 0.0) {
+    return;
+  }
+#ifdef _WIN32
+  Sleep((DWORD)(seconds * 1000.0));
+#else
+  struct timespec ts;
+  ts.tv_sec = (time_t)seconds;
+  ts.tv_nsec = (long)((seconds - (double)ts.tv_sec) * 1e9);
+  nanosleep(&ts, NULL);
+#endif
+}
+
+double mg_router_backoff_seconds(uint32_t attempt, double base, double cap) {
+  if (attempt < 1) {
+    return 0.0;
+  }
+  // base * 2^(attempt-1), computed by repeated doubling to avoid pow() (and the
+  // math library dependency), clamping to `cap` as soon as it is reached.
+  double delay = base;
+  for (uint32_t i = 1; i < attempt; ++i) {
+    if (delay >= cap) {
+      return cap;
+    }
+    delay *= 2.0;
+  }
+  return delay > cap ? cap : delay;
+}
+
+// Runs one attempt of `work` on an established `session`. For a write, wraps it
+// in an explicit transaction and commits it, treating a committed-on-main
+// (SYNC-replica-unreachable) failure as success. Returns 0 on success, else a
+// non-zero MG_ERROR_ code with the message copied into the router.
+static int router_run_unit(mg_router *router, mg_session *session, int writing,
+                           mg_work_fn work, void *work_data) {
+  if (writing) {
+    int status = mg_session_begin_transaction(session, NULL);
+    if (status != 0) {
+      router_set_error(router, mg_session_error(session));
+      return status;
+    }
+  }
+
+  int status = work(session, work_data);
+  if (status != 0) {
+    router_set_error(router, mg_session_error(session));
+    if (writing) {
+      mg_result *result = NULL;
+      mg_session_rollback_transaction(session, &result);  // best effort
+    }
+    return status;
+  }
+
+  if (writing) {
+    mg_result *result = NULL;
+    status = mg_session_commit_transaction(session, &result);
+    if (status != 0) {
+      const char *message = mg_session_error(session);
+      if (mg_error_is_committed_on_main(message)) {
+        // The write is durable on the main; a retry would duplicate it, so
+        // report success even though the SYNC-replica guarantee was not met.
+        return 0;
+      }
+      router_set_error(router, message);
+      return status;
+    }
+  }
+  return 0;
+}
+
+static int router_execute(mg_router *router, enum mg_routing_role role,
+                          mg_work_fn work, void *work_data) {
+  if (!router || !work) {
+    return MG_ERROR_BAD_PARAMETER;
+  }
+  router->error[0] = '\0';
+  int writing = (role == MG_ROUTING_ROLE_WRITE);
+  // At least one attempt, even if max_retries was set to 0.
+  uint32_t max_attempts = router->max_retries > 0 ? router->max_retries : 1;
+  int last_status = MG_ERROR_TRANSIENT_ERROR;
+
+  for (uint32_t attempt = 1; attempt <= max_attempts; ++attempt) {
+    mg_session *session = NULL;
+    int status = router_connect_role(router, role, &session);
+    if (status == 0) {
+      status = router_run_unit(router, session, writing, work, work_data);
+      mg_session_destroy(session);
+      if (status == 0) {
+        return 0;
+      }
+    }
+    // Either connect or the unit failed; the message is already in the router.
+    last_status = status;
+
+    if (attempt == max_attempts || !mg_error_is_transient(last_status)) {
+      break;
+    }
+    // Transient: force a routing refresh on the next attempt (so it re-routes
+    // to the new main after a failover) and back off first.
+    router->expires_at = 0;
+    router_sleep_seconds(mg_router_backoff_seconds(
+        attempt, router->retry_backoff, router->retry_backoff_cap));
+  }
+  return last_status;
+}
+
+int mg_router_execute_read(mg_router *router, mg_work_fn work, void *work_data) {
+  return router_execute(router, MG_ROUTING_ROLE_READ, work, work_data);
+}
+
+int mg_router_execute_write(mg_router *router, mg_work_fn work,
+                            void *work_data) {
+  return router_execute(router, MG_ROUTING_ROLE_WRITE, work, work_data);
 }

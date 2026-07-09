@@ -59,6 +59,64 @@ extern "C" int EnvMapResolver(const char *advertised, mg_resolver_result *result
   return mg_resolver_result_add(result, advertised);
 }
 
+// A unit of work (C linkage) that just counts how many times it is invoked, so
+// tests can assert whether the router ever reached the work stage.
+extern "C" int CountingWork(mg_session *session, void *data) {
+  (void)session;
+  ++*static_cast<int *>(data);
+  return 0;
+}
+
+// Drains any pending result stream on `session`. Returns 0 on success, or the
+// negative status if a fetch failed.
+static int DrainResults(mg_session *session) {
+  mg_result *result = nullptr;
+  int fetch;
+  while ((fetch = mg_session_fetch(session, &result)) == 1) {
+  }
+  return fetch < 0 ? fetch : 0;
+}
+
+// A write unit of work: creates and immediately deletes a node (a net no-op
+// that still exercises the write path and commit). Must not commit itself --
+// mg_router_execute_write owns the transaction boundary.
+extern "C" int WriteNoOpWork(mg_session *session, void *data) {
+  (void)data;
+  int status = mg_session_run(session, "CREATE (n:_MgRouterExecuteTest) DELETE n",
+                              nullptr, nullptr, nullptr, nullptr);
+  if (status != 0) {
+    return status;
+  }
+  if ((status = mg_session_pull(session, nullptr)) != 0) {
+    return status;
+  }
+  return DrainResults(session);
+}
+
+// A read unit of work: runs "RETURN 1" and stores the value through `data`.
+extern "C" int ReadReturnsOneWork(mg_session *session, void *data) {
+  int status = mg_session_run(session, "RETURN 1", nullptr, nullptr, nullptr,
+                              nullptr);
+  if (status != 0) {
+    return status;
+  }
+  if ((status = mg_session_pull(session, nullptr)) != 0) {
+    return status;
+  }
+  mg_result *result = nullptr;
+  int fetch;
+  while ((fetch = mg_session_fetch(session, &result)) == 1) {
+    const mg_list *row = mg_result_row(result);
+    if (row && mg_list_size(row) > 0) {
+      const mg_value *value = mg_list_at(row, 0);
+      if (value && mg_value_get_type(value) == MG_VALUE_TYPE_INTEGER) {
+        *static_cast<int *>(data) = static_cast<int>(mg_value_integer(value));
+      }
+    }
+  }
+  return fetch < 0 ? fetch : 0;
+}
+
 namespace {
 
 // Initialises mgclient once for the whole test binary (mg_init sets up the
@@ -493,6 +551,101 @@ TEST(RoutingTable, ParseIgnoresMalformedEntries) {
 
   mg_routing_table_destroy(table);
   mg_map_destroy(raw);
+}
+
+// ---------------------------------------------------------------------------
+// Managed transactions: retry policy (pure) + execute lifecycle.
+// ---------------------------------------------------------------------------
+
+TEST(RouterBackoff, CappedExponential) {
+  // base=1, cap=15: 1, 2, 4, 8, then capped at 15.
+  EXPECT_DOUBLE_EQ(mg_router_backoff_seconds(1, 1.0, 15.0), 1.0);
+  EXPECT_DOUBLE_EQ(mg_router_backoff_seconds(2, 1.0, 15.0), 2.0);
+  EXPECT_DOUBLE_EQ(mg_router_backoff_seconds(3, 1.0, 15.0), 4.0);
+  EXPECT_DOUBLE_EQ(mg_router_backoff_seconds(4, 1.0, 15.0), 8.0);
+  EXPECT_DOUBLE_EQ(mg_router_backoff_seconds(5, 1.0, 15.0), 15.0);  // capped
+  EXPECT_DOUBLE_EQ(mg_router_backoff_seconds(9, 1.0, 15.0), 15.0);  // stays capped
+}
+
+TEST(RouterBackoff, EdgeCases) {
+  EXPECT_DOUBLE_EQ(mg_router_backoff_seconds(0, 1.0, 15.0), 0.0);  // no attempt 0
+  EXPECT_DOUBLE_EQ(mg_router_backoff_seconds(1, 0.0, 15.0), 0.0);  // zero base
+  EXPECT_DOUBLE_EQ(mg_router_backoff_seconds(3, 2.5, 5.0), 5.0);   // 2.5,5,capped
+}
+
+namespace {
+mg_router *MakeRouterWithRetries(const char *host, uint16_t port,
+                                 uint32_t max_retries, double base, double cap) {
+  mg_router_config *config = mg_router_config_make();
+  mg_session_params *params = SeedParams(host, port);
+  mg_router_config_set_session_params(config, params);
+  mg_router_config_set_max_retries(config, max_retries);
+  mg_router_config_set_retry_backoff(config, base, cap);
+  mg_router *router = mg_router_make(config);
+  mg_session_params_destroy(params);
+  mg_router_config_destroy(config);
+  return router;
+}
+}  // namespace
+
+TEST(RouterExecute, FailsWhenSeedUnreachable) {
+  // Nothing listens on port 1, so no READ connection can be established; the
+  // work must never run, and the transient failure is reported after retries.
+  // base=cap=0 keeps the test fast (no real sleeping between attempts).
+  mg_router *router = MakeRouterWithRetries("127.0.0.1", 1, 2, 0.0, 0.0);
+  ASSERT_NE(router, nullptr);
+
+  int calls = 0;
+  int status = mg_router_execute_read(router, CountingWork, &calls);
+  EXPECT_NE(status, 0);
+  EXPECT_TRUE(mg_error_is_transient(status));
+  EXPECT_EQ(calls, 0);  // connect never succeeded, so work never ran
+  EXPECT_STRNE(mg_router_error(router), "");
+
+  mg_router_destroy(router);
+}
+
+TEST(RouterExecute, RejectsNullWork) {
+  mg_router *router = MakeRouter("127.0.0.1", 7687);
+  ASSERT_NE(router, nullptr);
+  EXPECT_EQ(mg_router_execute_read(router, nullptr, nullptr),
+            MG_ERROR_BAD_PARAMETER);
+  EXPECT_EQ(mg_router_execute_write(router, nullptr, nullptr),
+            MG_ERROR_BAD_PARAMETER);
+  mg_router_destroy(router);
+}
+
+// Cluster-gated (see the RouterConnect tests above for the env vars).
+TEST(RouterExecute, WriteCommits) {
+  const char *host = std::getenv("MEMGRAPH_HA_COORDINATOR_HOST");
+  if (!host) {
+    GTEST_SKIP() << "set MEMGRAPH_HA_COORDINATOR_HOST to run";
+  }
+  mg_router *router =
+      MakeRouterWithResolver(host, CoordinatorPort(), EnvMapResolver);
+  ASSERT_NE(router, nullptr);
+
+  int status = mg_router_execute_write(router, WriteNoOpWork, nullptr);
+  EXPECT_EQ(status, 0) << mg_router_error(router);
+
+  mg_router_destroy(router);
+}
+
+TEST(RouterExecute, ReadRuns) {
+  const char *host = std::getenv("MEMGRAPH_HA_COORDINATOR_HOST");
+  if (!host) {
+    GTEST_SKIP() << "set MEMGRAPH_HA_COORDINATOR_HOST to run";
+  }
+  mg_router *router =
+      MakeRouterWithResolver(host, CoordinatorPort(), EnvMapResolver);
+  ASSERT_NE(router, nullptr);
+
+  int value = 0;
+  int status = mg_router_execute_read(router, ReadReturnsOneWork, &value);
+  ASSERT_EQ(status, 0) << mg_router_error(router);
+  EXPECT_EQ(value, 1);
+
+  mg_router_destroy(router);
 }
 
 TEST(RoutingTable, ParseIsLenientAboutMissingKeys) {

@@ -1557,6 +1557,22 @@ MGCLIENT_EXPORT void mg_router_config_set_resolver(mg_router_config *config,
 MGCLIENT_EXPORT void mg_router_config_set_routing_context(
     mg_router_config *config, const mg_map *routing_context);
 
+/// Sets the maximum number of attempts a managed transaction
+/// (\ref mg_router_execute_read / \ref mg_router_execute_write) makes before
+/// giving up on a transient failure. A value of 1 disables retries. The
+/// default is 8.
+MGCLIENT_EXPORT void mg_router_config_set_max_retries(mg_router_config *config,
+                                                      uint32_t max_retries);
+
+/// Sets the capped-exponential backoff used between managed-transaction
+/// attempts. The delay before the retry following attempt N (1-based) is
+/// ``min(base_seconds * 2^(N-1), cap_seconds)``. The defaults are
+/// ``base_seconds = 1.0`` and ``cap_seconds = 15.0``. A ``base_seconds`` of 0
+/// disables waiting between attempts.
+MGCLIENT_EXPORT void mg_router_config_set_retry_backoff(mg_router_config *config,
+                                                        double base_seconds,
+                                                        double cap_seconds);
+
 /// A client-side routing engine for a Memgraph high-availability cluster.
 ///
 /// A \ref mg_router is created against a seed coordinator and is meant to be
@@ -1616,6 +1632,51 @@ MGCLIENT_EXPORT const mg_routing_table *mg_router_routing_table(
 /// string if there has been none. The string is owned by the router and valid
 /// until the next call on it.
 MGCLIENT_EXPORT const char *mg_router_error(mg_router *router);
+
+/// A unit of work run by \ref mg_router_execute_read / \ref
+/// mg_router_execute_write against a routed \p session.
+///
+/// The callback issues its query or queries with \ref mg_session_run /
+/// \ref mg_session_pull / \ref mg_session_fetch and stashes whatever the caller
+/// needs through \p work_data (the opaque pointer passed to execute). For a
+/// write, it must NOT begin/commit/rollback the transaction itself -- execute
+/// owns the transaction boundary.
+///
+/// \return 0 on success, or the failing \ref MG_ERROR_ code (typically the one
+///         returned by the session call that failed). The router uses this code
+///         to decide whether the failure is transient and worth retrying (see
+///         \ref mg_error_is_transient).
+///
+/// The callback may be invoked more than once (on retry), so it should be free
+/// of side effects other than the database operations themselves.
+typedef int (*mg_work_fn)(mg_session *session, void *work_data);
+
+/// Runs \p work as a managed read against a server that serves reads (a
+/// replica).
+///
+/// Opens a routed READ connection, invokes ``work(session, work_data)``, and
+/// closes the connection. On a transient failure -- while connecting, or the
+/// code returned by \p work -- the routing table is refreshed and the whole
+/// unit is retried with capped-exponential backoff, up to the configured
+/// ``max_retries`` (see \ref mg_router_config_set_max_retries and
+/// \ref mg_router_config_set_retry_backoff).
+///
+/// \return 0 if \p work succeeded, otherwise the last non-zero \ref MG_ERROR_
+///         code (after the retry budget is exhausted, or immediately for a
+///         non-transient failure), with a message in \ref mg_router_error.
+MGCLIENT_EXPORT int mg_router_execute_read(mg_router *router, mg_work_fn work,
+                                           void *work_data);
+
+/// Runs \p work as a managed write against the server that serves writes (the
+/// main).
+///
+/// Like \ref mg_router_execute_read, but routed to the main and wrapped in an
+/// explicit transaction that execute begins before \p work and commits after
+/// it. A write that committed on the main but could not reach a SYNC replica is
+/// durable, so it is treated as success and NOT retried (a retry would
+/// duplicate the write); see \ref mg_error_is_committed_on_main.
+MGCLIENT_EXPORT int mg_router_execute_write(mg_router *router, mg_work_fn work,
+                                            void *work_data);
 
 /// Starts an Explicit transaction on the server.
 ///

@@ -52,6 +52,12 @@ int mg_routing_select_targets(const mg_routing_table *table,
                               mg_resolver_fn resolver, void *resolver_data,
                               uint32_t *read_index, mg_addr_list *out);
 
+// The capped-exponential backoff delay (in seconds) to wait before the retry
+// that follows attempt `attempt` (1-based): min(base * 2^(attempt-1), cap).
+// Returns 0 for attempt < 1. Exposed for white-box testing of the retry policy
+// used by mg_router_execute_read / mg_router_execute_write.
+double mg_router_backoff_seconds(uint32_t attempt, double base, double cap);
+
 #ifdef __cplusplus
 }
 #endif
