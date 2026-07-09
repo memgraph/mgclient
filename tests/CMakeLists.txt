@@ -76,3 +76,10 @@ add_test(example_basic_cpp example_basic_cpp 127.0.0.1 7687 "RETURN 1")
 add_executable(example_advanced_cpp ${EXAMPLE_DIR}/advanced.cpp)
 target_link_libraries(example_advanced_cpp mgclient-static mgclient_cpp project_cpp_warnings)
 add_test(example_advanced_cpp example_advanced_cpp 127.0.0.1 7687)
+
+# Client-side routing example. Built (so it stays compilable) but not run as a
+# test: it needs a high-availability cluster coordinator, which CI does not
+# provide. Run it manually against a coordinator, e.g.
+#   ./example_routing_c <coordinator-host> <coordinator-port> [user] [password]
+add_executable(example_routing_c ${EXAMPLE_DIR}/routing.c)
+target_link_libraries(example_routing_c mgclient-static project_c_warnings)
