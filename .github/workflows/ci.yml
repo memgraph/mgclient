@@ -240,6 +240,7 @@ jobs:
             make install"
 
       - name: Run routing example
+        if: ${{ env.MEMGRAPH_HA_COORDINATOR_HOST }}
         run: |
           docker exec -i testcontainer \
             /mgclient/build-gcc/tests/example_routing_c \
