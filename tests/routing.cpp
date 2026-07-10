@@ -31,34 +31,6 @@ extern "C" int CollapseResolver(const char *advertised,
   return mg_resolver_result_add(result, "10.0.0.1:7687");
 }
 
-// Resolver that remaps advertised addresses per MEMGRAPH_HA_ADDRESS_MAP
-// ("adv1=target1,adv2=target2,..."), falling back to identity. Lets the
-// cluster-gated tests reach a Kubernetes cluster through kubectl port-forwards.
-extern "C" int EnvMapResolver(const char *advertised,
-                              mg_resolver_result *result, void *data) {
-  (void)data;
-  const char *map = std::getenv("MEMGRAPH_HA_ADDRESS_MAP");
-  if (map) {
-    const std::string advertised_str(advertised);
-    const std::string entries(map);
-    size_t pos = 0;
-    while (pos <= entries.size()) {
-      size_t comma = entries.find(',', pos);
-      std::string pair = entries.substr(
-          pos, comma == std::string::npos ? std::string::npos : comma - pos);
-      size_t eq = pair.find('=');
-      if (eq != std::string::npos && pair.substr(0, eq) == advertised_str) {
-        return mg_resolver_result_add(result, pair.substr(eq + 1).c_str());
-      }
-      if (comma == std::string::npos) {
-        break;
-      }
-      pos = comma + 1;
-    }
-  }
-  return mg_resolver_result_add(result, advertised);
-}
-
 // A unit of work (C linkage) that just counts how many times it is invoked, so
 // tests can assert whether the router ever reached the work stage.
 extern "C" int CountingWork(mg_session *session, void *data) {
@@ -425,18 +397,6 @@ std::string ReplicationRole(mg_session *session) {
   return role;
 }
 
-mg_router *MakeRouterWithResolver(const char *host, uint16_t port,
-                                  mg_resolver_fn resolver) {
-  mg_router_config *config = mg_router_config_make();
-  mg_session_params *params = SeedParams(host, port);
-  mg_router_config_set_session_params(config, params);
-  mg_router_config_set_resolver(config, resolver, nullptr);
-  mg_router *router = mg_router_make(config);
-  mg_session_params_destroy(params);
-  mg_router_config_destroy(config);
-  return router;
-}
-
 // Returns the coordinator port from MEMGRAPH_HA_COORDINATOR_PORT (default
 // 7687).
 uint16_t CoordinatorPort() {
@@ -445,15 +405,15 @@ uint16_t CoordinatorPort() {
 }
 }  // namespace
 
-// Cluster-gated: set MEMGRAPH_HA_COORDINATOR_HOST (and MEMGRAPH_HA_ADDRESS_MAP
-// if the advertised addresses are not directly reachable) to run these.
+// Cluster-gated: set MEMGRAPH_HA_COORDINATOR_HOST to run these. The cluster's
+// advertised instance addresses must be directly reachable from here (e.g. a
+// local Docker HA cluster on the host network, as CI runs).
 TEST(RouterConnect, WriteReachesMain) {
   const char *host = std::getenv("MEMGRAPH_HA_COORDINATOR_HOST");
   if (!host) {
     GTEST_SKIP() << "set MEMGRAPH_HA_COORDINATOR_HOST to run";
   }
-  mg_router *router =
-      MakeRouterWithResolver(host, CoordinatorPort(), EnvMapResolver);
+  mg_router *router = MakeRouter(host, CoordinatorPort());
   ASSERT_NE(router, nullptr);
 
   mg_session *session = nullptr;
@@ -471,8 +431,7 @@ TEST(RouterConnect, ReadReachesReplica) {
   if (!host) {
     GTEST_SKIP() << "set MEMGRAPH_HA_COORDINATOR_HOST to run";
   }
-  mg_router *router =
-      MakeRouterWithResolver(host, CoordinatorPort(), EnvMapResolver);
+  mg_router *router = MakeRouter(host, CoordinatorPort());
   ASSERT_NE(router, nullptr);
 
   mg_session *session = nullptr;
@@ -610,8 +569,7 @@ TEST(RouterExecute, WriteCommits) {
   if (!host) {
     GTEST_SKIP() << "set MEMGRAPH_HA_COORDINATOR_HOST to run";
   }
-  mg_router *router =
-      MakeRouterWithResolver(host, CoordinatorPort(), EnvMapResolver);
+  mg_router *router = MakeRouter(host, CoordinatorPort());
   ASSERT_NE(router, nullptr);
 
   int status = mg_router_execute_write(router, WriteNoOpWork, nullptr);
@@ -625,8 +583,7 @@ TEST(RouterExecute, ReadRuns) {
   if (!host) {
     GTEST_SKIP() << "set MEMGRAPH_HA_COORDINATOR_HOST to run";
   }
-  mg_router *router =
-      MakeRouterWithResolver(host, CoordinatorPort(), EnvMapResolver);
+  mg_router *router = MakeRouter(host, CoordinatorPort());
   ASSERT_NE(router, nullptr);
 
   int value = 0;
