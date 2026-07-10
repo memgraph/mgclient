@@ -240,8 +240,11 @@ jobs:
             make install"
 
       - name: Run routing example
-        if: ${{ env.MEMGRAPH_HA_COORDINATOR_HOST }}
         run: |
+          if [[ -z "${MEMGRAPH_HA_COORDINATOR_HOST}}" || -z "${MEMGRAPH_HA_COORDINATOR_PORT}" ]]; then
+            echo "::notice::Skipping HA routing example"
+            exit 0
+          fi
           docker exec -i testcontainer \
             /mgclient/build-gcc/tests/example_routing_c \
             "$MEMGRAPH_HA_COORDINATOR_HOST" "$MEMGRAPH_HA_COORDINATOR_PORT"

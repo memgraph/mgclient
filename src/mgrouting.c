@@ -521,6 +521,9 @@ static int refresh_from_session(mg_router *router, mg_session *session) {
 }
 
 int mg_router_refresh(mg_router *router) {
+  if (!router) {
+    return MG_ERROR_BAD_PARAMETER;
+  }
   router->error[0] = '\0';
   int last_status = MG_ERROR_TRANSIENT_ERROR;
 
@@ -671,16 +674,29 @@ static int router_connect_role(mg_router *router, enum mg_routing_role role,
 
     mg_addr_list candidates;
     memset(&candidates, 0, sizeof(candidates));
-    mg_routing_select_targets(router->table, role, router->resolver,
-                              router->resolver_data, &router->read_index,
-                              &candidates);
+    int select_status = mg_routing_select_targets(
+        router->table, role, router->resolver, router->resolver_data,
+        &router->read_index, &candidates);
+    if (select_status != 0) {
+      // Target selection failed (out of memory). This is not a transient
+      // condition, so report it rather than falling through and retrying.
+      router_set_error(router, "out of memory selecting routing targets");
+      mg_addr_list_clear(&candidates);
+      return select_status;
+    }
 
     if (candidates.size == 0) {
-      char message[128];
-      snprintf(message, sizeof(message), "no %s server in the routing table",
-               role_name(role));
-      router_set_error(router, message);
-      last_status = MG_ERROR_TRANSIENT_ERROR;
+      // Only report "no server for this role" when we actually fetched a table
+      // that lacks one. If refresh failed and left no table, keep its more
+      // specific error and status (e.g. the coordinator was unreachable)
+      // rather than overwriting them with a misleading message.
+      if (router->table) {
+        char message[128];
+        snprintf(message, sizeof(message), "no %s server in the routing table",
+                 role_name(role));
+        router_set_error(router, message);
+        last_status = MG_ERROR_TRANSIENT_ERROR;
+      }
     } else {
       for (uint32_t i = 0; i < candidates.size; ++i) {
         char *host = NULL;

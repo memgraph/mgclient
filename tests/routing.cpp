@@ -16,6 +16,7 @@
 
 #include <cstdint>
 #include <cstdlib>
+#include <cstring>
 #include <string>
 #include <vector>
 
@@ -326,6 +327,10 @@ mg_router *MakeRouter(const char *host, uint16_t port) {
 }
 }  // namespace
 
+TEST(RouterRefresh, RejectsNullRouter) {
+  EXPECT_EQ(mg_router_refresh(nullptr), MG_ERROR_BAD_PARAMETER);
+}
+
 TEST(RouterRefresh, AccessorsBeforeAnyRefresh) {
   mg_router *router = MakeRouter("127.0.0.1", 7687);
   ASSERT_NE(router, nullptr);
@@ -345,6 +350,28 @@ TEST(RouterRefresh, FailsWhenSeedUnreachable) {
       mg_error_is_transient(status));         // connection refused is transient
   EXPECT_STRNE(mg_router_error(router), "");  // a message was recorded
   EXPECT_EQ(mg_router_routing_table(router), nullptr);  // nothing cached
+
+  mg_router_destroy(router);
+}
+
+TEST(RouterConnect, UnreachableSeedKeepsRefreshError) {
+  // With no cached table and an unreachable seed, connecting must surface the
+  // refresh failure (e.g. the coordinator connection error), not overwrite it
+  // with a misleading "no <role> server in the routing table".
+  mg_router *router = MakeRouter("127.0.0.1", 1);
+  ASSERT_NE(router, nullptr);
+
+  ASSERT_NE(mg_router_refresh(router), 0);
+  const std::string refresh_error = mg_router_error(router);
+  ASSERT_FALSE(refresh_error.empty());
+
+  mg_session *session = nullptr;
+  int status = mg_router_connect_write(router, &session);
+  EXPECT_NE(status, 0);
+  EXPECT_EQ(session, nullptr);
+  // The connect surfaces the same coordinator-connection failure, not a
+  // fabricated routing-table message.
+  EXPECT_EQ(std::string(mg_router_error(router)), refresh_error);
 
   mg_router_destroy(router);
 }
