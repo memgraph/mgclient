@@ -325,6 +325,13 @@ mg_router *MakeRouter(const char *host, uint16_t port) {
   mg_router_config_destroy(config);
   return router;
 }
+
+// Returns the coordinator port from MEMGRAPH_HA_COORDINATOR_PORT (default
+// 7687).
+uint16_t CoordinatorPort() {
+  const char *port_str = std::getenv("MEMGRAPH_HA_COORDINATOR_PORT");
+  return port_str ? static_cast<uint16_t>(std::atoi(port_str)) : 7687;
+}
 }  // namespace
 
 TEST(RouterRefresh, RejectsNullRouter) {
@@ -383,10 +390,8 @@ TEST(RouterRefresh, FetchesTableFromCoordinator) {
   if (!host) {
     GTEST_SKIP() << "set MEMGRAPH_HA_COORDINATOR_HOST to run";
   }
-  const char *port_str = std::getenv("MEMGRAPH_HA_COORDINATOR_PORT");
-  uint16_t port = port_str ? static_cast<uint16_t>(std::atoi(port_str)) : 7687;
 
-  mg_router *router = MakeRouter(host, port);
+  mg_router *router = MakeRouter(host, CoordinatorPort());
   ASSERT_NE(router, nullptr);
 
   int status = mg_router_refresh(router);
@@ -422,13 +427,6 @@ std::string ReplicationRole(mg_session *session) {
     }
   }
   return role;
-}
-
-// Returns the coordinator port from MEMGRAPH_HA_COORDINATOR_PORT (default
-// 7687).
-uint16_t CoordinatorPort() {
-  const char *port_str = std::getenv("MEMGRAPH_HA_COORDINATOR_PORT");
-  return port_str ? static_cast<uint16_t>(std::atoi(port_str)) : 7687;
 }
 }  // namespace
 
