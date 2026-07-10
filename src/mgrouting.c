@@ -751,8 +751,13 @@ int mg_router_connect_write(mg_router *router, mg_session **session) {
 
 // Sleep for `seconds` (fractional). No-op for non-positive values.
 static void router_sleep_seconds(double seconds) {
-  if (seconds <= 0.0) {
+  // Skip non-positive values and NaN (NaN > 0.0 is false)
+  if (!(seconds > 0.0)) {
     return;
+  }
+  // Clamp absurd or infinite values: no single backoff should exceed an hour.
+  if (seconds > 3600.0) {
+    seconds = 3600.0;
   }
 #ifdef _WIN32
   Sleep((DWORD)(seconds * 1000.0));
