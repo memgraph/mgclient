@@ -22,7 +22,7 @@ endif()
 project(mgclient VERSION 1.7.0)
 # Minor version increase can also mean ABI incompatibility with previous
 # versions. IMPORTANT: Take care of the SO version manually.
-set(mgclient_SOVERSION 2)
+set(mgclient_SOVERSION 3)
 set(WASM OFF CACHE BOOL "Compile mgclient for wasm")
 add_definitions(-DMGCLIENT_VERSION="${mgclient_VERSION}")
 
