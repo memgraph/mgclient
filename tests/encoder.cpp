@@ -1,4 +1,4 @@
-// Copyright (c) 2016-2020 Memgraph Ltd. [https://memgraph.com]
+// Copyright (c) 2016-2026 Memgraph Ltd. [https://memgraph.com]
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -370,37 +370,33 @@ TEST_P(ValueTest, Encoding) {
   ASSERT_MEMORY_OK();
 }
 
-INSTANTIATE_TEST_CASE_P(Null, ValueTest,
-                        ::testing::ValuesIn(NullTestCases()), );
+INSTANTIATE_TEST_SUITE_P(Null, ValueTest, ::testing::ValuesIn(NullTestCases()));
 
-INSTANTIATE_TEST_CASE_P(Bool, ValueTest,
-                        ::testing::ValuesIn(BoolTestCases()), );
+INSTANTIATE_TEST_SUITE_P(Bool, ValueTest, ::testing::ValuesIn(BoolTestCases()));
 
-INSTANTIATE_TEST_CASE_P(Integer, ValueTest,
-                        ::testing::ValuesIn(IntegerTestCases()), );
+INSTANTIATE_TEST_SUITE_P(Integer, ValueTest,
+                         ::testing::ValuesIn(IntegerTestCases()));
 
-INSTANTIATE_TEST_CASE_P(Float, ValueTest,
-                        ::testing::ValuesIn(FloatTestCases()), );
+INSTANTIATE_TEST_SUITE_P(Float, ValueTest,
+                         ::testing::ValuesIn(FloatTestCases()));
 
-INSTANTIATE_TEST_CASE_P(String, ValueTest,
-                        ::testing::ValuesIn(StringTestCases()), );
+INSTANTIATE_TEST_SUITE_P(String, ValueTest,
+                         ::testing::ValuesIn(StringTestCases()));
 
-INSTANTIATE_TEST_CASE_P(List, ValueTest,
-                        ::testing::ValuesIn(ListTestCases()), );
+INSTANTIATE_TEST_SUITE_P(List, ValueTest, ::testing::ValuesIn(ListTestCases()));
 
-INSTANTIATE_TEST_CASE_P(Date, ValueTest,
-                        ::testing::ValuesIn(DateTestCases()), );
+INSTANTIATE_TEST_SUITE_P(Date, ValueTest, ::testing::ValuesIn(DateTestCases()));
 
-INSTANTIATE_TEST_CASE_P(LocalTime, ValueTest,
-                        ::testing::ValuesIn(LocalTimeTestCases()), );
+INSTANTIATE_TEST_SUITE_P(LocalTime, ValueTest,
+                         ::testing::ValuesIn(LocalTimeTestCases()));
 
-INSTANTIATE_TEST_CASE_P(LocalDateTime, ValueTest,
-                        ::testing::ValuesIn(LocalDateTimeTestCases()), );
+INSTANTIATE_TEST_SUITE_P(LocalDateTime, ValueTest,
+                         ::testing::ValuesIn(LocalDateTimeTestCases()));
 
-INSTANTIATE_TEST_CASE_P(DateTime, ValueTest,
-                        ::testing::ValuesIn(DateTimeTestCases()), );
+INSTANTIATE_TEST_SUITE_P(DateTime, ValueTest,
+                         ::testing::ValuesIn(DateTimeTestCases()));
 
-INSTANTIATE_TEST_CASE_P(Duration, ValueTest,
-                        ::testing::ValuesIn((DurationTestCases())), );
+INSTANTIATE_TEST_SUITE_P(Duration, ValueTest,
+                         ::testing::ValuesIn((DurationTestCases())));
 
-INSTANTIATE_TEST_CASE_P(Map, ValueTest, ::testing::ValuesIn(MapTestCases()), );
+INSTANTIATE_TEST_SUITE_P(Map, ValueTest, ::testing::ValuesIn(MapTestCases()));

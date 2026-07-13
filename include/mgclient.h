@@ -1,4 +1,4 @@
-// Copyright (c) 2016-2020 Memgraph Ltd. [https://memgraph.com]
+// Copyright (c) 2016-2026 Memgraph Ltd. [https://memgraph.com]
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -1421,6 +1421,251 @@ MGCLIENT_EXPORT int mg_session_route(mg_session *session, const mg_map *routing,
                                      const mg_list *bookmarks,
                                      const mg_map *extra,
                                      mg_map **routing_table);
+
+/// The role a server plays in a client-side routing table.
+enum mg_routing_role {
+  MG_ROUTING_ROLE_READ,
+  MG_ROUTING_ROLE_WRITE,
+  MG_ROUTING_ROLE_ROUTE,
+};
+
+/// A parsed client-side routing table: the advertised "host:port" addresses
+/// grouped by role, together with the table's time-to-live. Build one from the
+/// map returned by \ref mg_session_route using \ref mg_routing_table_parse.
+///
+/// \ref mg_routing_table is an opaque data type. The addresses of every server
+/// sharing a role are flattened into a single list for that role, in the order
+/// they appear in the source map.
+typedef struct mg_routing_table mg_routing_table;
+
+/// Parses the routing-table map returned by \ref mg_session_route.
+///
+/// \param raw The routing-table map (see \ref mg_session_route for its shape).
+///            The map is only read; ownership is not taken.
+///
+/// \return A freshly allocated \ref mg_routing_table (ownership transferred to
+///         the caller, who must call \ref mg_routing_table_destroy), or NULL if
+///         \p raw is NULL or an allocation failed.
+///
+///         Parsing is lenient: only \p raw being NULL (or an allocation
+///         failure) causes a NULL result. Anything malformed is skipped rather
+///         than treated as an error -- a missing or non-integer "ttl" defaults
+///         to 0, a missing or non-list "servers" yields an empty table, and any
+///         server entry that is not a map, whose "role" is missing/non-string
+///         or not one of "READ"/"WRITE"/"ROUTE", or whose "addresses" are
+///         missing/non-list is ignored (individual non-string addresses are
+///         skipped too).
+MGCLIENT_EXPORT mg_routing_table *mg_routing_table_parse(const mg_map *raw);
+
+/// Destroys a \ref mg_routing_table.
+MGCLIENT_EXPORT void mg_routing_table_destroy(mg_routing_table *table);
+
+/// Returns the time-to-live of the routing table, in seconds.
+MGCLIENT_EXPORT int64_t mg_routing_table_ttl(const mg_routing_table *table);
+
+/// Returns the number of advertised addresses for \p role.
+MGCLIENT_EXPORT uint32_t mg_routing_table_address_count(
+    const mg_routing_table *table, enum mg_routing_role role);
+
+/// Returns the \p index-th advertised "host:port" address for \p role.
+///
+/// The returned string is NUL-terminated and owned by \p table (valid until it
+/// is destroyed). Returns NULL if \p index is out of range.
+MGCLIENT_EXPORT const char *mg_routing_table_address_at(
+    const mg_routing_table *table, enum mg_routing_role role, uint32_t index);
+
+/// Returns non-zero if \p error (an MG_ERROR_* status code) denotes a transient
+/// condition worth retrying.
+///
+/// This is the server's TransientError category (\ref MG_ERROR_TRANSIENT_ERROR)
+/// or a low-level transport/connection failure (\ref MG_ERROR_SEND_FAILED,
+/// \ref MG_ERROR_RECV_FAILED, \ref MG_ERROR_NETWORK_FAILURE, \ref
+/// MG_ERROR_SOCKET) -- all of which may succeed on a retry after the cluster
+/// reconverges. Non-transport failures (bad parameters, decoding/protocol
+/// errors, SSL errors, and the client/database error categories) return 0.
+MGCLIENT_EXPORT int mg_error_is_transient(int error);
+
+/// An opaque accumulator to which a \ref mg_resolver_fn appends the candidate
+/// "host:port" targets that an advertised address resolves to.
+typedef struct mg_resolver_result mg_resolver_result;
+
+/// Appends a candidate "host:port" \p target to \p result. The string is
+/// copied, so the caller need not keep it alive. Targets are tried in the order
+/// they are appended.
+///
+/// \return 0 on success, or \ref MG_ERROR_OOM if the copy could not be
+///         allocated.
+MGCLIENT_EXPORT int mg_resolver_result_add(mg_resolver_result *result,
+                                           const char *target);
+
+/// Maps an advertised "host:port" address from the routing table to zero or
+/// more reachable "host:port" targets.
+///
+/// The resolver appends each target (in the order to try them) to \p result
+/// using \ref mg_resolver_result_add. \p resolver_data is the pointer supplied
+/// to \ref mg_router_config_set_resolver. This is the hook to use when the
+/// addresses a cluster advertises are not directly reachable by the client (for
+/// example behind a proxy or a port-forward).
+///
+/// \return 0 on success, or a non-zero value to signal that resolution failed.
+typedef int (*mg_resolver_fn)(const char *advertised,
+                              mg_resolver_result *result, void *resolver_data);
+
+/// Configuration for a \ref mg_router. Opaque; created with
+/// \ref mg_router_config_make, populated with the setters below, and passed to
+/// \ref mg_router_make (which copies what it needs, so the config and anything
+/// it references may be destroyed afterwards).
+typedef struct mg_router_config mg_router_config;
+
+/// Creates a \ref mg_router_config with default settings, or NULL on allocation
+/// failure. Free it with \ref mg_router_config_destroy.
+MGCLIENT_EXPORT mg_router_config *mg_router_config_make(void);
+
+/// Destroys a \ref mg_router_config.
+MGCLIENT_EXPORT void mg_router_config_destroy(mg_router_config *config);
+
+/// Sets the connection template used for every connection the router opens, to
+/// coordinators and data instances alike (required).
+///
+/// The host/port in \p params identify the seed coordinator; for each routed
+/// connection the router substitutes the resolved host/port and reuses the
+/// remaining options (username, password, SSL settings, client name). The
+/// router deep-copies the parameters (including their strings), so \p params
+/// and its strings may be freed after \ref mg_router_make. Any
+/// ``trust_callback``/``trust_data`` are borrowed and must outlive the router.
+MGCLIENT_EXPORT void mg_router_config_set_session_params(
+    mg_router_config *config, const mg_session_params *params);
+
+/// Sets an optional address \p resolver and an opaque \p resolver_data pointer
+/// passed back to it. If unset, advertised addresses are used unchanged. The
+/// resolver and its data are borrowed and must outlive the router.
+MGCLIENT_EXPORT void mg_router_config_set_resolver(mg_router_config *config,
+                                                   mg_resolver_fn resolver,
+                                                   void *resolver_data);
+
+/// Sets an optional routing context forwarded to the ROUTE request (see
+/// \ref mg_session_route). Copied; NULL (the default) means an empty context.
+MGCLIENT_EXPORT void mg_router_config_set_routing_context(
+    mg_router_config *config, const mg_map *routing_context);
+
+/// Sets the maximum number of attempts a managed transaction
+/// (\ref mg_router_execute_read / \ref mg_router_execute_write) makes before
+/// giving up on a transient failure. A value of 1 disables retries. The
+/// default is 8.
+MGCLIENT_EXPORT void mg_router_config_set_max_retries(mg_router_config *config,
+                                                      uint32_t max_retries);
+
+/// Sets the capped-exponential backoff used between managed-transaction
+/// attempts. The delay before the retry following attempt N (1-based) is
+/// ``min(base_seconds * 2^(N-1), cap_seconds)``. The defaults are
+/// ``base_seconds = 1.0`` and ``cap_seconds = 15.0``. A ``base_seconds`` of 0
+/// disables waiting between attempts.
+MGCLIENT_EXPORT void mg_router_config_set_retry_backoff(
+    mg_router_config *config, double base_seconds, double cap_seconds);
+
+/// A client-side routing engine for a Memgraph high-availability cluster.
+///
+/// A \ref mg_router is created against a seed coordinator and is meant to be
+/// long-lived and reused. It fetches the cluster routing table (via a Bolt
+/// ROUTE message), caches it until its TTL expires, and hands out ordinary
+/// \ref mg_session objects bound to the appropriate data instance.
+///
+/// A \ref mg_router is NOT thread-safe: like a \ref mg_session it must be used
+/// by a single thread at a time (use one router per thread). The sessions it
+/// returns are ordinary sessions owned by the caller.
+typedef struct mg_router mg_router;
+
+/// Creates a \ref mg_router from \p config. Opens no connection. Copies what it
+/// needs, so \p config may be destroyed afterwards.
+///
+/// \return A freshly allocated \ref mg_router (ownership transferred to the
+///         caller, who must call \ref mg_router_destroy), or NULL if \p config
+///         is NULL, has no session params set, or an allocation failed.
+MGCLIENT_EXPORT mg_router *mg_router_make(const mg_router_config *config);
+
+/// Destroys a \ref mg_router.
+MGCLIENT_EXPORT void mg_router_destroy(mg_router *router);
+
+/// Opens a connection to a server that serves reads (a replica).
+///
+/// On success returns 0 and stores a ready session (owned by the caller, who
+/// must call \ref mg_session_destroy) in \p session. On failure returns a
+/// non-zero \ref MG_ERROR_ code, stores NULL in \p session, and leaves a
+/// message retrievable via \ref mg_router_error. The cached routing table is
+/// used (refreshing it if it is missing or expired), the role's replicas are
+/// tried in round-robin order, and if all are unreachable the table is
+/// refreshed once and the attempt retried. A failover condition (no reachable
+/// replica) yields a transient-classified code (see \ref
+/// mg_error_is_transient).
+MGCLIENT_EXPORT int mg_router_connect_read(mg_router *router,
+                                           mg_session **session);
+
+/// Opens a connection to the server that serves writes (the main). Behaves like
+/// \ref mg_router_connect_read but targets the WRITE role.
+MGCLIENT_EXPORT int mg_router_connect_write(mg_router *router,
+                                            mg_session **session);
+
+/// Forces an immediate refresh of the cached routing table, contacting the seed
+/// coordinator (falling back to the ROUTE-role coordinators from the cached
+/// table). Returns 0, or a non-zero \ref MG_ERROR_ code with a message in
+/// \ref mg_router_error.
+MGCLIENT_EXPORT int mg_router_refresh(mg_router *router);
+
+/// Returns the router's currently cached routing table, or NULL if none has
+/// been fetched yet. The table is borrowed and owned by the router: it is
+/// invalidated by the next refresh (including one triggered internally by a
+/// connect) or by \ref mg_router_destroy. This does NOT itself trigger a
+/// refresh -- call \ref mg_router_refresh first if you need current data.
+MGCLIENT_EXPORT const mg_routing_table *mg_router_routing_table(
+    mg_router *router);
+
+/// Returns the message describing the last error on \p router, or an empty
+/// string if there has been none. The string is owned by the router and valid
+/// until the next call on it.
+MGCLIENT_EXPORT const char *mg_router_error(mg_router *router);
+
+/// A unit of work run by \ref mg_router_execute_read / \ref
+/// mg_router_execute_write against a routed \p session.
+///
+/// The callback issues its query or queries with \ref mg_session_run /
+/// \ref mg_session_pull / \ref mg_session_fetch and stashes whatever the caller
+/// needs through \p work_data (the opaque pointer passed to execute). For a
+/// write, it must NOT begin/commit/rollback the transaction itself -- execute
+/// owns the transaction boundary.
+///
+/// \return 0 on success, or the failing \ref MG_ERROR_ code (typically the one
+///         returned by the session call that failed). The router uses this code
+///         to decide whether the failure is transient and worth retrying (see
+///         \ref mg_error_is_transient).
+///
+/// The callback may be invoked more than once (on retry), so it should be free
+/// of side effects other than the database operations themselves.
+typedef int (*mg_work_fn)(mg_session *session, void *work_data);
+
+/// Runs \p work as a managed read against a server that serves reads (a
+/// replica).
+///
+/// Opens a routed READ connection, invokes ``work(session, work_data)``, and
+/// closes the connection. On a transient failure -- while connecting, or the
+/// code returned by \p work -- the routing table is refreshed and the whole
+/// unit is retried with capped-exponential backoff, up to the configured
+/// ``max_retries`` (see \ref mg_router_config_set_max_retries and
+/// \ref mg_router_config_set_retry_backoff).
+///
+/// \return 0 if \p work succeeded, otherwise the last non-zero \ref MG_ERROR_
+///         code (after the retry budget is exhausted, or immediately for a
+///         non-transient failure), with a message in \ref mg_router_error.
+MGCLIENT_EXPORT int mg_router_execute_read(mg_router *router, mg_work_fn work,
+                                           void *work_data);
+
+/// Runs \p work as a managed write against the server that serves writes (the
+/// main).
+///
+/// Like \ref mg_router_execute_read, but routed to the main and wrapped in an
+/// explicit transaction that execute begins before \p work and commits after
+/// it.
+MGCLIENT_EXPORT int mg_router_execute_write(mg_router *router, mg_work_fn work,
+                                            void *work_data);
 
 /// Starts an Explicit transaction on the server.
 ///

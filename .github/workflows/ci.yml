@@ -104,7 +104,8 @@ jobs:
   build_and_test_linux:
     if: ${{ github.event_name == 'pull_request' || (github.event_name == 'workflow_dispatch' && inputs.linux) }}
     strategy:
-     matrix:
+      fail-fast: false
+      matrix:
         platform: [ubuntu-24.04, fedora-41]
         mgversion: ["latest"]
         packages: ["gcc g++ clang cmake git"]
@@ -128,7 +129,7 @@ jobs:
           docker network create ${{ env.MEMGRAPH_NETWORK }} || true
           platform="${{ matrix.platform }}"
           tag=${platform//-/:}
-          docker run -d --rm --name testcontainer --network ${{ env.MEMGRAPH_NETWORK }} "$tag" sleep infinity      
+          docker run -d --rm --name testcontainer --network ${{ env.MEMGRAPH_NETWORK }} "$tag" sleep infinity
 
       - name: Install environment
         run: |
@@ -159,13 +160,40 @@ jobs:
       - name: Load and run Memgraph Docker image
         run: |
           docker load -i memgraph-docker.tar.gz
-          docker run -d --rm --name memgraphcontainer --network ${{ env.MEMGRAPH_NETWORK }} -p 7687:7687 memgraph/memgraph --telemetry-enabled=false 
+          docker run -d --rm --name memgraphcontainer --network ${{ env.MEMGRAPH_NETWORK }} -p 7687:7687 memgraph/memgraph --telemetry-enabled=false
           rm memgraph-docker.tar.gz
           sleep 5
           docker logs memgraphcontainer
 
+      - name: Run Memgraph HA Cluster
+        env:
+          MEMGRAPH_ENTERPRISE_LICENSE: ${{ secrets.MEMGRAPH_ENTERPRISE_LICENSE }}
+          MEMGRAPH_ORGANIZATION_NAME: ${{ secrets.MEMGRAPH_ORGANIZATION_NAME }}
+        run: |
+          # High availability is a Memgraph Enterprise feature. The license
+          # secrets are unavailable on PRs from forks, so skip the cluster (and
+          # the routing tests, which GTEST_SKIP when the coordinator env vars are
+          # unset) with a warning rather than failing the whole build.
+          if [ -z "$MEMGRAPH_ENTERPRISE_LICENSE" ] || [ -z "$MEMGRAPH_ORGANIZATION_NAME" ]; then
+            echo "::warning::Memgraph enterprise license secrets are not set; skipping the HA cluster and the routing tests."
+            exit 0
+          fi
+
+          MEMGRAPH_HA_NETWORK="${{ env.MEMGRAPH_NETWORK }}" ./tool/ha_cluster.sh start
+
+          # Tell the test steps to run the routing tests against mg-coord1.
+          echo "MEMGRAPH_HA_COORDINATOR_HOST=127.0.0.1" >> "$GITHUB_ENV"
+          echo "MEMGRAPH_HA_COORDINATOR_PORT=7691" >> "$GITHUB_ENV"
+
       - name: Build with gcc, test and install mgclient
         run: |
+          # Forward the HA coordinator env vars into the container only when the
+          # cluster is up; when unset the routing tests GTEST_SKIP.
+          ha_env=()
+          if [ -n "${MEMGRAPH_HA_COORDINATOR_HOST:-}" ]; then
+            ha_env=(-e "MEMGRAPH_HA_COORDINATOR_HOST=${MEMGRAPH_HA_COORDINATOR_HOST}" \
+                    -e "MEMGRAPH_HA_COORDINATOR_PORT=${MEMGRAPH_HA_COORDINATOR_PORT}")
+          fi
           cmake_configure="cmake \
             -DCMAKE_C_COMPILER=gcc${{ matrix.gcc-postfix }} \
             -DCMAKE_CXX_COMPILER=g++${{ matrix.gcc-postfix }} \
@@ -176,16 +204,23 @@ jobs:
             -DCPP_WARNINGS_AS_ERRORS=ON \
             .."
 
-          docker exec -i testcontainer bash -c "
-            mkdir /mgclient/build-gcc && 
-            cd /mgclient/build-gcc && 
-            $cmake_configure && 
-            cmake --build . --parallel && 
-            ctest --output-on-failure && 
+          docker exec -i "${ha_env[@]}" testcontainer bash -c "
+            mkdir /mgclient/build-gcc &&
+            cd /mgclient/build-gcc &&
+            $cmake_configure &&
+            cmake --build . --parallel &&
+            ctest --output-on-failure &&
             make install"
-          
+
       - name: Build with clang, test and install mgclient
         run: |
+          # Forward the HA coordinator env vars into the container only when the
+          # cluster is up; when unset the routing tests GTEST_SKIP.
+          ha_env=()
+          if [ -n "${MEMGRAPH_HA_COORDINATOR_HOST:-}" ]; then
+            ha_env=(-e "MEMGRAPH_HA_COORDINATOR_HOST=${MEMGRAPH_HA_COORDINATOR_HOST}" \
+                    -e "MEMGRAPH_HA_COORDINATOR_PORT=${MEMGRAPH_HA_COORDINATOR_PORT}")
+          fi
           cmake_configure="cmake \
             -DCMAKE_C_COMPILER=clang${{ matrix.clang-postfix }} \
             -DCMAKE_CXX_COMPILER=clang++${{ matrix.clang-postfix }} \
@@ -196,19 +231,30 @@ jobs:
             -DCPP_WARNINGS_AS_ERRORS=ON \
           .."
 
-          docker exec -i testcontainer bash -c "
-            mkdir /mgclient/build-clang && 
-            cd /mgclient/build-clang && 
-            $cmake_configure && 
-            cmake --build . --parallel && 
-            ctest --output-on-failure && 
+          docker exec -i "${ha_env[@]}" testcontainer bash -c "
+            mkdir /mgclient/build-clang &&
+            cd /mgclient/build-clang &&
+            $cmake_configure &&
+            cmake --build . --parallel &&
+            ctest --output-on-failure &&
             make install"
+
+      - name: Run routing example
+        run: |
+          if [[ -z "${MEMGRAPH_HA_COORDINATOR_HOST}}" || -z "${MEMGRAPH_HA_COORDINATOR_PORT}" ]]; then
+            echo "::notice::Skipping HA routing example"
+            exit 0
+          fi
+          docker exec -i testcontainer \
+            /mgclient/build-gcc/tests/example_routing_c \
+            "$MEMGRAPH_HA_COORDINATOR_HOST" "$MEMGRAPH_HA_COORDINATOR_PORT"
 
       - name: Cleanup
         if: always()
         run: |
           docker stop testcontainer || echo "testcontainer already stopped"
           docker stop memgraphcontainer || echo "memgraphcontainer already stopped"
+          ./tool/ha_cluster.sh stop || echo "HA cluster already stopped"
           docker wait testcontainer || true
           docker wait memgraphcontainer || true
           docker rm "${{ env.MEMGRAPH_NETWORK }}" || echo "network already removed"
