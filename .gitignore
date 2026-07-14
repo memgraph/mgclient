@@ -19,3 +19,7 @@ html/
 
 # emsdk folder pulled from wasm/install_deps.sh
 wasm/emsdk
+
+# Python bytecode cache (tool/*.py)
+__pycache__/
+*.pyc

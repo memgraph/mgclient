@@ -40,6 +40,28 @@ jobs:
       run: |
         ./tool/format.sh
 
+  abi_check:
+    if: ${{ github.event_name == 'push' || github.event_name == 'pull_request' }}
+    runs-on: ubuntu-latest
+    steps:
+    - name: Set-up repository
+      uses: actions/checkout@v4
+    - name: Install environment
+      # build-essential, cmake, binutils (readelf) and python3 are preinstalled
+      # on the ubuntu-latest runner; only abigail-tools and pytest are missing.
+      # libssl-dev is kept explicit because the build does
+      # find_package(OpenSSL REQUIRED). python3-pytest avoids a pip install on
+      # the runner's externally-managed Python.
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y --no-install-recommends abigail-tools libssl-dev python3-pytest
+    - name: Test the policy core
+      run: |
+        python3 -m pytest tool/ -q
+    - name: Check ABI vs versioning
+      run: |
+        python3 ./tool/abicheck.py
+
   build_and_test_apple:
     if: ${{ github.event_name == 'pull_request' || (github.event_name == 'workflow_dispatch' && inputs.apple) }}
     strategy:

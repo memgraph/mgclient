@@ -1,0 +1,2798 @@
+<abi-corpus version='2.2' architecture='elf-amd-x86_64' soname='libmgclient.so.2'>
+  <elf-needed>
+    <dependency name='libssl.so.3'/>
+    <dependency name='libcrypto.so.3'/>
+    <dependency name='libc.so.6'/>
+  </elf-needed>
+  <elf-function-symbols>
+    <elf-symbol name='mg_client_version' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_connect' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_date_copy' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_date_days' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_date_destroy' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_date_make' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_date_time_copy' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_date_time_destroy' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_date_time_make' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_date_time_nanoseconds' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_date_time_seconds' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_date_time_tz_offset_minutes' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_date_time_zone_id_copy' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_date_time_zone_id_destroy' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_date_time_zone_id_make' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_date_time_zone_id_nanoseconds' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_date_time_zone_id_seconds' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_date_time_zone_id_timezone_name' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_duration_copy' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_duration_days' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_duration_destroy' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_duration_make' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_duration_months' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_duration_nanoseconds' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_duration_seconds' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_error_is_transient' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_finalize' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_init' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_list_append' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_list_at' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_list_copy' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_list_destroy' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_list_make_empty' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_list_size' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_local_date_time_copy' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_local_date_time_destroy' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_local_date_time_make' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_local_date_time_nanoseconds' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_local_date_time_seconds' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_local_time_copy' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_local_time_destroy' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_local_time_make' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_local_time_nanoseconds' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_map_at' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_map_at2' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_map_copy' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_map_destroy' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_map_insert' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_map_insert2' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_map_insert_unsafe' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_map_insert_unsafe2' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_map_key_at' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_map_make_empty' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_map_size' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_map_value_at' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_node_copy' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_node_destroy' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_node_id' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_node_label_at' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_node_label_count' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_node_properties' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_path_copy' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_path_destroy' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_path_length' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_path_node_at' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_path_relationship_at' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_path_relationship_reversed_at' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_point_2d_copy' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_point_2d_destroy' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_point_2d_make' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_point_2d_srid' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_point_2d_x' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_point_2d_y' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_point_3d_copy' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_point_3d_destroy' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_point_3d_make' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_point_3d_srid' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_point_3d_x' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_point_3d_y' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_point_3d_z' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_relationship_copy' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_relationship_destroy' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_relationship_end_id' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_relationship_id' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_relationship_properties' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_relationship_start_id' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_relationship_type' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_resolver_result_add' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_result_columns' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_result_row' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_result_summary' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_router_config_destroy' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_router_config_make' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_router_config_set_max_retries' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_router_config_set_resolver' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_router_config_set_retry_backoff' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_router_config_set_routing_context' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_router_config_set_session_params' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_router_connect_read' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_router_connect_write' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_router_destroy' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_router_error' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_router_execute_read' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_router_execute_write' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_router_make' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_router_refresh' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_router_routing_table' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_routing_table_address_at' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_routing_table_address_count' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_routing_table_destroy' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_routing_table_parse' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_routing_table_ttl' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_session_begin_transaction' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_session_commit_transaction' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_session_destroy' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_session_error' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_session_fetch' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_session_params_destroy' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_session_params_get_address' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_session_params_get_host' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_session_params_get_password' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_session_params_get_port' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_session_params_get_sslcert' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_session_params_get_sslkey' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_session_params_get_sslmode' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_session_params_get_trust_callback' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_session_params_get_trust_data' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_session_params_get_user_agent' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_session_params_get_username' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_session_params_make' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_session_params_set_address' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_session_params_set_host' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_session_params_set_password' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_session_params_set_port' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_session_params_set_sslcert' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_session_params_set_sslkey' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_session_params_set_sslmode' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_session_params_set_trust_callback' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_session_params_set_trust_data' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_session_params_set_user_agent' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_session_params_set_username' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_session_pull' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_session_rollback_transaction' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_session_route' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_session_run' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_session_status' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_string_copy' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_string_data' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_string_destroy' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_string_make' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_string_make2' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_string_size' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_time_copy' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_time_destroy' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_time_nanoseconds' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_time_tz_offset_seconds' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_unbound_relationship_copy' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_unbound_relationship_destroy' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_unbound_relationship_id' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_unbound_relationship_properties' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_unbound_relationship_type' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_value_bool' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_value_copy' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_value_date' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_value_date_time' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_value_date_time_zone_id' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_value_destroy' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_value_duration' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_value_float' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_value_get_type' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_value_integer' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_value_list' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_value_local_date_time' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_value_local_time' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_value_make_bool' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_value_make_date' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_value_make_date_time' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_value_make_date_time_zone_id' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_value_make_duration' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_value_make_float' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_value_make_integer' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_value_make_list' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_value_make_local_date_time' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_value_make_local_time' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_value_make_map' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_value_make_node' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_value_make_null' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_value_make_path' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_value_make_point_2d' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_value_make_point_3d' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_value_make_relationship' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_value_make_string' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_value_make_string2' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_value_make_time' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_value_make_unbound_relationship' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_value_map' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_value_node' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_value_path' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_value_point_2d' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_value_point_3d' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_value_relationship' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_value_string' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_value_time' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='mg_value_unbound_relationship' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+  </elf-function-symbols>
+  <abi-instr address-size='64' path='/home/gareth/checkout/mgclient/src/linux/mgsocket.c' comp-dir-path='/tmp/tmp09s4zkrb/src' language='LANG_C11'>
+    <typedef-decl name='nfds_t' type-id='type-id-1' id='type-id-2'/>
+    <function-decl name='mg_session_set_error' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-3'/>
+      <parameter type-id='type-id-4'/>
+      <parameter is-variadic='yes'/>
+      <return type-id='type-id-5'/>
+    </function-decl>
+    <function-decl name='__errno_location' visibility='default' binding='global' size-in-bits='64'>
+      <return type-id='type-id-6'/>
+    </function-decl>
+    <function-decl name='abort' visibility='default' binding='global' size-in-bits='64'>
+      <return type-id='type-id-5'/>
+    </function-decl>
+    <function-decl name='strerror' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-7'/>
+      <return type-id='type-id-8'/>
+    </function-decl>
+    <function-decl name='close' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-7'/>
+      <return type-id='type-id-7'/>
+    </function-decl>
+    <function-decl name='__poll_chk' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-9'/>
+      <parameter type-id='type-id-2'/>
+      <parameter type-id='type-id-7'/>
+      <parameter type-id='type-id-1'/>
+      <return type-id='type-id-7'/>
+    </function-decl>
+    <function-decl name='__recv_chk' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-7'/>
+      <parameter type-id='type-id-10'/>
+      <parameter type-id='type-id-11'/>
+      <parameter type-id='type-id-11'/>
+      <parameter type-id='type-id-7'/>
+      <return type-id='type-id-12'/>
+    </function-decl>
+    <function-decl name='socket' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-7'/>
+      <parameter type-id='type-id-7'/>
+      <parameter type-id='type-id-7'/>
+      <return type-id='type-id-7'/>
+    </function-decl>
+    <function-decl name='socketpair' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-7'/>
+      <parameter type-id='type-id-7'/>
+      <parameter type-id='type-id-7'/>
+      <parameter type-id='type-id-6'/>
+      <return type-id='type-id-7'/>
+    </function-decl>
+    <function-decl name='connect' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-7'/>
+      <parameter type-id='type-id-13'/>
+      <parameter type-id='type-id-14'/>
+      <return type-id='type-id-7'/>
+    </function-decl>
+    <function-decl name='send' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-7'/>
+      <parameter type-id='type-id-10'/>
+      <parameter type-id='type-id-11'/>
+      <parameter type-id='type-id-7'/>
+      <return type-id='type-id-12'/>
+    </function-decl>
+    <function-decl name='setsockopt' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-7'/>
+      <parameter type-id='type-id-7'/>
+      <parameter type-id='type-id-7'/>
+      <parameter type-id='type-id-10'/>
+      <parameter type-id='type-id-14'/>
+      <return type-id='type-id-7'/>
+    </function-decl>
+  </abi-instr>
+  <abi-instr address-size='64' path='/home/gareth/checkout/mgclient/src/mgallocator.c' comp-dir-path='/tmp/tmp09s4zkrb/src' language='LANG_C11'>
+    <type-decl name='char' size-in-bits='8' id='type-id-15'/>
+    <array-type-def dimensions='1' type-id='type-id-15' size-in-bits='8' id='type-id-16'>
+      <subrange length='1' lower-bound='0' upper-bound='0' type-id='type-id-1' id='type-id-17'/>
+    </array-type-def>
+    <array-type-def dimensions='1' type-id='type-id-15' size-in-bits='160' id='type-id-18'>
+      <subrange length='20' lower-bound='0' upper-bound='19' type-id='type-id-1' id='type-id-19'/>
+    </array-type-def>
+    <type-decl name='int' size-in-bits='32' id='type-id-7'/>
+    <type-decl name='long int' size-in-bits='64' id='type-id-20'/>
+    <type-decl name='signed char' size-in-bits='8' id='type-id-21'/>
+    <class-decl name='_IO_FILE' size-in-bits='1728' is-struct='yes' visibility='default' id='type-id-22'>
+      <data-member access='public' layout-offset-in-bits='0'>
+        <var-decl name='_flags' type-id='type-id-7' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='64'>
+        <var-decl name='_IO_read_ptr' type-id='type-id-8' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='128'>
+        <var-decl name='_IO_read_end' type-id='type-id-8' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='192'>
+        <var-decl name='_IO_read_base' type-id='type-id-8' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='256'>
+        <var-decl name='_IO_write_base' type-id='type-id-8' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='320'>
+        <var-decl name='_IO_write_ptr' type-id='type-id-8' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='384'>
+        <var-decl name='_IO_write_end' type-id='type-id-8' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='448'>
+        <var-decl name='_IO_buf_base' type-id='type-id-8' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='512'>
+        <var-decl name='_IO_buf_end' type-id='type-id-8' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='576'>
+        <var-decl name='_IO_save_base' type-id='type-id-8' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='640'>
+        <var-decl name='_IO_backup_base' type-id='type-id-8' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='704'>
+        <var-decl name='_IO_save_end' type-id='type-id-8' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='768'>
+        <var-decl name='_markers' type-id='type-id-23' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='832'>
+        <var-decl name='_chain' type-id='type-id-24' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='896'>
+        <var-decl name='_fileno' type-id='type-id-7' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='928'>
+        <var-decl name='_flags2' type-id='type-id-7' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='960'>
+        <var-decl name='_old_offset' type-id='type-id-25' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='1024'>
+        <var-decl name='_cur_column' type-id='type-id-26' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='1040'>
+        <var-decl name='_vtable_offset' type-id='type-id-21' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='1048'>
+        <var-decl name='_shortbuf' type-id='type-id-16' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='1088'>
+        <var-decl name='_lock' type-id='type-id-27' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='1152'>
+        <var-decl name='_offset' type-id='type-id-28' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='1216'>
+        <var-decl name='_codecvt' type-id='type-id-29' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='1280'>
+        <var-decl name='_wide_data' type-id='type-id-30' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='1344'>
+        <var-decl name='_freeres_list' type-id='type-id-24' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='1408'>
+        <var-decl name='_freeres_buf' type-id='type-id-10' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='1472'>
+        <var-decl name='__pad5' type-id='type-id-11' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='1536'>
+        <var-decl name='_mode' type-id='type-id-7' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='1568'>
+        <var-decl name='_unused2' type-id='type-id-18' visibility='default'/>
+      </data-member>
+    </class-decl>
+    <class-decl name='mg_allocator' size-in-bits='192' is-struct='yes' visibility='default' id='type-id-31'>
+      <data-member access='public' layout-offset-in-bits='0'>
+        <var-decl name='malloc' type-id='type-id-32' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='64'>
+        <var-decl name='realloc' type-id='type-id-33' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='128'>
+        <var-decl name='free' type-id='type-id-34' visibility='default'/>
+      </data-member>
+    </class-decl>
+    <typedef-decl name='FILE' type-id='type-id-22' id='type-id-35'/>
+    <typedef-decl name='_IO_lock_t' type-id='type-id-5' id='type-id-36'/>
+    <typedef-decl name='__off64_t' type-id='type-id-20' id='type-id-28'/>
+    <typedef-decl name='__off_t' type-id='type-id-20' id='type-id-25'/>
+    <typedef-decl name='size_t' type-id='type-id-1' id='type-id-11'/>
+    <type-decl name='unsigned long int' size-in-bits='64' id='type-id-1'/>
+    <type-decl name='unsigned short int' size-in-bits='16' id='type-id-26'/>
+    <pointer-type-def type-id='type-id-35' size-in-bits='64' id='type-id-37'/>
+    <qualified-type-def type-id='type-id-37' restrict='yes' id='type-id-38'/>
+    <pointer-type-def type-id='type-id-22' size-in-bits='64' id='type-id-24'/>
+    <pointer-type-def type-id='type-id-15' size-in-bits='64' id='type-id-8'/>
+    <qualified-type-def type-id='type-id-15' const='yes' id='type-id-39'/>
+    <pointer-type-def type-id='type-id-39' size-in-bits='64' id='type-id-4'/>
+    <qualified-type-def type-id='type-id-4' restrict='yes' id='type-id-40'/>
+    <pointer-type-def type-id='type-id-31' size-in-bits='64' id='type-id-41'/>
+    <pointer-type-def type-id='type-id-42' size-in-bits='64' id='type-id-34'/>
+    <pointer-type-def type-id='type-id-43' size-in-bits='64' id='type-id-32'/>
+    <pointer-type-def type-id='type-id-44' size-in-bits='64' id='type-id-33'/>
+    <pointer-type-def type-id='type-id-45' size-in-bits='64' id='type-id-29'/>
+    <pointer-type-def type-id='type-id-36' size-in-bits='64' id='type-id-27'/>
+    <pointer-type-def type-id='type-id-46' size-in-bits='64' id='type-id-23'/>
+    <pointer-type-def type-id='type-id-47' size-in-bits='64' id='type-id-30'/>
+    <class-decl name='_IO_codecvt' is-struct='yes' visibility='default' is-declaration-only='yes' id='type-id-45'/>
+    <class-decl name='_IO_marker' is-struct='yes' visibility='default' is-declaration-only='yes' id='type-id-46'/>
+    <class-decl name='_IO_wide_data' is-struct='yes' visibility='default' is-declaration-only='yes' id='type-id-47'/>
+    <var-decl name='mg_system_allocator' type-id='type-id-31' visibility='default'/>
+    <function-decl name='malloc' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-11'/>
+      <return type-id='type-id-10'/>
+    </function-decl>
+    <function-decl name='realloc' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-10'/>
+      <parameter type-id='type-id-11'/>
+      <return type-id='type-id-10'/>
+    </function-decl>
+    <function-decl name='free' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-10'/>
+      <return type-id='type-id-5'/>
+    </function-decl>
+    <function-decl name='__fprintf_chk' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-38'/>
+      <parameter type-id='type-id-7'/>
+      <parameter type-id='type-id-40'/>
+      <parameter is-variadic='yes'/>
+      <return type-id='type-id-7'/>
+    </function-decl>
+    <type-decl name='variadic parameter type' id='type-id-48'/>
+    <type-decl name='void' id='type-id-5'/>
+    <pointer-type-def type-id='type-id-5' id='type-id-10'/>
+    <function-type size-in-bits='64' id='type-id-42'>
+      <parameter type-id='type-id-41'/>
+      <parameter type-id='type-id-10'/>
+      <return type-id='type-id-5'/>
+    </function-type>
+    <function-type size-in-bits='64' id='type-id-43'>
+      <parameter type-id='type-id-41'/>
+      <parameter type-id='type-id-11'/>
+      <return type-id='type-id-10'/>
+    </function-type>
+    <function-type size-in-bits='64' id='type-id-44'>
+      <parameter type-id='type-id-41'/>
+      <parameter type-id='type-id-10'/>
+      <parameter type-id='type-id-11'/>
+      <return type-id='type-id-10'/>
+    </function-type>
+  </abi-instr>
+  <abi-instr address-size='64' path='/home/gareth/checkout/mgclient/src/mgclient.c' comp-dir-path='/tmp/tmp09s4zkrb/src' language='LANG_C11'>
+    <array-type-def dimensions='1' type-id='type-id-15' size-in-bits='8192' id='type-id-49'>
+      <subrange length='1024' lower-bound='0' upper-bound='1023' type-id='type-id-1' id='type-id-50'/>
+    </array-type-def>
+    <array-type-def dimensions='1' type-id='type-id-15' size-in-bits='112' id='type-id-51'>
+      <subrange length='14' lower-bound='0' upper-bound='13' type-id='type-id-1' id='type-id-52'/>
+    </array-type-def>
+    <type-decl name='double' size-in-bits='64' id='type-id-53'/>
+    <enum-decl name='mg_message_type' id='type-id-54'>
+      <underlying-type type-id='type-id-55'/>
+      <enumerator name='MG_MESSAGE_TYPE_RECORD' value='0'/>
+      <enumerator name='MG_MESSAGE_TYPE_SUCCESS' value='1'/>
+      <enumerator name='MG_MESSAGE_TYPE_FAILURE' value='2'/>
+      <enumerator name='MG_MESSAGE_TYPE_INIT' value='3'/>
+      <enumerator name='MG_MESSAGE_TYPE_HELLO' value='4'/>
+      <enumerator name='MG_MESSAGE_TYPE_RUN' value='5'/>
+      <enumerator name='MG_MESSAGE_TYPE_ACK_FAILURE' value='6'/>
+      <enumerator name='MG_MESSAGE_TYPE_RESET' value='7'/>
+      <enumerator name='MG_MESSAGE_TYPE_PULL' value='8'/>
+      <enumerator name='MG_MESSAGE_TYPE_BEGIN' value='9'/>
+      <enumerator name='MG_MESSAGE_TYPE_COMMIT' value='10'/>
+      <enumerator name='MG_MESSAGE_TYPE_ROLLBACK' value='11'/>
+    </enum-decl>
+    <enum-decl name='mg_sslmode' id='type-id-56'>
+      <underlying-type type-id='type-id-55'/>
+      <enumerator name='MG_SSLMODE_DISABLE' value='0'/>
+      <enumerator name='MG_SSLMODE_REQUIRE' value='1'/>
+    </enum-decl>
+    <enum-decl name='mg_value_type' id='type-id-57'>
+      <underlying-type type-id='type-id-55'/>
+      <enumerator name='MG_VALUE_TYPE_NULL' value='0'/>
+      <enumerator name='MG_VALUE_TYPE_BOOL' value='1'/>
+      <enumerator name='MG_VALUE_TYPE_INTEGER' value='2'/>
+      <enumerator name='MG_VALUE_TYPE_FLOAT' value='3'/>
+      <enumerator name='MG_VALUE_TYPE_STRING' value='4'/>
+      <enumerator name='MG_VALUE_TYPE_LIST' value='5'/>
+      <enumerator name='MG_VALUE_TYPE_MAP' value='6'/>
+      <enumerator name='MG_VALUE_TYPE_NODE' value='7'/>
+      <enumerator name='MG_VALUE_TYPE_RELATIONSHIP' value='8'/>
+      <enumerator name='MG_VALUE_TYPE_UNBOUND_RELATIONSHIP' value='9'/>
+      <enumerator name='MG_VALUE_TYPE_PATH' value='10'/>
+      <enumerator name='MG_VALUE_TYPE_DATE' value='11'/>
+      <enumerator name='MG_VALUE_TYPE_TIME' value='12'/>
+      <enumerator name='MG_VALUE_TYPE_LOCAL_TIME' value='13'/>
+      <enumerator name='MG_VALUE_TYPE_DATE_TIME' value='14'/>
+      <enumerator name='MG_VALUE_TYPE_DATE_TIME_ZONE_ID' value='15'/>
+      <enumerator name='MG_VALUE_TYPE_LOCAL_DATE_TIME' value='16'/>
+      <enumerator name='MG_VALUE_TYPE_DURATION' value='17'/>
+      <enumerator name='MG_VALUE_TYPE_POINT_2D' value='18'/>
+      <enumerator name='MG_VALUE_TYPE_POINT_3D' value='19'/>
+      <enumerator name='MG_VALUE_TYPE_UNKNOWN' value='20'/>
+    </enum-decl>
+    <class-decl name='addrinfo' size-in-bits='384' is-struct='yes' visibility='default' id='type-id-58'>
+      <data-member access='public' layout-offset-in-bits='0'>
+        <var-decl name='ai_flags' type-id='type-id-7' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='32'>
+        <var-decl name='ai_family' type-id='type-id-7' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='64'>
+        <var-decl name='ai_socktype' type-id='type-id-7' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='96'>
+        <var-decl name='ai_protocol' type-id='type-id-7' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='128'>
+        <var-decl name='ai_addrlen' type-id='type-id-14' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='192'>
+        <var-decl name='ai_addr' type-id='type-id-59' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='256'>
+        <var-decl name='ai_canonname' type-id='type-id-8' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='320'>
+        <var-decl name='ai_next' type-id='type-id-60' visibility='default'/>
+      </data-member>
+    </class-decl>
+    <class-decl name='mg_date' size-in-bits='64' is-struct='yes' visibility='default' id='type-id-61'>
+      <data-member access='public' layout-offset-in-bits='0'>
+        <var-decl name='days' type-id='type-id-62' visibility='default'/>
+      </data-member>
+    </class-decl>
+    <class-decl name='mg_date_time' size-in-bits='192' is-struct='yes' visibility='default' id='type-id-63'>
+      <data-member access='public' layout-offset-in-bits='0'>
+        <var-decl name='seconds' type-id='type-id-62' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='64'>
+        <var-decl name='nanoseconds' type-id='type-id-62' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='128'>
+        <var-decl name='tz_offset_minutes' type-id='type-id-62' visibility='default'/>
+      </data-member>
+    </class-decl>
+    <class-decl name='mg_date_time_zone_id' size-in-bits='192' is-struct='yes' visibility='default' id='type-id-64'>
+      <data-member access='public' layout-offset-in-bits='0'>
+        <var-decl name='seconds' type-id='type-id-62' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='64'>
+        <var-decl name='nanoseconds' type-id='type-id-62' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='128'>
+        <var-decl name='timezone_name' type-id='type-id-65' visibility='default'/>
+      </data-member>
+    </class-decl>
+    <class-decl name='mg_duration' size-in-bits='256' is-struct='yes' visibility='default' id='type-id-66'>
+      <data-member access='public' layout-offset-in-bits='0'>
+        <var-decl name='months' type-id='type-id-62' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='64'>
+        <var-decl name='days' type-id='type-id-62' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='128'>
+        <var-decl name='seconds' type-id='type-id-62' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='192'>
+        <var-decl name='nanoseconds' type-id='type-id-62' visibility='default'/>
+      </data-member>
+    </class-decl>
+    <class-decl name='mg_list' size-in-bits='128' is-struct='yes' visibility='default' id='type-id-67'>
+      <data-member access='public' layout-offset-in-bits='0'>
+        <var-decl name='size' type-id='type-id-68' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='32'>
+        <var-decl name='capacity' type-id='type-id-68' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='64'>
+        <var-decl name='elements' type-id='type-id-69' visibility='default'/>
+      </data-member>
+    </class-decl>
+    <class-decl name='mg_local_date_time' size-in-bits='128' is-struct='yes' visibility='default' id='type-id-70'>
+      <data-member access='public' layout-offset-in-bits='0'>
+        <var-decl name='seconds' type-id='type-id-62' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='64'>
+        <var-decl name='nanoseconds' type-id='type-id-62' visibility='default'/>
+      </data-member>
+    </class-decl>
+    <class-decl name='mg_local_time' size-in-bits='64' is-struct='yes' visibility='default' id='type-id-71'>
+      <data-member access='public' layout-offset-in-bits='0'>
+        <var-decl name='nanoseconds' type-id='type-id-62' visibility='default'/>
+      </data-member>
+    </class-decl>
+    <class-decl name='mg_map' size-in-bits='192' is-struct='yes' visibility='default' id='type-id-72'>
+      <data-member access='public' layout-offset-in-bits='0'>
+        <var-decl name='size' type-id='type-id-68' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='32'>
+        <var-decl name='capacity' type-id='type-id-68' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='64'>
+        <var-decl name='keys' type-id='type-id-73' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='128'>
+        <var-decl name='values' type-id='type-id-69' visibility='default'/>
+      </data-member>
+    </class-decl>
+    <class-decl name='mg_message' size-in-bits='128' is-struct='yes' visibility='default' id='type-id-74'>
+      <data-member access='public' layout-offset-in-bits='0'>
+        <var-decl name='type' type-id='type-id-54' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='64'>
+        <var-decl name='' type-id='type-id-75' visibility='default'/>
+      </data-member>
+    </class-decl>
+    <class-decl name='mg_message_begin' size-in-bits='64' is-struct='yes' visibility='default' id='type-id-76'>
+      <data-member access='public' layout-offset-in-bits='0'>
+        <var-decl name='extra' type-id='type-id-77' visibility='default'/>
+      </data-member>
+    </class-decl>
+    <class-decl name='mg_message_failure' size-in-bits='64' is-struct='yes' visibility='default' id='type-id-78'>
+      <data-member access='public' layout-offset-in-bits='0'>
+        <var-decl name='metadata' type-id='type-id-77' visibility='default'/>
+      </data-member>
+    </class-decl>
+    <class-decl name='mg_message_hello' size-in-bits='64' is-struct='yes' visibility='default' id='type-id-79'>
+      <data-member access='public' layout-offset-in-bits='0'>
+        <var-decl name='extra' type-id='type-id-77' visibility='default'/>
+      </data-member>
+    </class-decl>
+    <class-decl name='mg_message_init' size-in-bits='128' is-struct='yes' visibility='default' id='type-id-80'>
+      <data-member access='public' layout-offset-in-bits='0'>
+        <var-decl name='client_name' type-id='type-id-65' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='64'>
+        <var-decl name='auth_token' type-id='type-id-77' visibility='default'/>
+      </data-member>
+    </class-decl>
+    <class-decl name='mg_message_pull' size-in-bits='64' is-struct='yes' visibility='default' id='type-id-81'>
+      <data-member access='public' layout-offset-in-bits='0'>
+        <var-decl name='extra' type-id='type-id-77' visibility='default'/>
+      </data-member>
+    </class-decl>
+    <class-decl name='mg_message_record' size-in-bits='64' is-struct='yes' visibility='default' id='type-id-82'>
+      <data-member access='public' layout-offset-in-bits='0'>
+        <var-decl name='fields' type-id='type-id-83' visibility='default'/>
+      </data-member>
+    </class-decl>
+    <class-decl name='mg_message_run' size-in-bits='192' is-struct='yes' visibility='default' id='type-id-84'>
+      <data-member access='public' layout-offset-in-bits='0'>
+        <var-decl name='statement' type-id='type-id-65' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='64'>
+        <var-decl name='parameters' type-id='type-id-77' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='128'>
+        <var-decl name='extra' type-id='type-id-77' visibility='default'/>
+      </data-member>
+    </class-decl>
+    <class-decl name='mg_message_success' size-in-bits='64' is-struct='yes' visibility='default' id='type-id-85'>
+      <data-member access='public' layout-offset-in-bits='0'>
+        <var-decl name='metadata' type-id='type-id-77' visibility='default'/>
+      </data-member>
+    </class-decl>
+    <class-decl name='mg_node' size-in-bits='256' is-struct='yes' visibility='default' id='type-id-86'>
+      <data-member access='public' layout-offset-in-bits='0'>
+        <var-decl name='id' type-id='type-id-62' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='64'>
+        <var-decl name='label_count' type-id='type-id-68' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='128'>
+        <var-decl name='labels' type-id='type-id-73' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='192'>
+        <var-decl name='properties' type-id='type-id-77' visibility='default'/>
+      </data-member>
+    </class-decl>
+    <class-decl name='mg_path' size-in-bits='320' is-struct='yes' visibility='default' id='type-id-87'>
+      <data-member access='public' layout-offset-in-bits='0'>
+        <var-decl name='node_count' type-id='type-id-68' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='32'>
+        <var-decl name='relationship_count' type-id='type-id-68' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='64'>
+        <var-decl name='sequence_length' type-id='type-id-68' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='128'>
+        <var-decl name='nodes' type-id='type-id-88' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='192'>
+        <var-decl name='relationships' type-id='type-id-89' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='256'>
+        <var-decl name='sequence' type-id='type-id-90' visibility='default'/>
+      </data-member>
+    </class-decl>
+    <class-decl name='mg_point_2d' size-in-bits='192' is-struct='yes' visibility='default' id='type-id-91'>
+      <data-member access='public' layout-offset-in-bits='0'>
+        <var-decl name='srid' type-id='type-id-62' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='64'>
+        <var-decl name='x' type-id='type-id-53' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='128'>
+        <var-decl name='y' type-id='type-id-53' visibility='default'/>
+      </data-member>
+    </class-decl>
+    <class-decl name='mg_point_3d' size-in-bits='256' is-struct='yes' visibility='default' id='type-id-92'>
+      <data-member access='public' layout-offset-in-bits='0'>
+        <var-decl name='srid' type-id='type-id-62' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='64'>
+        <var-decl name='x' type-id='type-id-53' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='128'>
+        <var-decl name='y' type-id='type-id-53' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='192'>
+        <var-decl name='z' type-id='type-id-53' visibility='default'/>
+      </data-member>
+    </class-decl>
+    <class-decl name='mg_raw_transport' size-in-bits='448' is-struct='yes' visibility='default' id='type-id-93'>
+      <data-member access='public' layout-offset-in-bits='0'>
+        <var-decl name='send' type-id='type-id-94' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='64'>
+        <var-decl name='recv' type-id='type-id-95' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='128'>
+        <var-decl name='destroy' type-id='type-id-96' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='192'>
+        <var-decl name='suspend_until_ready_to_read' type-id='type-id-96' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='256'>
+        <var-decl name='suspend_until_ready_to_write' type-id='type-id-96' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='320'>
+        <var-decl name='sockfd' type-id='type-id-7' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='384'>
+        <var-decl name='allocator' type-id='type-id-97' visibility='default'/>
+      </data-member>
+    </class-decl>
+    <class-decl name='mg_relationship' size-in-bits='320' is-struct='yes' visibility='default' id='type-id-98'>
+      <data-member access='public' layout-offset-in-bits='0'>
+        <var-decl name='id' type-id='type-id-62' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='64'>
+        <var-decl name='start_id' type-id='type-id-62' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='128'>
+        <var-decl name='end_id' type-id='type-id-62' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='192'>
+        <var-decl name='type' type-id='type-id-65' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='256'>
+        <var-decl name='properties' type-id='type-id-77' visibility='default'/>
+      </data-member>
+    </class-decl>
+    <class-decl name='mg_result' size-in-bits='256' is-struct='yes' visibility='default' id='type-id-99'>
+      <data-member access='public' layout-offset-in-bits='0'>
+        <var-decl name='status' type-id='type-id-7' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='64'>
+        <var-decl name='session' type-id='type-id-3' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='128'>
+        <var-decl name='message' type-id='type-id-100' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='192'>
+        <var-decl name='columns' type-id='type-id-83' visibility='default'/>
+      </data-member>
+    </class-decl>
+    <class-decl name='mg_secure_transport' size-in-bits='640' is-struct='yes' visibility='default' id='type-id-101'>
+      <data-member access='public' layout-offset-in-bits='0'>
+        <var-decl name='send' type-id='type-id-94' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='64'>
+        <var-decl name='recv' type-id='type-id-95' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='128'>
+        <var-decl name='destroy' type-id='type-id-96' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='192'>
+        <var-decl name='suspend_until_ready_to_read' type-id='type-id-96' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='256'>
+        <var-decl name='suspend_until_ready_to_write' type-id='type-id-96' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='320'>
+        <var-decl name='ssl' type-id='type-id-102' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='384'>
+        <var-decl name='bio' type-id='type-id-103' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='448'>
+        <var-decl name='peer_pubkey_type' type-id='type-id-4' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='512'>
+        <var-decl name='peer_pubkey_fp' type-id='type-id-8' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='576'>
+        <var-decl name='allocator' type-id='type-id-97' visibility='default'/>
+      </data-member>
+    </class-decl>
+    <class-decl name='mg_session' size-in-bits='9344' is-struct='yes' visibility='default' id='type-id-104'>
+      <data-member access='public' layout-offset-in-bits='0'>
+        <var-decl name='status' type-id='type-id-7' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='32'>
+        <var-decl name='explicit_transaction' type-id='type-id-7' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='64'>
+        <var-decl name='query_number' type-id='type-id-7' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='128'>
+        <var-decl name='transport' type-id='type-id-105' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='192'>
+        <var-decl name='version' type-id='type-id-7' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='224'>
+        <var-decl name='version_minor' type-id='type-id-7' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='256'>
+        <var-decl name='out_buffer' type-id='type-id-8' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='320'>
+        <var-decl name='out_begin' type-id='type-id-11' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='384'>
+        <var-decl name='out_end' type-id='type-id-11' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='448'>
+        <var-decl name='out_capacity' type-id='type-id-11' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='512'>
+        <var-decl name='in_buffer' type-id='type-id-8' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='576'>
+        <var-decl name='in_end' type-id='type-id-11' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='640'>
+        <var-decl name='in_capacity' type-id='type-id-11' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='704'>
+        <var-decl name='in_cursor' type-id='type-id-11' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='768'>
+        <var-decl name='result' type-id='type-id-106' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='1024'>
+        <var-decl name='error_buffer' type-id='type-id-49' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='9216'>
+        <var-decl name='allocator' type-id='type-id-97' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='9280'>
+        <var-decl name='decoder_allocator' type-id='type-id-97' visibility='default'/>
+      </data-member>
+    </class-decl>
+    <class-decl name='mg_session_params' size-in-bits='704' is-struct='yes' visibility='default' id='type-id-107'>
+      <data-member access='public' layout-offset-in-bits='0'>
+        <var-decl name='address' type-id='type-id-4' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='64'>
+        <var-decl name='host' type-id='type-id-4' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='128'>
+        <var-decl name='port' type-id='type-id-108' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='192'>
+        <var-decl name='username' type-id='type-id-4' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='256'>
+        <var-decl name='password' type-id='type-id-4' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='320'>
+        <var-decl name='user_agent' type-id='type-id-4' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='384'>
+        <var-decl name='sslmode' type-id='type-id-56' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='448'>
+        <var-decl name='sslcert' type-id='type-id-4' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='512'>
+        <var-decl name='sslkey' type-id='type-id-4' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='576'>
+        <var-decl name='trust_callback' type-id='type-id-109' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='640'>
+        <var-decl name='trust_data' type-id='type-id-10' visibility='default'/>
+      </data-member>
+    </class-decl>
+    <class-decl name='mg_string' size-in-bits='128' is-struct='yes' visibility='default' id='type-id-110'>
+      <data-member access='public' layout-offset-in-bits='0'>
+        <var-decl name='size' type-id='type-id-68' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='64'>
+        <var-decl name='data' type-id='type-id-8' visibility='default'/>
+      </data-member>
+    </class-decl>
+    <class-decl name='mg_time' size-in-bits='128' is-struct='yes' visibility='default' id='type-id-111'>
+      <data-member access='public' layout-offset-in-bits='0'>
+        <var-decl name='nanoseconds' type-id='type-id-62' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='64'>
+        <var-decl name='tz_offset_seconds' type-id='type-id-62' visibility='default'/>
+      </data-member>
+    </class-decl>
+    <class-decl name='mg_transport' size-in-bits='320' is-struct='yes' visibility='default' id='type-id-112'>
+      <data-member access='public' layout-offset-in-bits='0'>
+        <var-decl name='send' type-id='type-id-94' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='64'>
+        <var-decl name='recv' type-id='type-id-95' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='128'>
+        <var-decl name='destroy' type-id='type-id-96' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='192'>
+        <var-decl name='suspend_until_ready_to_read' type-id='type-id-96' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='256'>
+        <var-decl name='suspend_until_ready_to_write' type-id='type-id-96' visibility='default'/>
+      </data-member>
+    </class-decl>
+    <class-decl name='mg_unbound_relationship' size-in-bits='192' is-struct='yes' visibility='default' id='type-id-113'>
+      <data-member access='public' layout-offset-in-bits='0'>
+        <var-decl name='id' type-id='type-id-62' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='64'>
+        <var-decl name='type' type-id='type-id-65' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='128'>
+        <var-decl name='properties' type-id='type-id-77' visibility='default'/>
+      </data-member>
+    </class-decl>
+    <class-decl name='mg_value' size-in-bits='128' is-struct='yes' visibility='default' id='type-id-114'>
+      <data-member access='public' layout-offset-in-bits='0'>
+        <var-decl name='type' type-id='type-id-57' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='64'>
+        <var-decl name='' type-id='type-id-115' visibility='default'/>
+      </data-member>
+    </class-decl>
+    <class-decl name='sockaddr' size-in-bits='128' is-struct='yes' visibility='default' id='type-id-116'>
+      <data-member access='public' layout-offset-in-bits='0'>
+        <var-decl name='sa_family' type-id='type-id-117' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='16'>
+        <var-decl name='sa_data' type-id='type-id-51' visibility='default'/>
+      </data-member>
+    </class-decl>
+    <typedef-decl name='__int64_t' type-id='type-id-20' id='type-id-118'/>
+    <typedef-decl name='__socklen_t' type-id='type-id-119' id='type-id-120'/>
+    <typedef-decl name='__uint16_t' type-id='type-id-26' id='type-id-121'/>
+    <typedef-decl name='__uint32_t' type-id='type-id-119' id='type-id-122'/>
+    <typedef-decl name='int64_t' type-id='type-id-118' id='type-id-62'/>
+    <typedef-decl name='mg_allocator' type-id='type-id-31' id='type-id-123'/>
+    <typedef-decl name='mg_date' type-id='type-id-61' id='type-id-124'/>
+    <typedef-decl name='mg_date_time' type-id='type-id-63' id='type-id-125'/>
+    <typedef-decl name='mg_date_time_zone_id' type-id='type-id-64' id='type-id-126'/>
+    <typedef-decl name='mg_duration' type-id='type-id-66' id='type-id-127'/>
+    <typedef-decl name='mg_list' type-id='type-id-67' id='type-id-128'/>
+    <typedef-decl name='mg_local_date_time' type-id='type-id-70' id='type-id-129'/>
+    <typedef-decl name='mg_local_time' type-id='type-id-71' id='type-id-130'/>
+    <typedef-decl name='mg_map' type-id='type-id-72' id='type-id-131'/>
+    <typedef-decl name='mg_message' type-id='type-id-74' id='type-id-132'/>
+    <typedef-decl name='mg_message_begin' type-id='type-id-76' id='type-id-133'/>
+    <typedef-decl name='mg_message_failure' type-id='type-id-78' id='type-id-134'/>
+    <typedef-decl name='mg_message_hello' type-id='type-id-79' id='type-id-135'/>
+    <typedef-decl name='mg_message_init' type-id='type-id-80' id='type-id-136'/>
+    <typedef-decl name='mg_message_pull' type-id='type-id-81' id='type-id-137'/>
+    <typedef-decl name='mg_message_record' type-id='type-id-82' id='type-id-138'/>
+    <typedef-decl name='mg_message_run' type-id='type-id-84' id='type-id-139'/>
+    <typedef-decl name='mg_message_success' type-id='type-id-85' id='type-id-140'/>
+    <typedef-decl name='mg_node' type-id='type-id-86' id='type-id-141'/>
+    <typedef-decl name='mg_path' type-id='type-id-87' id='type-id-142'/>
+    <typedef-decl name='mg_point_2d' type-id='type-id-91' id='type-id-143'/>
+    <typedef-decl name='mg_point_3d' type-id='type-id-92' id='type-id-144'/>
+    <typedef-decl name='mg_raw_transport' type-id='type-id-93' id='type-id-145'/>
+    <typedef-decl name='mg_relationship' type-id='type-id-98' id='type-id-146'/>
+    <typedef-decl name='mg_result' type-id='type-id-99' id='type-id-106'/>
+    <typedef-decl name='mg_secure_transport' type-id='type-id-101' id='type-id-147'/>
+    <typedef-decl name='mg_session' type-id='type-id-104' id='type-id-148'/>
+    <typedef-decl name='mg_session_params' type-id='type-id-107' id='type-id-149'/>
+    <typedef-decl name='mg_string' type-id='type-id-110' id='type-id-150'/>
+    <typedef-decl name='mg_time' type-id='type-id-111' id='type-id-151'/>
+    <typedef-decl name='mg_transport' type-id='type-id-112' id='type-id-152'/>
+    <typedef-decl name='mg_unbound_relationship' type-id='type-id-113' id='type-id-153'/>
+    <typedef-decl name='mg_value' type-id='type-id-114' id='type-id-154'/>
+    <typedef-decl name='sa_family_t' type-id='type-id-26' id='type-id-117'/>
+    <typedef-decl name='socklen_t' type-id='type-id-120' id='type-id-14'/>
+    <typedef-decl name='uint16_t' type-id='type-id-121' id='type-id-108'/>
+    <typedef-decl name='uint32_t' type-id='type-id-122' id='type-id-68'/>
+    <union-decl name='__anonymous_union__1' size-in-bits='64' is-anonymous='yes' visibility='default' id='type-id-115'>
+      <data-member access='public'>
+        <var-decl name='bool_v' type-id='type-id-7' visibility='default'/>
+      </data-member>
+      <data-member access='public'>
+        <var-decl name='integer_v' type-id='type-id-62' visibility='default'/>
+      </data-member>
+      <data-member access='public'>
+        <var-decl name='float_v' type-id='type-id-53' visibility='default'/>
+      </data-member>
+      <data-member access='public'>
+        <var-decl name='string_v' type-id='type-id-65' visibility='default'/>
+      </data-member>
+      <data-member access='public'>
+        <var-decl name='list_v' type-id='type-id-83' visibility='default'/>
+      </data-member>
+      <data-member access='public'>
+        <var-decl name='map_v' type-id='type-id-77' visibility='default'/>
+      </data-member>
+      <data-member access='public'>
+        <var-decl name='node_v' type-id='type-id-155' visibility='default'/>
+      </data-member>
+      <data-member access='public'>
+        <var-decl name='relationship_v' type-id='type-id-156' visibility='default'/>
+      </data-member>
+      <data-member access='public'>
+        <var-decl name='unbound_relationship_v' type-id='type-id-157' visibility='default'/>
+      </data-member>
+      <data-member access='public'>
+        <var-decl name='path_v' type-id='type-id-158' visibility='default'/>
+      </data-member>
+      <data-member access='public'>
+        <var-decl name='date_v' type-id='type-id-159' visibility='default'/>
+      </data-member>
+      <data-member access='public'>
+        <var-decl name='time_v' type-id='type-id-160' visibility='default'/>
+      </data-member>
+      <data-member access='public'>
+        <var-decl name='local_time_v' type-id='type-id-161' visibility='default'/>
+      </data-member>
+      <data-member access='public'>
+        <var-decl name='date_time_v' type-id='type-id-162' visibility='default'/>
+      </data-member>
+      <data-member access='public'>
+        <var-decl name='date_time_zone_id_v' type-id='type-id-163' visibility='default'/>
+      </data-member>
+      <data-member access='public'>
+        <var-decl name='local_date_time_v' type-id='type-id-164' visibility='default'/>
+      </data-member>
+      <data-member access='public'>
+        <var-decl name='duration_v' type-id='type-id-165' visibility='default'/>
+      </data-member>
+      <data-member access='public'>
+        <var-decl name='point_2d_v' type-id='type-id-166' visibility='default'/>
+      </data-member>
+      <data-member access='public'>
+        <var-decl name='point_3d_v' type-id='type-id-167' visibility='default'/>
+      </data-member>
+    </union-decl>
+    <union-decl name='__anonymous_union__' size-in-bits='64' is-anonymous='yes' visibility='default' id='type-id-75'>
+      <data-member access='public'>
+        <var-decl name='success_v' type-id='type-id-168' visibility='default'/>
+      </data-member>
+      <data-member access='public'>
+        <var-decl name='failure_v' type-id='type-id-169' visibility='default'/>
+      </data-member>
+      <data-member access='public'>
+        <var-decl name='record_v' type-id='type-id-170' visibility='default'/>
+      </data-member>
+      <data-member access='public'>
+        <var-decl name='init_v' type-id='type-id-171' visibility='default'/>
+      </data-member>
+      <data-member access='public'>
+        <var-decl name='hello_v' type-id='type-id-172' visibility='default'/>
+      </data-member>
+      <data-member access='public'>
+        <var-decl name='run_v' type-id='type-id-173' visibility='default'/>
+      </data-member>
+      <data-member access='public'>
+        <var-decl name='begin_v' type-id='type-id-174' visibility='default'/>
+      </data-member>
+      <data-member access='public'>
+        <var-decl name='pull_v' type-id='type-id-175' visibility='default'/>
+      </data-member>
+    </union-decl>
+    <type-decl name='unnamed-enum-underlying-type-32' is-anonymous='yes' size-in-bits='32' alignment-in-bits='32' id='type-id-55'/>
+    <type-decl name='unsigned int' size-in-bits='32' id='type-id-119'/>
+    <pointer-type-def type-id='type-id-58' size-in-bits='64' id='type-id-60'/>
+    <pointer-type-def type-id='type-id-60' size-in-bits='64' id='type-id-176'/>
+    <qualified-type-def type-id='type-id-176' restrict='yes' id='type-id-177'/>
+    <qualified-type-def type-id='type-id-8' restrict='yes' id='type-id-178'/>
+    <qualified-type-def type-id='type-id-58' const='yes' id='type-id-179'/>
+    <pointer-type-def type-id='type-id-179' size-in-bits='64' id='type-id-180'/>
+    <qualified-type-def type-id='type-id-180' restrict='yes' id='type-id-181'/>
+    <qualified-type-def type-id='type-id-128' const='yes' id='type-id-182'/>
+    <pointer-type-def type-id='type-id-182' size-in-bits='64' id='type-id-183'/>
+    <pointer-type-def type-id='type-id-183' size-in-bits='64' id='type-id-184'/>
+    <qualified-type-def type-id='type-id-131' const='yes' id='type-id-185'/>
+    <pointer-type-def type-id='type-id-185' size-in-bits='64' id='type-id-186'/>
+    <qualified-type-def type-id='type-id-106' const='yes' id='type-id-187'/>
+    <pointer-type-def type-id='type-id-187' size-in-bits='64' id='type-id-188'/>
+    <qualified-type-def type-id='type-id-149' const='yes' id='type-id-189'/>
+    <pointer-type-def type-id='type-id-189' size-in-bits='64' id='type-id-190'/>
+    <qualified-type-def type-id='type-id-150' const='yes' id='type-id-191'/>
+    <pointer-type-def type-id='type-id-191' size-in-bits='64' id='type-id-192'/>
+    <qualified-type-def type-id='type-id-154' const='yes' id='type-id-193'/>
+    <pointer-type-def type-id='type-id-193' size-in-bits='64' id='type-id-194'/>
+    <qualified-type-def type-id='type-id-116' const='yes' id='type-id-195'/>
+    <pointer-type-def type-id='type-id-195' size-in-bits='64' id='type-id-13'/>
+    <qualified-type-def type-id='type-id-13' restrict='yes' id='type-id-196'/>
+    <pointer-type-def type-id='type-id-197' size-in-bits='64' id='type-id-109'/>
+    <pointer-type-def type-id='type-id-198' size-in-bits='64' id='type-id-95'/>
+    <pointer-type-def type-id='type-id-199' size-in-bits='64' id='type-id-94'/>
+    <pointer-type-def type-id='type-id-7' size-in-bits='64' id='type-id-6'/>
+    <pointer-type-def type-id='type-id-62' size-in-bits='64' id='type-id-90'/>
+    <pointer-type-def type-id='type-id-123' size-in-bits='64' id='type-id-97'/>
+    <pointer-type-def type-id='type-id-124' size-in-bits='64' id='type-id-159'/>
+    <pointer-type-def type-id='type-id-125' size-in-bits='64' id='type-id-162'/>
+    <pointer-type-def type-id='type-id-126' size-in-bits='64' id='type-id-163'/>
+    <pointer-type-def type-id='type-id-127' size-in-bits='64' id='type-id-165'/>
+    <pointer-type-def type-id='type-id-128' size-in-bits='64' id='type-id-83'/>
+    <pointer-type-def type-id='type-id-129' size-in-bits='64' id='type-id-164'/>
+    <pointer-type-def type-id='type-id-130' size-in-bits='64' id='type-id-161'/>
+    <pointer-type-def type-id='type-id-131' size-in-bits='64' id='type-id-77'/>
+    <pointer-type-def type-id='type-id-77' size-in-bits='64' id='type-id-200'/>
+    <pointer-type-def type-id='type-id-132' size-in-bits='64' id='type-id-100'/>
+    <pointer-type-def type-id='type-id-100' size-in-bits='64' id='type-id-201'/>
+    <pointer-type-def type-id='type-id-133' size-in-bits='64' id='type-id-174'/>
+    <pointer-type-def type-id='type-id-134' size-in-bits='64' id='type-id-169'/>
+    <pointer-type-def type-id='type-id-135' size-in-bits='64' id='type-id-172'/>
+    <pointer-type-def type-id='type-id-136' size-in-bits='64' id='type-id-171'/>
+    <pointer-type-def type-id='type-id-137' size-in-bits='64' id='type-id-175'/>
+    <pointer-type-def type-id='type-id-138' size-in-bits='64' id='type-id-170'/>
+    <pointer-type-def type-id='type-id-139' size-in-bits='64' id='type-id-173'/>
+    <pointer-type-def type-id='type-id-140' size-in-bits='64' id='type-id-168'/>
+    <pointer-type-def type-id='type-id-141' size-in-bits='64' id='type-id-155'/>
+    <pointer-type-def type-id='type-id-155' size-in-bits='64' id='type-id-88'/>
+    <pointer-type-def type-id='type-id-142' size-in-bits='64' id='type-id-158'/>
+    <pointer-type-def type-id='type-id-143' size-in-bits='64' id='type-id-166'/>
+    <pointer-type-def type-id='type-id-144' size-in-bits='64' id='type-id-167'/>
+    <pointer-type-def type-id='type-id-145' size-in-bits='64' id='type-id-202'/>
+    <pointer-type-def type-id='type-id-202' size-in-bits='64' id='type-id-203'/>
+    <pointer-type-def type-id='type-id-146' size-in-bits='64' id='type-id-156'/>
+    <pointer-type-def type-id='type-id-106' size-in-bits='64' id='type-id-204'/>
+    <pointer-type-def type-id='type-id-204' size-in-bits='64' id='type-id-205'/>
+    <pointer-type-def type-id='type-id-147' size-in-bits='64' id='type-id-206'/>
+    <pointer-type-def type-id='type-id-206' size-in-bits='64' id='type-id-207'/>
+    <pointer-type-def type-id='type-id-148' size-in-bits='64' id='type-id-3'/>
+    <pointer-type-def type-id='type-id-3' size-in-bits='64' id='type-id-208'/>
+    <pointer-type-def type-id='type-id-149' size-in-bits='64' id='type-id-209'/>
+    <pointer-type-def type-id='type-id-150' size-in-bits='64' id='type-id-65'/>
+    <pointer-type-def type-id='type-id-65' size-in-bits='64' id='type-id-73'/>
+    <pointer-type-def type-id='type-id-151' size-in-bits='64' id='type-id-160'/>
+    <pointer-type-def type-id='type-id-112' size-in-bits='64' id='type-id-210'/>
+    <pointer-type-def type-id='type-id-152' size-in-bits='64' id='type-id-105'/>
+    <pointer-type-def type-id='type-id-153' size-in-bits='64' id='type-id-157'/>
+    <pointer-type-def type-id='type-id-157' size-in-bits='64' id='type-id-89'/>
+    <pointer-type-def type-id='type-id-154' size-in-bits='64' id='type-id-211'/>
+    <pointer-type-def type-id='type-id-211' size-in-bits='64' id='type-id-69'/>
+    <pointer-type-def type-id='type-id-116' size-in-bits='64' id='type-id-59'/>
+    <pointer-type-def type-id='type-id-212' size-in-bits='64' id='type-id-96'/>
+    <pointer-type-def type-id='type-id-213' size-in-bits='64' id='type-id-103'/>
+    <pointer-type-def type-id='type-id-214' size-in-bits='64' id='type-id-102'/>
+    <class-decl name='bio_st' is-struct='yes' visibility='default' is-declaration-only='yes' id='type-id-215'/>
+    <class-decl name='ssl_st' is-struct='yes' visibility='default' is-declaration-only='yes' id='type-id-216'/>
+    <qualified-type-def type-id='type-id-10' restrict='yes' id='type-id-217'/>
+    <function-decl name='mg_value_make_integer' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-62'/>
+      <return type-id='type-id-211'/>
+    </function-decl>
+    <function-decl name='mg_value_make_string' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-4'/>
+      <return type-id='type-id-211'/>
+    </function-decl>
+    <function-decl name='mg_value_get_type' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-194'/>
+      <return type-id='type-id-57'/>
+    </function-decl>
+    <function-decl name='mg_value_bool' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-194'/>
+      <return type-id='type-id-7'/>
+    </function-decl>
+    <function-decl name='mg_value_integer' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-194'/>
+      <return type-id='type-id-62'/>
+    </function-decl>
+    <function-decl name='mg_value_string' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-194'/>
+      <return type-id='type-id-192'/>
+    </function-decl>
+    <function-decl name='mg_value_list' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-194'/>
+      <return type-id='type-id-183'/>
+    </function-decl>
+    <function-decl name='mg_value_map' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-194'/>
+      <return type-id='type-id-186'/>
+    </function-decl>
+    <function-decl name='mg_value_destroy' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-211'/>
+      <return type-id='type-id-5'/>
+    </function-decl>
+    <function-decl name='mg_list_make_empty' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-68'/>
+      <return type-id='type-id-83'/>
+    </function-decl>
+    <function-decl name='mg_list_destroy' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-83'/>
+      <return type-id='type-id-5'/>
+    </function-decl>
+    <function-decl name='mg_map_make_empty' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-68'/>
+      <return type-id='type-id-77'/>
+    </function-decl>
+    <function-decl name='mg_map_insert_unsafe' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-77'/>
+      <parameter type-id='type-id-4'/>
+      <parameter type-id='type-id-211'/>
+      <return type-id='type-id-7'/>
+    </function-decl>
+    <function-decl name='mg_map_at' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-186'/>
+      <parameter type-id='type-id-4'/>
+      <return type-id='type-id-194'/>
+    </function-decl>
+    <function-decl name='mg_map_destroy' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-77'/>
+      <return type-id='type-id-5'/>
+    </function-decl>
+    <function-decl name='mg_allocator_malloc' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-41'/>
+      <parameter type-id='type-id-11'/>
+      <return type-id='type-id-10'/>
+    </function-decl>
+    <function-decl name='mg_allocator_free' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-41'/>
+      <parameter type-id='type-id-10'/>
+      <return type-id='type-id-5'/>
+    </function-decl>
+    <function-decl name='mg_client_version' mangled-name='mg_client_version' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_client_version'>
+      <return type-id='type-id-4'/>
+    </function-decl>
+    <function-decl name='mg_init' mangled-name='mg_init' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_init'>
+      <return type-id='type-id-7'/>
+    </function-decl>
+    <function-decl name='mg_finalize' mangled-name='mg_finalize' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_finalize'>
+      <return type-id='type-id-5'/>
+    </function-decl>
+    <function-decl name='mg_session_params_make' mangled-name='mg_session_params_make' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_session_params_make'>
+      <return type-id='type-id-209'/>
+    </function-decl>
+    <function-decl name='mg_session_params_destroy' mangled-name='mg_session_params_destroy' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_session_params_destroy'>
+      <parameter type-id='type-id-209' name='params'/>
+      <return type-id='type-id-5'/>
+    </function-decl>
+    <function-decl name='mg_session_params_set_address' mangled-name='mg_session_params_set_address' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_session_params_set_address'>
+      <parameter type-id='type-id-209' name='params'/>
+      <parameter type-id='type-id-4' name='address'/>
+      <return type-id='type-id-5'/>
+    </function-decl>
+    <function-decl name='mg_session_params_set_host' mangled-name='mg_session_params_set_host' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_session_params_set_host'>
+      <parameter type-id='type-id-209' name='params'/>
+      <parameter type-id='type-id-4' name='host'/>
+      <return type-id='type-id-5'/>
+    </function-decl>
+    <function-decl name='mg_session_params_set_port' mangled-name='mg_session_params_set_port' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_session_params_set_port'>
+      <parameter type-id='type-id-209' name='params'/>
+      <parameter type-id='type-id-108' name='port'/>
+      <return type-id='type-id-5'/>
+    </function-decl>
+    <function-decl name='mg_session_params_set_username' mangled-name='mg_session_params_set_username' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_session_params_set_username'>
+      <parameter type-id='type-id-209' name='params'/>
+      <parameter type-id='type-id-4' name='username'/>
+      <return type-id='type-id-5'/>
+    </function-decl>
+    <function-decl name='mg_session_params_set_password' mangled-name='mg_session_params_set_password' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_session_params_set_password'>
+      <parameter type-id='type-id-209' name='params'/>
+      <parameter type-id='type-id-4' name='password'/>
+      <return type-id='type-id-5'/>
+    </function-decl>
+    <function-decl name='mg_session_params_set_user_agent' mangled-name='mg_session_params_set_user_agent' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_session_params_set_user_agent'>
+      <parameter type-id='type-id-209' name='params'/>
+      <parameter type-id='type-id-4' name='user_agent'/>
+      <return type-id='type-id-5'/>
+    </function-decl>
+    <function-decl name='mg_session_params_set_sslmode' mangled-name='mg_session_params_set_sslmode' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_session_params_set_sslmode'>
+      <parameter type-id='type-id-209' name='params'/>
+      <parameter type-id='type-id-56' name='sslmode'/>
+      <return type-id='type-id-5'/>
+    </function-decl>
+    <function-decl name='mg_session_params_set_sslcert' mangled-name='mg_session_params_set_sslcert' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_session_params_set_sslcert'>
+      <parameter type-id='type-id-209' name='params'/>
+      <parameter type-id='type-id-4' name='sslcert'/>
+      <return type-id='type-id-5'/>
+    </function-decl>
+    <function-decl name='mg_session_params_set_sslkey' mangled-name='mg_session_params_set_sslkey' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_session_params_set_sslkey'>
+      <parameter type-id='type-id-209' name='params'/>
+      <parameter type-id='type-id-4' name='sslkey'/>
+      <return type-id='type-id-5'/>
+    </function-decl>
+    <function-decl name='mg_session_params_set_trust_callback' mangled-name='mg_session_params_set_trust_callback' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_session_params_set_trust_callback'>
+      <parameter type-id='type-id-209' name='params'/>
+      <parameter type-id='type-id-109' name='trust_callback'/>
+      <return type-id='type-id-5'/>
+    </function-decl>
+    <function-decl name='mg_session_params_set_trust_data' mangled-name='mg_session_params_set_trust_data' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_session_params_set_trust_data'>
+      <parameter type-id='type-id-209' name='params'/>
+      <parameter type-id='type-id-10' name='trust_data'/>
+      <return type-id='type-id-5'/>
+    </function-decl>
+    <function-decl name='mg_session_params_get_address' mangled-name='mg_session_params_get_address' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_session_params_get_address'>
+      <parameter type-id='type-id-190' name='params'/>
+      <return type-id='type-id-4'/>
+    </function-decl>
+    <function-decl name='mg_session_params_get_host' mangled-name='mg_session_params_get_host' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_session_params_get_host'>
+      <parameter type-id='type-id-190' name='params'/>
+      <return type-id='type-id-4'/>
+    </function-decl>
+    <function-decl name='mg_session_params_get_port' mangled-name='mg_session_params_get_port' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_session_params_get_port'>
+      <parameter type-id='type-id-190' name='params'/>
+      <return type-id='type-id-108'/>
+    </function-decl>
+    <function-decl name='mg_session_params_get_username' mangled-name='mg_session_params_get_username' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_session_params_get_username'>
+      <parameter type-id='type-id-190' name='params'/>
+      <return type-id='type-id-4'/>
+    </function-decl>
+    <function-decl name='mg_session_params_get_password' mangled-name='mg_session_params_get_password' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_session_params_get_password'>
+      <parameter type-id='type-id-190' name='params'/>
+      <return type-id='type-id-4'/>
+    </function-decl>
+    <function-decl name='mg_session_params_get_user_agent' mangled-name='mg_session_params_get_user_agent' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_session_params_get_user_agent'>
+      <parameter type-id='type-id-190' name='params'/>
+      <return type-id='type-id-4'/>
+    </function-decl>
+    <function-decl name='mg_session_params_get_sslmode' mangled-name='mg_session_params_get_sslmode' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_session_params_get_sslmode'>
+      <parameter type-id='type-id-190' name='params'/>
+      <return type-id='type-id-56'/>
+    </function-decl>
+    <function-decl name='mg_session_params_get_sslcert' mangled-name='mg_session_params_get_sslcert' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_session_params_get_sslcert'>
+      <parameter type-id='type-id-190' name='params'/>
+      <return type-id='type-id-4'/>
+    </function-decl>
+    <function-decl name='mg_session_params_get_sslkey' mangled-name='mg_session_params_get_sslkey' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_session_params_get_sslkey'>
+      <parameter type-id='type-id-190' name='params'/>
+      <return type-id='type-id-4'/>
+    </function-decl>
+    <function-decl name='mg_session_params_get_trust_callback' mangled-name='mg_session_params_get_trust_callback' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_session_params_get_trust_callback'>
+      <parameter type-id='type-id-190' name='params'/>
+      <return type-id='type-id-109'/>
+    </function-decl>
+    <function-decl name='mg_session_params_get_trust_data' mangled-name='mg_session_params_get_trust_data' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_session_params_get_trust_data'>
+      <parameter type-id='type-id-190' name='params'/>
+      <return type-id='type-id-10'/>
+    </function-decl>
+    <function-decl name='mg_connect' mangled-name='mg_connect' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_connect'>
+      <parameter type-id='type-id-190' name='params'/>
+      <parameter type-id='type-id-208' name='session'/>
+      <return type-id='type-id-7'/>
+    </function-decl>
+    <function-decl name='mg_session_run' mangled-name='mg_session_run' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_session_run'>
+      <parameter type-id='type-id-3' name='session'/>
+      <parameter type-id='type-id-4' name='query'/>
+      <parameter type-id='type-id-186' name='params'/>
+      <parameter type-id='type-id-186' name='extra_run_information'/>
+      <parameter type-id='type-id-184' name='columns'/>
+      <parameter type-id='type-id-90' name='qid'/>
+      <return type-id='type-id-7'/>
+    </function-decl>
+    <function-decl name='mg_session_route' mangled-name='mg_session_route' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_session_route'>
+      <parameter type-id='type-id-3' name='session'/>
+      <parameter type-id='type-id-186' name='routing'/>
+      <parameter type-id='type-id-183' name='bookmarks'/>
+      <parameter type-id='type-id-186' name='extra'/>
+      <parameter type-id='type-id-200' name='routing_table'/>
+      <return type-id='type-id-7'/>
+    </function-decl>
+    <function-decl name='mg_session_pull' mangled-name='mg_session_pull' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_session_pull'>
+      <parameter type-id='type-id-3' name='session'/>
+      <parameter type-id='type-id-186' name='pull_information'/>
+      <return type-id='type-id-7'/>
+    </function-decl>
+    <function-decl name='mg_session_fetch' mangled-name='mg_session_fetch' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_session_fetch'>
+      <parameter type-id='type-id-3' name='session'/>
+      <parameter type-id='type-id-205' name='result'/>
+      <return type-id='type-id-7'/>
+    </function-decl>
+    <function-decl name='mg_session_begin_transaction' mangled-name='mg_session_begin_transaction' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_session_begin_transaction'>
+      <parameter type-id='type-id-3' name='session'/>
+      <parameter type-id='type-id-186' name='extra_run_information'/>
+      <return type-id='type-id-7'/>
+    </function-decl>
+    <function-decl name='mg_session_commit_transaction' mangled-name='mg_session_commit_transaction' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_session_commit_transaction'>
+      <parameter type-id='type-id-3' name='session'/>
+      <parameter type-id='type-id-205' name='result'/>
+      <return type-id='type-id-7'/>
+    </function-decl>
+    <function-decl name='mg_session_rollback_transaction' mangled-name='mg_session_rollback_transaction' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_session_rollback_transaction'>
+      <parameter type-id='type-id-3' name='session'/>
+      <parameter type-id='type-id-205' name='result'/>
+      <return type-id='type-id-7'/>
+    </function-decl>
+    <function-decl name='mg_result_columns' mangled-name='mg_result_columns' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_result_columns'>
+      <parameter type-id='type-id-188' name='result'/>
+      <return type-id='type-id-183'/>
+    </function-decl>
+    <function-decl name='mg_result_row' mangled-name='mg_result_row' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_result_row'>
+      <parameter type-id='type-id-188' name='result'/>
+      <return type-id='type-id-183'/>
+    </function-decl>
+    <function-decl name='mg_result_summary' mangled-name='mg_result_summary' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_result_summary'>
+      <parameter type-id='type-id-188' name='result'/>
+      <return type-id='type-id-186'/>
+    </function-decl>
+    <function-decl name='mg_message_destroy_ca' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-100'/>
+      <parameter type-id='type-id-97'/>
+      <return type-id='type-id-5'/>
+    </function-decl>
+    <function-decl name='mg_session_init' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-97'/>
+      <return type-id='type-id-3'/>
+    </function-decl>
+    <function-decl name='mg_session_invalidate' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-3'/>
+      <return type-id='type-id-5'/>
+    </function-decl>
+    <function-decl name='mg_session_receive_message' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-3'/>
+      <return type-id='type-id-7'/>
+    </function-decl>
+    <function-decl name='mg_session_read_bolt_message' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-3'/>
+      <parameter type-id='type-id-201'/>
+      <return type-id='type-id-7'/>
+    </function-decl>
+    <function-decl name='mg_session_send_init_message' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-3'/>
+      <parameter type-id='type-id-4'/>
+      <parameter type-id='type-id-186'/>
+      <return type-id='type-id-7'/>
+    </function-decl>
+    <function-decl name='mg_session_send_hello_message' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-3'/>
+      <parameter type-id='type-id-186'/>
+      <return type-id='type-id-7'/>
+    </function-decl>
+    <function-decl name='mg_session_send_run_message' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-3'/>
+      <parameter type-id='type-id-4'/>
+      <parameter type-id='type-id-186'/>
+      <parameter type-id='type-id-186'/>
+      <return type-id='type-id-7'/>
+    </function-decl>
+    <function-decl name='mg_session_send_pull_message' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-3'/>
+      <parameter type-id='type-id-186'/>
+      <return type-id='type-id-7'/>
+    </function-decl>
+    <function-decl name='mg_session_send_reset_message' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-3'/>
+      <return type-id='type-id-7'/>
+    </function-decl>
+    <function-decl name='mg_session_send_ack_failure_message' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-3'/>
+      <return type-id='type-id-7'/>
+    </function-decl>
+    <function-decl name='mg_session_send_begin_message' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-3'/>
+      <parameter type-id='type-id-186'/>
+      <return type-id='type-id-7'/>
+    </function-decl>
+    <function-decl name='mg_session_send_commit_messsage' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-3'/>
+      <return type-id='type-id-7'/>
+    </function-decl>
+    <function-decl name='mg_session_send_rollback_messsage' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-3'/>
+      <return type-id='type-id-7'/>
+    </function-decl>
+    <function-decl name='mg_session_send_route_message_v4_3' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-3'/>
+      <parameter type-id='type-id-186'/>
+      <parameter type-id='type-id-183'/>
+      <parameter type-id='type-id-4'/>
+      <parameter type-id='type-id-68'/>
+      <return type-id='type-id-7'/>
+    </function-decl>
+    <function-decl name='mg_session_send_route_message_v4_4' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-3'/>
+      <parameter type-id='type-id-186'/>
+      <parameter type-id='type-id-183'/>
+      <parameter type-id='type-id-186'/>
+      <return type-id='type-id-7'/>
+    </function-decl>
+    <function-decl name='mg_socket_init' visibility='default' binding='global' size-in-bits='64'>
+      <return type-id='type-id-7'/>
+    </function-decl>
+    <function-decl name='mg_socket_create' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-7'/>
+      <parameter type-id='type-id-7'/>
+      <parameter type-id='type-id-7'/>
+      <return type-id='type-id-7'/>
+    </function-decl>
+    <function-decl name='mg_socket_create_handle_error' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-7'/>
+      <parameter type-id='type-id-3'/>
+      <return type-id='type-id-7'/>
+    </function-decl>
+    <function-decl name='mg_socket_connect' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-7'/>
+      <parameter type-id='type-id-13'/>
+      <parameter type-id='type-id-14'/>
+      <return type-id='type-id-7'/>
+    </function-decl>
+    <function-decl name='mg_socket_connect_handle_error' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-6'/>
+      <parameter type-id='type-id-7'/>
+      <parameter type-id='type-id-3'/>
+      <return type-id='type-id-7'/>
+    </function-decl>
+    <function-decl name='mg_socket_options' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-7'/>
+      <parameter type-id='type-id-3'/>
+      <return type-id='type-id-7'/>
+    </function-decl>
+    <function-decl name='mg_socket_close' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-7'/>
+      <return type-id='type-id-7'/>
+    </function-decl>
+    <function-decl name='mg_socket_finalize' visibility='default' binding='global' size-in-bits='64'>
+      <return type-id='type-id-5'/>
+    </function-decl>
+    <function-decl name='mg_transport_send' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-105'/>
+      <parameter type-id='type-id-4'/>
+      <parameter type-id='type-id-11'/>
+      <return type-id='type-id-7'/>
+    </function-decl>
+    <function-decl name='mg_transport_recv' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-105'/>
+      <parameter type-id='type-id-8'/>
+      <parameter type-id='type-id-11'/>
+      <return type-id='type-id-7'/>
+    </function-decl>
+    <function-decl name='mg_transport_suspend_until_ready_to_read' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-210'/>
+      <return type-id='type-id-5'/>
+    </function-decl>
+    <function-decl name='mg_transport_suspend_until_ready_to_write' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-210'/>
+      <return type-id='type-id-5'/>
+    </function-decl>
+    <function-decl name='mg_raw_transport_init' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-7'/>
+      <parameter type-id='type-id-203'/>
+      <parameter type-id='type-id-97'/>
+      <return type-id='type-id-7'/>
+    </function-decl>
+    <function-decl name='mg_secure_transport_init' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-7'/>
+      <parameter type-id='type-id-4'/>
+      <parameter type-id='type-id-4'/>
+      <parameter type-id='type-id-207'/>
+      <parameter type-id='type-id-97'/>
+      <return type-id='type-id-7'/>
+    </function-decl>
+    <function-decl name='mg_list_copy_ca' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-183'/>
+      <parameter type-id='type-id-97'/>
+      <return type-id='type-id-83'/>
+    </function-decl>
+    <function-decl name='mg_map_copy_ca' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-186'/>
+      <parameter type-id='type-id-97'/>
+      <return type-id='type-id-77'/>
+    </function-decl>
+    <function-decl name='mg_list_destroy_ca' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-83'/>
+      <parameter type-id='type-id-97'/>
+      <return type-id='type-id-5'/>
+    </function-decl>
+    <function-decl name='inet_ntop' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-7'/>
+      <parameter type-id='type-id-217'/>
+      <parameter type-id='type-id-178'/>
+      <parameter type-id='type-id-14'/>
+      <return type-id='type-id-4'/>
+    </function-decl>
+    <function-decl name='getaddrinfo' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-40'/>
+      <parameter type-id='type-id-40'/>
+      <parameter type-id='type-id-181'/>
+      <parameter type-id='type-id-177'/>
+      <return type-id='type-id-7'/>
+    </function-decl>
+    <function-decl name='freeaddrinfo' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-60'/>
+      <return type-id='type-id-5'/>
+    </function-decl>
+    <function-decl name='gai_strerror' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-7'/>
+      <return type-id='type-id-4'/>
+    </function-decl>
+    <function-decl name='getnameinfo' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-196'/>
+      <parameter type-id='type-id-14'/>
+      <parameter type-id='type-id-178'/>
+      <parameter type-id='type-id-14'/>
+      <parameter type-id='type-id-178'/>
+      <parameter type-id='type-id-14'/>
+      <parameter type-id='type-id-7'/>
+      <return type-id='type-id-7'/>
+    </function-decl>
+    <typedef-decl name='BIO' type-id='type-id-215' id='type-id-213'/>
+    <typedef-decl name='SSL' type-id='type-id-216' id='type-id-214'/>
+    <function-decl name='strncmp' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-4'/>
+      <parameter type-id='type-id-4'/>
+      <parameter type-id='type-id-11'/>
+      <return type-id='type-id-7'/>
+    </function-decl>
+    <function-decl name='strchr' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-4'/>
+      <parameter type-id='type-id-7'/>
+      <return type-id='type-id-8'/>
+    </function-decl>
+    <function-type size-in-bits='64' id='type-id-197'>
+      <parameter type-id='type-id-4'/>
+      <parameter type-id='type-id-4'/>
+      <parameter type-id='type-id-4'/>
+      <parameter type-id='type-id-4'/>
+      <parameter type-id='type-id-10'/>
+      <return type-id='type-id-7'/>
+    </function-type>
+    <function-type size-in-bits='64' id='type-id-198'>
+      <parameter type-id='type-id-210'/>
+      <parameter type-id='type-id-8'/>
+      <parameter type-id='type-id-11'/>
+      <return type-id='type-id-7'/>
+    </function-type>
+    <function-type size-in-bits='64' id='type-id-199'>
+      <parameter type-id='type-id-210'/>
+      <parameter type-id='type-id-4'/>
+      <parameter type-id='type-id-11'/>
+      <return type-id='type-id-7'/>
+    </function-type>
+    <function-type size-in-bits='64' id='type-id-212'>
+      <parameter type-id='type-id-210'/>
+      <return type-id='type-id-5'/>
+    </function-type>
+  </abi-instr>
+  <abi-instr address-size='64' path='/home/gareth/checkout/mgclient/src/mgmessage.c' comp-dir-path='/tmp/tmp09s4zkrb/src' language='LANG_C11'>
+    <function-decl name='mg_string_destroy_ca' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-65'/>
+      <parameter type-id='type-id-97'/>
+      <return type-id='type-id-5'/>
+    </function-decl>
+    <function-decl name='mg_map_destroy_ca' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-77'/>
+      <parameter type-id='type-id-97'/>
+      <return type-id='type-id-5'/>
+    </function-decl>
+  </abi-instr>
+  <abi-instr address-size='64' path='/home/gareth/checkout/mgclient/src/mgrouting.c' comp-dir-path='/tmp/tmp09s4zkrb/src' language='LANG_C11'>
+    <enum-decl name='mg_routing_role' id='type-id-218'>
+      <underlying-type type-id='type-id-55'/>
+      <enumerator name='MG_ROUTING_ROLE_READ' value='0'/>
+      <enumerator name='MG_ROUTING_ROLE_WRITE' value='1'/>
+      <enumerator name='MG_ROUTING_ROLE_ROUTE' value='2'/>
+    </enum-decl>
+    <array-type-def dimensions='1' type-id='type-id-219' size-in-bits='384' id='type-id-220'>
+      <subrange length='3' lower-bound='0' upper-bound='2' type-id='type-id-1' id='type-id-221'/>
+    </array-type-def>
+    <class-decl name='mg_addr_list' size-in-bits='128' is-struct='yes' naming-typedef-id='type-id-219' visibility='default' id='type-id-222'>
+      <data-member access='public' layout-offset-in-bits='0'>
+        <var-decl name='items' type-id='type-id-223' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='64'>
+        <var-decl name='size' type-id='type-id-68' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='96'>
+        <var-decl name='capacity' type-id='type-id-68' visibility='default'/>
+      </data-member>
+    </class-decl>
+    <class-decl name='mg_resolver_result' size-in-bits='128' is-struct='yes' visibility='default' id='type-id-224'>
+      <data-member access='public' layout-offset-in-bits='0'>
+        <var-decl name='list' type-id='type-id-219' visibility='default'/>
+      </data-member>
+    </class-decl>
+    <class-decl name='mg_router' size-in-bits='9408' is-struct='yes' visibility='default' id='type-id-225'>
+      <data-member access='public' layout-offset-in-bits='0'>
+        <var-decl name='seed_host' type-id='type-id-8' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='64'>
+        <var-decl name='seed_address' type-id='type-id-8' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='128'>
+        <var-decl name='seed_port' type-id='type-id-108' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='192'>
+        <var-decl name='username' type-id='type-id-8' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='256'>
+        <var-decl name='password' type-id='type-id-8' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='320'>
+        <var-decl name='user_agent' type-id='type-id-8' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='384'>
+        <var-decl name='sslmode' type-id='type-id-56' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='448'>
+        <var-decl name='sslcert' type-id='type-id-8' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='512'>
+        <var-decl name='sslkey' type-id='type-id-8' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='576'>
+        <var-decl name='trust_callback' type-id='type-id-226' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='640'>
+        <var-decl name='trust_data' type-id='type-id-10' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='704'>
+        <var-decl name='resolver' type-id='type-id-227' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='768'>
+        <var-decl name='resolver_data' type-id='type-id-10' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='832'>
+        <var-decl name='routing_context' type-id='type-id-77' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='896'>
+        <var-decl name='table' type-id='type-id-228' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='960'>
+        <var-decl name='expires_at' type-id='type-id-229' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='1024'>
+        <var-decl name='read_index' type-id='type-id-68' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='1056'>
+        <var-decl name='max_retries' type-id='type-id-68' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='1088'>
+        <var-decl name='retry_backoff' type-id='type-id-53' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='1152'>
+        <var-decl name='retry_backoff_cap' type-id='type-id-53' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='1216'>
+        <var-decl name='error' type-id='type-id-49' visibility='default'/>
+      </data-member>
+    </class-decl>
+    <class-decl name='mg_router_config' size-in-bits='448' is-struct='yes' visibility='default' id='type-id-230'>
+      <data-member access='public' layout-offset-in-bits='0'>
+        <var-decl name='session_params' type-id='type-id-190' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='64'>
+        <var-decl name='resolver' type-id='type-id-227' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='128'>
+        <var-decl name='resolver_data' type-id='type-id-10' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='192'>
+        <var-decl name='routing_context' type-id='type-id-77' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='256'>
+        <var-decl name='max_retries' type-id='type-id-68' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='320'>
+        <var-decl name='retry_backoff' type-id='type-id-53' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='384'>
+        <var-decl name='retry_backoff_cap' type-id='type-id-53' visibility='default'/>
+      </data-member>
+    </class-decl>
+    <class-decl name='mg_routing_table' size-in-bits='448' is-struct='yes' visibility='default' id='type-id-231'>
+      <data-member access='public' layout-offset-in-bits='0'>
+        <var-decl name='ttl' type-id='type-id-62' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='64'>
+        <var-decl name='roles' type-id='type-id-220' visibility='default'/>
+      </data-member>
+    </class-decl>
+    <class-decl name='timespec' size-in-bits='128' is-struct='yes' visibility='default' id='type-id-232'>
+      <data-member access='public' layout-offset-in-bits='0'>
+        <var-decl name='tv_sec' type-id='type-id-233' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='64'>
+        <var-decl name='tv_nsec' type-id='type-id-234' visibility='default'/>
+      </data-member>
+    </class-decl>
+    <typedef-decl name='__syscall_slong_t' type-id='type-id-20' id='type-id-234'/>
+    <typedef-decl name='__time_t' type-id='type-id-20' id='type-id-233'/>
+    <typedef-decl name='mg_addr_list' type-id='type-id-222' id='type-id-219'/>
+    <typedef-decl name='mg_resolver_fn' type-id='type-id-235' id='type-id-227'/>
+    <typedef-decl name='mg_resolver_result' type-id='type-id-224' id='type-id-236'/>
+    <typedef-decl name='mg_router' type-id='type-id-225' id='type-id-237'/>
+    <typedef-decl name='mg_router_config' type-id='type-id-230' id='type-id-238'/>
+    <typedef-decl name='mg_routing_table' type-id='type-id-231' id='type-id-239'/>
+    <typedef-decl name='mg_trust_callback_type' type-id='type-id-109' id='type-id-226'/>
+    <typedef-decl name='mg_work_fn' type-id='type-id-240' id='type-id-241'/>
+    <typedef-decl name='time_t' type-id='type-id-233' id='type-id-229'/>
+    <pointer-type-def type-id='type-id-8' size-in-bits='64' id='type-id-223'/>
+    <qualified-type-def type-id='type-id-223' restrict='yes' id='type-id-242'/>
+    <qualified-type-def type-id='type-id-238' const='yes' id='type-id-243'/>
+    <pointer-type-def type-id='type-id-243' size-in-bits='64' id='type-id-244'/>
+    <qualified-type-def type-id='type-id-239' const='yes' id='type-id-245'/>
+    <pointer-type-def type-id='type-id-245' size-in-bits='64' id='type-id-246'/>
+    <qualified-type-def type-id='type-id-232' const='yes' id='type-id-247'/>
+    <pointer-type-def type-id='type-id-247' size-in-bits='64' id='type-id-248'/>
+    <pointer-type-def type-id='type-id-249' size-in-bits='64' id='type-id-235'/>
+    <pointer-type-def type-id='type-id-250' size-in-bits='64' id='type-id-240'/>
+    <pointer-type-def type-id='type-id-236' size-in-bits='64' id='type-id-251'/>
+    <pointer-type-def type-id='type-id-237' size-in-bits='64' id='type-id-252'/>
+    <pointer-type-def type-id='type-id-238' size-in-bits='64' id='type-id-253'/>
+    <pointer-type-def type-id='type-id-239' size-in-bits='64' id='type-id-228'/>
+    <pointer-type-def type-id='type-id-229' size-in-bits='64' id='type-id-254'/>
+    <pointer-type-def type-id='type-id-232' size-in-bits='64' id='type-id-255'/>
+    <function-decl name='mg_string_data' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-192'/>
+      <return type-id='type-id-4'/>
+    </function-decl>
+    <function-decl name='mg_string_size' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-192'/>
+      <return type-id='type-id-68'/>
+    </function-decl>
+    <function-decl name='mg_list_size' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-183'/>
+      <return type-id='type-id-68'/>
+    </function-decl>
+    <function-decl name='mg_list_at' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-183'/>
+      <parameter type-id='type-id-68'/>
+      <return type-id='type-id-194'/>
+    </function-decl>
+    <function-decl name='mg_map_copy' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-186'/>
+      <return type-id='type-id-77'/>
+    </function-decl>
+    <function-decl name='mg_session_params_get_trust_callback' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-190'/>
+      <return type-id='type-id-226'/>
+    </function-decl>
+    <function-decl name='mg_session_error' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-3'/>
+      <return type-id='type-id-4'/>
+    </function-decl>
+    <function-decl name='mg_session_destroy' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-3'/>
+      <return type-id='type-id-5'/>
+    </function-decl>
+    <function-decl name='mg_routing_table_parse' mangled-name='mg_routing_table_parse' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_routing_table_parse'>
+      <parameter type-id='type-id-186' name='raw'/>
+      <return type-id='type-id-228'/>
+    </function-decl>
+    <function-decl name='mg_routing_table_destroy' mangled-name='mg_routing_table_destroy' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_routing_table_destroy'>
+      <parameter type-id='type-id-228' name='table'/>
+      <return type-id='type-id-5'/>
+    </function-decl>
+    <function-decl name='mg_routing_table_ttl' mangled-name='mg_routing_table_ttl' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_routing_table_ttl'>
+      <parameter type-id='type-id-246' name='table'/>
+      <return type-id='type-id-62'/>
+    </function-decl>
+    <function-decl name='mg_routing_table_address_count' mangled-name='mg_routing_table_address_count' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_routing_table_address_count'>
+      <parameter type-id='type-id-246' name='table'/>
+      <parameter type-id='type-id-218' name='role'/>
+      <return type-id='type-id-68'/>
+    </function-decl>
+    <function-decl name='mg_routing_table_address_at' mangled-name='mg_routing_table_address_at' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_routing_table_address_at'>
+      <parameter type-id='type-id-246' name='table'/>
+      <parameter type-id='type-id-218' name='role'/>
+      <parameter type-id='type-id-68' name='index'/>
+      <return type-id='type-id-4'/>
+    </function-decl>
+    <function-decl name='mg_error_is_transient' mangled-name='mg_error_is_transient' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_error_is_transient'>
+      <parameter type-id='type-id-7' name='error'/>
+      <return type-id='type-id-7'/>
+    </function-decl>
+    <function-decl name='mg_router_config_make' mangled-name='mg_router_config_make' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_router_config_make'>
+      <return type-id='type-id-253'/>
+    </function-decl>
+    <function-decl name='mg_router_config_destroy' mangled-name='mg_router_config_destroy' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_router_config_destroy'>
+      <parameter type-id='type-id-253' name='config'/>
+      <return type-id='type-id-5'/>
+    </function-decl>
+    <function-decl name='mg_router_config_set_session_params' mangled-name='mg_router_config_set_session_params' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_router_config_set_session_params'>
+      <parameter type-id='type-id-253' name='config'/>
+      <parameter type-id='type-id-190' name='params'/>
+      <return type-id='type-id-5'/>
+    </function-decl>
+    <function-decl name='mg_router_config_set_resolver' mangled-name='mg_router_config_set_resolver' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_router_config_set_resolver'>
+      <parameter type-id='type-id-253' name='config'/>
+      <parameter type-id='type-id-227' name='resolver'/>
+      <parameter type-id='type-id-10' name='resolver_data'/>
+      <return type-id='type-id-5'/>
+    </function-decl>
+    <function-decl name='mg_router_config_set_routing_context' mangled-name='mg_router_config_set_routing_context' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_router_config_set_routing_context'>
+      <parameter type-id='type-id-253' name='config'/>
+      <parameter type-id='type-id-186' name='routing_context'/>
+      <return type-id='type-id-5'/>
+    </function-decl>
+    <function-decl name='mg_router_config_set_max_retries' mangled-name='mg_router_config_set_max_retries' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_router_config_set_max_retries'>
+      <parameter type-id='type-id-253' name='config'/>
+      <parameter type-id='type-id-68' name='max_retries'/>
+      <return type-id='type-id-5'/>
+    </function-decl>
+    <function-decl name='mg_router_config_set_retry_backoff' mangled-name='mg_router_config_set_retry_backoff' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_router_config_set_retry_backoff'>
+      <parameter type-id='type-id-253' name='config'/>
+      <parameter type-id='type-id-53' name='base_seconds'/>
+      <parameter type-id='type-id-53' name='cap_seconds'/>
+      <return type-id='type-id-5'/>
+    </function-decl>
+    <function-decl name='mg_router_make' mangled-name='mg_router_make' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_router_make'>
+      <parameter type-id='type-id-244' name='config'/>
+      <return type-id='type-id-252'/>
+    </function-decl>
+    <function-decl name='mg_router_destroy' mangled-name='mg_router_destroy' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_router_destroy'>
+      <parameter type-id='type-id-252' name='router'/>
+      <return type-id='type-id-5'/>
+    </function-decl>
+    <function-decl name='mg_resolver_result_add' mangled-name='mg_resolver_result_add' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_resolver_result_add'>
+      <parameter type-id='type-id-251' name='result'/>
+      <parameter type-id='type-id-4' name='target'/>
+      <return type-id='type-id-7'/>
+    </function-decl>
+    <function-decl name='mg_router_refresh' mangled-name='mg_router_refresh' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_router_refresh'>
+      <parameter type-id='type-id-252' name='router'/>
+      <return type-id='type-id-7'/>
+    </function-decl>
+    <function-decl name='mg_router_routing_table' mangled-name='mg_router_routing_table' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_router_routing_table'>
+      <parameter type-id='type-id-252' name='router'/>
+      <return type-id='type-id-246'/>
+    </function-decl>
+    <function-decl name='mg_router_error' mangled-name='mg_router_error' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_router_error'>
+      <parameter type-id='type-id-252' name='router'/>
+      <return type-id='type-id-4'/>
+    </function-decl>
+    <function-decl name='mg_router_connect_read' mangled-name='mg_router_connect_read' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_router_connect_read'>
+      <parameter type-id='type-id-252' name='router'/>
+      <parameter type-id='type-id-208' name='session'/>
+      <return type-id='type-id-7'/>
+    </function-decl>
+    <function-decl name='mg_router_connect_write' mangled-name='mg_router_connect_write' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_router_connect_write'>
+      <parameter type-id='type-id-252' name='router'/>
+      <parameter type-id='type-id-208' name='session'/>
+      <return type-id='type-id-7'/>
+    </function-decl>
+    <function-decl name='mg_router_execute_read' mangled-name='mg_router_execute_read' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_router_execute_read'>
+      <parameter type-id='type-id-252' name='router'/>
+      <parameter type-id='type-id-241' name='work'/>
+      <parameter type-id='type-id-10' name='work_data'/>
+      <return type-id='type-id-7'/>
+    </function-decl>
+    <function-decl name='mg_router_execute_write' mangled-name='mg_router_execute_write' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_router_execute_write'>
+      <parameter type-id='type-id-252' name='router'/>
+      <parameter type-id='type-id-241' name='work'/>
+      <parameter type-id='type-id-10' name='work_data'/>
+      <return type-id='type-id-7'/>
+    </function-decl>
+    <function-decl name='strtol' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-40'/>
+      <parameter type-id='type-id-242'/>
+      <parameter type-id='type-id-7'/>
+      <return type-id='type-id-20'/>
+    </function-decl>
+    <function-decl name='calloc' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-11'/>
+      <parameter type-id='type-id-11'/>
+      <return type-id='type-id-10'/>
+    </function-decl>
+    <function-decl name='memcmp' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-10'/>
+      <parameter type-id='type-id-10'/>
+      <parameter type-id='type-id-11'/>
+      <return type-id='type-id-7'/>
+    </function-decl>
+    <function-decl name='strcmp' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-4'/>
+      <parameter type-id='type-id-4'/>
+      <return type-id='type-id-7'/>
+    </function-decl>
+    <function-decl name='strrchr' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-4'/>
+      <parameter type-id='type-id-7'/>
+      <return type-id='type-id-8'/>
+    </function-decl>
+    <function-decl name='strlen' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-4'/>
+      <return type-id='type-id-11'/>
+    </function-decl>
+    <function-decl name='time' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-254'/>
+      <return type-id='type-id-229'/>
+    </function-decl>
+    <function-decl name='nanosleep' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-248'/>
+      <parameter type-id='type-id-255'/>
+      <return type-id='type-id-7'/>
+    </function-decl>
+    <function-type size-in-bits='64' id='type-id-249'>
+      <parameter type-id='type-id-4'/>
+      <parameter type-id='type-id-251'/>
+      <parameter type-id='type-id-10'/>
+      <return type-id='type-id-7'/>
+    </function-type>
+    <function-type size-in-bits='64' id='type-id-250'>
+      <parameter type-id='type-id-3'/>
+      <parameter type-id='type-id-10'/>
+      <return type-id='type-id-7'/>
+    </function-type>
+  </abi-instr>
+  <abi-instr address-size='64' path='/home/gareth/checkout/mgclient/src/mgsession-decoder.c' comp-dir-path='/tmp/tmp09s4zkrb/src' language='LANG_C11'>
+    <function-decl name='mg_string_alloc' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-68'/>
+      <parameter type-id='type-id-97'/>
+      <return type-id='type-id-65'/>
+    </function-decl>
+    <function-decl name='mg_list_alloc' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-68'/>
+      <parameter type-id='type-id-97'/>
+      <return type-id='type-id-83'/>
+    </function-decl>
+    <function-decl name='mg_map_alloc' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-68'/>
+      <parameter type-id='type-id-97'/>
+      <return type-id='type-id-77'/>
+    </function-decl>
+    <function-decl name='mg_node_alloc' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-68'/>
+      <parameter type-id='type-id-97'/>
+      <return type-id='type-id-155'/>
+    </function-decl>
+    <function-decl name='mg_path_alloc' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-68'/>
+      <parameter type-id='type-id-68'/>
+      <parameter type-id='type-id-68'/>
+      <parameter type-id='type-id-97'/>
+      <return type-id='type-id-158'/>
+    </function-decl>
+    <function-decl name='mg_date_alloc' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-97'/>
+      <return type-id='type-id-159'/>
+    </function-decl>
+    <function-decl name='mg_time_alloc' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-97'/>
+      <return type-id='type-id-160'/>
+    </function-decl>
+    <function-decl name='mg_local_time_alloc' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-97'/>
+      <return type-id='type-id-161'/>
+    </function-decl>
+    <function-decl name='mg_date_time_alloc' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-97'/>
+      <return type-id='type-id-162'/>
+    </function-decl>
+    <function-decl name='mg_date_time_zone_id_alloc' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-97'/>
+      <return type-id='type-id-163'/>
+    </function-decl>
+    <function-decl name='mg_local_date_time_alloc' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-97'/>
+      <return type-id='type-id-164'/>
+    </function-decl>
+    <function-decl name='mg_duration_alloc' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-97'/>
+      <return type-id='type-id-165'/>
+    </function-decl>
+    <function-decl name='mg_point_2d_alloc' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-97'/>
+      <return type-id='type-id-166'/>
+    </function-decl>
+    <function-decl name='mg_point_3d_alloc' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-97'/>
+      <return type-id='type-id-167'/>
+    </function-decl>
+    <function-decl name='mg_value_destroy_ca' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-211'/>
+      <parameter type-id='type-id-97'/>
+      <return type-id='type-id-5'/>
+    </function-decl>
+    <function-decl name='mg_node_destroy_ca' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-155'/>
+      <parameter type-id='type-id-97'/>
+      <return type-id='type-id-5'/>
+    </function-decl>
+    <function-decl name='mg_unbound_relationship_destroy_ca' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-157'/>
+      <parameter type-id='type-id-97'/>
+      <return type-id='type-id-5'/>
+    </function-decl>
+  </abi-instr>
+  <abi-instr address-size='64' path='/home/gareth/checkout/mgclient/src/mgsession-encoder.c' comp-dir-path='/tmp/tmp09s4zkrb/src' language='LANG_C11'>
+    <function-decl name='mg_session_write_raw' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-3'/>
+      <parameter type-id='type-id-4'/>
+      <parameter type-id='type-id-11'/>
+      <return type-id='type-id-7'/>
+    </function-decl>
+    <function-decl name='mg_session_flush_message' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-3'/>
+      <return type-id='type-id-7'/>
+    </function-decl>
+  </abi-instr>
+  <abi-instr address-size='64' path='/home/gareth/checkout/mgclient/src/mgsession.c' comp-dir-path='/tmp/tmp09s4zkrb/src' language='LANG_C11'>
+    <qualified-type-def type-id='type-id-148' const='yes' id='type-id-256'/>
+    <pointer-type-def type-id='type-id-256' size-in-bits='64' id='type-id-257'/>
+    <pointer-type-def type-id='type-id-258' size-in-bits='64' id='type-id-259'/>
+    <class-decl name='mg_linear_allocator' is-struct='yes' visibility='default' is-declaration-only='yes' id='type-id-260'/>
+    <function-decl name='mg_allocator_realloc' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-41'/>
+      <parameter type-id='type-id-10'/>
+      <parameter type-id='type-id-11'/>
+      <return type-id='type-id-10'/>
+    </function-decl>
+    <typedef-decl name='mg_linear_allocator' type-id='type-id-260' id='type-id-258'/>
+    <function-decl name='mg_linear_allocator_init' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-97'/>
+      <parameter type-id='type-id-11'/>
+      <parameter type-id='type-id-11'/>
+      <return type-id='type-id-259'/>
+    </function-decl>
+    <function-decl name='mg_linear_allocator_reset' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-259'/>
+      <return type-id='type-id-5'/>
+    </function-decl>
+    <function-decl name='mg_linear_allocator_destroy' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-259'/>
+      <return type-id='type-id-5'/>
+    </function-decl>
+    <function-decl name='mg_session_status' mangled-name='mg_session_status' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_session_status'>
+      <parameter type-id='type-id-257' name='session'/>
+      <return type-id='type-id-7'/>
+    </function-decl>
+    <function-decl name='mg_transport_destroy' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-105'/>
+      <return type-id='type-id-5'/>
+    </function-decl>
+  </abi-instr>
+  <abi-instr address-size='64' path='/home/gareth/checkout/mgclient/src/mgtransport.c' comp-dir-path='/tmp/tmp09s4zkrb/src' language='LANG_C11'>
+    <type-decl name='short int' size-in-bits='16' id='type-id-261'/>
+    <class-decl name='pollfd' size-in-bits='64' is-struct='yes' visibility='default' id='type-id-262'>
+      <data-member access='public' layout-offset-in-bits='0'>
+        <var-decl name='fd' type-id='type-id-7' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='32'>
+        <var-decl name='events' type-id='type-id-261' visibility='default'/>
+      </data-member>
+      <data-member access='public' layout-offset-in-bits='48'>
+        <var-decl name='revents' type-id='type-id-261' visibility='default'/>
+      </data-member>
+    </class-decl>
+    <typedef-decl name='__ssize_t' type-id='type-id-20' id='type-id-263'/>
+    <typedef-decl name='__uint64_t' type-id='type-id-1' id='type-id-264'/>
+    <typedef-decl name='ssize_t' type-id='type-id-263' id='type-id-12'/>
+    <typedef-decl name='uint64_t' type-id='type-id-264' id='type-id-265'/>
+    <type-decl name='unsigned char' size-in-bits='8' id='type-id-266'/>
+    <pointer-type-def type-id='type-id-267' size-in-bits='64' id='type-id-268'/>
+    <pointer-type-def type-id='type-id-262' size-in-bits='64' id='type-id-9'/>
+    <pointer-type-def type-id='type-id-266' size-in-bits='64' id='type-id-269'/>
+    <pointer-type-def type-id='type-id-119' size-in-bits='64' id='type-id-270'/>
+    <pointer-type-def type-id='type-id-271' size-in-bits='64' id='type-id-272'/>
+    <pointer-type-def type-id='type-id-273' size-in-bits='64' id='type-id-274'/>
+    <pointer-type-def type-id='type-id-275' size-in-bits='64' id='type-id-276'/>
+    <pointer-type-def type-id='type-id-277' size-in-bits='64' id='type-id-278'/>
+    <pointer-type-def type-id='type-id-279' size-in-bits='64' id='type-id-280'/>
+    <qualified-type-def type-id='type-id-281' const='yes' id='type-id-282'/>
+    <pointer-type-def type-id='type-id-282' size-in-bits='64' id='type-id-283'/>
+    <qualified-type-def type-id='type-id-273' const='yes' id='type-id-284'/>
+    <pointer-type-def type-id='type-id-284' size-in-bits='64' id='type-id-285'/>
+    <qualified-type-def type-id='type-id-275' const='yes' id='type-id-286'/>
+    <pointer-type-def type-id='type-id-286' size-in-bits='64' id='type-id-287'/>
+    <qualified-type-def type-id='type-id-288' const='yes' id='type-id-289'/>
+    <pointer-type-def type-id='type-id-289' size-in-bits='64' id='type-id-290'/>
+    <qualified-type-def type-id='type-id-279' const='yes' id='type-id-291'/>
+    <pointer-type-def type-id='type-id-291' size-in-bits='64' id='type-id-292'/>
+    <class-decl name='bio_st' is-struct='yes' visibility='default' is-declaration-only='yes' id='type-id-293'/>
+    <class-decl name='evp_md_st' is-struct='yes' visibility='default' is-declaration-only='yes' id='type-id-294'/>
+    <class-decl name='evp_pkey_st' is-struct='yes' visibility='default' is-declaration-only='yes' id='type-id-295'/>
+    <class-decl name='ssl_ctx_st' is-struct='yes' visibility='default' is-declaration-only='yes' id='type-id-296'/>
+    <class-decl name='ssl_method_st' is-struct='yes' visibility='default' is-declaration-only='yes' id='type-id-297'/>
+    <class-decl name='ssl_st' is-struct='yes' visibility='default' is-declaration-only='yes' id='type-id-298'/>
+    <class-decl name='x509_st' is-struct='yes' visibility='default' is-declaration-only='yes' id='type-id-299'/>
+    <function-decl name='mg_socket_send' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-7'/>
+      <parameter type-id='type-id-10'/>
+      <parameter type-id='type-id-7'/>
+      <return type-id='type-id-12'/>
+    </function-decl>
+    <function-decl name='mg_socket_receive' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-7'/>
+      <parameter type-id='type-id-10'/>
+      <parameter type-id='type-id-7'/>
+      <return type-id='type-id-12'/>
+    </function-decl>
+    <function-decl name='mg_socket_poll' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-9'/>
+      <parameter type-id='type-id-119'/>
+      <parameter type-id='type-id-7'/>
+      <return type-id='type-id-7'/>
+    </function-decl>
+    <function-decl name='BIO_free' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-272'/>
+      <return type-id='type-id-7'/>
+    </function-decl>
+    <function-decl name='BIO_ctrl' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-272'/>
+      <parameter type-id='type-id-7'/>
+      <parameter type-id='type-id-20'/>
+      <parameter type-id='type-id-10'/>
+      <return type-id='type-id-20'/>
+    </function-decl>
+    <function-decl name='BIO_new_socket' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-7'/>
+      <parameter type-id='type-id-7'/>
+      <return type-id='type-id-272'/>
+    </function-decl>
+    <function-decl name='ERR_clear_error' visibility='default' binding='global' size-in-bits='64'>
+      <return type-id='type-id-5'/>
+    </function-decl>
+    <function-decl name='ERR_print_errors_cb' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-268'/>
+      <parameter type-id='type-id-10'/>
+      <return type-id='type-id-5'/>
+    </function-decl>
+    <function-decl name='EVP_sha512' visibility='default' binding='global' size-in-bits='64'>
+      <return type-id='type-id-283'/>
+    </function-decl>
+    <function-decl name='EVP_PKEY_get_base_id' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-285'/>
+      <return type-id='type-id-7'/>
+    </function-decl>
+    <function-decl name='EVP_PKEY_free' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-274'/>
+      <return type-id='type-id-5'/>
+    </function-decl>
+    <function-decl name='OBJ_nid2ln' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-7'/>
+      <return type-id='type-id-4'/>
+    </function-decl>
+    <typedef-decl name='SSL_METHOD' type-id='type-id-297' id='type-id-288'/>
+    <function-decl name='SSL_CTX_set_options' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-278'/>
+      <parameter type-id='type-id-265'/>
+      <return type-id='type-id-265'/>
+    </function-decl>
+    <function-decl name='SSL_CTX_new' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-290'/>
+      <return type-id='type-id-278'/>
+    </function-decl>
+    <function-decl name='SSL_CTX_free' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-278'/>
+      <return type-id='type-id-5'/>
+    </function-decl>
+    <function-decl name='SSL_set_bio' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-276'/>
+      <parameter type-id='type-id-272'/>
+      <parameter type-id='type-id-272'/>
+      <return type-id='type-id-5'/>
+    </function-decl>
+    <function-decl name='SSL_CTX_use_PrivateKey_file' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-278'/>
+      <parameter type-id='type-id-4'/>
+      <parameter type-id='type-id-7'/>
+      <return type-id='type-id-7'/>
+    </function-decl>
+    <function-decl name='SSL_CTX_use_certificate_chain_file' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-278'/>
+      <parameter type-id='type-id-4'/>
+      <return type-id='type-id-7'/>
+    </function-decl>
+    <function-decl name='SSL_get1_peer_certificate' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-287'/>
+      <return type-id='type-id-280'/>
+    </function-decl>
+    <function-decl name='SSL_new' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-278'/>
+      <return type-id='type-id-276'/>
+    </function-decl>
+    <function-decl name='SSL_free' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-276'/>
+      <return type-id='type-id-5'/>
+    </function-decl>
+    <function-decl name='SSL_connect' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-276'/>
+      <return type-id='type-id-7'/>
+    </function-decl>
+    <function-decl name='SSL_read' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-276'/>
+      <parameter type-id='type-id-10'/>
+      <parameter type-id='type-id-7'/>
+      <return type-id='type-id-7'/>
+    </function-decl>
+    <function-decl name='SSL_write' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-276'/>
+      <parameter type-id='type-id-10'/>
+      <parameter type-id='type-id-7'/>
+      <return type-id='type-id-7'/>
+    </function-decl>
+    <function-decl name='SSL_get_error' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-287'/>
+      <parameter type-id='type-id-7'/>
+      <return type-id='type-id-7'/>
+    </function-decl>
+    <function-decl name='TLS_client_method' visibility='default' binding='global' size-in-bits='64'>
+      <return type-id='type-id-290'/>
+    </function-decl>
+    <typedef-decl name='BIO' type-id='type-id-293' id='type-id-271'/>
+    <typedef-decl name='EVP_MD' type-id='type-id-294' id='type-id-281'/>
+    <typedef-decl name='EVP_PKEY' type-id='type-id-295' id='type-id-273'/>
+    <typedef-decl name='X509' type-id='type-id-299' id='type-id-279'/>
+    <typedef-decl name='SSL' type-id='type-id-298' id='type-id-275'/>
+    <typedef-decl name='SSL_CTX' type-id='type-id-296' id='type-id-277'/>
+    <function-decl name='X509_pubkey_digest' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-292'/>
+      <parameter type-id='type-id-283'/>
+      <parameter type-id='type-id-269'/>
+      <parameter type-id='type-id-270'/>
+      <return type-id='type-id-7'/>
+    </function-decl>
+    <function-decl name='X509_free' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-280'/>
+      <return type-id='type-id-5'/>
+    </function-decl>
+    <function-decl name='X509_get_pubkey' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-280'/>
+      <return type-id='type-id-274'/>
+    </function-decl>
+    <function-decl name='perror' visibility='default' binding='global' size-in-bits='64'>
+      <parameter type-id='type-id-4'/>
+      <return type-id='type-id-5'/>
+    </function-decl>
+    <function-type size-in-bits='64' id='type-id-267'>
+      <parameter type-id='type-id-4'/>
+      <parameter type-id='type-id-11'/>
+      <parameter type-id='type-id-10'/>
+      <return type-id='type-id-7'/>
+    </function-type>
+  </abi-instr>
+  <abi-instr address-size='64' path='/home/gareth/checkout/mgclient/src/mgvalue.c' comp-dir-path='/tmp/tmp09s4zkrb/src' language='LANG_C11'>
+    <typedef-decl name='__int32_t' type-id='type-id-7' id='type-id-300'/>
+    <typedef-decl name='int32_t' type-id='type-id-300' id='type-id-301'/>
+    <qualified-type-def type-id='type-id-124' const='yes' id='type-id-302'/>
+    <pointer-type-def type-id='type-id-302' size-in-bits='64' id='type-id-303'/>
+    <qualified-type-def type-id='type-id-125' const='yes' id='type-id-304'/>
+    <pointer-type-def type-id='type-id-304' size-in-bits='64' id='type-id-305'/>
+    <qualified-type-def type-id='type-id-126' const='yes' id='type-id-306'/>
+    <pointer-type-def type-id='type-id-306' size-in-bits='64' id='type-id-307'/>
+    <qualified-type-def type-id='type-id-127' const='yes' id='type-id-308'/>
+    <pointer-type-def type-id='type-id-308' size-in-bits='64' id='type-id-309'/>
+    <qualified-type-def type-id='type-id-129' const='yes' id='type-id-310'/>
+    <pointer-type-def type-id='type-id-310' size-in-bits='64' id='type-id-311'/>
+    <qualified-type-def type-id='type-id-130' const='yes' id='type-id-312'/>
+    <pointer-type-def type-id='type-id-312' size-in-bits='64' id='type-id-313'/>
+    <qualified-type-def type-id='type-id-141' const='yes' id='type-id-314'/>
+    <pointer-type-def type-id='type-id-314' size-in-bits='64' id='type-id-315'/>
+    <qualified-type-def type-id='type-id-142' const='yes' id='type-id-316'/>
+    <pointer-type-def type-id='type-id-316' size-in-bits='64' id='type-id-317'/>
+    <qualified-type-def type-id='type-id-143' const='yes' id='type-id-318'/>
+    <pointer-type-def type-id='type-id-318' size-in-bits='64' id='type-id-319'/>
+    <qualified-type-def type-id='type-id-144' const='yes' id='type-id-320'/>
+    <pointer-type-def type-id='type-id-320' size-in-bits='64' id='type-id-321'/>
+    <qualified-type-def type-id='type-id-146' const='yes' id='type-id-322'/>
+    <pointer-type-def type-id='type-id-322' size-in-bits='64' id='type-id-323'/>
+    <qualified-type-def type-id='type-id-151' const='yes' id='type-id-324'/>
+    <pointer-type-def type-id='type-id-324' size-in-bits='64' id='type-id-325'/>
+    <qualified-type-def type-id='type-id-153' const='yes' id='type-id-326'/>
+    <pointer-type-def type-id='type-id-326' size-in-bits='64' id='type-id-327'/>
+    <function-decl name='mg_value_make_null' mangled-name='mg_value_make_null' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_value_make_null'>
+      <return type-id='type-id-211'/>
+    </function-decl>
+    <function-decl name='mg_value_make_bool' mangled-name='mg_value_make_bool' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_value_make_bool'>
+      <parameter type-id='type-id-7' name='val'/>
+      <return type-id='type-id-211'/>
+    </function-decl>
+    <function-decl name='mg_value_make_float' mangled-name='mg_value_make_float' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_value_make_float'>
+      <parameter type-id='type-id-53' name='val'/>
+      <return type-id='type-id-211'/>
+    </function-decl>
+    <function-decl name='mg_value_make_string2' mangled-name='mg_value_make_string2' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_value_make_string2'>
+      <parameter type-id='type-id-65' name='str'/>
+      <return type-id='type-id-211'/>
+    </function-decl>
+    <function-decl name='mg_value_make_list' mangled-name='mg_value_make_list' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_value_make_list'>
+      <parameter type-id='type-id-83' name='list'/>
+      <return type-id='type-id-211'/>
+    </function-decl>
+    <function-decl name='mg_value_make_map' mangled-name='mg_value_make_map' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_value_make_map'>
+      <parameter type-id='type-id-77' name='map'/>
+      <return type-id='type-id-211'/>
+    </function-decl>
+    <function-decl name='mg_value_make_node' mangled-name='mg_value_make_node' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_value_make_node'>
+      <parameter type-id='type-id-155' name='node'/>
+      <return type-id='type-id-211'/>
+    </function-decl>
+    <function-decl name='mg_value_make_relationship' mangled-name='mg_value_make_relationship' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_value_make_relationship'>
+      <parameter type-id='type-id-156' name='rel'/>
+      <return type-id='type-id-211'/>
+    </function-decl>
+    <function-decl name='mg_value_make_unbound_relationship' mangled-name='mg_value_make_unbound_relationship' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_value_make_unbound_relationship'>
+      <parameter type-id='type-id-157' name='rel'/>
+      <return type-id='type-id-211'/>
+    </function-decl>
+    <function-decl name='mg_value_make_path' mangled-name='mg_value_make_path' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_value_make_path'>
+      <parameter type-id='type-id-158' name='path'/>
+      <return type-id='type-id-211'/>
+    </function-decl>
+    <function-decl name='mg_value_make_date' mangled-name='mg_value_make_date' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_value_make_date'>
+      <parameter type-id='type-id-159' name='date'/>
+      <return type-id='type-id-211'/>
+    </function-decl>
+    <function-decl name='mg_value_make_time' mangled-name='mg_value_make_time' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_value_make_time'>
+      <parameter type-id='type-id-160' name='time'/>
+      <return type-id='type-id-211'/>
+    </function-decl>
+    <function-decl name='mg_value_make_local_time' mangled-name='mg_value_make_local_time' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_value_make_local_time'>
+      <parameter type-id='type-id-161' name='local_time'/>
+      <return type-id='type-id-211'/>
+    </function-decl>
+    <function-decl name='mg_value_make_date_time' mangled-name='mg_value_make_date_time' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_value_make_date_time'>
+      <parameter type-id='type-id-162' name='date_time'/>
+      <return type-id='type-id-211'/>
+    </function-decl>
+    <function-decl name='mg_value_make_date_time_zone_id' mangled-name='mg_value_make_date_time_zone_id' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_value_make_date_time_zone_id'>
+      <parameter type-id='type-id-163' name='date_time_zone_id'/>
+      <return type-id='type-id-211'/>
+    </function-decl>
+    <function-decl name='mg_value_make_local_date_time' mangled-name='mg_value_make_local_date_time' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_value_make_local_date_time'>
+      <parameter type-id='type-id-164' name='local_date_time'/>
+      <return type-id='type-id-211'/>
+    </function-decl>
+    <function-decl name='mg_value_make_duration' mangled-name='mg_value_make_duration' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_value_make_duration'>
+      <parameter type-id='type-id-165' name='duration'/>
+      <return type-id='type-id-211'/>
+    </function-decl>
+    <function-decl name='mg_value_make_point_2d' mangled-name='mg_value_make_point_2d' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_value_make_point_2d'>
+      <parameter type-id='type-id-166' name='point_2d'/>
+      <return type-id='type-id-211'/>
+    </function-decl>
+    <function-decl name='mg_value_make_point_3d' mangled-name='mg_value_make_point_3d' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_value_make_point_3d'>
+      <parameter type-id='type-id-167' name='point_3d'/>
+      <return type-id='type-id-211'/>
+    </function-decl>
+    <function-decl name='mg_value_float' mangled-name='mg_value_float' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_value_float'>
+      <parameter type-id='type-id-194' name='val'/>
+      <return type-id='type-id-53'/>
+    </function-decl>
+    <function-decl name='mg_value_copy' mangled-name='mg_value_copy' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_value_copy'>
+      <parameter type-id='type-id-194' name='val'/>
+      <return type-id='type-id-211'/>
+    </function-decl>
+    <function-decl name='mg_string_make' mangled-name='mg_string_make' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_string_make'>
+      <parameter type-id='type-id-4' name='str'/>
+      <return type-id='type-id-65'/>
+    </function-decl>
+    <function-decl name='mg_string_make2' mangled-name='mg_string_make2' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_string_make2'>
+      <parameter type-id='type-id-68' name='len'/>
+      <parameter type-id='type-id-4' name='data'/>
+      <return type-id='type-id-65'/>
+    </function-decl>
+    <function-decl name='mg_string_copy' mangled-name='mg_string_copy' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_string_copy'>
+      <parameter type-id='type-id-192' name='str'/>
+      <return type-id='type-id-65'/>
+    </function-decl>
+    <function-decl name='mg_string_destroy' mangled-name='mg_string_destroy' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_string_destroy'>
+      <parameter type-id='type-id-65' name='str'/>
+      <return type-id='type-id-5'/>
+    </function-decl>
+    <function-decl name='mg_list_append' mangled-name='mg_list_append' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_list_append'>
+      <parameter type-id='type-id-83' name='list'/>
+      <parameter type-id='type-id-211' name='value'/>
+      <return type-id='type-id-7'/>
+    </function-decl>
+    <function-decl name='mg_list_copy' mangled-name='mg_list_copy' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_list_copy'>
+      <parameter type-id='type-id-183' name='list'/>
+      <return type-id='type-id-83'/>
+    </function-decl>
+    <function-decl name='mg_map_insert' mangled-name='mg_map_insert' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_map_insert'>
+      <parameter type-id='type-id-77' name='map'/>
+      <parameter type-id='type-id-4' name='key_str'/>
+      <parameter type-id='type-id-211' name='value'/>
+      <return type-id='type-id-7'/>
+    </function-decl>
+    <function-decl name='mg_map_insert2' mangled-name='mg_map_insert2' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_map_insert2'>
+      <parameter type-id='type-id-77' name='map'/>
+      <parameter type-id='type-id-65' name='key'/>
+      <parameter type-id='type-id-211' name='value'/>
+      <return type-id='type-id-7'/>
+    </function-decl>
+    <function-decl name='mg_map_insert_unsafe2' mangled-name='mg_map_insert_unsafe2' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_map_insert_unsafe2'>
+      <parameter type-id='type-id-77' name='map'/>
+      <parameter type-id='type-id-65' name='key'/>
+      <parameter type-id='type-id-211' name='value'/>
+      <return type-id='type-id-7'/>
+    </function-decl>
+    <function-decl name='mg_map_at2' mangled-name='mg_map_at2' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_map_at2'>
+      <parameter type-id='type-id-186' name='map'/>
+      <parameter type-id='type-id-68' name='key_size'/>
+      <parameter type-id='type-id-4' name='key_data'/>
+      <return type-id='type-id-194'/>
+    </function-decl>
+    <function-decl name='mg_map_size' mangled-name='mg_map_size' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_map_size'>
+      <parameter type-id='type-id-186' name='map'/>
+      <return type-id='type-id-68'/>
+    </function-decl>
+    <function-decl name='mg_map_key_at' mangled-name='mg_map_key_at' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_map_key_at'>
+      <parameter type-id='type-id-186' name='map'/>
+      <parameter type-id='type-id-68' name='pos'/>
+      <return type-id='type-id-192'/>
+    </function-decl>
+    <function-decl name='mg_map_value_at' mangled-name='mg_map_value_at' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_map_value_at'>
+      <parameter type-id='type-id-186' name='map'/>
+      <parameter type-id='type-id-68' name='pos'/>
+      <return type-id='type-id-194'/>
+    </function-decl>
+    <function-decl name='mg_node_id' mangled-name='mg_node_id' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_node_id'>
+      <parameter type-id='type-id-315' name='node'/>
+      <return type-id='type-id-62'/>
+    </function-decl>
+    <function-decl name='mg_node_label_count' mangled-name='mg_node_label_count' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_node_label_count'>
+      <parameter type-id='type-id-315' name='node'/>
+      <return type-id='type-id-68'/>
+    </function-decl>
+    <function-decl name='mg_node_label_at' mangled-name='mg_node_label_at' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_node_label_at'>
+      <parameter type-id='type-id-315' name='node'/>
+      <parameter type-id='type-id-68' name='pos'/>
+      <return type-id='type-id-192'/>
+    </function-decl>
+    <function-decl name='mg_node_properties' mangled-name='mg_node_properties' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_node_properties'>
+      <parameter type-id='type-id-315' name='node'/>
+      <return type-id='type-id-186'/>
+    </function-decl>
+    <function-decl name='mg_node_copy' mangled-name='mg_node_copy' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_node_copy'>
+      <parameter type-id='type-id-315' name='node'/>
+      <return type-id='type-id-155'/>
+    </function-decl>
+    <function-decl name='mg_node_destroy' mangled-name='mg_node_destroy' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_node_destroy'>
+      <parameter type-id='type-id-155' name='node'/>
+      <return type-id='type-id-5'/>
+    </function-decl>
+    <function-decl name='mg_relationship_id' mangled-name='mg_relationship_id' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_relationship_id'>
+      <parameter type-id='type-id-323' name='rel'/>
+      <return type-id='type-id-62'/>
+    </function-decl>
+    <function-decl name='mg_relationship_start_id' mangled-name='mg_relationship_start_id' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_relationship_start_id'>
+      <parameter type-id='type-id-323' name='rel'/>
+      <return type-id='type-id-62'/>
+    </function-decl>
+    <function-decl name='mg_relationship_end_id' mangled-name='mg_relationship_end_id' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_relationship_end_id'>
+      <parameter type-id='type-id-323' name='rel'/>
+      <return type-id='type-id-62'/>
+    </function-decl>
+    <function-decl name='mg_relationship_type' mangled-name='mg_relationship_type' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_relationship_type'>
+      <parameter type-id='type-id-323' name='rel'/>
+      <return type-id='type-id-192'/>
+    </function-decl>
+    <function-decl name='mg_relationship_properties' mangled-name='mg_relationship_properties' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_relationship_properties'>
+      <parameter type-id='type-id-323' name='rel'/>
+      <return type-id='type-id-186'/>
+    </function-decl>
+    <function-decl name='mg_relationship_copy' mangled-name='mg_relationship_copy' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_relationship_copy'>
+      <parameter type-id='type-id-323' name='rel'/>
+      <return type-id='type-id-156'/>
+    </function-decl>
+    <function-decl name='mg_relationship_destroy' mangled-name='mg_relationship_destroy' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_relationship_destroy'>
+      <parameter type-id='type-id-156' name='rel'/>
+      <return type-id='type-id-5'/>
+    </function-decl>
+    <function-decl name='mg_unbound_relationship_id' mangled-name='mg_unbound_relationship_id' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_unbound_relationship_id'>
+      <parameter type-id='type-id-327' name='rel'/>
+      <return type-id='type-id-62'/>
+    </function-decl>
+    <function-decl name='mg_unbound_relationship_type' mangled-name='mg_unbound_relationship_type' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_unbound_relationship_type'>
+      <parameter type-id='type-id-327' name='rel'/>
+      <return type-id='type-id-192'/>
+    </function-decl>
+    <function-decl name='mg_unbound_relationship_properties' mangled-name='mg_unbound_relationship_properties' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_unbound_relationship_properties'>
+      <parameter type-id='type-id-327' name='rel'/>
+      <return type-id='type-id-186'/>
+    </function-decl>
+    <function-decl name='mg_unbound_relationship_copy' mangled-name='mg_unbound_relationship_copy' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_unbound_relationship_copy'>
+      <parameter type-id='type-id-327' name='rel'/>
+      <return type-id='type-id-157'/>
+    </function-decl>
+    <function-decl name='mg_unbound_relationship_destroy' mangled-name='mg_unbound_relationship_destroy' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_unbound_relationship_destroy'>
+      <parameter type-id='type-id-157' name='rel'/>
+      <return type-id='type-id-5'/>
+    </function-decl>
+    <function-decl name='mg_path_length' mangled-name='mg_path_length' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_path_length'>
+      <parameter type-id='type-id-317' name='path'/>
+      <return type-id='type-id-68'/>
+    </function-decl>
+    <function-decl name='mg_path_node_at' mangled-name='mg_path_node_at' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_path_node_at'>
+      <parameter type-id='type-id-317' name='path'/>
+      <parameter type-id='type-id-68' name='pos'/>
+      <return type-id='type-id-315'/>
+    </function-decl>
+    <function-decl name='mg_path_relationship_at' mangled-name='mg_path_relationship_at' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_path_relationship_at'>
+      <parameter type-id='type-id-317' name='path'/>
+      <parameter type-id='type-id-68' name='pos'/>
+      <return type-id='type-id-327'/>
+    </function-decl>
+    <function-decl name='mg_path_relationship_reversed_at' mangled-name='mg_path_relationship_reversed_at' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_path_relationship_reversed_at'>
+      <parameter type-id='type-id-317' name='path'/>
+      <parameter type-id='type-id-68' name='pos'/>
+      <return type-id='type-id-7'/>
+    </function-decl>
+    <function-decl name='mg_path_copy' mangled-name='mg_path_copy' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_path_copy'>
+      <parameter type-id='type-id-317' name='path'/>
+      <return type-id='type-id-158'/>
+    </function-decl>
+    <function-decl name='mg_path_destroy' mangled-name='mg_path_destroy' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_path_destroy'>
+      <parameter type-id='type-id-158' name='path'/>
+      <return type-id='type-id-5'/>
+    </function-decl>
+    <function-decl name='mg_date_days' mangled-name='mg_date_days' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_date_days'>
+      <parameter type-id='type-id-303' name='date'/>
+      <return type-id='type-id-62'/>
+    </function-decl>
+    <function-decl name='mg_time_nanoseconds' mangled-name='mg_time_nanoseconds' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_time_nanoseconds'>
+      <parameter type-id='type-id-325' name='time'/>
+      <return type-id='type-id-62'/>
+    </function-decl>
+    <function-decl name='mg_time_tz_offset_seconds' mangled-name='mg_time_tz_offset_seconds' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_time_tz_offset_seconds'>
+      <parameter type-id='type-id-325' name='time'/>
+      <return type-id='type-id-62'/>
+    </function-decl>
+    <function-decl name='mg_local_time_nanoseconds' mangled-name='mg_local_time_nanoseconds' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_local_time_nanoseconds'>
+      <parameter type-id='type-id-313' name='local_time'/>
+      <return type-id='type-id-62'/>
+    </function-decl>
+    <function-decl name='mg_date_time_seconds' mangled-name='mg_date_time_seconds' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_date_time_seconds'>
+      <parameter type-id='type-id-305' name='date_time'/>
+      <return type-id='type-id-62'/>
+    </function-decl>
+    <function-decl name='mg_date_time_nanoseconds' mangled-name='mg_date_time_nanoseconds' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_date_time_nanoseconds'>
+      <parameter type-id='type-id-305' name='date_time'/>
+      <return type-id='type-id-62'/>
+    </function-decl>
+    <function-decl name='mg_date_time_tz_offset_minutes' mangled-name='mg_date_time_tz_offset_minutes' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_date_time_tz_offset_minutes'>
+      <parameter type-id='type-id-305' name='date_time'/>
+      <return type-id='type-id-62'/>
+    </function-decl>
+    <function-decl name='mg_date_time_zone_id_seconds' mangled-name='mg_date_time_zone_id_seconds' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_date_time_zone_id_seconds'>
+      <parameter type-id='type-id-307' name='date_time_zone_id'/>
+      <return type-id='type-id-62'/>
+    </function-decl>
+    <function-decl name='mg_date_time_zone_id_nanoseconds' mangled-name='mg_date_time_zone_id_nanoseconds' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_date_time_zone_id_nanoseconds'>
+      <parameter type-id='type-id-307' name='date_time_zone_id'/>
+      <return type-id='type-id-62'/>
+    </function-decl>
+    <function-decl name='mg_date_time_zone_id_timezone_name' mangled-name='mg_date_time_zone_id_timezone_name' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_date_time_zone_id_timezone_name'>
+      <parameter type-id='type-id-307' name='date_time_zone_id'/>
+      <return type-id='type-id-192'/>
+    </function-decl>
+    <function-decl name='mg_local_date_time_seconds' mangled-name='mg_local_date_time_seconds' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_local_date_time_seconds'>
+      <parameter type-id='type-id-311' name='local_date_time'/>
+      <return type-id='type-id-62'/>
+    </function-decl>
+    <function-decl name='mg_local_date_time_nanoseconds' mangled-name='mg_local_date_time_nanoseconds' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_local_date_time_nanoseconds'>
+      <parameter type-id='type-id-311' name='local_date_time'/>
+      <return type-id='type-id-62'/>
+    </function-decl>
+    <function-decl name='mg_duration_months' mangled-name='mg_duration_months' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_duration_months'>
+      <parameter type-id='type-id-309' name='duration'/>
+      <return type-id='type-id-62'/>
+    </function-decl>
+    <function-decl name='mg_duration_days' mangled-name='mg_duration_days' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_duration_days'>
+      <parameter type-id='type-id-309' name='duration'/>
+      <return type-id='type-id-62'/>
+    </function-decl>
+    <function-decl name='mg_duration_seconds' mangled-name='mg_duration_seconds' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_duration_seconds'>
+      <parameter type-id='type-id-309' name='duration'/>
+      <return type-id='type-id-62'/>
+    </function-decl>
+    <function-decl name='mg_duration_nanoseconds' mangled-name='mg_duration_nanoseconds' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_duration_nanoseconds'>
+      <parameter type-id='type-id-309' name='duration'/>
+      <return type-id='type-id-62'/>
+    </function-decl>
+    <function-decl name='mg_point_2d_srid' mangled-name='mg_point_2d_srid' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_point_2d_srid'>
+      <parameter type-id='type-id-319' name='point_2d'/>
+      <return type-id='type-id-62'/>
+    </function-decl>
+    <function-decl name='mg_point_2d_x' mangled-name='mg_point_2d_x' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_point_2d_x'>
+      <parameter type-id='type-id-319' name='point_2d'/>
+      <return type-id='type-id-53'/>
+    </function-decl>
+    <function-decl name='mg_point_2d_y' mangled-name='mg_point_2d_y' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_point_2d_y'>
+      <parameter type-id='type-id-319' name='point_2d'/>
+      <return type-id='type-id-53'/>
+    </function-decl>
+    <function-decl name='mg_point_3d_srid' mangled-name='mg_point_3d_srid' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_point_3d_srid'>
+      <parameter type-id='type-id-321' name='point_3d'/>
+      <return type-id='type-id-62'/>
+    </function-decl>
+    <function-decl name='mg_point_3d_x' mangled-name='mg_point_3d_x' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_point_3d_x'>
+      <parameter type-id='type-id-321' name='point_3d'/>
+      <return type-id='type-id-53'/>
+    </function-decl>
+    <function-decl name='mg_point_3d_y' mangled-name='mg_point_3d_y' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_point_3d_y'>
+      <parameter type-id='type-id-321' name='point_3d'/>
+      <return type-id='type-id-53'/>
+    </function-decl>
+    <function-decl name='mg_point_3d_z' mangled-name='mg_point_3d_z' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_point_3d_z'>
+      <parameter type-id='type-id-321' name='point_3d'/>
+      <return type-id='type-id-53'/>
+    </function-decl>
+    <function-decl name='mg_date_copy' mangled-name='mg_date_copy' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_date_copy'>
+      <parameter type-id='type-id-303' name='date'/>
+      <return type-id='type-id-159'/>
+    </function-decl>
+    <function-decl name='mg_date_destroy' mangled-name='mg_date_destroy' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_date_destroy'>
+      <parameter type-id='type-id-159' name='date'/>
+      <return type-id='type-id-5'/>
+    </function-decl>
+    <function-decl name='mg_time_copy' mangled-name='mg_time_copy' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_time_copy'>
+      <parameter type-id='type-id-325' name='time'/>
+      <return type-id='type-id-160'/>
+    </function-decl>
+    <function-decl name='mg_date_time_copy' mangled-name='mg_date_time_copy' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_date_time_copy'>
+      <parameter type-id='type-id-305' name='date_time'/>
+      <return type-id='type-id-162'/>
+    </function-decl>
+    <function-decl name='mg_date_time_zone_id_copy' mangled-name='mg_date_time_zone_id_copy' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_date_time_zone_id_copy'>
+      <parameter type-id='type-id-307' name='date_time_zone_id'/>
+      <return type-id='type-id-163'/>
+    </function-decl>
+    <function-decl name='mg_date_time_zone_id_destroy' mangled-name='mg_date_time_zone_id_destroy' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_date_time_zone_id_destroy'>
+      <parameter type-id='type-id-163' name='date_time_zone_id'/>
+      <return type-id='type-id-5'/>
+    </function-decl>
+    <function-decl name='mg_duration_copy' mangled-name='mg_duration_copy' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_duration_copy'>
+      <parameter type-id='type-id-309' name='duration'/>
+      <return type-id='type-id-165'/>
+    </function-decl>
+    <function-decl name='mg_date_make' mangled-name='mg_date_make' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_date_make'>
+      <parameter type-id='type-id-62' name='days'/>
+      <return type-id='type-id-159'/>
+    </function-decl>
+    <function-decl name='mg_local_time_make' mangled-name='mg_local_time_make' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_local_time_make'>
+      <parameter type-id='type-id-62' name='nanoseconds'/>
+      <return type-id='type-id-161'/>
+    </function-decl>
+    <function-decl name='mg_date_time_make' mangled-name='mg_date_time_make' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_date_time_make'>
+      <parameter type-id='type-id-62' name='seconds'/>
+      <parameter type-id='type-id-62' name='nanoseconds'/>
+      <parameter type-id='type-id-301' name='tz_offset_minutes'/>
+      <return type-id='type-id-162'/>
+    </function-decl>
+    <function-decl name='mg_date_time_zone_id_make' mangled-name='mg_date_time_zone_id_make' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_date_time_zone_id_make'>
+      <parameter type-id='type-id-62' name='seconds'/>
+      <parameter type-id='type-id-62' name='nanoseconds'/>
+      <parameter type-id='type-id-4' name='timezone_name'/>
+      <return type-id='type-id-163'/>
+    </function-decl>
+    <function-decl name='mg_local_date_time_make' mangled-name='mg_local_date_time_make' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_local_date_time_make'>
+      <parameter type-id='type-id-62' name='seconds'/>
+      <parameter type-id='type-id-62' name='nanoseconds'/>
+      <return type-id='type-id-164'/>
+    </function-decl>
+    <function-decl name='mg_duration_make' mangled-name='mg_duration_make' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_duration_make'>
+      <parameter type-id='type-id-62' name='months'/>
+      <parameter type-id='type-id-62' name='days'/>
+      <parameter type-id='type-id-62' name='seconds'/>
+      <parameter type-id='type-id-62' name='nanoseconds'/>
+      <return type-id='type-id-165'/>
+    </function-decl>
+    <function-decl name='mg_point_2d_make' mangled-name='mg_point_2d_make' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_point_2d_make'>
+      <parameter type-id='type-id-108' name='srid'/>
+      <parameter type-id='type-id-53' name='x_longitude'/>
+      <parameter type-id='type-id-53' name='y_latitude'/>
+      <return type-id='type-id-166'/>
+    </function-decl>
+    <function-decl name='mg_point_3d_make' mangled-name='mg_point_3d_make' visibility='default' binding='global' size-in-bits='64' elf-symbol-id='mg_point_3d_make'>
+      <parameter type-id='type-id-108' name='srid'/>
+      <parameter type-id='type-id-53' name='x_longitude'/>
+      <parameter type-id='type-id-53' name='y_latitude'/>
+      <parameter type-id='type-id-53' name='z_height'/>
+      <return type-id='type-id-167'/>
+    </function-decl>
+    <var-decl name='mg_default_pull_extra_map' type-id='type-id-77' visibility='default'/>
+    <var-decl name='mg_empty_map' type-id='type-id-131' visibility='default'/>
+  </abi-instr>
+</abi-corpus>
