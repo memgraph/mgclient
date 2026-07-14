@@ -23,9 +23,9 @@ extern "C" {
 #include "apple/mgcommon.h"
 #endif  // MGCLIENT_ON_APPLE
 
-#ifdef MGCLIENT_ON_LINUX
+#ifdef MGCLIENT_ON_POSIX
 #include "linux/mgcommon.h"
-#endif  // MGCLIENT_ON_LINUX
+#endif  // MGCLIENT_ON_POSIX
 
 #ifdef MGCLIENT_ON_WINDOWS
 #include "windows/mgcommon.h"

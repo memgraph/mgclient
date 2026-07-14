@@ -28,7 +28,7 @@ set(mgclient_src_files
         mgvalue.c)
 if(MGCLIENT_ON_APPLE)
     list(APPEND mgclient_src_files apple/mgsocket.c)
-elseif(MGCLIENT_ON_LINUX)
+elseif(MGCLIENT_ON_POSIX)
     list(APPEND mgclient_src_files linux/mgsocket.c)
 elseif(MGCLIENT_ON_WINDOWS)
     list(APPEND mgclient_src_files windows/mgsocket.c)
