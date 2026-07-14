@@ -28,7 +28,7 @@ extern "C" {
 #include <unistd.h>
 #endif  // MGCLIENT_ON_APPLE
 
-#ifdef MGCLIENT_ON_LINUX
+#ifdef MGCLIENT_ON_POSIX
 #include <arpa/inet.h>
 #include <errno.h>
 #include <netdb.h>
@@ -38,7 +38,7 @@ extern "C" {
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <unistd.h>
-#endif  // MGCLIENT_ON_LINUX
+#endif  // MGCLIENT_ON_POSIX
 
 #ifdef MGCLIENT_ON_WINDOWS
 #include <Ws2tcpip.h>

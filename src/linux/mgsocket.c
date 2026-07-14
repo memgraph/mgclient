@@ -102,15 +102,15 @@ int mg_socket_options(int sock, mg_session *session) {
     int optname;
     int optval;
   } socket_options[] = {// disable Nagle algorithm for performance reasons
-                        {SOL_TCP, TCP_NODELAY, 1},
+                        {IPPROTO_TCP, TCP_NODELAY, 1},
                         // turn keep-alive on
                         {SOL_SOCKET, SO_KEEPALIVE, 1},
                         // wait 20s before sending keep-alive packets
-                        {SOL_TCP, TCP_KEEPIDLE, 20},
+                        {IPPROTO_TCP, TCP_KEEPIDLE, 20},
                         // 4 keep-alive packets must fail to close
-                        {SOL_TCP, TCP_KEEPCNT, 4},
+                        {IPPROTO_TCP, TCP_KEEPCNT, 4},
                         // send keep-alive packets every 15s
-                        {SOL_TCP, TCP_KEEPINTVL, 15}};
+                        {IPPROTO_TCP, TCP_KEEPINTVL, 15}};
   const size_t OPTCNT = sizeof(socket_options) / sizeof(socket_options[0]);
 
   for (size_t i = 0; i < OPTCNT; ++i) {
