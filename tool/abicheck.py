@@ -35,6 +35,7 @@ see tool/test_abicheck.py.
 
 Usage:
   tool/abicheck.py                      # check working tree vs committed baseline
+  tool/abicheck.py --ci                 # as above, plus GitHub Actions annotations
   tool/abicheck.py update               # refresh baseline from current tree
   tool/abicheck.py update --version 2.0.0 --soversion 3
                                         # set CMake vars, rebuild, refresh baseline
@@ -158,7 +159,28 @@ def has_failure(findings: list[Finding]) -> bool:
 
 
 # --- I/O shell ------------------------------------------------------------- #
+# Set by main() from --ci; when true, findings/result are also emitted as GitHub
+# Actions workflow commands so they surface as annotations on the run.
+CI = False
+
+# Maps a finding severity to the GitHub Actions annotation level.
+_ANNOTATION_LEVEL = {Severity.FAIL: "error", Severity.WARN: "warning"}
+
+
+def annotate(level: str, message: str, title: str = "ABI check") -> None:
+    """Emit a GitHub Actions annotation (no-op unless --ci). `level` is one of
+    error/warning/notice. Percent and newlines are escaped per the workflow-
+    command spec so a multi-line message renders as a single annotation."""
+    if not CI:
+        return
+    data = (message.replace("%", "%25")
+                   .replace("\r", "%0D")
+                   .replace("\n", "%0A"))
+    print(f"::{level} title={title}::{data}")
+
+
 def die(msg: str, code: int = EXIT_TOOLING) -> NoReturn:
+    annotate("error", msg)
     print(f"error: {msg}", file=sys.stderr)
     sys.exit(code)
 
@@ -289,11 +311,16 @@ def cmd_check(_args: argparse.Namespace) -> None:
     findings = evaluate(change, base, built)
     for f in findings:
         print(f"{f.severity.value}:  {f.message}")
+        annotate(_ANNOTATION_LEVEL[f.severity], f.message)
 
     if has_failure(findings):
-        print(">> RESULT: versioning is INCONSISTENT with the ABI change.")
+        result = "versioning is INCONSISTENT with the ABI change."
+        print(f">> RESULT: {result}")
+        annotate("error", result)
         sys.exit(EXIT_POLICY)
-    print(">> RESULT: versioning is consistent with the ABI baseline.")
+    result = "versioning is consistent with the ABI baseline."
+    print(f">> RESULT: {result}")
+    annotate("notice", result)
 
 
 def set_cmake_var(pattern: str, replacement: str, label: str) -> None:
@@ -335,12 +362,16 @@ def cmd_update(args: argparse.Namespace) -> None:
 
 def main() -> None:
     p = argparse.ArgumentParser(description="mgclient ABI/version consistency gate")
+    p.add_argument("--ci", action="store_true",
+                   help="also emit findings/result as GitHub Actions annotations")
     sub = p.add_subparsers(dest="cmd")
     sub.add_parser("check", help="check working tree vs committed baseline (default)")
     up = sub.add_parser("update", help="rebuild and refresh the baseline (+ optionally set CMake vars)")
     up.add_argument("--version", help="set project VERSION (X.Y.Z) in CMakeLists.txt")
     up.add_argument("--soversion", type=int, help="set mgclient_SOVERSION in CMakeLists.txt")
     args = p.parse_args()
+    global CI
+    CI = args.ci
     (cmd_update if args.cmd == "update" else cmd_check)(args)
 
 

@@ -60,7 +60,7 @@ jobs:
         python3 -m pytest tool/ -q
     - name: Check ABI vs versioning
       run: |
-        python3 ./tool/abicheck.py
+        python3 ./tool/abicheck.py --ci
 
   build_and_test_apple:
     if: ${{ github.event_name == 'pull_request' || (github.event_name == 'workflow_dispatch' && inputs.apple) }}
