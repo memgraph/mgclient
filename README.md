@@ -113,6 +113,59 @@ cmake -DBUILD_TESTING=ON -DBUILD_TESTING_INTEGRATION=ON ..
 ctest
 ```
 
+## Building and installing on BSD
+
+mgclient builds on FreeBSD, NetBSD, OpenBSD, and DragonFly BSD, which share the
+same POSIX socket implementation as Linux.
+
+To build and install mgclient from source you will need:
+   - CMake version >= 3.8
+   - OpenSSL version >= 1.0.2
+   - a C11 compiler (the base system Clang is sufficient)
+
+```
+# FreeBSD / DragonFly BSD
+pkg install cmake git gcc openssl
+
+# OpenBSD
+pkg_add cmake git gcc openssl
+
+# NetBSD
+pkgin install cmake git gcc openssl
+```
+
+Once everything is in place, configure and build the project from the source
+directory:
+
+```
+cmake -B build .
+cmake --build build
+```
+
+This will build two `mgclient` library flavours: a static library (usually
+named `libmgclient.a`) and a shared library (usually named `libmgclient.so`).
+
+To install the libraries and corresponding header files run:
+
+```
+cmake --install build
+```
+
+This will install to system default installation directory. If you want to
+change this location, use the `-DCMAKE_INSTALL_PREFIX` option when configuring.
+
+If you want to build and run tests, configure with:
+
+```
+cmake -B build -DBUILD_TESTING=ON -DBUILD_TESTING_INTEGRATION=ON .
+cmake --build build
+ctest --test-dir build
+```
+
+NOTE: FreeBSD defaults to Clang with libc++. If you instead configure the build
+with GCC (e.g. from `lang/gcc`), point CMake at it explicitly with
+`-DCMAKE_C_COMPILER=` / `-DCMAKE_CXX_COMPILER=`.
+
 ## Building and installing on Windows
 
 To build and install mgclient from source on Windows you will need:
