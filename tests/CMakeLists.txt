@@ -65,17 +65,21 @@ endif()
 # Build examples and add them to tests
 set(EXAMPLE_DIR ${PROJECT_SOURCE_DIR}/examples)
 
+# The examples read the host/port from the MEMGRAPH_HOST/MEMGRAPH_PORT
+# environment variables (like the integration tests), falling back to
+# 127.0.0.1:7687. Override the whole suite at once, e.g.
+#   MEMGRAPH_HOST=<ip> MEMGRAPH_PORT=<port> ctest --test-dir build
 add_executable(example_basic_c ${EXAMPLE_DIR}/basic.c)
 target_link_libraries(example_basic_c mgclient-static project_c_warnings)
-add_test(example_basic_c example_basic_c 127.0.0.1 7687 "RETURN 1")
+add_test(example_basic_c example_basic_c "RETURN 1")
 
 add_executable(example_basic_cpp ${EXAMPLE_DIR}/basic.cpp)
 target_link_libraries(example_basic_cpp mgclient-static mgclient_cpp project_cpp_warnings)
-add_test(example_basic_cpp example_basic_cpp 127.0.0.1 7687 "RETURN 1")
+add_test(example_basic_cpp example_basic_cpp "RETURN 1")
 
 add_executable(example_advanced_cpp ${EXAMPLE_DIR}/advanced.cpp)
 target_link_libraries(example_advanced_cpp mgclient-static mgclient_cpp project_cpp_warnings)
-add_test(example_advanced_cpp example_advanced_cpp 127.0.0.1 7687)
+add_test(example_advanced_cpp example_advanced_cpp)
 
 # Client-side routing example. Built (so it stays compilable) but not run as a
 # test: it needs a high-availability cluster coordinator, which CI does not
