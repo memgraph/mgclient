@@ -49,7 +49,20 @@ elseif(MGCLIENT_ON_POSIX)
     target_link_libraries(client -Wl,--wrap=mg_secure_transport_init)
 endif()
 add_gtest(transport transport.cpp)
-if(MGCLIENT_ON_APPLE OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+# transport.cpp uses std::filesystem, whose runtime support library depends on
+# the C++ standard library in use rather than the compiler or OS: libc++
+# (Clang's default on Apple and the BSDs) bundles it into libc++, while
+# libstdc++ (GCC, and Clang on Linux) splits it into a separate libstdc++fs for
+# versions older than GCC 9. Detect libc++ via its version macro and link the
+# matching library.
+include(CheckCXXSourceCompiles)
+check_cxx_source_compiles("
+#include <cstddef>
+#ifndef _LIBCPP_VERSION
+#error not libc++
+#endif
+int main() { return 0; }" MGCLIENT_USING_LIBCXX)
+if(MGCLIENT_USING_LIBCXX)
     target_link_libraries(transport c++)
 else()
     target_link_libraries(transport stdc++fs)
