@@ -101,16 +101,28 @@ int mg_socket_options(int sock, mg_session *session) {
     int level;
     int optname;
     int optval;
-  } socket_options[] = {// disable Nagle algorithm for performance reasons
-                        {IPPROTO_TCP, TCP_NODELAY, 1},
-                        // turn keep-alive on
-                        {SOL_SOCKET, SO_KEEPALIVE, 1},
-                        // wait 20s before sending keep-alive packets
-                        {IPPROTO_TCP, TCP_KEEPIDLE, 20},
-                        // 4 keep-alive packets must fail to close
-                        {IPPROTO_TCP, TCP_KEEPCNT, 4},
-                        // send keep-alive packets every 15s
-                        {IPPROTO_TCP, TCP_KEEPINTVL, 15}};
+  } socket_options[] = {
+    // disable Nagle algorithm for performance reasons
+    {IPPROTO_TCP, TCP_NODELAY, 1},
+    // turn keep-alive on
+    {SOL_SOCKET, SO_KEEPALIVE, 1},
+// The per-socket keep-alive tuning options below are not portable: OpenBSD,
+// for one, only supports SO_KEEPALIVE and tunes the timers system-wide via
+// sysctl (net.inet.tcp.keep*). Guard each on its macro so those platforms fall
+// back to plain keep-alive instead of failing to build.
+#ifdef TCP_KEEPIDLE
+    // wait 20s before sending keep-alive packets
+    {IPPROTO_TCP, TCP_KEEPIDLE, 20},
+#endif
+#ifdef TCP_KEEPCNT
+    // 4 keep-alive packets must fail to close
+    {IPPROTO_TCP, TCP_KEEPCNT, 4},
+#endif
+#ifdef TCP_KEEPINTVL
+    // send keep-alive packets every 15s
+    {IPPROTO_TCP, TCP_KEEPINTVL, 15},
+#endif
+  };
   const size_t OPTCNT = sizeof(socket_options) / sizeof(socket_options[0]);
 
   for (size_t i = 0; i < OPTCNT; ++i) {
