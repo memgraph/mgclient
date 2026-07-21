@@ -43,13 +43,16 @@ elseif(UNIX AND NOT APPLE)
         message(STATUS "ON LINUX WASM BUILD")
     elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
         message(STATUS "ON LINUX BUILD")
-    elseif(CMAKE_SYSTEM_NAME STREQUAL "FreeBSD")
-        message(STATUS "ON FREEBSD BUILD")
+    elseif(CMAKE_SYSTEM_NAME STREQUAL "FreeBSD" OR
+           CMAKE_SYSTEM_NAME STREQUAL "NetBSD" OR
+           CMAKE_SYSTEM_NAME STREQUAL "OpenBSD" OR
+           CMAKE_SYSTEM_NAME STREQUAL "DragonFly")
+        message(STATUS "ON BSD BUILD (${CMAKE_SYSTEM_NAME})")
     else()
         message(FATAL_ERROR "Unsupported operating system. Please create issue or contribute!")
     endif()
-    # Linux and FreeBSD share the same POSIX socket path in src/linux/,
-    # selected by MGCLIENT_ON_POSIX.
+    # Linux and the BSDs (FreeBSD, NetBSD, OpenBSD, DragonFly) share the same
+    # POSIX socket path in src/linux/, selected by MGCLIENT_ON_POSIX.
     set(MGCLIENT_ON_POSIX TRUE)
     add_definitions(-DMGCLIENT_ON_POSIX)
     set(MGCLIENT_FIND_LIBRARY_PREFIXES "${CMAKE_FIND_LIBRARY_PREFIXES}")
