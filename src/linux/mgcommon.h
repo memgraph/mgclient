@@ -15,7 +15,7 @@
 #ifndef MGCLIENT_LINUX_MGCOMMON_H
 #define MGCLIENT_LINUX_MGCOMMON_H
 
-#if defined(__FreeBSD__)
+#if !defined(__FreeBSD__) && !defined(__NetBSD__) && !defined(__OpenBSD__) && !defined(__DragonFly__)
 #include <sys/endian.h>
 #else
 #include <endian.h>
