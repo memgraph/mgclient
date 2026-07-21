@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-cmake_minimum_required(VERSION 3.8)
+cmake_minimum_required(VERSION 3.10)
 
 if(WASM)
     execute_process(COMMAND ${CMAKE_SOURCE_DIR}/wasm/install_deps.sh)
