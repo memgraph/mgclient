@@ -1,11 +1,27 @@
 #include <cstdlib>
 #include <iostream>
+#include <sstream>
+#include <string>
 
 #include <mgclient.hpp>
 
+// Reads the environment variable `value_name`, falling back to `default_value`
+// when it is unset. Matches the helper used by the integration tests so the
+// examples honor the same MEMGRAPH_HOST / MEMGRAPH_PORT overrides, e.g.
+//   MEMGRAPH_HOST=<ip> MEMGRAPH_PORT=<port> ./example_basic_cpp "RETURN 1"
+template <typename T>
+T GetEnvOrDefault(const std::string &value_name, const T &default_value) {
+  const char *char_value = std::getenv(value_name.c_str());
+  if (!char_value) return default_value;
+  T value;
+  std::stringstream env_value_stream(char_value);
+  env_value_stream >> value;
+  return value;
+}
+
 int main(int argc, char *argv[]) {
-  if (argc != 4) {
-    std::cerr << "Usage: " << argv[0] << " [host] [port] [query]\n";
+  if (argc != 2) {
+    std::cerr << "Usage: " << argv[0] << " [query]\n";
     exit(1);
   }
 
@@ -13,8 +29,8 @@ int main(int argc, char *argv[]) {
 
   std::cout << "mgclient version: " << mg::Client::Version() << std::endl;
   mg::Client::Params params;
-  params.host = argv[1];
-  params.port = static_cast<uint16_t>(atoi(argv[2]));
+  params.host = GetEnvOrDefault<std::string>("MEMGRAPH_HOST", "127.0.0.1");
+  params.port = GetEnvOrDefault<uint16_t>("MEMGRAPH_PORT", 7687);
   params.use_ssl = false;
   auto client = mg::Client::Connect(params);
 
@@ -23,7 +39,7 @@ int main(int argc, char *argv[]) {
     return 1;
   }
 
-  if (!client->Execute(argv[3])) {
+  if (!client->Execute(argv[1])) {
     std::cerr << "Failed to execute query!";
     return 1;
   }
