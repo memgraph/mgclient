@@ -17,11 +17,11 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <string.h>
-#ifdef MGCLIENT_ON_LINUX
+#ifdef MGCLIENT_ON_POSIX
 #ifndef __EMSCRIPTEN__
 #include <pthread.h>
 #endif
-#endif  // MGCLIENT_ON_LINUX
+#endif  // MGCLIENT_ON_POSIX
 
 #include "mgallocator.h"
 #include "mgclient.h"

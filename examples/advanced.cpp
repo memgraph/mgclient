@@ -1,7 +1,24 @@
+#include <cstdlib>
 #include <iostream>
 #include <numeric>
+#include <sstream>
+#include <string>
 
 #include "mgclient.hpp"
+
+// Reads the environment variable `value_name`, falling back to `default_value`
+// when it is unset. Matches the helper used by the integration tests so the
+// examples honor the same MEMGRAPH_HOST / MEMGRAPH_PORT overrides, e.g.
+//   MEMGRAPH_HOST=<ip> MEMGRAPH_PORT=<port> ./example_advanced_cpp
+template <typename T>
+T GetEnvOrDefault(const std::string &value_name, const T &default_value) {
+  const char *char_value = std::getenv(value_name.c_str());
+  if (!char_value) return default_value;
+  T value;
+  std::stringstream env_value_stream(char_value);
+  env_value_stream >> value;
+  return value;
+}
 
 void ClearDatabaseData(mg::Client *client) {
   if (!client->Execute("MATCH (n) DETACH DELETE n;")) {
@@ -46,18 +63,13 @@ std::string MgValueToString(const mg::ConstValue &value) {
   return value_str;
 }
 
-int main(int argc, char *argv[]) {
-  if (argc != 3) {
-    std::cerr << "Usage: " << argv[0] << " [host] [port]\n";
-    std::exit(1);
-  }
-
+int main() {
   mg::Client::Init();
 
   {
     mg::Client::Params params;
-    params.host = argv[1];
-    params.port = static_cast<uint16_t>(atoi(argv[2]));
+    params.host = GetEnvOrDefault<std::string>("MEMGRAPH_HOST", "127.0.0.1");
+    params.port = GetEnvOrDefault<uint16_t>("MEMGRAPH_PORT", 7687);
     auto client = mg::Client::Connect(params);
     if (!client) {
       std::cerr << "Failed to connect." << std::endl;
